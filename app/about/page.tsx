@@ -10,11 +10,21 @@ interface AboutData {
   heroSubtitle: string
   heroDescription: string
   heroImage: string
-  mission: string
-  vision: string
+  about?: {
+    badge?: string
+    title?: string
+    highlightedTitle?: string
+    description?: string
+    longDescription?: string
+    image?: string
+    values: Array<{ title: string; description: string; icon?: string }>
+  }
+  mission?: { badge?: string; title?: string; highlightedTitle?: string; description: string; image?: string; values?: Array<{ title: string }> }
+  vision?: { badge?: string; title?: string; highlightedTitle?: string; description: string; image?: string; values?: Array<{ title: string }> }
+  achievementsSection?: { badge?: string; title?: string; highlightedTitle?: string; description?: string; buttonText?: string }
   values: Array<{ title: string; description: string; icon: string }>
   story: { title: string; content: string; image: string }
-  team: Array<{ id: string; name: string; role: string; image: string; bio: string; linkedin: string }>
+  team?: { badge?: string; title?: string; highlightedTitle?: string; buttonText?: string; members: Array<{ id: string; name: string; role: string; image: string; bio?: string; linkedin?: string }> }
   stats: Array<{ value: string; label: string }>
   achievements: Array<{ year: string; title: string; description: string }>
 }
@@ -24,10 +34,41 @@ const defaultData: AboutData = {
   heroSubtitle: "",
   heroDescription: "",
   heroImage: "",
-  mission:
-    "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
-  vision:
-    "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+  about: {
+    badge: "About Us",
+    title: "A team of",
+    highlightedTitle: "creative thinkers",
+    description: "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+    longDescription: "We specialize in delivering innovative and impactful design solutions that elevate brands and drive results. From digital experiences to print media, our team of creative professionals is dedicated to transforming ideas into compelling visual stories that resonate with audiences. With a focus on creativity, strategy, and client collaboration.",
+    image: "/modern-creative-team.png",
+    values: [
+      { title: "Creativity and Innovation", description: "" },
+      { title: "Client-Centricity", description: "" },
+      { title: "Integrity and Transparency", description: "" },
+      { title: "Excellence and Quality", description: "" },
+    ],
+  },
+  mission: {
+    badge: "Our Mission",
+    title: "Bringing ideas to life through",
+    highlightedTitle: "creativity",
+    description: "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+    image: "/mobile-app-design-showcase-on-phone.jpg",
+  },
+  vision: {
+    badge: "Our Vision",
+    title: "Driving the Future of",
+    highlightedTitle: "Creativity",
+    description: "We're a full-service design agency specializing in branding, web design, and creative strategies.",
+    image: "/social-media-marketing-dashboard-on-laptop.jpg",
+  },
+  achievementsSection: {
+    badge: "Our Achievements",
+    title: "proud moments",
+    highlightedTitle: "milestones",
+    description: "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+    buttonText: "Let's discuss →",
+  },
   values: [
     { title: "Creativity and Innovation", description: "", icon: "" },
     { title: "Client-Centricity", description: "", icon: "" },
@@ -35,7 +76,13 @@ const defaultData: AboutData = {
     { title: "Excellence and Quality", description: "", icon: "" },
   ],
   story: { title: "", content: "", image: "" },
-  team: [],
+  team: {
+    badge: "Our Team",
+    title: "The minds behind the",
+    highlightedTitle: "magic",
+    buttonText: "All Team Members",
+    members: [],
+  },
   stats: [
     { value: "1000+", label: "Project Completed" },
     { value: "15+", label: "Years Of Experience" },
@@ -60,11 +107,13 @@ export default function AboutPage() {
             heroSubtitle: fetchedData.hero?.highlightedText || defaultData.heroSubtitle,
             heroDescription: "",
             heroImage: "",
-            mission: fetchedData.mission?.description || defaultData.mission,
-            vision: fetchedData.vision?.description || defaultData.vision,
+            about: fetchedData.about || defaultData.about,
+            mission: fetchedData.mission || defaultData.mission,
+            vision: fetchedData.vision || defaultData.vision,
+            achievementsSection: fetchedData.achievementsSection || defaultData.achievementsSection,
             values: fetchedData.about?.values || defaultData.values,
             story: defaultData.story,
-            team: fetchedData.team?.members || defaultData.team,
+            team: fetchedData.team || defaultData.team,
             stats: fetchedData.stats || defaultData.stats,
             achievements: fetchedData.achievements || defaultData.achievements,
           }
@@ -115,43 +164,7 @@ export default function AboutPage() {
           },
         ]
 
-  const teamMembers =
-    data.team?.length > 0
-      ? data.team
-      : [
-          {
-            id: "1",
-            name: "John Smith",
-            role: "CEO & Founder",
-            image: "/professional-man-headshot.png",
-            bio: "",
-            linkedin: "",
-          },
-          {
-            id: "2",
-            name: "Sarah Johnson",
-            role: "Creative Director",
-            image: "/professional-woman-headshot.png",
-            bio: "",
-            linkedin: "",
-          },
-          {
-            id: "3",
-            name: "Michael Chen",
-            role: "Tech Lead",
-            image: "/professional-asian-man-headshot.png",
-            bio: "",
-            linkedin: "",
-          },
-          {
-            id: "4",
-            name: "Emily Davis",
-            role: "Marketing Director",
-            image: "/professional-blonde-woman-headshot.png",
-            bio: "",
-            linkedin: "",
-          },
-        ]
+  const teamMembers = data.team?.members || []
 
   if (loading) {
     return (
@@ -186,13 +199,15 @@ export default function AboutPage() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
           <div className="relative">
-            <Image
-              src="/modern-creative-team.png"
-              alt="Our Team"
-              width={500}
-              height={400}
-              className="rounded-2xl w-full"
-            />
+            {data.about?.image && (
+              <Image
+                src={data.about.image}
+                alt="Our Team"
+                width={500}
+                height={400}
+                className="rounded-2xl w-full"
+              />
+            )}
           </div>
           <div>
             <p className="text-[#E63946] text-sm mb-2">About Us</p>
@@ -204,10 +219,7 @@ export default function AboutPage() {
                 thinkers
               </span>
             </h2>
-            <p className="text-[#888] mb-6 leading-relaxed">
-              We're a full-service design agency specializing in branding, web design, and creative strategies that
-              elevate businesses...
-            </p>
+            <p className="text-[#888] mb-6 leading-relaxed">{data.about?.description}</p>
             <ul className="space-y-3">
               {data.values.map((value, index) => (
                 <li key={index} className="flex items-center gap-3 text-[#888]">
@@ -225,12 +237,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="text-[#888] leading-relaxed mb-6">
-                We specialize in delivering innovative and impactful design solutions that elevate brands and drive
-                results. From digital experiences to print media, our team of creative professionals is dedicated to
-                transforming ideas into compelling visual stories that resonate with audiences. With a focus on
-                creativity, strategy, and client collaboration.
-              </p>
+              <p className="text-[#888] leading-relaxed mb-6">{data.about?.longDescription}</p>
             </div>
             <div className="flex items-center justify-end">
               <div className="w-24 h-24 bg-[#E63946] rounded-xl flex items-center justify-center">
@@ -264,17 +271,14 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-12">
             <div>
-              <p className="text-[#888] text-sm mb-2">Our Achievements</p>
+              <p className="text-[#888] text-sm mb-2">{data.achievementsSection?.badge || "Our Achievements"}</p>
               <h2 className="text-3xl font-bold text-white mb-4">
-                proud moments
-                <br />& <span className="text-[#E63946]">milestones</span>
+                {data.achievementsSection?.title || "proud moments"}
+                <br />& <span className="text-[#E63946]">{data.achievementsSection?.highlightedTitle || "milestones"}</span>
               </h2>
-              <p className="text-[#888] text-sm mb-6 leading-relaxed">
-                We're a full-service design agency specializing in branding, web design, and creative strategies that
-                elevate businesses.
-              </p>
+              <p className="text-[#888] text-sm mb-6 leading-relaxed">{data.achievementsSection?.description}</p>
               <button className="px-6 py-3 bg-[#E63946] text-white rounded-full text-sm hover:bg-[#d62839] transition-colors">
-                Let's discuss →
+                {data.achievementsSection?.buttonText || "Let's discuss →"}
               </button>
             </div>
             <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
@@ -294,24 +298,26 @@ export default function AboutPage() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="relative">
-            <Image
-              src="/social-media-marketing-dashboard-on-laptop.jpg"
-              alt="Our Vision"
-              width={500}
-              height={400}
-              className="rounded-2xl w-full"
-            />
+            {data.vision?.image && (
+              <Image
+                src={data.vision.image}
+                alt="Our Vision"
+                width={500}
+                height={400}
+                className="rounded-2xl w-full"
+              />
+            )}
           </div>
           <div>
-            <p className="text-[#E63946] text-sm mb-2">Our Vision</p>
+            <p className="text-[#E63946] text-sm mb-2">{data.vision?.badge || "Our Vision"}</p>
             <h2 className="text-3xl font-bold text-white mb-6">
-              Driving the
+              {data.vision?.title || "Driving the"}
               <br />
-              Future of <span className="text-[#E63946]">Creativity</span>
+              {data.vision?.title?.includes("Future") ? "Future of" : ""} <span className="text-[#E63946]">{data.vision?.highlightedTitle || "Creativity"}</span>
             </h2>
-            <p className="text-[#888] mb-6 leading-relaxed">{data.vision}</p>
+            <p className="text-[#888] mb-6 leading-relaxed">{data.vision?.description}</p>
             <ul className="space-y-3">
-              {data.values.map((value, index) => (
+              {(data.vision?.values || data.values).map((value, index) => (
                 <li key={index} className="flex items-center gap-3 text-[#888]">
                   <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
                   {value.title}
@@ -326,15 +332,15 @@ export default function AboutPage() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-[#E63946] text-sm mb-2">Our Mission</p>
+            <p className="text-[#E63946] text-sm mb-2">{data.mission?.badge || "Our Mission"}</p>
             <h2 className="text-3xl font-bold text-white mb-6">
-              Bringing ideas to
+              {data.mission?.title || "Bringing ideas to"}
               <br />
-              life through <span className="text-[#E63946]">creativity</span>
+              {data.mission?.title?.includes("life") ? "life through" : ""} <span className="text-[#E63946]">{data.mission?.highlightedTitle || "creativity"}</span>
             </h2>
-            <p className="text-[#888] mb-6 leading-relaxed">{data.mission}</p>
+            <p className="text-[#888] mb-6 leading-relaxed">{data.mission?.description}</p>
             <ul className="space-y-3">
-              {data.values.map((value, index) => (
+              {(data.mission?.values || data.values).map((value, index) => (
                 <li key={index} className="flex items-center gap-3 text-[#888]">
                   <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
                   {value.title}
@@ -343,13 +349,15 @@ export default function AboutPage() {
             </ul>
           </div>
           <div className="relative">
-            <Image
-              src="/mobile-app-design-showcase-on-phone.jpg"
-              alt="Our Mission"
-              width={500}
-              height={400}
-              className="rounded-2xl w-full"
-            />
+            {data.mission?.image && (
+              <Image
+                src={data.mission.image}
+                alt="Our Mission"
+                width={500}
+                height={400}
+                className="rounded-2xl w-full"
+              />
+            )}
           </div>
         </div>
       </section>
@@ -359,13 +367,13 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <p className="text-[#E63946] text-sm mb-2">Our Team</p>
+              <p className="text-[#E63946] text-sm mb-2">{data.team?.badge || "Our Team"}</p>
               <h2 className="text-3xl font-bold text-white">
-                The minds behind the <span className="text-[#E63946]">magic</span>
+                {data.team?.title || "The minds behind the"} <span className="text-[#E63946]">{data.team?.highlightedTitle || "magic"}</span>
               </h2>
             </div>
             <button className="px-6 py-3 bg-[#E63946] text-white rounded-full text-sm hover:bg-[#d62839] transition-colors">
-              All Team Members →
+              {data.team?.buttonText || "All Team Members →"}
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

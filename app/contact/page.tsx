@@ -104,7 +104,14 @@ export default function ContactPage() {
       await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, source: "Contact Form" }),
+        body: JSON.stringify({ 
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+          source: "contact_form",
+        }),
       })
       setSubmitted(true)
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" })

@@ -120,50 +120,109 @@ export function InsightsPageManager() {
         <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Posts List */}
-        <div className="col-span-1 bg-[#111] border border-[#222] rounded-xl p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-white">Posts</h2>
-            <button
-              onClick={addPost}
-              className="px-3 py-1.5 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
-            >
-              + Add
-            </button>
-          </div>
-          <div className="space-y-2 max-h-[500px] overflow-auto">
-            {data.posts.map((post) => (
-              <button
-                key={post.id}
-                onClick={() => setEditingPost(post)}
-                className={`w-full text-left p-3 rounded-lg transition-colors ${
-                  editingPost?.id === post.id
-                    ? "bg-[#E63946] text-white"
-                    : "bg-[#0a0a0a] text-[#888] hover:text-white hover:bg-[#1a1a1a]"
-                }`}
-              >
-                <div className="font-medium truncate">{post.title}</div>
-                <div className="text-xs opacity-70 flex items-center gap-2">
-                  <span>{post.category}</span>
-                  {post.published && <span className="text-green-400">Published</span>}
-                </div>
-              </button>
-            ))}
-            {data.posts.length === 0 && <p className="text-[#666] text-sm text-center py-4">No posts yet</p>}
-          </div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Blog Posts ({data.posts.length})</h2>
+          <p className="text-[#888] text-sm">Manage blog posts and articles</p>
         </div>
+        <button
+          onClick={addPost}
+          className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+        >
+          + Add Post
+        </button>
+      </div>
 
-        {/* Post Editor */}
-        <div className="col-span-2 bg-[#111] border border-[#222] rounded-xl p-6 max-h-[600px] overflow-auto">
-          {editingPost ? (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-white">Edit Post</h2>
-                <button onClick={() => deletePost(editingPost.id)} className="text-red-500 hover:text-red-400 text-sm">
-                  Delete Post
+      {/* Posts Table */}
+      <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[#222]">
+              <th className="text-left p-4 text-[#888] font-medium">Title</th>
+              <th className="text-left p-4 text-[#888] font-medium">Category</th>
+              <th className="text-left p-4 text-[#888] font-medium">Author</th>
+              <th className="text-left p-4 text-[#888] font-medium">Date</th>
+              <th className="text-left p-4 text-[#888] font-medium">Status</th>
+              <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.posts.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-[#666]">
+                  No blog posts yet
+                </td>
+              </tr>
+            ) : (
+              data.posts.map((post) => (
+                <tr key={post.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                  <td className="p-4">
+                    <div className="text-white font-medium">{post.title}</div>
+                    <div className="text-[#666] text-sm">{post.slug}</div>
+                  </td>
+                  <td className="p-4">
+                    <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400">
+                      {post.category}
+                    </span>
+                  </td>
+                  <td className="p-4 text-[#888]">{post.author || "-"}</td>
+                  <td className="p-4 text-[#888] text-sm">{post.date}</td>
+                  <td className="p-4">
+                    <span
+                      className={`px-2 py-1 rounded text-xs ${
+                        post.published
+                          ? "bg-green-500/20 text-green-400"
+                          : "bg-gray-500/20 text-gray-400"
+                      }`}
+                    >
+                      {post.published ? "Published" : "Draft"}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => setEditingPost(post)}
+                        className="text-gray-400 hover:text-white px-2 py-1 text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deletePost(post.id)}
+                        className="text-red-400 hover:text-red-300 px-2 py-1 text-sm"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Edit Modal */}
+      {editingPost && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#111] border border-[#222] rounded-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white">Edit Blog Post</h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => deletePost(editingPost.id)}
+                  className="text-red-500 hover:text-red-400 text-sm px-3 py-1"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setEditingPost(null)}
+                  className="text-[#888] hover:text-white text-sm px-3 py-1"
+                >
+                  Close
                 </button>
               </div>
+            </div>
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm text-[#888] mb-2">Title</label>
                 <input
@@ -286,11 +345,9 @@ export function InsightsPageManager() {
                 </label>
               </div>
             </div>
-          ) : (
-            <div className="text-center text-[#666] py-12">Select a post to edit or add a new one</div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="mt-6">
         <button

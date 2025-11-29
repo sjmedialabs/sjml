@@ -186,6 +186,8 @@ export const defaultAboutContent = {
     highlightedTitle: "creative thinkers",
     description:
       "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+    longDescription:
+      "We specialize in delivering innovative and impactful design solutions that elevate brands and drive results. From digital experiences to print media, our team of creative professionals is dedicated to transforming ideas into compelling visual stories that resonate with audiences. With a focus on creativity, strategy, and client collaboration.",
     image: "/modern-creative-team.png",
     values: [
       { title: "Creativity and Innovation", description: "" },
@@ -213,6 +215,13 @@ export const defaultAboutContent = {
     },
     { year: "2018 - 2019", title: "Awwward Winner", description: "We design by getting to know you and your brand." },
   ],
+  achievementsSection: {
+    badge: "Our Achievements",
+    title: "proud moments",
+    highlightedTitle: "milestones",
+    description: "We're a full-service design agency specializing in branding, web design, and creative strategies that elevate businesses.",
+    buttonText: "Let's discuss →",
+  },
   vision: {
     badge: "Our Vision",
     title: "Driving the Future of",
@@ -402,6 +411,7 @@ export const defaultCareersContent = {
   culture: {
     title: "Our Culture",
     description: "We believe in fostering creativity, collaboration, and continuous growth.",
+    image: "/creative-team-collaboration-office.jpg",
     values: [
       { title: "Innovation", description: "We encourage bold ideas" },
       { title: "Collaboration", description: "We work together" },
@@ -413,6 +423,12 @@ export const defaultCareersContent = {
     { icon: "vacation", title: "Paid Time Off", description: "Generous vacation policy" },
     { icon: "learning", title: "Learning Budget", description: "Annual learning allowance" },
   ],
+  cta: {
+    title: "Don't See a Perfect Fit?",
+    description: "We're always looking for talented individuals. Send us your resume and we'll keep you in mind.",
+    buttonText: "Submit Your Resume",
+    email: "careers@sjmedialabs.com",
+  },
   jobs: [],
 }
 
@@ -434,6 +450,7 @@ export const defaultContactContent = {
     title: "Contact Information",
     phone: "123-456-7890",
     email: "support@sjmedialabs.com",
+    careersEmail: "careers@sjmedialabs.com",
   },
 }
 
@@ -564,6 +581,26 @@ export const defaultClientsContent = {
   },
 }
 
+export const defaultHeaderContent = {
+  pageKey: "header",
+  logo: "/logo.svg",
+  logoText: "SJ MEDIA LABS",
+  navItems: [
+    { id: "1", label: "About", href: "/about" },
+    { id: "2", label: "Work", href: "/work" },
+    { id: "3", label: "Services", href: "/services" },
+    { id: "4", label: "Case Studies", href: "/case-studies" },
+    { id: "5", label: "Insights", href: "/insights" },
+    { id: "6", label: "Clients", href: "/clients" },
+    { id: "7", label: "Testimonials", href: "/testimonials" },
+    { id: "8", label: "Careers", href: "/careers" },
+    { id: "9", label: "Contact", href: "/contact" },
+  ],
+  ctaButton: { text: "Start a project", href: "/contact" },
+  showTopBar: false,
+  topBarText: "",
+}
+
 export function getDefaultPageContent(page: string) {
   const defaults: Record<string, any> = {
     home: defaultHomeContent,
@@ -576,6 +613,7 @@ export function getDefaultPageContent(page: string) {
     insights: defaultInsightsContent,
     testimonials: defaultTestimonialsContent,
     clients: defaultClientsContent,
+    header: defaultHeaderContent,
   }
   return defaults[page] || {}
 }

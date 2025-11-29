@@ -176,9 +176,13 @@ export function HomePageManager() {
     setSaving(true)
     setMessage("")
     try {
+      const token = localStorage.getItem("adminToken")
       const response = await fetch("/api/content/home", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify({
           hero: heroData,
           stats: statsData,
@@ -213,8 +217,7 @@ export function HomePageManager() {
   const tabs = [
     { id: "hero", label: "Hero Section" },
     { id: "stats", label: "Statistics" },
-    { id: "case-studies", label: "Case Studies" },
-    { id: "services", label: "Services" },
+    { id: "section-settings", label: "Section Settings" },
     { id: "industries", label: "Industries" },
     { id: "testimonials", label: "Testimonials" },
     { id: "insights", label: "Insights" },
@@ -533,194 +536,90 @@ export function HomePageManager() {
         </div>
       )}
 
-      {/* Case Studies Section - Added background image upload */}
-      {activeTab === "case-studies" && (
+      {/* Section Settings - Background Images Only */}
+      {activeTab === "section-settings" && (
         <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Case Studies</h3>
-            <button
-              onClick={addCaseStudy}
-              className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80"
-            >
-              Add Case Study
-            </button>
-          </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
-            <ImageUpload
-              value={caseStudiesBackgroundImage}
-              onChange={(url) => setCaseStudiesBackgroundImage(url)}
-              label="Upload Background"
-            />
+            <h3 className="text-xl font-semibold text-white mb-4">Section Background Images</h3>
+            <p className="text-gray-400 text-sm mb-6">Control background images for different sections. Manage actual content (Works, Services, Case Studies) in their respective pages.</p>
           </div>
 
-          {caseStudiesData.map((cs) => (
-            <div key={cs.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={cs.title}
-                    onChange={(e) => updateCaseStudy(cs.id, "title", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Tags (comma separated)</label>
-                  <input
-                    type="text"
-                    value={cs.tags.join(", ")}
-                    onChange={(e) =>
-                      updateCaseStudy(
-                        cs.id,
-                        "tags",
-                        e.target.value.split(",").map((t) => t.trim()),
-                      )
-                    }
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
-                <textarea
-                  value={cs.description}
-                  onChange={(e) => updateCaseStudy(cs.id, "description", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Image</label>
-                <ImageUpload
-                  value={cs.image}
-                  onChange={(url) => updateCaseStudy(cs.id, "image", url)}
-                  label="Upload Image"
-                />
-              </div>
-              <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Stat 1 Label</label>
-                  <input
-                    type="text"
-                    value={cs.stat1Label}
-                    onChange={(e) => updateCaseStudy(cs.id, "stat1Label", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Stat 1 Value</label>
-                  <input
-                    type="text"
-                    value={cs.stat1Value}
-                    onChange={(e) => updateCaseStudy(cs.id, "stat1Value", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Stat 2 Label</label>
-                  <input
-                    type="text"
-                    value={cs.stat2Label}
-                    onChange={(e) => updateCaseStudy(cs.id, "stat2Label", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Stat 2 Value</label>
-                  <input
-                    type="text"
-                    value={cs.stat2Value}
-                    onChange={(e) => updateCaseStudy(cs.id, "stat2Value", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-              </div>
-              <button onClick={() => removeCaseStudy(cs.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Case Studies Section Background</label>
+              <ImageUpload
+                value={caseStudiesBackgroundImage}
+                onChange={(url) => setCaseStudiesBackgroundImage(url)}
+                label="Upload Background"
+              />
             </div>
-          ))}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Services Section Background</label>
+              <ImageUpload
+                value={servicesBackgroundImage}
+                onChange={(url) => setServicesBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Stats Section Background</label>
+              <ImageUpload
+                value={statsBackgroundImage}
+                onChange={(url) => setStatsBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Industries Section Background</label>
+              <ImageUpload
+                value={industriesBackgroundImage}
+                onChange={(url) => setIndustriesBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Testimonials Section Background</label>
+              <ImageUpload
+                value={testimonialsBackgroundImage}
+                onChange={(url) => setTestimonialsBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Insights Section Background</label>
+              <ImageUpload
+                value={insightsBackgroundImage}
+                onChange={(url) => setInsightsBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Trusted By Section Background</label>
+              <ImageUpload
+                value={trustedByBackgroundImage}
+                onChange={(url) => setTrustedByBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Brand Playbook Section Background</label>
+              <ImageUpload
+                value={playbookBackgroundImage}
+                onChange={(url) => setPlaybookBackgroundImage(url)}
+                label="Upload Background"
+              />
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Services Section - Added background image upload */}
-      {activeTab === "services" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Services</h3>
-            <button onClick={addService} className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80">
-              Add Service
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
-            <ImageUpload
-              value={servicesBackgroundImage}
-              onChange={(url) => setServicesBackgroundImage(url)}
-              label="Upload Background"
-            />
-          </div>
-
-          {servicesData.map((service) => (
-            <div key={service.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={service.title}
-                    onChange={(e) => updateService(service.id, "title", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Link</label>
-                  <input
-                    type="text"
-                    value={service.link}
-                    onChange={(e) => updateService(service.id, "link", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
-                <textarea
-                  value={service.description}
-                  onChange={(e) => updateService(service.id, "description", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Icon Image</label>
-                  <ImageUpload
-                    value={service.icon}
-                    onChange={(url) => updateService(service.id, "icon", url)}
-                    label="Upload Icon"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Service Image</label>
-                  <ImageUpload
-                    value={service.image}
-                    onChange={(url) => updateService(service.id, "image", url)}
-                    label="Upload Image"
-                  />
-                </div>
-              </div>
-              <button onClick={() => removeService(service.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Industries Section - Added background image upload */}
       {activeTab === "industries" && (

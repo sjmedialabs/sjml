@@ -109,7 +109,9 @@ export default function CareersPage() {
             <p className="text-[#888] leading-relaxed">{data.culture.description}</p>
           </div>
           <div>
-            <img src="/creative-team-collaboration-office.jpg" alt="Our Team" className="rounded-2xl w-full" />
+            {data.culture.image && (
+              <img src={data.culture.image} alt="Our Team" className="rounded-2xl w-full" />
+            )}
           </div>
         </div>
       </section>
@@ -199,20 +201,20 @@ export default function CareersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Don't See a Perfect Fit?</h2>
-          <p className="text-[#888] mb-8">
-            We're always looking for talented individuals. Send us your resume and we'll keep you in mind.
-          </p>
-          <a
-            href="mailto:careers@sjmedialabs.com"
-            className="inline-block px-8 py-4 bg-[#0d0d0d] border border-[#333] text-white rounded-full font-medium hover:border-[#E63946] transition-colors"
-          >
-            Submit Your Resume
-          </a>
-        </div>
-      </section>
+      {data.cta && (
+        <section className="py-16 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">{data.cta.title}</h2>
+            <p className="text-[#888] mb-8">{data.cta.description}</p>
+            <a
+              href={`mailto:${data.cta.email}`}
+              className="inline-block px-8 py-4 bg-[#0d0d0d] border border-[#333] text-white rounded-full font-medium hover:border-[#E63946] transition-colors"
+            >
+              {data.cta.buttonText}
+            </a>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </main>

@@ -1,33 +1,42 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
+import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function ClientsPage() {
-  let data
+  let clients: any[] = []
+  let industries: string[] = ["All Industries"]
 
   try {
-    data = await getPageContent("clients")
-    if (!data) {
-      data = getDefaultPageContent("clients")
-    }
+    // Fetch clients directly from MongoDB
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const clientsData = await db.collection("clients").find({ featured: true }).sort({ createdAt: -1 }).toArray()
+    
+    // Extract unique industries
+    const industriesSet = new Set<string>()
+    clients = clientsData.map(c => {
+      if (c.industry) industriesSet.add(c.industry)
+      return {
+        ...c,
+        _id: c._id.toString()
+      }
+    })
+    
+    industries = ["All Industries", ...Array.from(industriesSet)]
   } catch (error) {
-    console.error("Failed to fetch clients content:", error)
-    data = getDefaultPageContent("clients")
+    console.error("Failed to fetch clients:", error)
   }
 
-  const hero = data?.hero || {
+  const hero = {
     title: "Our Clients",
     subtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
   }
 
-  const clients = data?.clients || []
-  const industries = data?.industries || ["All Industries"]
-  const stats = data?.stats || []
-  const cta = data?.cta || {
+  const stats: any[] = []
+  const cta = {
     title: "Join Our Growing Client List",
     description: "Partner with us and experience the difference.",
     buttonText: "Become a Client",
@@ -92,23 +101,20 @@ export default async function ClientsPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 px-4 bg-[#111]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { value: "200+", label: "Happy Clients" },
-              { value: "40+", label: "Countries" },
-              { value: "98%", label: "Client Retention" },
-              { value: "500+", label: "Projects Completed" },
-            ].map((stat, index) => (
-              <div key={index}>
-                <div className="text-4xl font-bold text-[#E63946] mb-2">{stat.value}</div>
-                <div className="text-[#888]">{stat.label}</div>
-              </div>
-            ))}
+      {stats.length > 0 && (
+        <section className="py-16 px-4 bg-[#111]">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              {stats.map((stat, index) => (
+                <div key={index}>
+                  <div className="text-4xl font-bold text-[#E63946] mb-2">{stat.value}</div>
+                  <div className="text-[#888]">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="py-16 px-4">

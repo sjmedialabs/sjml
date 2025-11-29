@@ -4,6 +4,8 @@ import Image from "next/image"
 import Link from "next/link"
 import type { JSX } from "react"
 import { clientPromise } from "@/lib/mongodb"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -71,8 +73,15 @@ const serviceIcons: Record<string, JSX.Element> = {
 
 export default async function ServicesPage() {
   let services: any[] = []
+  let content
 
   try {
+    // Fetch page content
+    content = await getPageContent("services")
+    if (!content) {
+      content = getDefaultPageContent("services")
+    }
+
     // Fetch services directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
@@ -85,16 +94,17 @@ export default async function ServicesPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch services:", error)
+    content = getDefaultPageContent("services")
   }
 
-  const hero = {
+  const hero = content?.hero || {
     title: "Redefining Digital Success with Strategy, Design, and Development",
     highlightedWords: ["Success", "Strategy, Design"],
     backgroundImage: "/business-people-working-on-laptops-hands-typing-pr.jpg",
     watermark: "SERVICES",
   }
 
-  const section = {
+  const section = content?.section || {
     title: "Our Services we're providing",
     subtitle: "to our customers",
     description: "Comprehensive solutions to elevate your brand and drive business growth across all channels.",

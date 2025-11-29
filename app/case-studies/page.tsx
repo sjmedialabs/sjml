@@ -3,6 +3,8 @@ import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -60,12 +62,19 @@ function ClockIcon() {
 
 export default async function CaseStudiesPage() {
   let caseStudies: any[] = []
+  let content
 
   try {
+    // Fetch page content
+    content = await getPageContent("case-studies")
+    if (!content) {
+      content = getDefaultPageContent("case-studies")
+    }
+
     // Fetch case studies directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
-    const studies = await db.collection("case_studies").find({ isActive: true, isFeatured: true }).sort({ createdAt: -1 }).toArray()
+    const studies = await db.collection("case-studies").find({ featured: true }).sort({ createdAt: -1 }).toArray()
     
     // Serialize MongoDB _id
     caseStudies = studies.map(cs => ({
@@ -74,15 +83,16 @@ export default async function CaseStudiesPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch case studies:", error)
+    content = getDefaultPageContent("case-studies")
   }
 
-  const hero = {
+  const hero = content?.hero || {
     title: "Elevate Beyond the Ordinary.",
     subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
     description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
   }
 
-  const section = {
+  const section = content?.section || {
     title: "Featured Case Studies",
     description: "Discover how we've helped brands achieve extraordinary results.",
   }

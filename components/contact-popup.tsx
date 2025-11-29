@@ -33,7 +33,11 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
           source: "website_popup",
         }),
       })

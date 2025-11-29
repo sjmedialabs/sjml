@@ -4,45 +4,15 @@ import { Button } from "@/components/ui/button"
 interface Insight {
   id: string
   title: string
-  description: string
+  description?: string
+  excerpt?: string
   image: string
   date: string
   category: string
   readTime?: string
 }
 
-const defaultInsights: Insight[] = [
-  {
-    id: "1",
-    title: "The Ultimate Guide to Brand Strategy in 2024",
-    description:
-      "Discover the essential elements of a winning brand strategy and how to position your brand for success in the evolving market landscape.",
-    image: "/brand-strategy-business-planning.jpg",
-    date: "Nov 05, 2025",
-    category: "Branding",
-    readTime: "8 min read",
-  },
-  {
-    id: "2",
-    title: "10 Digital Marketing Trends You Can't Ignore",
-    description:
-      "Stay ahead of the curve with these emerging digital marketing trends that will shape the industry in the coming year.",
-    image: "/digital-marketing-trends.png",
-    date: "Nov 05, 2025",
-    category: "Marketing",
-    readTime: "8 min read",
-  },
-  {
-    id: "3",
-    title: "UX Design Best Practices for Conversion",
-    description:
-      "Learn how to create user experiences that not only delight users but also drive conversions and business growth.",
-    image: "/ux-design-wireframe-prototype.jpg",
-    date: "Nov 05, 2025",
-    category: "Design",
-    readTime: "8 min read",
-  },
-]
+// Insights are now fully dynamic from the database
 
 function ClockIcon({ className }: { className?: string }) {
   return (
@@ -69,7 +39,7 @@ interface InsightsSectionProps {
 }
 
 export function InsightsSection({ data, backgroundImage }: InsightsSectionProps) {
-  const insights = data || defaultInsights
+  const insights = data || []
 
   return (
     <section className="relative py-20 bg-[#0a0a0a]">
@@ -136,7 +106,7 @@ export function InsightsSection({ data, backgroundImage }: InsightsSectionProps)
                 <h3 className="text-gray-900 text-lg font-bold mb-2 leading-tight">{insight.title}</h3>
 
                 {/* Description */}
-                <p className="text-gray-500 text-sm mb-4 flex-1 line-clamp-3">{insight.description}</p>
+                <p className="text-gray-500 text-sm mb-4 flex-1 line-clamp-3">{insight.excerpt || insight.description}</p>
 
                 {/* Button */}
                 <Button className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-xl py-5">Read More</Button>

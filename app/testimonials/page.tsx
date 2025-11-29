@@ -1,31 +1,34 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
+import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function TestimonialsPage() {
-  let data
+  let testimonials: any[] = []
 
   try {
-    data = await getPageContent("testimonials")
-    if (!data) {
-      data = getDefaultPageContent("testimonials")
-    }
+    // Fetch testimonials directly from MongoDB
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const testimonialsData = await db.collection("testimonials").find({ featured: true }).sort({ createdAt: -1 }).toArray()
+    
+    // Serialize MongoDB _id
+    testimonials = testimonialsData.map(t => ({
+      ...t,
+      _id: t._id.toString()
+    }))
   } catch (error) {
-    console.error("Failed to fetch testimonials content:", error)
-    data = getDefaultPageContent("testimonials")
+    console.error("Failed to fetch testimonials:", error)
   }
 
-  const hero = data?.hero || {
+  const hero = {
     title: "What Our Clients Say",
     subtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
   }
 
-  const testimonials = data?.testimonials || []
-  const cta = data?.cta || {
+  const cta = {
     title: "Ready to Join Our Success Stories?",
     description: "Let's create something extraordinary together.",
     buttonText: "Start Your Project",
@@ -39,11 +42,15 @@ export default async function TestimonialsPage() {
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            What Our <span className="text-[#E63946]">Clients Say</span>
+            {hero.title.includes("Clients Say") ? (
+              <>
+                What Our <span className="text-[#E63946]">Clients Say</span>
+              </>
+            ) : (
+              hero.title
+            )}
           </h1>
-          <p className="text-xl text-[#888] max-w-3xl mx-auto">
-            Don't just take our word for it. Hear from the brands we've helped transform.
-          </p>
+          <p className="text-xl text-[#888] max-w-3xl mx-auto">{hero.subtitle}</p>
         </div>
       </section>
 

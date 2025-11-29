@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Search, Download, RefreshCw, Filter, Plus, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Download, RefreshCw, Filter, Plus, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
 
 interface Lead {
   id: string
@@ -379,49 +379,104 @@ export function LeadsManager() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Leads List */}
-        <div className="col-span-1 bg-[#111] border border-[#222] rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-4">Leads ({filteredLeads.length})</h2>
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" />
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-[400px] overflow-auto">
-              {filteredLeads.map((lead) => (
-                <button
-                  key={lead.id}
-                  onClick={() => setSelectedLead(lead)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
-                    selectedLead?.id === lead.id
-                      ? "bg-[#E63946] text-white"
-                      : "bg-[#0a0a0a] text-[#888] hover:text-white hover:bg-[#1a1a1a]"
-                  }`}
-                >
-                  <div className="font-medium truncate">{lead.name}</div>
-                  <div className="text-xs opacity-70 truncate">{lead.email}</div>
-                  <div className="mt-1 flex gap-1 flex-wrap">
+      {/* Leads Table */}
+      <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[#222]">
+              <th className="text-left p-4 text-[#888] font-medium">Name</th>
+              <th className="text-left p-4 text-[#888] font-medium">Email</th>
+              <th className="text-left p-4 text-[#888] font-medium">Phone</th>
+              <th className="text-left p-4 text-[#888] font-medium">Source</th>
+              <th className="text-left p-4 text-[#888] font-medium">Status</th>
+              <th className="text-left p-4 text-[#888] font-medium">Date</th>
+              <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={7} className="p-8 text-center">
+                  <div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" />
+                </td>
+              </tr>
+            ) : filteredLeads.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="p-8 text-center text-[#666]">
+                  No leads found
+                </td>
+              </tr>
+            ) : (
+              filteredLeads.map((lead) => (
+                <tr key={lead.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                  <td className="p-4">
+                    <div className="text-white font-medium">{lead.name}</div>
+                    {lead.company && <div className="text-[#666] text-sm">{lead.company}</div>}
+                  </td>
+                  <td className="p-4">
+                    <a href={`mailto:${lead.email}`} className="text-[#888] hover:text-[#E63946]">
+                      {lead.email}
+                    </a>
+                  </td>
+                  <td className="p-4 text-[#888]">{lead.phone || "-"}</td>
+                  <td className="p-4">
                     <span
-                      className={`text-xs px-2 py-0.5 rounded border ${selectedLead?.id === lead.id ? "bg-white/20 border-white/30" : statusColors[lead.status]}`}
-                    >
-                      {lead.status}
-                    </span>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded ${selectedLead?.id === lead.id ? "bg-white/20" : sourceColors[lead.source] || "bg-gray-500/20 text-gray-400"}`}
+                      className={`px-2 py-1 rounded text-xs ${sourceColors[lead.source] || "bg-gray-500/20 text-gray-400"}`}
                     >
                       {formatSource(lead.source)}
                     </span>
-                  </div>
-                </button>
-              ))}
-              {filteredLeads.length === 0 && <p className="text-[#666] text-sm text-center py-4">No leads found</p>}
-            </div>
-          )}
+                  </td>
+                  <td className="p-4">
+                    <Select value={lead.status} onValueChange={(value) => updateLeadStatus(lead.id, value as Lead["status"])}>
+                      <SelectTrigger className={`w-32 h-8 text-xs border ${statusColors[lead.status]}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#333]">
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="contacted">Contacted</SelectItem>
+                        <SelectItem value="qualified">Qualified</SelectItem>
+                        <SelectItem value="converted">Converted</SelectItem>
+                        <SelectItem value="lost">Lost</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="p-4 text-[#888] text-sm">
+                    {new Date(lead.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedLead(lead)}
+                        className="text-gray-400 hover:text-white"
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteLead(lead.id)}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
 
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#222] mt-4">
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between p-4 border-t border-[#222]">
+            <div className="text-sm text-[#888]">
+              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+              {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
+            </div>
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -431,7 +486,7 @@ export function LeadsManager() {
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="text-sm text-[#888]">
+              <span className="px-3 py-1 text-white">
                 {pagination.page} / {pagination.totalPages}
               </span>
               <Button
@@ -444,24 +499,19 @@ export function LeadsManager() {
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        {/* Lead Details */}
-        <div className="col-span-2 bg-[#111] border border-[#222] rounded-xl p-6">
-          {selectedLead ? (
+      {/* Lead Details Modal */}
+      <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
+        <DialogContent className="bg-[#111] border-[#222] text-white max-w-3xl">
+          {selectedLead && (
             <div className="space-y-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl font-semibold text-white">{selectedLead.name}</h2>
-                  <p className="text-[#888] text-sm">
-                    Submitted on {new Date(selectedLead.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <button onClick={() => deleteLead(selectedLead.id)} className="text-red-500 hover:text-red-400 text-sm">
-                  Delete Lead
-                </button>
-              </div>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold text-white">{selectedLead.name}</DialogTitle>
+                <p className="text-[#888] text-sm">Submitted on {new Date(selectedLead.createdAt).toLocaleDateString()}</p>
+              </DialogHeader>
 
               {/* Contact Info */}
               <div className="grid grid-cols-2 gap-4">
@@ -525,7 +575,10 @@ export function LeadsManager() {
                   {(["new", "contacted", "qualified", "converted", "lost"] as Lead["status"][]).map((status) => (
                     <button
                       key={status}
-                      onClick={() => updateLeadStatus(selectedLead.id, status)}
+                      onClick={() => {
+                        updateLeadStatus(selectedLead.id, status)
+                        setSelectedLead({ ...selectedLead, status })
+                      }}
                       className={`px-4 py-2 rounded-lg text-sm capitalize border transition-colors ${
                         selectedLead.status === status
                           ? statusColors[status]
@@ -550,12 +603,23 @@ export function LeadsManager() {
                   rows={3}
                 />
               </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => deleteLead(selectedLead.id)}
+                  className="border-red-500/50 text-red-400 hover:bg-red-500/20"
+                >
+                  Delete Lead
+                </Button>
+                <Button onClick={() => setSelectedLead(null)} className="bg-[#E63946] hover:bg-[#d32f3d]">
+                  Close
+                </Button>
+              </div>
             </div>
-          ) : (
-            <div className="text-center text-[#666] py-12">Select a lead to view details</div>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Lead Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>

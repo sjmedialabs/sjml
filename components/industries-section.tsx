@@ -7,44 +7,7 @@ interface Industry {
   image: string
 }
 
-const defaultIndustries: Industry[] = [
-  {
-    id: "1",
-    title: "Technology",
-    description: "SaaS, Cloud, AI/ML, and emerging tech brands",
-    image: "/technology-software-development-coding.jpg",
-  },
-  {
-    id: "2",
-    title: "Finance & Banking",
-    description: "Fintech, Banking, Investment, and Insurance",
-    image: "/finance-banking-fintech-modern.jpg",
-  },
-  {
-    id: "3",
-    title: "Healthcare",
-    description: "Medical devices, Pharma, and Health services",
-    image: "/healthcare-medical-hospital-modern.jpg",
-  },
-  {
-    id: "4",
-    title: "Retail & E-commerce",
-    description: "D2C brands, Marketplaces, and Retail chains",
-    image: "/retail-ecommerce-shopping-modern.jpg",
-  },
-  {
-    id: "5",
-    title: "Education",
-    description: "EdTech, Universities, and Learning platforms",
-    image: "/education-edtech-university-classroom.jpg",
-  },
-  {
-    id: "6",
-    title: "Real Estate",
-    description: "Property development and Management",
-    image: "/real-estate-property-building-modern.jpg",
-  },
-]
+// Industries are now fully dynamic from the database
 
 interface IndustriesSectionProps {
   data?: Industry[] | null
@@ -52,7 +15,7 @@ interface IndustriesSectionProps {
 }
 
 export function IndustriesSection({ data, backgroundImage }: IndustriesSectionProps) {
-  const industries = data || defaultIndustries
+  const industries = data || []
 
   return (
     <section className="relative py-20 bg-[#0a0a0a]">

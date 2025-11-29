@@ -165,47 +165,108 @@ export function CareersPageManager() {
       )}
 
       {activeTab === "jobs" && (
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-1 bg-[#111] border border-[#222] rounded-xl p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Job Postings</h2>
-              <button
-                onClick={addJob}
-                className="px-3 py-1.5 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
-              >
-                + Add
-              </button>
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-white">Job Postings ({data.jobs.length})</h2>
+              <p className="text-[#888] text-sm">Manage job openings and career opportunities</p>
             </div>
-            <div className="space-y-2">
-              {data.jobs.map((job) => (
-                <button
-                  key={job.id}
-                  onClick={() => setEditingJob(job)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
-                    editingJob?.id === job.id
-                      ? "bg-[#E63946] text-white"
-                      : "bg-[#0a0a0a] text-[#888] hover:text-white hover:bg-[#1a1a1a]"
-                  }`}
-                >
-                  <div className="font-medium truncate">{job.title}</div>
-                  <div className="text-xs opacity-70 flex items-center gap-2">
-                    <span>{job.department || "No dept"}</span>
-                    {job.published && <span className="text-green-400">Live</span>}
-                  </div>
-                </button>
-              ))}
-              {data.jobs.length === 0 && <p className="text-[#666] text-sm text-center py-4">No job postings yet</p>}
-            </div>
+            <button
+              onClick={addJob}
+              className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+            >
+              + Add Job
+            </button>
           </div>
 
-          <div className="col-span-2 bg-[#111] border border-[#222] rounded-xl p-6">
-            {editingJob ? (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-white">Edit Job Posting</h2>
-                  <button onClick={() => deleteJob(editingJob.id)} className="text-red-500 hover:text-red-400 text-sm">
-                    Delete
-                  </button>
+          {/* Jobs Table */}
+          <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#222]">
+                  <th className="text-left p-4 text-[#888] font-medium">Job Title</th>
+                  <th className="text-left p-4 text-[#888] font-medium">Department</th>
+                  <th className="text-left p-4 text-[#888] font-medium">Location</th>
+                  <th className="text-left p-4 text-[#888] font-medium">Type</th>
+                  <th className="text-left p-4 text-[#888] font-medium">Status</th>
+                  <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.jobs.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-[#666]">
+                      No job postings yet
+                    </td>
+                  </tr>
+                ) : (
+                  data.jobs.map((job) => (
+                    <tr key={job.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                      <td className="p-4">
+                        <div className="text-white font-medium">{job.title}</div>
+                        {job.salary && <div className="text-[#666] text-sm">{job.salary}</div>}
+                      </td>
+                      <td className="p-4 text-[#888]">{job.department || "-"}</td>
+                      <td className="p-4 text-[#888]">{job.location || "-"}</td>
+                      <td className="p-4">
+                        <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400">
+                          {job.type}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${
+                            job.published
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-gray-500/20 text-gray-400"
+                          }`}
+                        >
+                          {job.published ? "Published" : "Draft"}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingJob(job)}
+                            className="text-gray-400 hover:text-white px-2 py-1 text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteJob(job.id)}
+                            className="text-red-400 hover:text-red-300 px-2 py-1 text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Edit Modal/Drawer */}
+          {editingJob && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-[#111] border border-[#222] rounded-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-white">Edit Job Posting</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => deleteJob(editingJob.id)}
+                      className="text-red-500 hover:text-red-400 text-sm px-3 py-1"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setEditingJob(null)}
+                      className="text-[#888] hover:text-white text-sm px-3 py-1"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -297,10 +358,8 @@ export function CareersPageManager() {
                   Published (visible on website)
                 </label>
               </div>
-            ) : (
-              <div className="text-center text-[#666] py-12">Select a job posting to edit or add a new one</div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

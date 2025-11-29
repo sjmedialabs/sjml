@@ -114,6 +114,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"]:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* Custom animations */

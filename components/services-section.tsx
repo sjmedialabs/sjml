@@ -11,64 +11,7 @@ interface Service {
   image: string
 }
 
-const defaultServices: Service[] = [
-  {
-    id: "1",
-    title: "Research & Strategy",
-    description: "In-depth market research and strategic planning to position your brand for success.",
-    icon: "/images/service-1.png",
-    image: "/mobile-app-screens-dark-ui-design.jpg",
-  },
-  {
-    id: "2",
-    title: "Branding",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "/images/service-2.png",
-    image: "/mobile-app-screens-dark-ui-branding-design.jpg",
-  },
-  {
-    id: "3",
-    title: "Web & Experience",
-    description: "User-centered web design and digital experiences that engage and convert.",
-    icon: "/images/service-3.png",
-    image: "/web-design-user-experience-interface.jpg",
-  },
-  {
-    id: "4",
-    title: "Digital Marketing",
-    description: "Data-driven marketing strategies to grow your online presence and reach.",
-    icon: "/images/service-4.png",
-    image: "/digital-marketing-dashboard.png",
-  },
-  {
-    id: "5",
-    title: "Commercial Ads",
-    description: "Compelling video content and commercial production that tells your story.",
-    icon: "/images/service-5.png",
-    image: "/commercial-video-production-filming.jpg",
-  },
-  {
-    id: "6",
-    title: "Advertising",
-    description: "Strategic advertising campaigns that reach your target audience effectively.",
-    icon: "/images/service-6.png",
-    image: "/advertising-campaign-marketing-media.jpg",
-  },
-  {
-    id: "7",
-    title: "Influencer Marketing",
-    description: "Connect with influential voices to amplify your brand message.",
-    icon: "/images/service-7.png",
-    image: "/influencer-marketing-social-media-creators.jpg",
-  },
-  {
-    id: "8",
-    title: "Affiliate Marketing",
-    description: "Performance-based partnerships that drive measurable results.",
-    icon: "/images/service-8.png",
-    image: "/affiliate-marketing-partnership-network.jpg",
-  },
-]
+// Services are now fully dynamic from the database
 
 function ArrowRightIcon({ className }: { className?: string }) {
   return (
@@ -93,8 +36,8 @@ interface ServicesSectionProps {
 }
 
 export function ServicesSection({ data, backgroundImage }: ServicesSectionProps) {
-  const services = data || defaultServices
-  const [activeService, setActiveService] = useState(services[1]?.id || "2")
+  const services = data || []
+  const [activeService, setActiveService] = useState(services[1]?.id || services[0]?.id)
   const activeServiceData = services.find((s) => s.id === activeService) || services[0]
 
   return (
@@ -148,9 +91,9 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
                 }`}
               >
                 <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                  {service.icon ? (
+                  {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
                     <Image
-                      src={service.icon || "/placeholder.svg"}
+                      src={service.icon}
                       alt={service.title}
                       width={32}
                       height={32}
@@ -182,9 +125,9 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
             <div className="absolute bottom-4 right-4 left-4 md:left-auto md:w-[500px] bg-[rgba(15,15,20,0.9)] backdrop-blur-sm rounded-2xl p-6 border border-[#E63946]/30 shadow-[0_0_30px_rgba(230,57,70,0.15)]">
               {/* Icon */}
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4">
-                {activeServiceData.icon ? (
+                {activeServiceData?.icon && (activeServiceData.icon.startsWith('/') || activeServiceData.icon.startsWith('http')) ? (
                   <Image
-                    src={activeServiceData.icon || "/placeholder.svg"}
+                    src={activeServiceData.icon}
                     alt={activeServiceData.title}
                     width={28}
                     height={28}

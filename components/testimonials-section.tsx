@@ -12,35 +12,7 @@ interface Testimonial {
   rating: number
 }
 
-const defaultTestimonials: Testimonial[] = [
-  {
-    id: "1",
-    quote:
-      "This is due to their excellent service, competitive pricing and customer support. It's throughly refreshing to get such a personal touch at this stage to enable us to quote as necessary.",
-    author: "Archana. Madhavan",
-    company: "xyz company",
-    image: "/professional-woman-portrait.png",
-    rating: 5,
-  },
-  {
-    id: "2",
-    quote:
-      "Working with SJ Media Labs transformed our brand presence. Their strategic approach and creative execution exceeded all expectations.",
-    author: "Michael Chen",
-    company: "TechVentures",
-    image: "/professional-man-portrait.png",
-    rating: 5,
-  },
-  {
-    id: "3",
-    quote:
-      "The team's dedication to understanding our business needs resulted in a website that truly represents our brand values.",
-    author: "Sarah Johnson",
-    company: "GreenLeaf Co",
-    image: "/confident-businesswoman.png",
-    rating: 5,
-  },
-]
+// Testimonials are now fully dynamic from the database
 
 function StarIcon({ className, filled }: { className?: string; filled?: boolean }) {
   return (
@@ -102,7 +74,7 @@ interface TestimonialsSectionProps {
 }
 
 export function TestimonialsSection({ data, backgroundImage }: TestimonialsSectionProps) {
-  const testimonials = data || defaultTestimonials
+  const testimonials = data || []
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const nextTestimonial = () => {

@@ -1,12 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ContactPopup } from "@/components/contact-popup"
 
-const navLinks = [
+interface HeaderData {
+  logo?: string
+  logoText?: string
+  navItems?: Array<{ label: string; href: string }>
+  ctaButton?: { text: string; href: string }
+}
+
+interface HeaderProps {
+  data?: HeaderData | null
+}
+
+const defaultNavLinks = [
   { name: "About", href: "/about" },
   { name: "Work", href: "/work" },
   { name: "Services", href: "/services" },
@@ -57,10 +69,36 @@ function XIcon({ className }: { className?: string }) {
   )
 }
 
-export function Header() {
+export function Header({ data: propData }: HeaderProps = {}) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [contactPopupOpen, setContactPopupOpen] = useState(false)
+  const [headerData, setHeaderData] = useState<HeaderData | null>(propData || null)
+
+  useEffect(() => {
+    // Only fetch if data wasn't provided via props
+    if (!propData) {
+      const fetchHeaderData = async () => {
+        try {
+          const res = await fetch("/api/content/header")
+          if (res.ok) {
+            const data = await res.json()
+            setHeaderData(data)
+          }
+        } catch (error) {
+          console.error("Failed to fetch header data:", error)
+        }
+      }
+      fetchHeaderData()
+    }
+  }, [propData])
+
+  // Use header data if available, otherwise use defaults
+  const navLinks = headerData?.navItems
+    ? headerData.navItems.map((item) => ({ name: item.label, href: item.href }))
+    : defaultNavLinks
+  const logoText = headerData?.logoText || "SJ MEDIA LABS"
+  const ctaText = headerData?.ctaButton?.text || "Start a project"
 
   return (
     <>
@@ -69,13 +107,26 @@ export function Header() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#E63946] rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SJ</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-sm leading-tight">SJ MEDIA LABS</span>
-                <span className="text-[#666] text-[10px] tracking-wider">DIGITAL AGENCY</span>
-              </div>
+              {headerData?.logo ? (
+                <Image
+                  src={headerData.logo}
+                  alt={logoText}
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                  priority
+                />
+              ) : (
+                <>
+                  <div className="w-8 h-8 bg-[#E63946] rounded flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">SJ</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold text-sm leading-tight">{logoText}</span>
+                    <span className="text-[#666] text-[10px] tracking-wider">DIGITAL AGENCY</span>
+                  </div>
+                </>
+              )}
             </Link>
 
             {/* Desktop Navigation */}
@@ -102,7 +153,7 @@ export function Header() {
                 className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full px-6"
                 onClick={() => setContactPopupOpen(true)}
               >
-                Start a project
+                {ctaText}
               </Button>
             </div>
 
@@ -139,7 +190,7 @@ export function Header() {
                   setContactPopupOpen(true)
                 }}
               >
-                Start a project
+                {ctaText}
               </Button>
             </nav>
           </div>

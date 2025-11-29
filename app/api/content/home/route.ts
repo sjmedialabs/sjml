@@ -20,6 +20,54 @@ export async function GET() {
   }
 }
 
+export async function POST(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("Authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const token = authHeader.split(" ")[1]
+    if (!verifyToken(token)) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+    }
+
+    const content = await request.json()
+
+    // Update each section
+    const sections = [
+      "hero",
+      "stats",
+      "caseStudies",
+      "services",
+      "industries",
+      "testimonials",
+      "insights",
+      "playbook",
+      "partners",
+      "statsBackgroundImage",
+      "servicesBackgroundImage",
+      "industriesBackgroundImage",
+      "caseStudiesBackgroundImage",
+      "testimonialsBackgroundImage",
+      "insightsBackgroundImage",
+      "trustedByBackgroundImage",
+      "playbookBackgroundImage",
+    ]
+
+    for (const section of sections) {
+      if (content[section] !== undefined) {
+        await updateHomeContent(section, content[section])
+      }
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Update home content error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
 export async function PUT(request: NextRequest) {
   try {
     const authHeader = request.headers.get("Authorization")

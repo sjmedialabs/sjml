@@ -15,43 +15,7 @@ interface CaseStudy {
   stat2?: string
 }
 
-const defaultCaseStudies: CaseStudy[] = [
-  {
-    id: "1",
-    title: "TechCorp Global Rebranding",
-    description:
-      "Complete brand transformation resulting in 250% increase in brand recognition and 180% revenue growth.",
-    image: "/laptop-dashboard-analytics-business.jpg",
-    tags: ["Branding", "Technology"],
-    stat1Label: "Growth",
-    stat1Value: "250%",
-    stat2Label: "Duration",
-    stat2Value: "6 Months",
-  },
-  {
-    id: "2",
-    title: "TechCorp Global Rebranding",
-    description:
-      "Complete brand transformation resulting in 250% increase in brand recognition and 180% revenue growth.",
-    image: "/office-workers-at-computers-business-meeting.jpg",
-    tags: ["Digital Marketing", "Finance"],
-    stat1Label: "Leads",
-    stat1Value: "50K+",
-    stat2Label: "ROI",
-    stat2Value: "320%",
-  },
-  {
-    id: "3",
-    title: "MediCare+ Patient Platform",
-    description: "Award-winning healthcare platform serving 2M+ patients with 99.9% uptime and exceptional UX.",
-    image: "/doctor-holding-smartphone-medical-healthcare.jpg",
-    tags: ["Web Development", "Healthcare"],
-    stat1Label: "Award",
-    stat1Value: "Winner",
-    stat2Label: "Users",
-    stat2Value: "2M+",
-  },
-]
+// Case studies are now fully dynamic from the database
 
 function ArrowRightIcon({ className }: { className?: string }) {
   return (
@@ -76,7 +40,7 @@ interface CaseStudiesSectionProps {
 }
 
 export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSectionProps) {
-  const caseStudies = data || defaultCaseStudies
+  const caseStudies = data || []
 
   return (
     <section className="relative py-20 bg-[#0a0a0a]">
@@ -115,7 +79,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
                 />
                 {/* Tags */}
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                  {study.tags.map((tag, index) => (
+                  {study.tags?.map((tag, index) => (
                     <span
                       key={index}
                       className="px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs rounded-full"

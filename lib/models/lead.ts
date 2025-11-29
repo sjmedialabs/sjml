@@ -6,10 +6,11 @@ export interface Lead {
   email: string
   phone?: string
   company?: string
+  subject?: string
   message?: string
   service?: string
   budget?: string
-  source: "website" | "website_popup" | "meta_ads" | "google_ads" | "manual" | "other"
+  source: "website" | "website_popup" | "contact_form" | "meta_ads" | "google_ads" | "manual" | "other"
   status: "new" | "contacted" | "qualified" | "converted" | "lost"
   campaign?: {
     platform?: string

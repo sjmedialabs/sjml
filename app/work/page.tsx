@@ -3,6 +3,8 @@ import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -36,8 +38,15 @@ function FlowerDecoration() {
 
 export default async function WorkPage() {
   let projects: any[] = []
+  let content
 
   try {
+    // Fetch page content
+    content = await getPageContent("work")
+    if (!content) {
+      content = getDefaultPageContent("work")
+    }
+
     // Fetch works directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
@@ -50,15 +59,16 @@ export default async function WorkPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch works:", error)
+    content = getDefaultPageContent("work")
   }
 
-  const hero = {
+  const hero = content?.hero || {
     title: "Elevate Beyond the Ordinary.",
     subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
     description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
   }
 
-  const portfolio = {
+  const portfolio = content?.portfolio || {
     title: "Our Portfolio",
     description: "Discover how we've helped brands achieve extraordinary results.",
   }
