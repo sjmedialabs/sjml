@@ -11,24 +11,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const db = client.db("sjmedialabs")
 
     // Try to find by slug first, then by id
-    let work = await db.collection("works").findOne({ slug: id })
-    if (!work) {
-      work = await db.collection("works").findOne({ id })
+    let caseStudy = await db.collection("case_studies").findOne({ slug: id })
+    if (!caseStudy) {
+      caseStudy = await db.collection("case_studies").findOne({ id })
     }
 
-    if (!work) {
-      return NextResponse.json({ error: "Work not found" }, { status: 404 })
+    if (!caseStudy) {
+      return NextResponse.json({ error: "Case study not found" }, { status: 404 })
     }
 
     // Convert MongoDB _id to string for JSON serialization
-    const serializedWork = {
-      ...work,
-      _id: work._id.toString()
+    const serializedCaseStudy = {
+      ...caseStudy,
+      _id: caseStudy._id.toString()
     }
 
-    return NextResponse.json(serializedWork)
+    return NextResponse.json(serializedCaseStudy)
   } catch (error) {
-    console.error("Get work error:", error)
+    console.error("Get case study error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -55,15 +55,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
     delete updateData._id
 
-    const result = await db.collection("works").updateOne({ id }, { $set: updateData })
+    const result = await db.collection("case_studies").updateOne({ id }, { $set: updateData })
 
     if (result.matchedCount === 0) {
-      return NextResponse.json({ error: "Work not found" }, { status: 404 })
+      return NextResponse.json({ error: "Case study not found" }, { status: 404 })
     }
 
     return NextResponse.json({ ...updateData, id })
   } catch (error) {
-    console.error("Update work error:", error)
+    console.error("Update case study error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -83,15 +83,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
-    const result = await db.collection("works").deleteOne({ id })
+    const result = await db.collection("case_studies").deleteOne({ id })
 
     if (result.deletedCount === 0) {
-      return NextResponse.json({ error: "Work not found" }, { status: 404 })
+      return NextResponse.json({ error: "Case study not found" }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Delete work error:", error)
+    console.error("Delete case study error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

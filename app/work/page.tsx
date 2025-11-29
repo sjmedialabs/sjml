@@ -2,8 +2,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
-import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
+import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -35,55 +34,34 @@ function FlowerDecoration() {
   )
 }
 
-const defaultProjects = [
-  {
-    id: "1",
-    slug: "techcorp-rebranding",
-    title: "TechCorp Global Rebranding",
-    description: "Complete brand transformation resulting in 250% increase in brand recognition.",
-    image: "/tech-branding.jpg",
-  },
-  {
-    id: "2",
-    slug: "unve-design",
-    title: "Unve Design System",
-    description: "Complete design system for modern applications.",
-    image: "/design-system-abstract.png",
-  },
-  {
-    id: "3",
-    slug: "medicare-platform",
-    title: "MediCare+ Patient Platform",
-    description: "Award-winning healthcare platform serving 2M+ patients.",
-    image: "/healthcare-app-interface.png",
-  },
-]
-
 export default async function WorkPage() {
-  let data
+  let projects: any[] = []
 
   try {
-    data = await getPageContent("work")
-    if (!data) {
-      data = getDefaultPageContent("work")
-    }
+    // Fetch works directly from MongoDB
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const works = await db.collection("works").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
+    
+    // Serialize MongoDB _id
+    projects = works.map(work => ({
+      ...work,
+      _id: work._id.toString()
+    }))
   } catch (error) {
-    console.error("Failed to fetch work content:", error)
-    data = getDefaultPageContent("work")
+    console.error("Failed to fetch works:", error)
   }
 
-  const hero = data?.hero || {
+  const hero = {
     title: "Elevate Beyond the Ordinary.",
     subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
     description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
   }
 
-  const portfolio = data?.portfolio || {
+  const portfolio = {
     title: "Our Portfolio",
     description: "Discover how we've helped brands achieve extraordinary results.",
   }
-
-  const projects = data?.projects?.length ? data.projects : defaultProjects
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">

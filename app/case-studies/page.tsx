@@ -2,8 +2,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
-import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
+import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -59,46 +58,34 @@ function ClockIcon() {
   )
 }
 
-const defaultCaseStudies = [
-  {
-    id: "1",
-    slug: "techcorp-rebranding",
-    title: "TechCorp Global Rebranding",
-    description: "Complete brand transformation.",
-    image: "/tech-branding-project.jpg",
-    tags: ["Branding", "Strategy"],
-    stat1Label: "Growth",
-    stat1Value: "250%",
-    stat2Label: "Duration",
-    stat2Value: "6 Months",
-  },
-]
-
 export default async function CaseStudiesPage() {
-  let data
+  let caseStudies: any[] = []
 
   try {
-    data = await getPageContent("case-studies")
-    if (!data) {
-      data = getDefaultPageContent("case-studies")
-    }
+    // Fetch case studies directly from MongoDB
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const studies = await db.collection("case_studies").find({ isActive: true, isFeatured: true }).sort({ createdAt: -1 }).toArray()
+    
+    // Serialize MongoDB _id
+    caseStudies = studies.map(cs => ({
+      ...cs,
+      _id: cs._id.toString()
+    }))
   } catch (error) {
-    console.error("Failed to fetch case-studies content:", error)
-    data = getDefaultPageContent("case-studies")
+    console.error("Failed to fetch case studies:", error)
   }
 
-  const hero = data?.hero || {
+  const hero = {
     title: "Elevate Beyond the Ordinary.",
     subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
     description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
   }
 
-  const section = data?.section || {
+  const section = {
     title: "Featured Case Studies",
     description: "Discover how we've helped brands achieve extraordinary results.",
   }
-
-  const caseStudies = data?.caseStudies?.length ? data.caseStudies : defaultCaseStudies
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">

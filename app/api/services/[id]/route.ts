@@ -20,7 +20,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Service not found" }, { status: 404 })
     }
 
-    return NextResponse.json(service)
+    // Convert MongoDB _id to string for JSON serialization
+    const serializedService = {
+      ...service,
+      _id: service._id.toString()
+    }
+
+    return NextResponse.json(serializedService)
   } catch (error) {
     console.error("Get service error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

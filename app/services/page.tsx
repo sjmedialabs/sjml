@@ -2,9 +2,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
-import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 import type { JSX } from "react"
+import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -70,101 +69,36 @@ const serviceIcons: Record<string, JSX.Element> = {
   ),
 }
 
-// Default services if none in database
-const defaultServices = [
-  {
-    id: "1",
-    slug: "research-strategy",
-    title: "Research & Strategy",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "research-strategy",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "2",
-    slug: "branding",
-    title: "Branding",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "branding",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "3",
-    slug: "web-experience",
-    title: "Web & Experience",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "web-experience",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "4",
-    slug: "digital-marketing",
-    title: "Digital Marketing",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "digital-marketing",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "5",
-    slug: "commercial-ads",
-    title: "Commercial Ads",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "commercial-ads",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "6",
-    slug: "advertising",
-    title: "Advertising",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "advertising",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "7",
-    slug: "influencer-marketing",
-    title: "Influencer Marketing",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "influencer-marketing",
-    linkText: "Explore Branding",
-  },
-  {
-    id: "8",
-    slug: "affiliate-marketing",
-    title: "Affiliate Marketing",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "affiliate-marketing",
-    linkText: "Explore Branding",
-  },
-]
-
 export default async function ServicesPage() {
-  let data
+  let services: any[] = []
 
   try {
-    data = await getPageContent("services")
-    if (!data) {
-      data = getDefaultPageContent("services")
-    }
+    // Fetch services directly from MongoDB
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const servicesData = await db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
+    
+    // Serialize MongoDB _id
+    services = servicesData.map(service => ({
+      ...service,
+      _id: service._id.toString()
+    }))
   } catch (error) {
-    console.error("Failed to fetch services content:", error)
-    data = getDefaultPageContent("services")
+    console.error("Failed to fetch services:", error)
   }
 
-  const hero = data?.hero || {
+  const hero = {
     title: "Redefining Digital Success with Strategy, Design, and Development",
     highlightedWords: ["Success", "Strategy, Design"],
     backgroundImage: "/business-people-working-on-laptops-hands-typing-pr.jpg",
     watermark: "SERVICES",
   }
 
-  const section = data?.section || {
+  const section = {
     title: "Our Services we're providing",
     subtitle: "to our customers",
     description: "Comprehensive solutions to elevate your brand and drive business growth across all channels.",
   }
-
-  const services = data?.services?.length ? data.services : defaultServices
 
   return (
     <main className="min-h-screen bg-black">

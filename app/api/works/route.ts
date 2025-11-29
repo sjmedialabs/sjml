@@ -57,7 +57,12 @@ export async function GET(request: NextRequest) {
       if (works.length === 0) {
         return NextResponse.json(defaultWorks)
       }
-      return NextResponse.json(works)
+      // Convert MongoDB _id to string for JSON serialization
+      const serializedWorks = works.map(work => ({
+        ...work,
+        _id: work._id.toString()
+      }))
+      return NextResponse.json(serializedWorks)
     }
 
     // Paginated results for admin
@@ -65,8 +70,14 @@ export async function GET(request: NextRequest) {
     const total = await db.collection("works").countDocuments()
     const works = await db.collection("works").find().sort({ createdAt: -1 }).skip(skip).limit(limit).toArray()
 
+    // Convert MongoDB _id to string for JSON serialization
+    const serializedWorks = works.map(work => ({
+      ...work,
+      _id: work._id.toString()
+    }))
+
     return NextResponse.json({
-      works: works.length > 0 ? works : defaultWorks,
+      works: serializedWorks.length > 0 ? serializedWorks : defaultWorks,
       pagination: {
         page,
         limit,

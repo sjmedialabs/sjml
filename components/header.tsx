@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ContactPopup } from "@/components/contact-popup"
 
@@ -57,6 +58,7 @@ function XIcon({ className }: { className?: string }) {
 }
 
 export function Header() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [contactPopupOpen, setContactPopupOpen] = useState(false)
 
@@ -78,15 +80,20 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-[#999] hover:text-white text-sm transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`text-sm transition-colors ${
+                      isActive ? "text-[#E63946] font-medium" : "text-[#999] hover:text-white"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* CTA Button */}
@@ -110,16 +117,21 @@ export function Header() {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-[#0a0a0a] border-t border-[#222]">
             <nav className="flex flex-col p-4 gap-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-[#999] hover:text-white text-sm py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`text-sm py-2 ${
+                      isActive ? "text-[#E63946] font-medium" : "text-[#999] hover:text-white"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              })}
               <Button
                 className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full mt-4"
                 onClick={() => {

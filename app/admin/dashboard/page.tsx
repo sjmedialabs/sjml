@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { DashboardOverview } from "@/components/admin/dashboard-overview"
 import { HomePageManager } from "@/components/admin/home-page-manager"
@@ -22,7 +22,8 @@ import { SettingsManager } from "@/components/admin/settings-manager"
 
 export default function AdminDashboard() {
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState("overview")
+  const searchParams = useSearchParams()
+  const [activeSection, setActiveSection] = useState(searchParams.get("section") || "overview")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -49,6 +50,12 @@ export default function AdminDashboard() {
         .finally(() => setLoading(false))
     }
   }, [router])
+
+  // Update URL when section changes
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section)
+    router.push(`/admin/dashboard?section=${section}`, { scroll: false })
+  }
 
   if (loading) {
     return (
@@ -101,7 +108,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex">
-      <AdminSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+      <AdminSidebar activeSection={activeSection} setActiveSection={handleSectionChange} />
       <main className="flex-1 p-8 overflow-auto">{renderContent()}</main>
     </div>
   )

@@ -69,7 +69,12 @@ export async function GET(request: NextRequest) {
       if (services.length === 0) {
         return NextResponse.json(defaultServices)
       }
-      return NextResponse.json(services)
+      // Convert MongoDB _id to string for JSON serialization
+      const serializedServices = services.map(service => ({
+        ...service,
+        _id: service._id.toString()
+      }))
+      return NextResponse.json(serializedServices)
     }
 
     // Paginated results for admin
@@ -77,8 +82,14 @@ export async function GET(request: NextRequest) {
     const total = await db.collection("services").countDocuments()
     const services = await db.collection("services").find().sort({ createdAt: -1 }).skip(skip).limit(limit).toArray()
 
+    // Convert MongoDB _id to string for JSON serialization
+    const serializedServices = services.map(service => ({
+      ...service,
+      _id: service._id.toString()
+    }))
+
     return NextResponse.json({
-      services: services.length > 0 ? services : defaultServices,
+      services: serializedServices.length > 0 ? serializedServices : defaultServices,
       pagination: {
         page,
         limit,
