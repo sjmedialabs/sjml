@@ -437,6 +437,133 @@ export const defaultContactContent = {
   },
 }
 
+export const defaultInsightsContent = {
+  pageKey: "insights",
+  hero: {
+    title: "Insights & Resources",
+    subtitle: "Expert perspectives on branding, marketing, and digital transformation.",
+  },
+  posts: [
+    {
+      id: "1",
+      title: "The Ultimate Guide to Brand Strategy in 2024",
+      excerpt:
+        "Discover the essential elements that make up a successful brand strategy in today's rapidly evolving digital landscape.",
+      image: "/brand-strategy-guide.jpg",
+      category: "Brand Strategy",
+      author: "John Smith",
+      date: "Dec 15, 2024",
+      readTime: "8 min read",
+      slug: "brand-strategy-2024",
+    },
+    {
+      id: "2",
+      title: "10 Digital Marketing Trends You Can't Ignore",
+      excerpt:
+        "As we head into the new year, here are the top digital marketing trends that will shape how brands connect with audiences.",
+      image: "/digital-marketing-trends.png",
+      category: "Digital Marketing",
+      author: "Sarah Johnson",
+      date: "Dec 12, 2024",
+      readTime: "6 min read",
+      slug: "digital-marketing-trends",
+    },
+    {
+      id: "3",
+      title: "UX Design Best Practices for Conversion",
+      excerpt:
+        "Learn how thoughtful UX design can dramatically improve your website's conversion rates and user satisfaction.",
+      image: "/ux-design-conversion.jpg",
+      category: "UX Design",
+      author: "Michael Chen",
+      date: "Dec 10, 2024",
+      readTime: "5 min read",
+      slug: "ux-design-conversion",
+    },
+  ],
+  categories: ["All", "Brand Strategy", "Digital Marketing", "UX Design", "Social Media", "Content Marketing", "SEO"],
+  newsletter: {
+    title: "Subscribe to Our Newsletter",
+    description: "Get the latest insights and resources delivered to your inbox.",
+    buttonText: "Subscribe",
+  },
+}
+
+export const defaultTestimonialsContent = {
+  pageKey: "testimonials",
+  hero: {
+    title: "What Our Clients Say",
+    subtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
+  },
+  testimonials: [
+    {
+      id: "1",
+      quote:
+        "This is due to their excellent service, competitive pricing and customer support. It's thoroughly refreshing to get such a personal touch.",
+      author: "Archana Patel",
+      role: "CEO",
+      company: "MediTravel",
+      image: "/professional-indian-woman.png",
+      rating: 5,
+    },
+    {
+      id: "2",
+      quote:
+        "Working with SJ Media Labs transformed our brand presence. Their strategic approach and creative execution exceeded all expectations.",
+      author: "Michael Chen",
+      role: "Founder",
+      company: "TechVentures",
+      image: "/professional-asian-man.png",
+      rating: 5,
+    },
+    {
+      id: "3",
+      quote:
+        "The team's dedication to understanding our business needs resulted in a website that truly represents our brand values.",
+      author: "Sarah Johnson",
+      role: "Marketing Director",
+      company: "GreenLeaf Co",
+      image: "/professional-blonde-woman.png",
+      rating: 5,
+    },
+  ],
+  cta: {
+    title: "Ready to Join Our Success Stories?",
+    description: "Let's create something extraordinary together.",
+    buttonText: "Start Your Project",
+    buttonUrl: "/contact",
+  },
+}
+
+export const defaultClientsContent = {
+  pageKey: "clients",
+  hero: {
+    title: "Our Clients",
+    subtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
+  },
+  clients: [
+    { id: "1", name: "TechCorp", logo: "/tech-company-logo.jpg", industry: "Technology" },
+    { id: "2", name: "FinanceFlow", logo: "/finance-company-logo.png", industry: "Finance" },
+    { id: "3", name: "MediCare+", logo: "/healthcare-company-logo.png", industry: "Healthcare" },
+    { id: "4", name: "GreenLeaf", logo: "/eco-company-logo.png", industry: "Retail" },
+    { id: "5", name: "AutoDrive", logo: "/automotive-company-logo.png", industry: "Automotive" },
+    { id: "6", name: "FoodieHub", logo: "/food-delivery-logo.png", industry: "Food & Beverage" },
+  ],
+  industries: ["All Industries", "Technology", "Finance", "Healthcare", "Retail", "Automotive", "Education"],
+  stats: [
+    { value: "200+", label: "Happy Clients" },
+    { value: "40+", label: "Countries" },
+    { value: "98%", label: "Client Retention" },
+    { value: "500+", label: "Projects Completed" },
+  ],
+  cta: {
+    title: "Join Our Growing Client List",
+    description: "Partner with us and experience the difference.",
+    buttonText: "Become a Client",
+    buttonUrl: "/contact",
+  },
+}
+
 export function getDefaultPageContent(page: string) {
   const defaults: Record<string, any> = {
     home: defaultHomeContent,
@@ -446,6 +573,9 @@ export function getDefaultPageContent(page: string) {
     "case-studies": defaultCaseStudiesContent,
     careers: defaultCareersContent,
     contact: defaultContactContent,
+    insights: defaultInsightsContent,
+    testimonials: defaultTestimonialsContent,
+    clients: defaultClientsContent,
   }
   return defaults[page] || {}
 }

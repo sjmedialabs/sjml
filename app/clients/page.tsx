@@ -1,24 +1,38 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
-const clients = [
-  { name: "TechCorp", logo: "/tech-company-logo.jpg", industry: "Technology" },
-  { name: "FinanceFlow", logo: "/finance-company-logo.png", industry: "Finance" },
-  { name: "MediCare+", logo: "/healthcare-company-logo.png", industry: "Healthcare" },
-  { name: "GreenLeaf", logo: "/eco-company-logo.png", industry: "Retail" },
-  { name: "AutoDrive", logo: "/automotive-company-logo.png", industry: "Automotive" },
-  { name: "FoodieHub", logo: "/food-delivery-logo.png", industry: "Food & Beverage" },
-  { name: "EduPro", logo: "/education-company-logo.png", industry: "Education" },
-  { name: "TravelNow", logo: "/travel-company-logo.png", industry: "Travel" },
-  { name: "FitLife", logo: "/fitness-company-logo.jpg", industry: "Health & Fitness" },
-  { name: "HomeStyle", logo: "/home-decor-logo.png", industry: "Home & Living" },
-  { name: "CloudTech", logo: "/cloud-technology-logo.jpg", industry: "Technology" },
-  { name: "MediaMax", logo: "/generic-media-logo.png", industry: "Media" },
-]
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
-const industries = ["All Industries", "Technology", "Finance", "Healthcare", "Retail", "Automotive", "Education"]
+export default async function ClientsPage() {
+  let data
 
-export default function ClientsPage() {
+  try {
+    data = await getPageContent("clients")
+    if (!data) {
+      data = getDefaultPageContent("clients")
+    }
+  } catch (error) {
+    console.error("Failed to fetch clients content:", error)
+    data = getDefaultPageContent("clients")
+  }
+
+  const hero = data?.hero || {
+    title: "Our Clients",
+    subtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
+  }
+
+  const clients = data?.clients || []
+  const industries = data?.industries || ["All Industries"]
+  const stats = data?.stats || []
+  const cta = data?.cta || {
+    title: "Join Our Growing Client List",
+    description: "Partner with us and experience the difference.",
+    buttonText: "Become a Client",
+    buttonUrl: "/contact",
+  }
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />
@@ -99,13 +113,13 @@ export default function ClientsPage() {
       {/* CTA */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto bg-gradient-to-r from-[#E63946] to-[#d62839] rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Join Our Growing Client List</h2>
-          <p className="text-white/80 mb-8">Partner with us and experience the difference.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{cta.title}</h2>
+          <p className="text-white/80 mb-8">{cta.description}</p>
           <a
-            href="/contact"
+            href={cta.buttonUrl}
             className="inline-block px-8 py-4 bg-white text-[#E63946] rounded-full font-medium hover:bg-gray-100 transition-colors"
           >
-            Become a Client
+            {cta.buttonText}
           </a>
         </div>
       </section>

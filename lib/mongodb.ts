@@ -36,3 +36,4 @@ export async function getCollection<T extends Document>(name: string): Promise<C
 }
 
 export { clientPromise, ObjectId }
+export default clientPromise

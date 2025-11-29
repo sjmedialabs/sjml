@@ -1,70 +1,36 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
-const testimonials = [
-  {
-    id: "1",
-    quote:
-      "This is due to their excellent service, competitive pricing and customer support. It's thoroughly refreshing to get such a personal touch. Not to mention they've helped us create an iconic brand as possible as necessary.",
-    author: "Archana Patel",
-    role: "CEO",
-    company: "MediTravel",
-    image: "/professional-indian-woman.png",
-    rating: 5,
-  },
-  {
-    id: "2",
-    quote:
-      "Working with SJ Media Labs transformed our brand presence. Their strategic approach and creative execution exceeded all expectations. Our revenue grew 250% in the first year.",
-    author: "Michael Chen",
-    role: "Founder",
-    company: "TechVentures",
-    image: "/professional-asian-man.png",
-    rating: 5,
-  },
-  {
-    id: "3",
-    quote:
-      "The team's dedication to understanding our business needs resulted in a website that truly represents our brand values. Customer engagement increased by 180%.",
-    author: "Sarah Johnson",
-    role: "Marketing Director",
-    company: "GreenLeaf Co",
-    image: "/professional-blonde-woman.png",
-    rating: 5,
-  },
-  {
-    id: "4",
-    quote:
-      "From strategy to execution, they handled everything with professionalism and creativity. Our brand is now recognized industry-wide thanks to their efforts.",
-    author: "David Williams",
-    role: "COO",
-    company: "FinanceFlow",
-    image: "/professional-man-suit.png",
-    rating: 5,
-  },
-  {
-    id: "5",
-    quote:
-      "Exceptional service and outstanding results. They truly understand digital marketing and deliver campaigns that convert. ROI exceeded our projections by 320%.",
-    author: "Emily Rodriguez",
-    role: "VP Marketing",
-    company: "AutoDrive Motors",
-    image: "/professional-hispanic-woman.png",
-    rating: 5,
-  },
-  {
-    id: "6",
-    quote:
-      "The best agency we've ever worked with. Their attention to detail and commitment to excellence is unmatched. Highly recommend for any brand looking to grow.",
-    author: "James Thompson",
-    role: "CEO",
-    company: "CloudTech Solutions",
-    image: "/professional-man-glasses.jpg",
-    rating: 5,
-  },
-]
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
-export default function TestimonialsPage() {
+export default async function TestimonialsPage() {
+  let data
+
+  try {
+    data = await getPageContent("testimonials")
+    if (!data) {
+      data = getDefaultPageContent("testimonials")
+    }
+  } catch (error) {
+    console.error("Failed to fetch testimonials content:", error)
+    data = getDefaultPageContent("testimonials")
+  }
+
+  const hero = data?.hero || {
+    title: "What Our Clients Say",
+    subtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
+  }
+
+  const testimonials = data?.testimonials || []
+  const cta = data?.cta || {
+    title: "Ready to Join Our Success Stories?",
+    description: "Let's create something extraordinary together.",
+    buttonText: "Start Your Project",
+    buttonUrl: "/contact",
+  }
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />
@@ -122,13 +88,13 @@ export default function TestimonialsPage() {
       {/* CTA */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto bg-[#111] border border-[#222] rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Join Our Success Stories?</h2>
-          <p className="text-[#888] mb-8">Let's create something extraordinary together.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{cta.title}</h2>
+          <p className="text-[#888] mb-8">{cta.description}</p>
           <a
-            href="/contact"
+            href={cta.buttonUrl}
             className="inline-block px-8 py-4 bg-[#E63946] text-white rounded-full font-medium hover:bg-[#d62839] transition-colors"
           >
-            Start Your Project
+            {cta.buttonText}
           </a>
         </div>
       </section>

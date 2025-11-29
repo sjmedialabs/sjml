@@ -42,6 +42,9 @@ export async function POST() {
       { key: "case-studies", data: defaultCaseStudiesContent },
       { key: "careers", data: defaultCareersContent },
       { key: "contact", data: defaultContactContent },
+      { key: "insights", data: defaultInsightsContent },
+      { key: "testimonials", data: defaultTestimonialsContent },
+      { key: "clients", data: defaultClientsContent },
     ]
 
     for (const page of pages) {

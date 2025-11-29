@@ -1,85 +1,36 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { getPageContent } from "@/lib/models/content"
+import { getDefaultPageContent } from "@/lib/defaults"
 
-const posts = [
-  {
-    id: "1",
-    title: "The Ultimate Guide to Brand Strategy in 2024",
-    excerpt:
-      "Discover the essential elements that make up a successful brand strategy in today's rapidly evolving digital landscape.",
-    image: "/brand-strategy-guide.jpg",
-    category: "Brand Strategy",
-    author: "John Smith",
-    date: "Dec 15, 2024",
-    readTime: "8 min read",
-  },
-  {
-    id: "2",
-    title: "10 Digital Marketing Trends You Can't Ignore",
-    excerpt:
-      "As we head into the new year, here are the top digital marketing trends that will shape how brands connect with audiences.",
-    image: "/digital-marketing-trends.png",
-    category: "Digital Marketing",
-    author: "Sarah Johnson",
-    date: "Dec 12, 2024",
-    readTime: "6 min read",
-  },
-  {
-    id: "3",
-    title: "UX Design Best Practices for Conversion",
-    excerpt:
-      "Learn how thoughtful UX design can dramatically improve your website's conversion rates and user satisfaction.",
-    image: "/ux-design-conversion.jpg",
-    category: "UX Design",
-    author: "Michael Chen",
-    date: "Dec 10, 2024",
-    readTime: "5 min read",
-  },
-  {
-    id: "4",
-    title: "Building a Strong Social Media Presence",
-    excerpt:
-      "Strategies and tactics for building and maintaining a powerful social media presence that drives real results.",
-    image: "/social-media-marketing.png",
-    category: "Social Media",
-    author: "Emily Davis",
-    date: "Dec 8, 2024",
-    readTime: "7 min read",
-  },
-  {
-    id: "5",
-    title: "The Power of Video Marketing",
-    excerpt: "Why video content is essential for modern marketing and how to create compelling videos that convert.",
-    image: "/video-marketing-production.jpg",
-    category: "Content Marketing",
-    author: "John Smith",
-    date: "Dec 5, 2024",
-    readTime: "6 min read",
-  },
-  {
-    id: "6",
-    title: "SEO Strategies That Actually Work",
-    excerpt:
-      "Cut through the noise with proven SEO strategies that will help your website rank higher in search results.",
-    image: "/seo-strategy-analytics.jpg",
-    category: "SEO",
-    author: "Sarah Johnson",
-    date: "Dec 2, 2024",
-    readTime: "9 min read",
-  },
-]
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
-const categories = [
-  "All",
-  "Brand Strategy",
-  "Digital Marketing",
-  "UX Design",
-  "Social Media",
-  "Content Marketing",
-  "SEO",
-]
+export default async function InsightsPage() {
+  let data
 
-export default function InsightsPage() {
+  try {
+    data = await getPageContent("insights")
+    if (!data) {
+      data = getDefaultPageContent("insights")
+    }
+  } catch (error) {
+    console.error("Failed to fetch insights content:", error)
+    data = getDefaultPageContent("insights")
+  }
+
+  const hero = data?.hero || {
+    title: "Insights & Resources",
+    subtitle: "Expert perspectives on branding, marketing, and digital transformation.",
+  }
+
+  const posts = data?.posts || []
+  const categories = data?.categories || ["All"]
+  const newsletter = data?.newsletter || {
+    title: "Subscribe to Our Newsletter",
+    description: "Get the latest insights and resources delivered to your inbox.",
+    buttonText: "Subscribe",
+  }
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />
@@ -158,8 +109,8 @@ export default function InsightsPage() {
       {/* Newsletter */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto bg-[#111] border border-[#222] rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Subscribe to Our Newsletter</h2>
-          <p className="text-[#888] mb-8">Get the latest insights and resources delivered to your inbox.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{newsletter.title}</h2>
+          <p className="text-[#888] mb-8">{newsletter.description}</p>
           <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
               type="email"

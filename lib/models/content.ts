@@ -291,6 +291,85 @@ export interface ContactPageData {
   updatedAt?: Date
 }
 
+export interface InsightsPageData {
+  _id?: ObjectId
+  pageKey: string
+  hero: {
+    title: string
+    subtitle: string
+  }
+  posts: Array<{
+    id: string
+    title: string
+    excerpt: string
+    image: string
+    category: string
+    author: string
+    date: string
+    readTime: string
+    slug?: string
+  }>
+  categories: string[]
+  newsletter: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  updatedAt?: Date
+}
+
+export interface TestimonialsPageData {
+  _id?: ObjectId
+  pageKey: string
+  hero: {
+    title: string
+    subtitle: string
+  }
+  testimonials: Array<{
+    id: string
+    quote: string
+    author: string
+    role: string
+    company: string
+    image: string
+    rating: number
+  }>
+  cta: {
+    title: string
+    description: string
+    buttonText: string
+    buttonUrl: string
+  }
+  updatedAt?: Date
+}
+
+export interface ClientsPageData {
+  _id?: ObjectId
+  pageKey: string
+  hero: {
+    title: string
+    subtitle: string
+  }
+  clients: Array<{
+    id: string
+    name: string
+    logo: string
+    industry: string
+  }>
+  industries: string[]
+  stats: Array<{
+    value: string
+    label: string
+  }>
+  cta: {
+    title: string
+    description: string
+    buttonText: string
+    buttonUrl: string
+  }
+  updatedAt?: Date
+}
+
 // Content Model Functions
 export async function getHomeContent(): Promise<ContentData | null> {
   const collection = await getCollection<any>("content")

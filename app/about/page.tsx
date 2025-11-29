@@ -54,7 +54,21 @@ export default function AboutPage() {
         const res = await fetch("/api/content/about")
         if (res.ok) {
           const fetchedData = await res.json()
-          setData({ ...defaultData, ...fetchedData })
+          // Map API structure to component structure
+          const mappedData: AboutData = {
+            heroTitle: fetchedData.hero?.title || defaultData.heroTitle,
+            heroSubtitle: fetchedData.hero?.highlightedText || defaultData.heroSubtitle,
+            heroDescription: "",
+            heroImage: "",
+            mission: fetchedData.mission?.description || defaultData.mission,
+            vision: fetchedData.vision?.description || defaultData.vision,
+            values: fetchedData.about?.values || defaultData.values,
+            story: defaultData.story,
+            team: fetchedData.team?.members || defaultData.team,
+            stats: fetchedData.stats || defaultData.stats,
+            achievements: fetchedData.achievements || defaultData.achievements,
+          }
+          setData(mappedData)
         }
       } catch (error) {
         console.error("Failed to fetch about data")

@@ -3,7 +3,20 @@ import { verifyToken } from "@/lib/jwt"
 import { getPageContent, updatePageContent } from "@/lib/models/content"
 import { getDefaultPageContent } from "@/lib/defaults"
 
-const validPages = ["home", "about", "work", "services", "case-studies", "careers", "contact", "header", "seo"]
+const validPages = [
+  "home",
+  "about",
+  "work",
+  "services",
+  "case-studies",
+  "careers",
+  "contact",
+  "insights",
+  "testimonials",
+  "clients",
+  "header",
+  "seo",
+]
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ page: string }> }) {
   try {
