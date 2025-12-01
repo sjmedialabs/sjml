@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,25 +32,14 @@ interface Pagination {
   totalPages: number
 }
 
-const iconOptions = [
-  "research-strategy",
-  "branding",
-  "web-experience",
-  "digital-marketing",
-  "commercial-ads",
-  "advertising",
-  "influencer-marketing",
-  "affiliate-marketing",
-]
-
 const emptyService: Omit<ServiceItem, "id"> = {
   slug: "",
   title: "",
   description: "",
-  icon: "branding",
+  icon: "",
   linkText: "Explore Service",
   fullDescription: "",
-  image: "/placeholder.svg?height=400&width=600",
+  image: "",
   offerings: [],
   benefits: { title: "", description: "" },
   features: { title: "", points: [] },
@@ -220,8 +210,18 @@ export function ServicesPageManager() {
                   <tr key={service.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#222] rounded-lg flex items-center justify-center">
-                          <span className="text-[#E63946] text-xs">{service.icon?.slice(0, 2).toUpperCase()}</span>
+                        <div className="w-10 h-10 bg-[#222] rounded-lg flex items-center justify-center overflow-hidden">
+                          {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
+                            <Image
+                              src={service.icon}
+                              alt={service.title}
+                              width={24}
+                              height={24}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <span className="text-[#E63946] text-xs">?</span>
+                          )}
                         </div>
                         <div>
                           <div className="text-white font-medium">{service.title}</div>
@@ -349,19 +349,15 @@ export function ServicesPageManager() {
                   placeholder="service-slug"
                 />
               </div>
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Icon</label>
-                <select
+              <div className="col-span-2">
+                <label className="block text-sm text-[#888] mb-2">Service Icon</label>
+                <ImageUpload
                   value={editingService.icon}
-                  onChange={(e) => updateField("icon", e.target.value)}
-                  className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-md text-white"
-                >
-                  {iconOptions.map((icon) => (
-                    <option key={icon} value={icon}>
-                      {icon}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(url) => updateField("icon", url)}
+                  maxSizeMB={1}
+                  maxWidth={512}
+                  maxHeight={512}
+                />
               </div>
               <div>
                 <label className="block text-sm text-[#888] mb-2">Link Text</label>

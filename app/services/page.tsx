@@ -2,74 +2,12 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
 import Link from "next/link"
-import type { JSX } from "react"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
-
-// Service icons by name
-const serviceIcons: Record<string, JSX.Element> = {
-  "research-strategy": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <path d="M20 5L5 15L20 25L35 15L20 5Z" stroke="#E63946" strokeWidth="2" />
-      <path d="M5 25L20 35L35 25" stroke="#E63946" strokeWidth="2" />
-      <circle cx="20" cy="15" r="3" fill="#E63946" />
-    </svg>
-  ),
-  branding: (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="20" r="15" stroke="#E63946" strokeWidth="2" />
-      <circle cx="20" cy="20" r="8" stroke="#E63946" strokeWidth="2" />
-      <circle cx="20" cy="20" r="3" fill="#E63946" />
-    </svg>
-  ),
-  "web-experience": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <rect x="5" y="8" width="30" height="20" rx="2" stroke="#E63946" strokeWidth="2" />
-      <line x1="5" y1="14" x2="35" y2="14" stroke="#E63946" strokeWidth="2" />
-      <circle cx="9" cy="11" r="1.5" fill="#E63946" />
-      <circle cx="14" cy="11" r="1.5" fill="#E63946" />
-    </svg>
-  ),
-  "digital-marketing": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <path d="M5 30L15 20L22 27L35 10" stroke="#E63946" strokeWidth="2" />
-      <path d="M28 10H35V17" stroke="#E63946" strokeWidth="2" />
-    </svg>
-  ),
-  "commercial-ads": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <rect x="5" y="12" width="30" height="16" stroke="#E63946" strokeWidth="2" />
-      <rect x="8" y="8" width="24" height="4" stroke="#E63946" strokeWidth="2" />
-      <line x1="12" y1="20" x2="28" y2="20" stroke="#E63946" strokeWidth="2" />
-    </svg>
-  ),
-  advertising: (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <rect x="8" y="8" width="24" height="24" rx="2" stroke="#E63946" strokeWidth="2" />
-      <path d="M14 20H26" stroke="#E63946" strokeWidth="2" />
-      <path d="M20 14V26" stroke="#E63946" strokeWidth="2" />
-    </svg>
-  ),
-  "influencer-marketing": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="12" r="6" stroke="#E63946" strokeWidth="2" />
-      <circle cx="10" cy="28" r="4" stroke="#E63946" strokeWidth="2" />
-      <circle cx="30" cy="28" r="4" stroke="#E63946" strokeWidth="2" />
-      <path d="M20 18V24" stroke="#E63946" strokeWidth="2" />
-      <path d="M14 26L20 24L26 26" stroke="#E63946" strokeWidth="2" />
-    </svg>
-  ),
-  "affiliate-marketing": (
-    <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="20" r="12" stroke="#E63946" strokeWidth="2" />
-      <path d="M15 20L18 23L25 16" stroke="#E63946" strokeWidth="2" />
-    </svg>
-  ),
-}
 
 export default async function ServicesPage() {
   let services: any[] = []
@@ -162,8 +100,21 @@ export default async function ServicesPage() {
                 key={service.id}
                 className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl p-6 hover:border-[#333] transition-colors"
               >
-                <div className="w-12 h-12 bg-[#1a1a1a] rounded-full flex items-center justify-center mb-5">
-                  {serviceIcons[service.icon] || serviceIcons["branding"]}
+                <div className="w-12 h-12 bg-[#1a1a1a] rounded-full flex items-center justify-center mb-5 overflow-hidden">
+                  {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
+                    <Image
+                      src={service.icon}
+                      alt={service.title}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                      style={{
+                        filter: 'brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2255%) hue-rotate(337deg) brightness(91%) contrast(91%)'
+                      }}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-[#E63946] rounded" />
+                  )}
                 </div>
                 <h3 className="text-[#E63946] font-semibold text-lg mb-3">{service.title}</h3>
                 <p className="text-gray-500 text-sm mb-5 leading-relaxed">{service.description}</p>
@@ -171,7 +122,7 @@ export default async function ServicesPage() {
                   href={`/services/${service.slug}`}
                   className="text-[#E63946] text-sm font-medium hover:underline inline-flex items-center gap-2"
                 >
-                  {service.linkText || "Explore Branding"} <span className="text-lg">→</span>
+                  {service.linkText || "Explore Service"} <span className="text-lg">→</span>
                 </Link>
               </div>
             ))}

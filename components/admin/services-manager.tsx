@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
+import { ImageUpload } from "@/components/admin/image-upload"
 
 interface Service {
   id: string
@@ -14,39 +15,31 @@ interface Service {
   description: string
   icon: string
   image: string
+  slug?: string
+  linkText?: string
+  isActive?: boolean
 }
 
 export function ServicesManager() {
-  const [services, setServices] = useState<Service[]>([
-    {
-      id: "1",
-      title: "Research & Strategy",
-      description: "In-depth market research and strategic planning.",
-      icon: "Search",
-      image: "",
-    },
-    {
-      id: "2",
-      title: "Branding",
-      description: "Strategic brand development and identity design.",
-      icon: "Palette",
-      image: "",
-    },
-    {
-      id: "3",
-      title: "Web & Experience",
-      description: "User-centered web design and digital experiences.",
-      icon: "Globe",
-      image: "",
-    },
-    {
-      id: "4",
-      title: "Digital Marketing",
-      description: "Data-driven marketing strategies.",
-      icon: "BarChart3",
-      image: "",
-    },
-  ])
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchServices()
+  }, [])
+
+  const fetchServices = async () => {
+    try {
+      const res = await fetch("/api/services?all=true")
+      if (res.ok) {
+        const data = await res.json()
+        setServices(data || [])
+      }
+    } catch (error) {
+      console.error("Failed to fetch services:", error)
+    }
+    setLoading(false)
+  }
 
   const addService = () => {
     setServices([...services, { id: Date.now().toString(), title: "", description: "", icon: "", image: "" }])
@@ -56,22 +49,63 @@ export function ServicesManager() {
     setServices(services.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
   }
 
-  const removeService = (id: string) => {
-    setServices(services.filter((s) => s.id !== id))
+  const removeService = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this service?")) return
+    
+    const token = localStorage.getItem("adminToken")
+    try {
+      if (id && id.length > 5) {
+        // Delete from database if it exists
+        await fetch(`/api/services/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      }
+      setServices(services.filter((s) => s.id !== id))
+    } catch (error) {
+      console.error("Delete error:", error)
+      alert("Failed to delete service")
+    }
   }
 
   const handleSave = async () => {
     const token = localStorage.getItem("adminToken")
+    
+    // Save each service individually
     try {
-      await fetch("/api/content/services", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ services }),
+      const promises = services.map(async (service) => {
+        if (service.id && service.id.length > 5) {
+          // Update existing service
+          return fetch(`/api/services/${service.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(service),
+          })
+        } else {
+          // Create new service
+          return fetch("/api/services", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(service),
+          })
+        }
       })
+      
+      await Promise.all(promises)
       alert("Services saved successfully!")
+      await fetchServices() // Refresh data after save
     } catch (error) {
+      console.error("Save error:", error)
       alert("Failed to save services")
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
+      </div>
+    )
   }
 
   return (
@@ -116,6 +150,15 @@ export function ServicesManager() {
                 />
               </div>
               <div className="space-y-2">
+                <Label className="text-white">Slug (URL)</Label>
+                <Input
+                  value={service.slug || ""}
+                  onChange={(e) => updateService(service.id, "slug", e.target.value)}
+                  placeholder="e.g., digital-marketing"
+                  className="bg-[#1a1a1a] border-[#333] text-white"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label className="text-white">Description</Label>
                 <Textarea
                   value={service.description}
@@ -123,24 +166,27 @@ export function ServicesManager() {
                   className="bg-[#1a1a1a] border-[#333] text-white"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-white">Icon Name</Label>
-                  <Input
-                    value={service.icon}
-                    onChange={(e) => updateService(service.id, "icon", e.target.value)}
-                    placeholder="e.g., Search, Palette"
-                    className="bg-[#1a1a1a] border-[#333] text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-white">Image URL</Label>
-                  <Input
-                    value={service.image}
-                    onChange={(e) => updateService(service.id, "image", e.target.value)}
-                    className="bg-[#1a1a1a] border-[#333] text-white"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label className="text-white">Service Icon</Label>
+                <ImageUpload
+                  value={service.icon}
+                  onChange={(url) => updateService(service.id, "icon", url)}
+                  label=""
+                  maxSizeMB={1}
+                  maxWidth={512}
+                  maxHeight={512}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white">Service Image</Label>
+                <ImageUpload
+                  value={service.image}
+                  onChange={(url) => updateService(service.id, "image", url)}
+                  label=""
+                  maxSizeMB={2}
+                  maxWidth={1920}
+                  maxHeight={1080}
+                />
               </div>
             </CardContent>
           </Card>

@@ -86,6 +86,22 @@ export default function ServiceDetailPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black" />
         </div>
         <div className="relative max-w-6xl mx-auto px-4 text-center pt-16">
+          {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) && (
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-[#1a1a1a] rounded-full flex items-center justify-center">
+                <Image
+                  src={service.icon}
+                  alt={service.title}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  style={{
+                    filter: 'brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2255%) hue-rotate(337deg) brightness(91%) contrast(91%)'
+                  }}
+                />
+              </div>
+            </div>
+          )}
           <h1 className="text-4xl md:text-5xl font-bold text-white">{service.title}</h1>
         </div>
       </section>
