@@ -1,105 +1,134 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Save } from "lucide-react"
 
 export function FooterManager() {
   const [footerData, setFooterData] = useState({
-    address: "Studio Office, Building 18\n123 Innovation Way, 2nd Floor, Suite 450\nPalo Alto, CA 94301",
-    phone: "123-456-7890",
-    email: "support@sjmedialabs.com",
-    copyright: "© 2025 sjmedialabs All Rights Reserved",
-    newsletterText: "Subscribe for the latest news, insights and exclusive updates from our agency.",
+    address: "",
+    phone: "",
+    email: "",
+    copyright: "",
+    newsletterText: "",
   })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  const handleSave = async () => {
-    const token = localStorage.getItem("adminToken")
+  useEffect(() => {
+    fetchFooterData()
+  }, [])
+
+  const fetchFooterData = async () => {
     try {
-      await fetch("/api/content/footer", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(footerData),
-      })
-      alert("Footer saved successfully!")
+      const res = await fetch("/api/content/footer")
+      if (res.ok) {
+        const data = await res.json()
+        setFooterData(data)
+      }
     } catch (error) {
-      alert("Failed to save footer")
+      console.error("Failed to fetch footer data:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch("/api/content/footer", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(footerData),
+      })
+
+      if (res.ok) {
+        alert("Footer saved successfully!")
+      } else {
+        alert("Failed to save footer")
+      }
+    } catch (error) {
+      console.error("Save error:", error)
+      alert("Failed to save footer")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="p-4">Loading footer data...</div>
+  }
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Footer</h1>
-          <p className="text-[#888]">Manage footer content and contact information.</p>
-        </div>
-        <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] text-white">
-          <Save className="w-4 h-4 mr-2" />
-          Save Changes
-        </Button>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Footer Settings</h2>
+        <p className="text-muted-foreground">Manage your website footer content</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-[#111] border-[#222]">
-          <CardHeader>
-            <CardTitle className="text-white">Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-white">Address</Label>
-              <Textarea
-                value={footerData.address}
-                onChange={(e) => setFooterData({ ...footerData, address: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white min-h-[100px]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-white">Phone</Label>
-              <Input
-                value={footerData.phone}
-                onChange={(e) => setFooterData({ ...footerData, phone: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-white">Email</Label>
-              <Input
-                value={footerData.email}
-                onChange={(e) => setFooterData({ ...footerData, email: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
-              />
-            </div>
-          </CardContent>
-        </Card>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="address">Address</Label>
+          <Textarea
+            id="address"
+            value={footerData.address}
+            onChange={(e) => setFooterData({ ...footerData, address: e.target.value })}
+            placeholder="Enter company address"
+            rows={3}
+          />
+        </div>
 
-        <Card className="bg-[#111] border-[#222]">
-          <CardHeader>
-            <CardTitle className="text-white">Other Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-white">Copyright Text</Label>
-              <Input
-                value={footerData.copyright}
-                onChange={(e) => setFooterData({ ...footerData, copyright: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-white">Newsletter Description</Label>
-              <Textarea
-                value={footerData.newsletterText}
-                onChange={(e) => setFooterData({ ...footerData, newsletterText: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number</Label>
+          <Input
+            id="phone"
+            value={footerData.phone}
+            onChange={(e) => setFooterData({ ...footerData, phone: e.target.value })}
+            placeholder="Enter phone number"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input
+            id="email"
+            type="email"
+            value={footerData.email}
+            onChange={(e) => setFooterData({ ...footerData, email: e.target.value })}
+            placeholder="Enter email address"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="copyright">Copyright Text</Label>
+          <Input
+            id="copyright"
+            value={footerData.copyright}
+            onChange={(e) => setFooterData({ ...footerData, copyright: e.target.value })}
+            placeholder="© 2025 Your Company"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="newsletterText">Newsletter Text</Label>
+          <Textarea
+            id="newsletterText"
+            value={footerData.newsletterText}
+            onChange={(e) => setFooterData({ ...footerData, newsletterText: e.target.value })}
+            placeholder="Subscribe to get the latest insights..."
+            rows={2}
+          />
+        </div>
+
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Saving..." : "Save Footer"}
+        </Button>
       </div>
     </div>
   )
