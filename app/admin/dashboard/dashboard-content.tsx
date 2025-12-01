@@ -77,9 +77,9 @@ export default function AdminDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <AdminSidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
-      <main className="lg:pl-64">
+    <div className="flex min-h-screen bg-[#0a0a0a]">
+      <AdminSidebar activeSection={activeSection} setActiveSection={handleSectionChange} />
+      <main className="flex-1">
         <div className="p-8">{renderContent()}</div>
       </main>
     </div>
