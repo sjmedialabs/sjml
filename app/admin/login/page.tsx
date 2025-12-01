@@ -1,147 +1,174 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Lock } from "lucide-react"
-
 export default function AdminLoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form submitted!")
-    console.log("Email:", email)
-    console.log("Password length:", password.length)
+  const handleLogin = () => {
+    const email = (document.getElementById("email") as HTMLInputElement)?.value
+    const password = (document.getElementById("password") as HTMLInputElement)?.value
     
-    setLoading(true)
-    setError("")
-
-    try {
-      console.log("Sending request to /api/auth/login...")
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
-
-      console.log("Response status:", res.status)
-      const data = await res.json()
-      console.log("Response data:", data)
-
-      if (!res.ok) {
-        throw new Error(data.error || "Login failed")
-      }
-
-      console.log("Login successful, storing token...")
-      localStorage.setItem("adminToken", data.token)
-      console.log("Redirecting to dashboard...")
-      router.push("/admin/dashboard")
-    } catch (err) {
-      console.error("Login error:", err)
-      setError(err instanceof Error ? err.message : "Login failed")
-    } finally {
-      setLoading(false)
+    console.log("Login clicked!", { email, password })
+    
+    if (!email || !password) {
+      alert("Please enter email and password")
+      return
     }
+
+    fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Response:", data)
+        if (data.token) {
+          console.log("Saving token...")
+          localStorage.setItem("adminToken", data.token)
+          
+          const savedToken = localStorage.getItem("adminToken")
+          console.log("Token saved?", savedToken ? "YES" : "NO")
+          console.log("Token length:", savedToken?.length)
+          
+          console.log("Testing token verification...")
+          fetch("/api/auth/verify", {
+            headers: { Authorization: `Bearer ${savedToken}` }
+          })
+            .then(r => r.json())
+            .then(verifyData => {
+              console.log("Verify response:", verifyData)
+              if (verifyData.valid) {
+                console.log("Token is valid! Redirecting...")
+                console.log("Redirect URL:", window.location.origin + "/admin/dashboard")
+                
+                // Use replace instead of href to prevent back button issues
+                window.location.replace("/admin/dashboard")
+              } else {
+                alert("Token verification failed: " + JSON.stringify(verifyData))
+              }
+            })
+        } else {
+          alert(data.error || "Login failed")
+        }
+      })
+      .catch(err => {
+        console.error("Error:", err)
+        alert("Network error")
+      })
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-[#E63946] rounded flex items-center justify-center">
-              <span className="text-white font-bold">SJ</span>
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-white font-bold text-xl">SJ Media Labs</span>
-              <span className="text-[#666] text-xs">Admin Portal</span>
-            </div>
+    <div style={{
+      minHeight: "100vh",
+      background: "#0a0a0a",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "16px"
+    }}>
+      <div style={{ width: "100%", maxWidth: "400px" }}>
+        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <div style={{
+            width: "40px",
+            height: "40px",
+            background: "#E63946",
+            borderRadius: "4px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "16px"
+          }}>
+            <span style={{ color: "white", fontWeight: "bold" }}>SJ</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-[#999]">Sign in to access the admin dashboard</p>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "white", marginBottom: "8px" }}>
+            SJ Media Labs
+          </h1>
+          <p style={{ color: "#999" }}>Admin Portal - Welcome Back</p>
         </div>
 
-        <div className="bg-[#111] border border-[#333] rounded-lg p-8">
-          <form onSubmit={handleLogin} className="space-y-6">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error}
+        <div style={{
+          background: "#111",
+          border: "1px solid #333",
+          borderRadius: "8px",
+          padding: "32px"
+        }}>
+          <div style={{ marginBottom: "16px" }}>
+            <label htmlFor="email" style={{ display: "block", color: "white", marginBottom: "8px" }}>
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              defaultValue="admin@sjmedialabs.com"
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: "#1a1a1a",
+                border: "1px solid #333",
+                borderRadius: "4px",
+                color: "white",
+                fontSize: "14px"
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label htmlFor="password" style={{ display: "block", color: "white", marginBottom: "8px" }}>
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              defaultValue="SJMedia@2025"
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: "#1a1a1a",
+                border: "1px solid #333",
+                borderRadius: "4px",
+                color: "white",
+                fontSize: "14px"
+              }}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleLogin}
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#E63946",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              fontSize: "16px",
+              fontWeight: "500",
+              cursor: "pointer"
+            }}
+          >
+            Sign In
+          </button>
+
+          <div style={{
+            marginTop: "24px",
+            paddingTop: "24px",
+            borderTop: "1px solid #333"
+          }}>
+            <p style={{ fontSize: "12px", color: "#666", textAlign: "center", marginBottom: "8px" }}>
+              Default Credentials
+            </p>
+            <div style={{
+              background: "#1a1a1a",
+              borderRadius: "4px",
+              padding: "12px",
+              fontSize: "12px"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <span style={{ color: "#999" }}>Email:</span>
+                <span style={{ color: "white", fontFamily: "monospace" }}>admin@sjmedialabs.com</span>
               </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@sjmedialabs.com"
-                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-[#666]"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">
-                Password
-              </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-[#666] pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666] hover:text-white transition-colors"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <Button type="submit" disabled={loading} className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white py-6">
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Lock size={18} />
-                  Sign In
-                </span>
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-[#333]">
-            <p className="text-xs text-[#666] text-center mb-2">Default Credentials (For Testing)</p>
-            <div className="bg-[#1a1a1a] rounded p-3 text-xs">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[#999]">Email:</span>
-                <span className="text-white font-mono">admin@sjmedialabs.com</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#999]">Password:</span>
-                <span className="text-white font-mono">SJMedia@2025</span>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#999" }}>Password:</span>
+                <span style={{ color: "white", fontFamily: "monospace" }}>SJMedia@2025</span>
               </div>
             </div>
           </div>

@@ -1,29 +1,31 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-
-  // Protect admin routes
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const token = request.cookies.get("admin_token")?.value
-
+  
+  // Allow access to login page and API routes
+  if (pathname === '/admin/login' || pathname.startsWith('/api/')) {
+    return NextResponse.next()
+  }
+  
+  // Protect all /admin routes
+  if (pathname.startsWith('/admin')) {
+    // Check for token in cookies (set by login API)
+    const token = request.cookies.get('admin_token')?.value
+    
+    // If no token, redirect to login
     if (!token) {
-      return NextResponse.redirect(new URL("/admin/login", request.url))
+      return NextResponse.redirect(new URL('/admin/login', request.url))
     }
+    
+    // Token exists, allow access
+    return NextResponse.next()
   }
-
-  // Protect admin API routes (except login and public endpoints)
-  if (pathname.startsWith("/api/content") && request.method === "PUT") {
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-  }
-
+  
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/content/:path*"],
+  matcher: ['/admin/:path*', '/api/:path*']
 }

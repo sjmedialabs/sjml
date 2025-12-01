@@ -24,10 +24,7 @@ export default function AdminDashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [activeSection, setActiveSection] = useState("overview")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
 
-  // Initialize section from URL params after mount
   useEffect(() => {
     const section = searchParams.get("section")
     if (section) {
@@ -35,45 +32,10 @@ export default function AdminDashboardContent() {
     }
   }, [searchParams])
 
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken")
-    if (!token) {
-      router.push("/admin/login")
-    } else {
-      fetch("/api/auth/verify", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => {
-          if (res.ok) {
-            setIsAuthenticated(true)
-          } else {
-            localStorage.removeItem("adminToken")
-            router.push("/admin/login")
-          }
-        })
-        .catch(() => {
-          localStorage.removeItem("adminToken")
-          router.push("/admin/login")
-        })
-        .finally(() => setLoading(false))
-    }
-  }, [router])
-
-  // Update URL when section changes
   const handleSectionChange = (section: string) => {
     setActiveSection(section)
     router.push(`/admin/dashboard?section=${section}`, { scroll: false })
   }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) return null
 
   const renderContent = () => {
     switch (activeSection) {
@@ -115,9 +77,11 @@ export default function AdminDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
-      <AdminSidebar activeSection={activeSection} setActiveSection={handleSectionChange} />
-      <main className="flex-1 p-8 overflow-auto">{renderContent()}</main>
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <AdminSidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
+      <main className="lg:pl-64">
+        <div className="p-8">{renderContent()}</div>
+      </main>
     </div>
   )
 }
