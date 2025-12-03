@@ -3,8 +3,7 @@ import { Footer } from "@/components/footer"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const revalidate = 3600
 
 export default async function TestimonialsPage() {
   let testimonials: any[] = []

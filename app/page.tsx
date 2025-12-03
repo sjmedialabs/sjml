@@ -12,8 +12,7 @@ import { Footer } from "@/components/footer"
 import { getHomeContent } from "@/lib/models/content"
 import { clientPromise } from "@/lib/mongodb"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const revalidate = 3600
 
 export default async function HomePage() {
   let content

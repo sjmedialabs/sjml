@@ -4,8 +4,7 @@ import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import InsightsClient from "./insights-client"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const revalidate = 3600
 
 export default async function InsightsPage() {
   let posts: any[] = []
