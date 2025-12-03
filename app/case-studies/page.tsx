@@ -4,7 +4,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -68,7 +67,7 @@ export default async function CaseStudiesPage() {
     // Fetch page content
     content = await getPageContent("case-studies")
     if (!content) {
-      content = getDefaultPageContent("case-studies")
+      throw new Error("Case studies page content not found")
     }
 
     // Fetch case studies directly from MongoDB
@@ -83,19 +82,18 @@ export default async function CaseStudiesPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch case studies:", error)
-    content = getDefaultPageContent("case-studies")
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">Case studies page content has not been set up yet. Please contact the administrator.</p>
+        </div>
+      </main>
+    )
   }
 
-  const hero = content?.hero || {
-    title: "Elevate Beyond the Ordinary.",
-    subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
-    description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
-  }
-
-  const section = content?.section || {
-    title: "Featured Case Studies",
-    description: "Discover how we've helped brands achieve extraordinary results.",
-  }
+  const hero = content.hero
+  const section = content.section
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">

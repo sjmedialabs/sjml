@@ -1,8 +1,10 @@
 import Image from "next/image"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 interface CaseStudy {
   id: string
+  slug?: string
   title: string
   description: string
   image: string
@@ -48,9 +50,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/85" />
-        </div>
+        />
       )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
@@ -114,13 +114,13 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
                 </div>
 
                 {/* Link */}
-                <a
-                  href="#"
+                <Link
+                  href={`/case-studies/${study.slug || study.id}`}
                   className="inline-flex items-center gap-2 text-white text-sm font-medium hover:text-[#E63946] transition-colors"
                 >
                   View Case Study
                   <ArrowRightIcon className="w-4 h-4" />
-                </a>
+                </Link>
               </div>
             </div>
           ))}
@@ -128,12 +128,14 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Button
-            variant="outline"
-            className="border-white text-white hover:bg-white hover:text-black rounded-full px-8 bg-transparent"
-          >
-            View All Case Studies
-          </Button>
+          <Link href="/case-studies">
+            <Button
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-black rounded-full px-8 bg-transparent"
+            >
+              View All Case Studies
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

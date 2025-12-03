@@ -1,5 +1,8 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { PlaybookDownloadModal } from "@/components/playbook-download-modal"
 
 interface PlaybookData {
   title: string
@@ -7,15 +10,9 @@ interface PlaybookData {
   buttonText: string
   buttonUrl: string
   image?: string
+  pdfUrl?: string
 }
 
-const defaultPlaybook: PlaybookData = {
-  title: "Download Our Brand Playbook",
-  description:
-    "Get exclusive access to our comprehensive guide on building powerful brands. Learn strategies, frameworks, and best practices from industry experts.",
-  buttonText: "Download Now",
-  buttonUrl: "/playbook",
-}
 
 function DownloadIcon({ className }: { className?: string }) {
   return (
@@ -38,34 +35,46 @@ function DownloadIcon({ className }: { className?: string }) {
 }
 
 interface PlaybookSectionProps {
-  data?: PlaybookData | null
+  data: PlaybookData
   backgroundImage?: string
 }
 
 export function PlaybookSection({ data, backgroundImage }: PlaybookSectionProps) {
-  const playbook = data || defaultPlaybook
+  const playbook = data
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleDownloadClick = () => {
+    setIsModalOpen(true)
+  }
 
   return (
-    <section className="relative py-20 bg-[#111]">
-      {backgroundImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/80" />
-        </div>
-      )}
+    <>
+      <section className="relative py-20 bg-[#111]">
+        {backgroundImage && (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        )}
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{playbook.title}</h2>
-        <p className="text-gray-400 mb-8 max-w-2xl mx-auto">{playbook.description}</p>
-        <Link href={playbook.buttonUrl || "/playbook"}>
-          <Button className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full px-8 py-6 text-lg">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{playbook.title}</h2>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">{playbook.description}</p>
+          <Button
+            onClick={handleDownloadClick}
+            className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full px-8 py-6 text-lg"
+          >
             <DownloadIcon className="mr-2" />
             {playbook.buttonText}
           </Button>
-        </Link>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <PlaybookDownloadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        pdfUrl={playbook.pdfUrl || ""}
+      />
+    </>
   )
 }

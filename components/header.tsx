@@ -18,18 +18,6 @@ interface HeaderProps {
   data?: HeaderData | null
 }
 
-const defaultNavLinks = [
-  { name: "About", href: "/about" },
-  { name: "Work", href: "/work" },
-  { name: "Services", href: "/services" },
-  { name: "Case Studies", href: "/case-studies" },
-  { name: "Insights", href: "/insights" },
-  { name: "Clients", href: "/clients" },
-  { name: "Testimonials", href: "/testimonials" },
-  { name: "Careers", href: "/careers" },
-  { name: "Contact", href: "/contact" },
-]
-
 function MenuIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -93,12 +81,14 @@ export function Header({ data: propData }: HeaderProps = {}) {
     }
   }, [propData])
 
-  // Use header data if available, otherwise use defaults
-  const navLinks = headerData?.navItems
-    ? headerData.navItems.map((item) => ({ name: item.label, href: item.href }))
-    : defaultNavLinks
-  const logoText = headerData?.logoText || "SJ MEDIA LABS"
-  const ctaText = headerData?.ctaButton?.text || "Start a project"
+  // Don't render header if no data available
+  if (!headerData) {
+    return null
+  }
+
+  const navLinks = headerData.navItems?.map((item) => ({ name: item.label, href: item.href })) || []
+  const logoText = headerData.logoText || "SJ MEDIA LABS"
+  const ctaText = headerData.ctaButton?.text || "Start a project"
 
   return (
     <>

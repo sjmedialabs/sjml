@@ -30,45 +30,11 @@ interface ContactData {
   }
 }
 
-const defaultData: ContactData = {
-  hero: {
-    title: "Empowering Your Vision, Driving Transformation",
-    subtitle: "",
-    backgroundImage: "/placeholder.svg?height=500&width=1920",
-  },
-  form: {
-    badge: "Our Achievements",
-    title: "Feel free to get in touch with agency",
-    highlightedWords: ["touch", "with agency"],
-    buttonText: "Let's Get Started !",
-  },
-  offices: [
-    {
-      country: "India",
-      flag: "🇮🇳",
-      address: "E-307, 3rd Floor, guttalabegempet, kavuri hills, madhapur, hyderabad, Telangana, -500033",
-    },
-    {
-      country: "Singapore",
-      flag: "🇸🇬",
-      address: "160 Robinson Road, #14-04 Singapore Business Federation Centre, Singapore, 068914",
-    },
-    {
-      country: "USA",
-      flag: "🇺🇸",
-      address: "1021 E Lincolnway 7542 Cheyenne, WY 82001",
-    },
-  ],
-  contact: {
-    title: "Reach out to us",
-    phone: "+91 89299 96900",
-    email: "info@sjmedialabs.com",
-  },
-}
 
 export default function ContactPage() {
-  const [data, setData] = useState<ContactData>(defaultData)
+  const [data, setData] = useState<ContactData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -83,12 +49,14 @@ export default function ContactPage() {
     const fetchData = async () => {
       try {
         const res = await fetch("/api/content/contact")
-        if (res.ok) {
-          const fetchedData = await res.json()
-          setData({ ...defaultData, ...fetchedData })
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status}`)
         }
+        const fetchedData = await res.json()
+        setData(fetchedData)
       } catch (error) {
-        console.error("Failed to fetch contact data")
+        console.error("Failed to fetch contact data:", error)
+        setError("Failed to load page content. Please contact the administrator.")
       } finally {
         setLoading(false)
       }
@@ -138,7 +106,18 @@ export default function ContactPage() {
         <div className="flex items-center justify-center h-[60vh]">
           <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
         </div>
-        <Footer />
+      </main>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0a]">
+        <Header />
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">{error || "Page content has not been set up yet."}</p>
+        </div>
       </main>
     )
   }

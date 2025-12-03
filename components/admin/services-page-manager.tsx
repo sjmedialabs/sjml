@@ -48,7 +48,22 @@ const emptyService: Omit<ServiceItem, "id"> = {
   isActive: true,
 }
 
+interface PageContent {
+  hero: {
+    title: string
+    highlightedWords: string[]
+    backgroundImage: string
+    watermark: string
+  }
+  section: {
+    title: string
+    subtitle: string
+    description: string
+  }
+}
+
 export function ServicesPageManager() {
+  const [activeTab, setActiveTab] = useState<"services" | "page-content">("services")
   const [services, setServices] = useState<ServiceItem[]>([])
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [loading, setLoading] = useState(true)
@@ -58,10 +73,52 @@ export function ServicesPageManager() {
   const [view, setView] = useState<"list" | "edit">("list")
   const [editingService, setEditingService] = useState<ServiceItem | null>(null)
   const [isNew, setIsNew] = useState(false)
+  const [pageContent, setPageContent] = useState<PageContent>({
+    hero: { title: "", highlightedWords: [], backgroundImage: "", watermark: "SERVICES" },
+    section: { title: "", subtitle: "", description: "" }
+  })
+  const [pageContentSaving, setPageContentSaving] = useState(false)
 
   useEffect(() => {
     fetchServices()
+    fetchPageContent()
   }, [pagination.page])
+
+  const fetchPageContent = async () => {
+    try {
+      const res = await fetch('/api/content/services')
+      if (res.ok) {
+        const data = await res.json()
+        if (data.hero) setPageContent(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch page content')
+    }
+  }
+
+  const savePageContent = async () => {
+    setPageContentSaving(true)
+    try {
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch('/api/content/services', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ pageKey: 'services', ...pageContent })
+      })
+      if (res.ok) {
+        setMessage('Page content saved successfully!')
+        setTimeout(() => setMessage(''), 3000)
+      } else {
+        setMessage('Failed to save page content')
+      }
+    } catch {
+      setMessage('Failed to save page content')
+    }
+    setPageContentSaving(false)
+  }
 
   const fetchServices = async () => {
     setLoading(true)
@@ -159,30 +216,124 @@ export function ServicesPageManager() {
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold text-white mb-2">Services Management</h1>
-            <p className="text-[#888]">Create and manage your services. Each service has its own detail page.</p>
+            <p className="text-[#888]">Manage services page content and individual services</p>
           </div>
-          <Button onClick={addNewService} className="bg-[#E63946] hover:bg-[#d32f3d]">
-            <Plus className="w-4 h-4 mr-2" /> Add Service
-          </Button>
+          {activeTab === "services" && (
+            <Button onClick={addNewService} className="bg-[#E63946] hover:bg-[#d32f3d]">
+              <Plus className="w-4 h-4 mr-2" /> Add Service
+            </Button>
+          )}
+          {activeTab === "page-content" && (
+            <Button onClick={savePageContent} disabled={pageContentSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">
+              {pageContentSaving ? 'Saving...' : 'Save Page Content'}
+            </Button>
+          )}
         </div>
 
         {message && (
           <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
         )}
 
-        {/* Search */}
-        <div className="mb-6 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            placeholder="Search services..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#333] text-white w-64"
-          />
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-[#222] pb-4 mb-6">
+          <button
+            onClick={() => setActiveTab('page-content')}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-[#E63946] text-white' : 'bg-[#1a1a1a] text-gray-400 hover:text-white'}`}
+          >
+            Page Content
+          </button>
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-[#E63946] text-white' : 'bg-[#1a1a1a] text-gray-400 hover:text-white'}`}
+          >
+            Services List
+          </button>
         </div>
 
-        {/* Services Table */}
-        <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+        {/* Page Content Tab */}
+        {activeTab === 'page-content' && (
+          <div className="space-y-6">
+            <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Hero Section</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Background Image</label>
+                  <ImageUpload
+                    value={pageContent.hero.backgroundImage}
+                    onChange={(url) => setPageContent({...pageContent, hero: {...pageContent.hero, backgroundImage: url}})}
+                    label="Upload Background"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Hero Title</label>
+                  <Input
+                    value={pageContent.hero.title}
+                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, title: e.target.value}})}
+                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    placeholder="Redefining Digital Success..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Watermark Text</label>
+                  <Input
+                    value={pageContent.hero.watermark}
+                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, watermark: e.target.value}})}
+                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    placeholder="SERVICES"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Section Content</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Section Title</label>
+                  <Input
+                    value={pageContent.section.title}
+                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, title: e.target.value}})}
+                    className="bg-[#0a0a0a] border-[#333] text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Section Subtitle</label>
+                  <Input
+                    value={pageContent.section.subtitle}
+                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, subtitle: e.target.value}})}
+                    className="bg-[#0a0a0a] border-[#333] text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">Section Description</label>
+                  <Textarea
+                    value={pageContent.section.description}
+                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, description: e.target.value}})}
+                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Services List Tab */}
+        {activeTab === 'services' && (
+          <>
+            {/* Search */}
+            <div className="mb-6 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search services..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-[#1a1a1a] border-[#333] text-white w-64"
+              />
+            </div>
+
+            {/* Services Table */}
+            <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#222]">
@@ -296,6 +447,8 @@ export function ServicesPageManager() {
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
     )
   }
@@ -414,19 +567,19 @@ export function ServicesPageManager() {
           <div className="bg-[#111] border border-[#222] rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white mb-4">Service Offerings</h2>
             <Textarea
-              value={editingService.offerings.join(", ")}
+              value={editingService.offerings.join("\n")}
               onChange={(e) =>
                 updateField(
                   "offerings",
                   e.target.value
-                    .split(",")
+                    .split("\n")
                     .map((o) => o.trim())
                     .filter(Boolean),
                 )
               }
               className="bg-[#0a0a0a] border-[#333] text-white"
-              placeholder="Brand strategy, Visual identity, Web design (comma separated)"
-              rows={3}
+              placeholder="Brand strategy&#10;Visual identity, modern design&#10;Web design and development&#10;(one per line)"
+              rows={5}
             />
           </div>
 

@@ -4,40 +4,6 @@ import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 
-const defaultWorks = [
-  {
-    id: "1",
-    slug: "urvi-constructions",
-    title: "URVI CONSTRUCTIONS",
-    description: "Complete brand identity and web design for a leading construction company",
-    image: "/construction-branding.jpg",
-    category: "Branding",
-    client: "URVI Constructions",
-    industry: "Real Estate",
-    role: "Branding / Web Design",
-    technology: "Web | UI | UX",
-    year: "2025",
-    tags: ["Logo & Identity", "Web Design", "Development"],
-    overview: {
-      title: "Brand Overview",
-      description: "Complete brand identity redesign for a premier construction company.",
-      points: ["Branding and identity", "Websites and digital platforms", "Content strategy"],
-    },
-    logoVariations: [],
-    gallery: [],
-    process: [
-      { step: "01", title: "Discovery", description: "Understanding the brand vision and goals" },
-      { step: "02", title: "Design", description: "Creating visual identity and web layouts" },
-      { step: "03", title: "Development", description: "Building the final website" },
-    ],
-    showcase: [],
-    isActive: true,
-    isFeatured: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-]
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -54,9 +20,6 @@ export async function GET(request: NextRequest) {
       if (featured) filter.isFeatured = true
 
       const works = await db.collection("works").find(filter).sort({ createdAt: -1 }).toArray()
-      if (works.length === 0) {
-        return NextResponse.json(defaultWorks)
-      }
       // Convert MongoDB _id to string for JSON serialization
       const serializedWorks = works.map(work => ({
         ...work,
@@ -77,17 +40,17 @@ export async function GET(request: NextRequest) {
     }))
 
     return NextResponse.json({
-      works: serializedWorks.length > 0 ? serializedWorks : defaultWorks,
+      works: serializedWorks,
       pagination: {
         page,
         limit,
-        total: total || defaultWorks.length,
-        totalPages: Math.ceil((total || defaultWorks.length) / limit),
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     })
   } catch (error) {
     console.error("Get works error:", error)
-    return NextResponse.json({ works: defaultWorks, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } })
+    return NextResponse.json({ error: "Failed to fetch works" }, { status: 500 })
   }
 }
 

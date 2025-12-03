@@ -4,55 +4,6 @@ import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 
-const defaultServices = [
-  {
-    id: "1",
-    slug: "research-strategy",
-    title: "Research & Strategy",
-    description: "Strategic brand development, identity design, and brand management to create memorable experiences.",
-    icon: "research-strategy",
-    linkText: "Explore Service",
-    image: "/research-strategy-business.jpg",
-    fullDescription:
-      "We provide comprehensive research and strategy services to help your brand succeed in competitive markets.",
-    offerings: [
-      "Brand strategy development",
-      "Market research",
-      "Competitor analysis",
-      "Customer insights",
-      "Strategic planning",
-    ],
-    benefits: {
-      title: "Benefits of Research & Strategy",
-      description:
-        "Our strategic approach ensures your brand stands out and connects with your target audience effectively.",
-    },
-    features: {
-      title: "Key Features",
-      points: ["Data-driven insights", "Actionable recommendations", "Competitive advantage", "Market positioning"],
-    },
-    process: [
-      { icon: "thinking", title: "Discovery", description: "Understanding your business and goals" },
-      { icon: "analysis", title: "Research", description: "Deep market and competitor analysis" },
-      { icon: "strategy", title: "Strategy", description: "Creating actionable strategic plans" },
-    ],
-    faqs: [
-      {
-        question: "What is included in research services?",
-        answer:
-          "Our research services include market analysis, competitor research, customer insights, and strategic recommendations.",
-      },
-      {
-        question: "How long does the strategy process take?",
-        answer: "Typically 4-6 weeks depending on the scope and complexity of your project.",
-      },
-    ],
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-]
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -66,9 +17,6 @@ export async function GET(request: NextRequest) {
     if (all) {
       // Return all active services for frontend
       const services = await db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
-      if (services.length === 0) {
-        return NextResponse.json(defaultServices)
-      }
       // Convert MongoDB _id to string for JSON serialization
       const serializedServices = services.map(service => ({
         ...service,
@@ -89,17 +37,17 @@ export async function GET(request: NextRequest) {
     }))
 
     return NextResponse.json({
-      services: serializedServices.length > 0 ? serializedServices : defaultServices,
+      services: serializedServices,
       pagination: {
         page,
         limit,
-        total: total || defaultServices.length,
-        totalPages: Math.ceil((total || defaultServices.length) / limit),
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     })
   } catch (error) {
     console.error("Get services error:", error)
-    return NextResponse.json({ services: defaultServices, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } })
+    return NextResponse.json({ error: "Failed to fetch services" }, { status: 500 })
   }
 }
 

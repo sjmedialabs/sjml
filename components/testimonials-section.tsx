@@ -96,14 +96,16 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
         backgroundPosition: "center",
       }}
     >
-      {/* Dot pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `radial-gradient(circle, #333 1px, transparent 1px)`,
-          backgroundSize: "20px 20px",
-        }}
-      />
+      {/* Dot pattern overlay - only show when no background image */}
+      {!backgroundImage && (
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `radial-gradient(circle, #333 1px, transparent 1px)`,
+            backgroundSize: "20px 20px",
+          }}
+        />
+      )}
 
       <div className="max-w-5xl mx-auto px-4 relative z-10">
         <div className="text-center mb-12">

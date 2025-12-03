@@ -5,19 +5,16 @@ interface Stat {
 }
 
 interface StatsSectionProps {
-  data?: Stat[] | null
+  data: Stat[]
   backgroundImage?: string
 }
 
-const defaultStats: Stat[] = [
-  { id: "1", value: "500+", label: "Projects Completed" },
-  { id: "2", value: "95%", label: "Client NPS Score" },
-  { id: "3", value: "13+", label: "Years in Business" },
-  { id: "4", value: "40+", label: "Countries Served" },
-]
-
 export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
-  const stats = data || defaultStats
+  if (!data || data.length === 0) {
+    return null
+  }
+
+  const stats = data
 
   return (
     <section className="relative py-20 bg-[#0a0a0a]">
@@ -25,9 +22,7 @@ export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/80" />
-        </div>
+        />
       ) : (
         <div className="absolute inset-0 opacity-10">
           <div

@@ -10,7 +10,6 @@ import { PlaybookSection } from "@/components/playbook-section"
 import { TrustedBySection } from "@/components/trusted-by-section"
 import { Footer } from "@/components/footer"
 import { getHomeContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 import { clientPromise } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
@@ -22,13 +21,12 @@ export default async function HomePage() {
   let caseStudies: any[] = []
   let insights: any[] = []
   let testimonials: any[] = []
-  let clients: any[] = []
 
   try {
     // Fetch home page content (hero, stats, etc.)
     content = await getHomeContent()
     if (!content) {
-      content = getDefaultPageContent("home")
+      throw new Error("Home content not found in database")
     }
 
     // Fetch dynamic content from respective collections
@@ -41,7 +39,7 @@ export default async function HomePage() {
 
     // Fetch case studies
     const caseStudiesData = await db.collection("case-studies").find({ featured: true }).limit(3).toArray()
-    caseStudies = caseStudiesData.map(cs => ({ ...cs, id: cs._id.toString(), _id: cs._id.toString() }))
+    caseStudies = caseStudiesData.map(cs => ({ ...cs, id: cs.id || cs._id.toString(), _id: cs._id.toString() }))
 
     // Fetch insights
     const insightsData = await db.collection("insights").find({ published: true, featured: true }).limit(3).toArray()
@@ -50,13 +48,16 @@ export default async function HomePage() {
     // Fetch testimonials
     const testimonialsData = await db.collection("testimonials").find({ featured: true }).limit(3).toArray()
     testimonials = testimonialsData.map(t => ({ ...t, id: t._id.toString(), _id: t._id.toString() }))
-
-    // Fetch clients
-    const clientsData = await db.collection("clients").find({ featured: true }).limit(8).toArray()
-    clients = clientsData.map(c => ({ ...c, id: c._id.toString(), _id: c._id.toString() }))
   } catch (error) {
     console.error("Failed to fetch home content:", error)
-    content = getDefaultPageContent("home")
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">Home page content has not been set up yet. Please contact the administrator.</p>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -70,7 +71,7 @@ export default async function HomePage() {
       <TestimonialsSection data={testimonials} backgroundImage={content.testimonialsBackgroundImage} />
       <InsightsSection data={insights} backgroundImage={content.insightsBackgroundImage} />
       <PlaybookSection data={content.playbook} backgroundImage={content.playbookBackgroundImage} />
-      <TrustedBySection data={clients} backgroundImage={content.trustedByBackgroundImage} />
+      <TrustedBySection data={content.partners} backgroundImage={content.trustedByBackgroundImage} />
       <Footer data={content.footer} />
     </main>
   )

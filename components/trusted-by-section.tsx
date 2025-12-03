@@ -9,24 +9,17 @@ interface Partner {
   logo: string
 }
 
-const defaultPartners: Partner[] = [
-  { id: "1", name: "ACME Corp", logo: "" },
-  { id: "2", name: "Pinnacle", logo: "" },
-  { id: "3", name: "Price Jacs", logo: "" },
-  { id: "4", name: "GNTS", logo: "" },
-  { id: "5", name: "SuperPower", logo: "" },
-  { id: "6", name: "Mineskins", logo: "" },
-  { id: "7", name: "TechFlow", logo: "" },
-  { id: "8", name: "DataSync", logo: "" },
-]
-
 interface TrustedBySectionProps {
-  data?: Partner[] | null
+  data: Partner[]
   backgroundImage?: string
 }
 
 export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProps) {
-  const partners = data || defaultPartners
+  if (!data || data.length === 0) {
+    return null
+  }
+
+  const partners = data
   const [isPaused, setIsPaused] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -65,9 +58,7 @@ export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProp
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/85" />
-        </div>
+        />
       )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">

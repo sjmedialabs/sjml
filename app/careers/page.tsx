@@ -30,33 +30,24 @@ interface CareersData {
   jobs: JobPosting[]
 }
 
-const defaultData: CareersData = {
-  heroTitle: "Join Our Team",
-  heroSubtitle:
-    "Build your career with a team of passionate innovators dedicated to creating extraordinary digital experiences.",
-  culture: {
-    title: "Our Culture",
-    description: "We believe in fostering a creative environment where innovation thrives.",
-    values: [],
-  },
-  benefits: [],
-  jobs: [],
-}
 
 export default function CareersPage() {
-  const [data, setData] = useState<CareersData>(defaultData)
+  const [data, setData] = useState<CareersData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch("/api/content/careers")
-        if (res.ok) {
-          const fetchedData = await res.json()
-          setData({ ...defaultData, ...fetchedData })
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status}`)
         }
+        const fetchedData = await res.json()
+        setData(fetchedData)
       } catch (error) {
-        console.error("Failed to fetch careers data")
+        console.error("Failed to fetch careers data:", error)
+        setError("Failed to load page content. Please contact the administrator.")
       } finally {
         setLoading(false)
       }
@@ -64,8 +55,6 @@ export default function CareersPage() {
     fetchData()
   }, [])
 
-  // Filter only published jobs
-  const publishedJobs = data.jobs.filter((job) => job.published)
 
   if (loading) {
     return (
@@ -74,10 +63,24 @@ export default function CareersPage() {
         <div className="flex items-center justify-center h-[60vh]">
           <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
         </div>
-        <Footer />
       </main>
     )
   }
+
+  if (error || !data) {
+    return (
+      <main className="min-h-screen bg-black">
+        <Header />
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">{error || "Page content has not been set up yet."}</p>
+        </div>
+      </main>
+    )
+  }
+
+  // Filter only published jobs
+  const publishedJobs = data.jobs?.filter((job) => job.published) || []
 
   return (
     <main className="min-h-screen bg-black">

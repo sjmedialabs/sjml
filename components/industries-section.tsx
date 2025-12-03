@@ -23,9 +23,7 @@ export function IndustriesSection({ data, backgroundImage }: IndustriesSectionPr
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/85" />
-        </div>
+        />
       )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">

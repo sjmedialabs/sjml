@@ -1,14 +1,22 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { clientPromise } from "@/lib/mongodb"
+import { getPageContent } from "@/lib/models/content"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function TestimonialsPage() {
   let testimonials: any[] = []
+  let content
 
   try {
+    // Fetch page content
+    content = await getPageContent("testimonials")
+    if (!content) {
+      throw new Error("Testimonials page content not found")
+    }
+
     // Fetch testimonials directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
@@ -21,19 +29,18 @@ export default async function TestimonialsPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch testimonials:", error)
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">Testimonials page content has not been set up yet. Please contact the administrator.</p>
+        </div>
+      </main>
+    )
   }
 
-  const hero = {
-    title: "What Our Clients Say",
-    subtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
-  }
-
-  const cta = {
-    title: "Ready to Join Our Success Stories?",
-    description: "Let's create something extraordinary together.",
-    buttonText: "Start Your Project",
-    buttonUrl: "/contact",
-  }
+  const hero = content.hero
+  const cta = content.cta
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />

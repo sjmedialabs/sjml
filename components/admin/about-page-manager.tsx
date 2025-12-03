@@ -148,7 +148,18 @@ export function AboutPageManager() {
       const res = await fetch("/api/content/about")
       if (res.ok) {
         const fetchedData = await res.json()
-        setData({ ...defaultAboutData, ...fetchedData })
+        setData({ 
+          ...defaultAboutData, 
+          ...fetchedData,
+          aboutSection: fetchedData.about || defaultAboutData.aboutSection,
+          mission: fetchedData.mission?.description || fetchedData.mission || defaultAboutData.mission,
+          vision: fetchedData.vision?.description || fetchedData.vision || defaultAboutData.vision,
+          missionSection: fetchedData.mission || defaultAboutData.missionSection,
+          visionSection: fetchedData.vision || defaultAboutData.visionSection,
+          teamSection: fetchedData.team || defaultAboutData.teamSection,
+          team: Array.isArray(fetchedData.team?.members) ? fetchedData.team.members : (Array.isArray(fetchedData.team) ? fetchedData.team : []),
+          values: fetchedData.about?.values || fetchedData.values || defaultAboutData.values
+        })
       }
     } catch (error) {
       console.error("Failed to fetch about data")
@@ -157,15 +168,40 @@ export function AboutPageManager() {
 
   const saveData = async () => {
     setSaving(true)
+    console.log("Saving about data:", data)
+    console.log("heroBackgroundImage:", data.heroBackgroundImage)
     try {
       const token = localStorage.getItem("adminToken")
+      
+      // Transform data to match frontend structure
+      const transformedData = {
+        ...data,
+        about: {
+          ...data.aboutSection,
+          values: data.values
+        },
+        mission: {
+          ...data.missionSection,
+          description: data.mission
+        },
+        vision: {
+          ...data.visionSection,
+          description: data.vision
+        },
+        team: {
+          ...data.teamSection,
+          members: data.team
+        },
+        achievementsSection: data.achievementsSection
+      }
+      
       const res = await fetch("/api/content/about", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(transformedData),
       })
       if (res.ok) {
         setMessage("About page saved successfully!")

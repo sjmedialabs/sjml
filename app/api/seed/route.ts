@@ -9,6 +9,9 @@ import {
   defaultCaseStudiesContent,
   defaultCareersContent,
   defaultContactContent,
+  defaultInsightsContent,
+  defaultTestimonialsContent,
+  defaultClientsContent,
 } from "@/lib/defaults"
 
 export async function POST() {

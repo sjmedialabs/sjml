@@ -11,9 +11,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const db = client.db("sjmedialabs")
 
     // Try to find by slug first, then by id
-    let caseStudy = await db.collection("case_studies").findOne({ slug: id })
+    let caseStudy = await db.collection("case-studies").findOne({ slug: id })
     if (!caseStudy) {
-      caseStudy = await db.collection("case_studies").findOne({ id })
+      caseStudy = await db.collection("case-studies").findOne({ id })
     }
 
     if (!caseStudy) {
@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
     delete updateData._id
 
-    const result = await db.collection("case_studies").updateOne({ id }, { $set: updateData })
+    const result = await db.collection("case-studies").updateOne({ id }, { $set: updateData })
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: "Case study not found" }, { status: 404 })
@@ -83,7 +83,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
-    const result = await db.collection("case_studies").deleteOne({ id })
+    const result = await db.collection("case-studies").deleteOne({ id })
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Case study not found" }, { status: 404 })

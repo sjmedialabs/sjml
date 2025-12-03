@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 
 export async function GET() {
   try {
@@ -11,9 +10,7 @@ export async function GET() {
       return NextResponse.json(content)
     }
 
-    // Return default content if database is empty
-    const defaultContent = getDefaultPageContent("home")
-    return NextResponse.json(defaultContent)
+    return NextResponse.json({ error: "Content not found" }, { status: 404 })
   } catch (error) {
     console.error("Get home content error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

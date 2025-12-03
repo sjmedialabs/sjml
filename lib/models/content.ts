@@ -66,6 +66,7 @@ export interface ContentData {
     buttonText: string
     buttonUrl: string
     image: string
+    pdfUrl?: string
   }
   partners: Array<{
     id: string
@@ -99,6 +100,11 @@ export interface ContentData {
 export interface AboutPageData {
   _id?: ObjectId
   pageKey: string
+  heroTitle?: string
+  heroSubtitle?: string
+  heroDescription?: string
+  heroImage?: string
+  heroBackgroundImage?: string
   hero: {
     title: string
     highlightedText: string

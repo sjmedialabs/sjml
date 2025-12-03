@@ -15,16 +15,6 @@ interface HeroData {
   backgroundImage?: string
 }
 
-const defaultData: HeroData = {
-  title: "Transform Your Brand Into a",
-  description:
-    "Strategic brand development, identity design, and brand management to create memorable brand experiences.",
-  primaryButtonText: "Start a Project",
-  primaryButtonUrl: "/contact",
-  secondaryButtonText: "See Our works",
-  secondaryButtonUrl: "/work",
-  rotatingWords: ["Success Story", "Digital Experience", "Market Leader", "Creative Force"],
-}
 
 function PlayIcon({ className }: { className?: string }) {
   return (
@@ -36,11 +26,11 @@ function PlayIcon({ className }: { className?: string }) {
 }
 
 interface HeroSectionProps {
-  data?: HeroData | null
+  data: HeroData
 }
 
 export function HeroSection({ data }: HeroSectionProps) {
-  const heroData = data || defaultData
+  const heroData = data
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -60,12 +50,13 @@ export function HeroSection({ data }: HeroSectionProps) {
     <section className="relative min-h-screen flex items-center justify-center pt-16 bg-[#0a0a0a]">
       {/* Background Image or Pattern */}
       {heroData.backgroundImage ? (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroData.backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/70" />
-        </div>
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+            style={{ backgroundImage: `url(${heroData.backgroundImage})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black" />
+        </>
       ) : (
         <div className="absolute inset-0 opacity-20">
           <div

@@ -4,7 +4,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -44,7 +43,7 @@ export default async function WorkPage() {
     // Fetch page content
     content = await getPageContent("work")
     if (!content) {
-      content = getDefaultPageContent("work")
+      throw new Error("Work page content not found")
     }
 
     // Fetch works directly from MongoDB
@@ -59,19 +58,18 @@ export default async function WorkPage() {
     }))
   } catch (error) {
     console.error("Failed to fetch works:", error)
-    content = getDefaultPageContent("work")
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">Work page content has not been set up yet. Please contact the administrator.</p>
+        </div>
+      </main>
+    )
   }
 
-  const hero = content?.hero || {
-    title: "Elevate Beyond the Ordinary.",
-    subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
-    description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
-  }
-
-  const portfolio = content?.portfolio || {
-    title: "Our Portfolio",
-    description: "Discover how we've helped brands achieve extraordinary results.",
-  }
+  const hero = content.hero
+  const portfolio = content.portfolio
 
   return (
     <main className="min-h-screen bg-[#0a0a0a]">

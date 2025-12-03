@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { clientPromise } from "@/lib/mongodb"
+import { getPageContent } from "@/lib/models/content"
 import InsightsClient from "./insights-client"
 
 export const dynamic = "force-dynamic"
@@ -9,8 +10,15 @@ export const revalidate = 0
 export default async function InsightsPage() {
   let posts: any[] = []
   let categories: string[] = ["All"]
+  let content
 
   try {
+    // Fetch page content
+    content = await getPageContent("insights")
+    if (!content) {
+      throw new Error("Insights page content not found")
+    }
+
     // Fetch insights directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
@@ -30,18 +38,18 @@ export default async function InsightsPage() {
     categories = ["All", ...Array.from(categoriesSet)]
   } catch (error) {
     console.error("Failed to fetch insights:", error)
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center px-4">
+          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <p className="text-[#888]">Insights page content has not been set up yet. Please contact the administrator.</p>
+        </div>
+      </main>
+    )
   }
 
-  const hero = {
-    title: "Insights & Resources",
-    subtitle: "Expert perspectives on branding, marketing, and digital transformation.",
-  }
-
-  const newsletter = {
-    title: "Subscribe to Our Newsletter",
-    description: "Get the latest insights and resources delivered to your inbox.",
-    buttonText: "Subscribe",
-  }
+  const hero = content.hero
+  const newsletter = content.newsletter
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />

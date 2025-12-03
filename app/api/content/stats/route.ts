@@ -1,14 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
-import { getDefaultPageContent } from "@/lib/defaults"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
     const content = await getHomeContent()
-    return NextResponse.json(content?.stats || getDefaultPageContent("home").stats)
+    if (!content?.stats) {
+      return NextResponse.json({ error: "Content not found" }, { status: 404 })
+    }
+    return NextResponse.json(content.stats)
   } catch (error) {
     console.error("Get stats error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

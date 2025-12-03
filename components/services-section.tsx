@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface Service {
   id: string
+  slug?: string
   title: string
   description: string
   icon: string
@@ -46,9 +48,7 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-black/85" />
-        </div>
+        />
       ) : (
         <>
           {/* Decorative curved lines */}
@@ -149,13 +149,13 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
               <p className="text-gray-300 text-sm mb-4">{activeServiceData.description}</p>
 
               {/* Link */}
-              <a
-                href="#"
+              <Link
+                href={`/services/${activeServiceData.slug || activeServiceData.id}`}
                 className="text-[#E63946] text-sm font-medium inline-flex items-center gap-2 hover:gap-3 transition-all"
               >
                 Explore {activeServiceData.title}
                 <ArrowRightIcon className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

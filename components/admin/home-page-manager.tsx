@@ -54,6 +54,7 @@ interface PlaybookData {
   buttonText: string
   buttonUrl: string
   image: string
+  pdfUrl?: string
 }
 
 interface PartnerItem {
@@ -139,6 +140,7 @@ export function HomePageManager() {
 
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
+  const [rotatingWordsInput, setRotatingWordsInput] = useState("")
 
   useEffect(() => {
     fetchContent()
@@ -149,7 +151,10 @@ export function HomePageManager() {
       const response = await fetch("/api/content/home")
       if (response.ok) {
         const data: HomeContent = await response.json()
-        if (data.hero) setHeroData(data.hero)
+        if (data.hero) {
+          setHeroData(data.hero)
+          setRotatingWordsInput(data.hero.rotatingWords?.join(", ") || "")
+        }
         if (data.stats) setStatsData(data.stats)
         if (data.caseStudies) setCaseStudiesData(data.caseStudies)
         if (data.services) setServicesData(data.services)
@@ -176,6 +181,10 @@ export function HomePageManager() {
     setSaving(true)
     setMessage("")
     try {
+      // Parse the rotating words input before saving
+      const rotatingWords = rotatingWordsInput.split(",").map((w) => w.trim()).filter(w => w.length > 0)
+      const updatedHeroData = { ...heroData, rotatingWords }
+      
       const token = localStorage.getItem("adminToken")
       const response = await fetch("/api/content/home", {
         method: "POST",
@@ -184,7 +193,7 @@ export function HomePageManager() {
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          hero: heroData,
+          hero: updatedHeroData,
           stats: statsData,
           caseStudies: caseStudiesData,
           services: servicesData,
@@ -435,10 +444,9 @@ export function HomePageManager() {
             <label className="block text-sm font-medium text-gray-400 mb-2">Rotating Words (comma separated)</label>
             <input
               type="text"
-              value={heroData.rotatingWords?.join(", ") || ""}
-              onChange={(e) =>
-                setHeroData({ ...heroData, rotatingWords: e.target.value.split(",").map((w) => w.trim()) })
-              }
+              value={rotatingWordsInput}
+              onChange={(e) => setRotatingWordsInput(e.target.value)}
+              placeholder="Success Story, Digital Experience, Market Leader"
               className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
             />
           </div>
@@ -902,6 +910,16 @@ export function HomePageManager() {
                 className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">PDF Download URL</label>
+            <ImageUpload
+              value={playbookData.pdfUrl || ""}
+              onChange={(url) => setPlaybookData({ ...playbookData, pdfUrl: url })}
+              label="Upload PDF"
+            />
+            <p className="text-xs text-gray-500 mt-1">Upload the playbook PDF file that users will download after OTP verification</p>
           </div>
         </div>
       )}

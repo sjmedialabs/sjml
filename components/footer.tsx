@@ -8,13 +8,6 @@ interface FooterData {
   newsletterText: string
 }
 
-const defaultFooterData: FooterData = {
-  address: "Realtor Office Building 5F\n123 Anywhere St., Any City, 12345 Any State",
-  phone: "123-456-7890",
-  email: "support@sjmedialabs.com",
-  copyright: "© 2025 sjmedialabs All Rights Reserved",
-  newsletterText: "Subscribe to get the latest insights and updates.",
-}
 
 function PhoneIcon({ className }: { className?: string }) {
   return (
@@ -99,11 +92,18 @@ const socialLinks = [
 ]
 
 interface FooterProps {
-  data?: FooterData | null
+  data?: FooterData
 }
 
 export function Footer({ data }: FooterProps) {
-  const footerData = data || defaultFooterData
+  // Use minimal defaults if no data provided
+  const footerData = data || {
+    address: "",
+    phone: "",
+    email: "info@sjmedialabs.com",
+    copyright: "© 2025 SJ Media Labs. All Rights Reserved",
+    newsletterText: "Subscribe to get the latest updates."
+  }
 
   return (
     <footer className="bg-[#0a0a0a] pt-16 pb-8 border-t border-[#1a1a1a]">
