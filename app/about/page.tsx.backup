@@ -311,21 +311,15 @@ export default function AboutPage() {
                 {data.mission?.highlightedTitle || "creativity"}
               </span>
             </h2>
-            {data.mission?.description && (
-              typeof data.mission.description === "string" ? (
+            {data.mission?.description &&
+              typeof data.mission.description === "string" && (
                 <p className="text-[#888] mb-6 leading-relaxed">
                   {data.mission.description}
                 </p>
-              ) : data.mission.description?.description ? (
-                <p className="text-[#888] mb-6 leading-relaxed">
-                  {data.mission.description.description}
-                </p>
-              ) : null
-            )}
-            {((data.mission?.values && data.mission.values.length > 0) || 
-              (data.mission?.description?.values && data.mission.description.values.length > 0)) && (
+              )}
+            {data.mission?.values && data.mission.values.length > 0 && (
               <ul className="space-y-3">
-                {(data.mission?.values || data.mission?.description?.values || []).map((value, index) => (
+                {data.mission.values.map((value, index) => (
                   <li
                     key={index}
                     className="flex items-center gap-3 text-[#888]"
