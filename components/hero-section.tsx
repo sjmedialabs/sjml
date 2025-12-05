@@ -1,61 +1,68 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface HeroData {
-  title: string
-  description: string
-  primaryButtonText: string
-  primaryButtonUrl: string
-  secondaryButtonText: string
-  secondaryButtonUrl: string
-  rotatingWords: string[]
-  backgroundImage?: string
+  title: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonUrl: string;
+  secondaryButtonText: string;
+  secondaryButtonUrl: string;
+  rotatingWords: string[];
+  backgroundImage?: string;
 }
-
 
 function PlayIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
       <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="2" />
       <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
     </svg>
-  )
+  );
 }
 
 interface HeroSectionProps {
-  data: HeroData
+  data: HeroData;
 }
 
 export function HeroSection({ data }: HeroSectionProps) {
-  const heroData = data
-  const [currentWordIndex, setCurrentWordIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const heroData = data;
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsAnimating(true)
+      setIsAnimating(true);
       setTimeout(() => {
-        setCurrentWordIndex((prev) => (prev + 1) % heroData.rotatingWords.length)
-        setIsAnimating(false)
-      }, 300)
-    }, 3000)
+        setCurrentWordIndex(
+          (prev) => (prev + 1) % heroData.rotatingWords.length
+        );
+        setIsAnimating(false);
+      }, 300);
+    }, 3000);
 
-    return () => clearInterval(interval)
-  }, [heroData.rotatingWords.length])
+    return () => clearInterval(interval);
+  }, [heroData.rotatingWords.length]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-16 bg-[#0a0a0a]">
+    <section className="relative min-h-screen flex items-center justify-center pt-16">
       {/* Background Image or Pattern */}
       {heroData.backgroundImage ? (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${heroData.backgroundImage})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black" />
+          <div className="absolute inset-0" />
         </>
       ) : (
         <div className="absolute inset-0 opacity-20">
@@ -74,14 +81,18 @@ export function HeroSection({ data }: HeroSectionProps) {
           {heroData.title}{" "}
           <span
             className={`text-[#E63946] inline-block transition-all duration-300 ${
-              isAnimating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+              isAnimating
+                ? "opacity-0 translate-y-2"
+                : "opacity-100 translate-y-0"
             }`}
           >
             {heroData.rotatingWords[currentWordIndex]}
           </span>
         </h1>
 
-        <p className="text-[#888] text-lg md:text-xl max-w-2xl mx-auto mb-10">{heroData.description}</p>
+        <p className="text-[#888] text-lg md:text-xl max-w-2xl mx-auto mb-10">
+          {heroData.description}
+        </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href={heroData.primaryButtonUrl || "/contact"}>
@@ -101,5 +112,5 @@ export function HeroSection({ data }: HeroSectionProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,23 +1,23 @@
 interface Stat {
-  id: string
-  value: string
-  label: string
+  id: string;
+  value: string;
+  label: string;
 }
 
 interface StatsSectionProps {
-  data: Stat[]
-  backgroundImage?: string
+  data: Stat[];
+  backgroundImage?: string;
 }
 
 export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
   if (!data || data.length === 0) {
-    return null
+    return null;
   }
 
-  const stats = data
+  const stats = data;
 
   return (
-    <section className="relative py-20 bg-[#0a0a0a]">
+    <section className="relative py-20">
       {backgroundImage ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -49,11 +49,13 @@ export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
               >
                 {stat.value}
               </div>
-              <div className="text-white text-sm md:text-base font-medium">{stat.label}</div>
+              <div className="text-white text-sm md:text-base font-medium">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
