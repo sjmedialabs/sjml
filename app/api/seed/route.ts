@@ -70,7 +70,7 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       message: "Database seeded successfully",
-      admin: "admin@sjmedialabs.com / SJMedia@2025",
+      // Admin credentials removed for security
     })
   } catch (error) {
     console.error("Seed error:", error)

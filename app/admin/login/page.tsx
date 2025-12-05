@@ -6,7 +6,6 @@ export default function AdminLoginPage() {
     const password = (document.getElementById("password") as HTMLInputElement)
       ?.value;
 
-    console.log("Login clicked!", { email, password });
 
     if (!email || !password) {
       alert("Please enter email and password");
@@ -119,7 +118,7 @@ export default function AdminLoginPage() {
             <input
               id="email"
               type="email"
-              defaultValue="admin@sjmedialabs.com"
+              
               style={{
                 width: "100%",
                 padding: "12px",
@@ -142,7 +141,7 @@ export default function AdminLoginPage() {
             <input
               id="password"
               type="password"
-              defaultValue="SJMedia@2025"
+              
               style={{
                 width: "100%",
                 padding: "12px",
@@ -173,54 +172,8 @@ export default function AdminLoginPage() {
             Sign In
           </button>
 
-          <div
-            style={{
-              marginTop: "24px",
-              paddingTop: "24px",
-              borderTop: "1px solid #333",
-              display: "none",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "12px",
-                color: "#666",
-                textAlign: "center",
-                marginBottom: "8px",
-              }}
-            >
-              Default Credentials
-            </p>
-            <div
-              style={{
-                background: "#1a1a1a",
-                borderRadius: "4px",
-                padding: "12px",
-                fontSize: "12px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "4px",
-                }}
-              >
-                <span style={{ color: "#999" }}>Email:</span>
-                <span style={{ color: "white", fontFamily: "monospace" }}>
-                  admin@sjmedialabs.com
-                </span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#999" }}>Password:</span>
-                <span style={{ color: "white", fontFamily: "monospace" }}>
-                  SJMedia@2025
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+        </div>
     </div>
   );
 }

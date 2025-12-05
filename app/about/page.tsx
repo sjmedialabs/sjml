@@ -105,9 +105,9 @@ export default function AboutPage() {
       <main className="min-h-screen bg-black">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
-          <h1 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-white mb-4">
             Content Not Available
-          </h1>
+          </h2>
           <p className="text-[#888]">
             {error || "Page content has not been set up yet."}
           </p>

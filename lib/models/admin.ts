@@ -65,6 +65,5 @@ export async function ensureDefaultAdmin(): Promise<void> {
       name: "Admin",
       role: "superadmin",
     })
-    console.log("Default admin created: admin@sjmedialabs.com / SJMedia@2025")
   }
 }

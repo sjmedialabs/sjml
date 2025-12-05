@@ -12,7 +12,7 @@ import { Footer } from "@/components/footer"
 import { getHomeContent } from "@/lib/models/content"
 import { clientPromise } from "@/lib/mongodb"
 
-export const revalidate = 3600
+export const revalidate = 0 // Disable caching to always fetch fresh data
 
 export default async function HomePage() {
   let content

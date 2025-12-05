@@ -5,7 +5,7 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 3600
+export const revalidate = 0 // Disabled - always fetch fresh admin data
 
 function FlowerDecoration() {
   return (
@@ -84,7 +84,7 @@ export default async function CaseStudiesPage() {
     return (
       <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center px-4">
-          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
+          <h2 className="text-2xl font-bold text-white mb-4">Content Not Available</h2>
           <p className="text-[#888]">Case studies page content has not been set up yet. Please contact the administrator.</p>
         </div>
       </main>
