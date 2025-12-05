@@ -76,7 +76,7 @@ export function HeroSection({ data }: HeroSectionProps) {
         </div>
       )}
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
           {heroData.title}{" "}
           <div
