@@ -79,15 +79,15 @@ export function HeroSection({ data }: HeroSectionProps) {
       <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
           {heroData.title}{" "}
-          <span
-            className={`text-[#E63946] inline-block transition-all duration-300 ${
+          <div
+            className={`text-[#E63946] block transition-all duration-300 ${
               isAnimating
                 ? "opacity-0 translate-y-2"
                 : "opacity-100 translate-y-0"
             }`}
           >
             {heroData.rotatingWords[currentWordIndex]}
-          </span>
+          </div>
         </h1>
 
         <p className="text-[#888] text-lg md:text-xl max-w-2xl mx-auto mb-10">
