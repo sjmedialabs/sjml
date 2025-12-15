@@ -54,7 +54,7 @@ export function HeroSection({ data }: HeroSectionProps) {
   }, [heroData.rotatingWords.length]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-16">
+    <section className="relative min-h-screen flex items-center justify-center">
       {/* Background Image or Pattern */}
       {heroData.backgroundImage ? (
         <>
@@ -76,7 +76,10 @@ export function HeroSection({ data }: HeroSectionProps) {
         </div>
       )}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
+      <div
+        className="relative z-10 max-w-7xl mx-auto px-4 text-center"
+        style={{ top: "-50px" }}
+      >
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
           {heroData.title}{" "}
           <div
