@@ -5,7 +5,7 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 0 // Disabled - always fetch fresh admin data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 function FlowerDecoration() {
   return (
@@ -132,14 +132,14 @@ export default async function CaseStudiesPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {caseStudies.map((study: any) => (
-              <div key={study.id} className="bg-white rounded-2xl overflow-hidden">
+              <div key={study.id || study._id} className="bg-white rounded-2xl overflow-hidden">
                 <div className="relative">
                   <Image
                     src={study.image || "/placeholder.svg"}
                     alt={study.title}
                     width={400}
                     height={300}
-                    className="w-full aspect-[4/3] object-cover"
+                    className="w-full aspect-4/3 object-cover"
                   />
                 </div>
                 <div className="p-5">

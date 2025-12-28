@@ -1,86 +1,33 @@
-"use client"
-
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { useEffect, useState } from "react"
 import { Briefcase, MapPin, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { getPageContent, type CareersPageData } from "@/lib/models/content"
 
-interface JobPosting {
-  id: string
-  title: string
-  department: string
-  location: string
-  type: string
-  description: string
-  requirements: string[]
-  salary: string
-  published: boolean
-}
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
-interface CareersData {
-  heroTitle: string
-  heroSubtitle: string
-  culture: {
-    title: string
-    description: string
-    values: Array<{ title: string; description: string }>
-  }
-  benefits: Array<{ icon: string; title: string; description: string }>
-  jobs: JobPosting[]
-}
-
-
-export default function CareersPage() {
-  const [data, setData] = useState<CareersData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/content/careers")
-        if (!res.ok) {
-          throw new Error(`Failed to fetch: ${res.status}`)
-        }
-        const fetchedData = await res.json()
-        setData(fetchedData)
-      } catch (error) {
-        console.error("Failed to fetch careers data:", error)
-        setError("Failed to load page content. Please contact the administrator.")
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-        </div>
-      </main>
-    )
+export default async function CareersPage() {
+  let data: CareersPageData | null = null
+  try {
+    data = (await getPageContent("careers")) as CareersPageData | null
+  } catch (error) {
+    console.error("Failed to fetch careers data:", error)
   }
 
-  if (error || !data) {
+  if (!data) {
     return (
       <main className="min-h-screen bg-black">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
           <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
-          <p className="text-[#888]">{error || "Page content has not been set up yet."}</p>
+          <p className="text-[#888]">Page content has not been set up yet.</p>
         </div>
       </main>
     )
   }
 
   // Filter only published jobs
-  const publishedJobs = data.jobs?.filter((job) => job.published) || []
+  const publishedJobs = data.jobs?.filter((job: any) => job.published) || []
 
   return (
     <main className="min-h-screen bg-black">
@@ -120,7 +67,7 @@ export default function CareersPage() {
       </section>
 
       {/* Benefits */}
-      {data.benefits.length > 0 && (
+      {data.benefits && data.benefits.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-white text-center mb-12">
@@ -151,7 +98,7 @@ export default function CareersPage() {
 
           {publishedJobs.length > 0 ? (
             <div className="space-y-4">
-              {publishedJobs.map((job) => (
+              {publishedJobs.map((job: any) => (
                 <div
                   key={job.id}
                   className="bg-black border border-[#1a1a1a] rounded-xl p-6 hover:border-[#E63946]/50 transition-colors group"
@@ -204,16 +151,16 @@ export default function CareersPage() {
       </section>
 
       {/* CTA */}
-      {data.cta && (
+      {(data as any).cta && (
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">{data.cta.title}</h2>
-            <p className="text-[#888] mb-8">{data.cta.description}</p>
+            <h2 className="text-3xl font-bold text-white mb-4">{(data as any).cta.title}</h2>
+            <p className="text-[#888] mb-8">{(data as any).cta.description}</p>
             <a
-              href={`mailto:${data.cta.email}`}
+              href={`mailto:${(data as any).cta.email}`}
               className="inline-block px-8 py-4 bg-[#0d0d0d] border border-[#333] text-white rounded-full font-medium hover:border-[#E63946] transition-colors"
             >
-              {data.cta.buttonText}
+              {(data as any).cta.buttonText}
             </a>
           </div>
         </section>

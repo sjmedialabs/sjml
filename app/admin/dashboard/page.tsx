@@ -1,18 +1,12 @@
-"use client"
+import DashboardWrapper from "./dashboard-wrapper"
 
-import { Suspense } from "react"
-import AdminDashboardContent from "./dashboard-content"
+export const dynamic = "force-dynamic" // Admin pages should always be fresh
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage(props: { searchParams: Promise<{ section?: string }> }) {
+  const searchParams = await props.searchParams
+  const section = searchParams.section || "overview"
+
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <AdminDashboardContent />
-    </Suspense>
+    <DashboardWrapper section={section} />
   )
 }

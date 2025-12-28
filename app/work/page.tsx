@@ -5,7 +5,7 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 0 // Disabled - always fetch fresh admin data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 function FlowerDecoration() {
   return (
@@ -36,22 +36,25 @@ function FlowerDecoration() {
 
 export default async function WorkPage() {
   let projects: any[] = []
-  let content
+  let content: any = null
 
   try {
-    // Fetch page content
-    content = await getPageContent("work")
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+
+    // Fetch page content and works in parallel
+    const [pageContent, worksData] = await Promise.all([
+      getPageContent("work"),
+      db.collection("works").find({ isActive: true }).sort({ createdAt: -1 }).toArray(),
+    ])
+
+    content = pageContent
     if (!content) {
       throw new Error("Work page content not found")
     }
-
-    // Fetch works directly from MongoDB
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-    const works = await db.collection("works").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
     
     // Serialize MongoDB _id
-    projects = works.map(work => ({
+    projects = worksData.map((work) => ({
       ...work,
       _id: work._id.toString()
     }))
@@ -113,7 +116,7 @@ export default async function WorkPage() {
                     alt={project.title}
                     width={400}
                     height={300}
-                    className="w-full aspect-[4/3] object-cover"
+                    className="w-full aspect-4/3 object-cover"
                   />
                 </div>
                 <div className="p-5">

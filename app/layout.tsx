@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   description:
     "Strategic brand development, identity design, and brand management to create memorable brand experiences.",
   keywords: "branding, digital marketing, web development, advertising, brand strategy",
-    generator: 'v0.app'
+    generator: 'SJ Media Labs'
 }
 
 export default function RootLayout({

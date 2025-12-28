@@ -4,28 +4,31 @@ import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import InsightsClient from "./insights-client"
 
-export const revalidate = 0 // Disabled - always fetch fresh admin data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 export default async function InsightsPage() {
   let posts: any[] = []
   let categories: string[] = ["All"]
-  let content
+  let content: any = null
 
   try {
-    // Fetch page content
-    content = await getPageContent("insights")
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+
+    // Fetch content and insights in parallel
+    const [pageContent, insightsData] = await Promise.all([
+      getPageContent("insights"),
+      db.collection("insights").find({ published: true }).sort({ date: -1 }).toArray(),
+    ])
+
+    content = pageContent
     if (!content) {
       throw new Error("Insights page content not found")
     }
 
-    // Fetch insights directly from MongoDB
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-    const insights = await db.collection("insights").find({ published: true }).sort({ date: -1 }).toArray()
-    
     // Serialize MongoDB _id and extract categories
     const categoriesSet = new Set<string>()
-    posts = insights.map(insight => {
+    posts = insightsData.map((insight) => {
       if (insight.category) categoriesSet.add(insight.category)
       return {
         ...insight,

@@ -12,7 +12,7 @@ import { Footer } from "@/components/footer"
 import { getHomeContent } from "@/lib/models/content"
 import { clientPromise } from "@/lib/mongodb"
 
-export const revalidate = 0 // Disable caching to always fetch fresh data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 export default async function HomePage() {
   let content
@@ -22,31 +22,28 @@ export default async function HomePage() {
   let testimonials: any[] = []
 
   try {
-    // Fetch home page content (hero, stats, etc.)
-    content = await getHomeContent()
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+
+    // Fetch all data in parallel for faster server response
+    const [homeContent, servicesData, caseStudiesData, insightsData, testimonialsData] = await Promise.all([
+      getHomeContent(),
+      db.collection("services").find({ isActive: true }).limit(8).toArray(),
+      db.collection("case-studies").find({ featured: true }).limit(3).toArray(),
+      db.collection("insights").find({ published: true, featured: true }).limit(3).toArray(),
+      db.collection("testimonials").find({ featured: true }).limit(3).toArray(),
+    ])
+
+    content = homeContent
     if (!content) {
       throw new Error("Home content not found in database")
     }
 
-    // Fetch dynamic content from respective collections
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-
-    // Fetch services
-    const servicesData = await db.collection("services").find({ isActive: true }).limit(8).toArray()
-    services = servicesData.map(s => ({ ...s, id: s._id.toString(), _id: s._id.toString() }))
-
-    // Fetch case studies
-    const caseStudiesData = await db.collection("case-studies").find({ featured: true }).limit(3).toArray()
-    caseStudies = caseStudiesData.map(cs => ({ ...cs, id: cs.id || cs._id.toString(), _id: cs._id.toString() }))
-
-    // Fetch insights
-    const insightsData = await db.collection("insights").find({ published: true, featured: true }).limit(3).toArray()
-    insights = insightsData.map(i => ({ ...i, id: i._id.toString(), _id: i._id.toString() }))
-
-    // Fetch testimonials
-    const testimonialsData = await db.collection("testimonials").find({ featured: true }).limit(3).toArray()
-    testimonials = testimonialsData.map(t => ({ ...t, id: t._id.toString(), _id: t._id.toString() }))
+    // Map data
+    services = servicesData.map((s) => ({ ...s, id: s._id.toString(), _id: s._id.toString() }))
+    caseStudies = caseStudiesData.map((cs) => ({ ...cs, id: cs.id || cs._id.toString(), _id: cs._id.toString() }))
+    insights = insightsData.map((i) => ({ ...i, id: i._id.toString(), _id: i._id.toString() }))
+    testimonials = testimonialsData.map((t) => ({ ...t, id: t._id.toString(), _id: t._id.toString() }))
   } catch (error) {
     console.error("Failed to fetch home content:", error)
     return (

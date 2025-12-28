@@ -5,26 +5,29 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 0 // Disabled - always fetch fresh admin data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 export default async function ServicesPage() {
   let services: any[] = []
-  let content
+  let content: any = null
 
   try {
-    // Fetch page content
-    content = await getPageContent("services")
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+
+    // Fetch page content and services in parallel
+    const [pageContent, servicesData] = await Promise.all([
+      getPageContent("services"),
+      db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray(),
+    ])
+
+    content = pageContent
     if (!content) {
       throw new Error("Services page content not found")
     }
-
-    // Fetch services directly from MongoDB
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-    const servicesData = await db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
     
     // Serialize MongoDB _id
-    services = servicesData.map(service => ({
+    services = servicesData.map((service) => ({
       ...service,
       _id: service._id.toString()
     }))

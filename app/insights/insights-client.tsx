@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 
 interface Post {
   id: string
@@ -88,11 +89,14 @@ export default function InsightsClient({ posts, categories, hero, newsletter }: 
                   key={post.id}
                   className="bg-[#111] border border-[#222] rounded-2xl overflow-hidden hover:border-[#E63946]/50 transition-colors"
                 >
-                  <img
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full aspect-[16/10] object-cover"
-                  />
+                  <div className="relative w-full aspect-16/10">
+                    <Image
+                      src={post.image || "/placeholder.svg"}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="p-6">
                     <div className="flex items-center gap-4 text-sm text-[#888] mb-3">
                       <span className="text-[#E63946]">{post.category}</span>

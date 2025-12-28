@@ -1,89 +1,37 @@
-"use client"
-
-import type React from "react"
-
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, Briefcase, MapPin, Clock, DollarSign, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { getPageContent, type CareersPageData } from "@/lib/models/content"
+import { JobApplicationForm } from "@/components/job-application-form"
+import { notFound } from "next/navigation"
 
-interface JobPosting {
-  id: string
-  title: string
-  department: string
-  location: string
-  type: string
-  description: string
-  requirements: string[]
-  benefits: string[]
-  salary: string
-  published: boolean
+export const revalidate = 3600 // Enable ISR
+
+// Pre-render all published job pages at build time
+export async function generateStaticParams() {
+  try {
+    const data = (await getPageContent("careers")) as CareersPageData | null
+    if (!data?.jobs) return []
+    return data.jobs.filter((j) => j.published).map((j) => ({ id: j.id }))
+  } catch (e) {
+    return []
+  }
 }
 
-export default function JobDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const [job, setJob] = useState<JobPosting | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    resume: "",
-    coverLetter: "",
-  })
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+export default async function JobDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
+  let job: any = null
 
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await fetch("/api/content/careers")
-        if (res.ok) {
-          const data = await res.json()
-          const foundJob = data.jobs?.find((j: JobPosting) => j.id === params.id && j.published)
-          if (foundJob) {
-            setJob(foundJob)
-          } else {
-            router.push("/careers")
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch job")
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchJob()
-  }, [params.id, router])
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    setSubmitted(true)
-    setSubmitting(false)
-  }
-
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-        </div>
-        <Footer />
-      </main>
-    )
+  try {
+    const data = (await getPageContent("careers")) as CareersPageData | null
+    job = data?.jobs?.find((j) => j.id === params.id && j.published)
+  } catch (error) {
+    console.error("Failed to fetch job details:", error)
   }
 
   if (!job) {
-    return null
+    notFound()
   }
 
   return (
@@ -144,9 +92,9 @@ export default function JobDetailPage() {
               <div>
                 <h2 className="text-xl font-bold text-white mb-4">Requirements</h2>
                 <ul className="space-y-3">
-                  {job.requirements.map((req, index) => (
+                  {job.requirements.map((req: string, index: number) => (
                     <li key={index} className="flex items-start gap-3 text-[#888]">
-                      <CheckCircle size={16} className="text-[#E63946] mt-1 flex-shrink-0" />
+                      <CheckCircle size={16} className="text-[#E63946] mt-1 shrink-0" />
                       {req}
                     </li>
                   ))}
@@ -154,13 +102,13 @@ export default function JobDetailPage() {
               </div>
             )}
 
-            {job.benefits && job.benefits.length > 0 && (
+            {job.benefits && (job.benefits as string[]).length > 0 && (
               <div>
                 <h2 className="text-xl font-bold text-white mb-4">Benefits</h2>
                 <ul className="space-y-3">
-                  {job.benefits.map((benefit, index) => (
+                  {(job.benefits as string[]).map((benefit, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#888]">
-                      <CheckCircle size={16} className="text-[#E63946] mt-1 flex-shrink-0" />
+                      <CheckCircle size={16} className="text-[#E63946] mt-1 shrink-0" />
                       {benefit}
                     </li>
                   ))}
@@ -173,74 +121,7 @@ export default function JobDetailPage() {
           <div className="lg:col-span-1">
             <div className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-xl p-6 sticky top-24">
               <h2 className="text-xl font-bold text-white mb-6">Apply Now</h2>
-
-              {submitted ? (
-                <div className="text-center py-8">
-                  <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
-                  <h3 className="text-white font-semibold mb-2">Application Submitted!</h3>
-                  <p className="text-[#888] text-sm">We'll be in touch soon.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-[#888] mb-2">Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-black border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-[#888] mb-2">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-black border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-[#888] mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-black border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-[#888] mb-2">Resume/LinkedIn URL *</label>
-                    <input
-                      type="url"
-                      required
-                      value={formData.resume}
-                      onChange={(e) => setFormData({ ...formData, resume: e.target.value })}
-                      placeholder="https://"
-                      className="w-full px-4 py-3 bg-black border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-[#888] mb-2">Cover Letter</label>
-                    <textarea
-                      rows={4}
-                      value={formData.coverLetter}
-                      onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
-                      placeholder="Tell us why you're interested..."
-                      className="w-full px-4 py-3 bg-black border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946] resize-none"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] transition-colors disabled:opacity-50"
-                  >
-                    {submitting ? "Submitting..." : "Submit Application"}
-                  </button>
-                </form>
-              )}
+              <JobApplicationForm />
             </div>
           </div>
         </div>

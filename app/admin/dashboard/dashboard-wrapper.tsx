@@ -3,7 +3,11 @@
 import { Suspense } from "react"
 import AdminDashboardContent from "./dashboard-content"
 
-export default function DashboardWrapper() {
+interface DashboardWrapperProps {
+  section?: string
+}
+
+export default function DashboardWrapper({ section }: DashboardWrapperProps) {
   return (
     <Suspense
       fallback={
@@ -12,7 +16,7 @@ export default function DashboardWrapper() {
         </div>
       }
     >
-      <AdminDashboardContent />
+      <AdminDashboardContent initialSection={section} />
     </Suspense>
   )
 }

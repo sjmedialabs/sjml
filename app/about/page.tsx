@@ -1,9 +1,7 @@
-"use client";
-
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { getPageContent } from "@/lib/models/content";
 
 interface AboutData {
   heroTitle: string;
@@ -63,44 +61,18 @@ interface AboutData {
   achievements: Array<{ year: string; title: string; description: string }>;
 }
 
-export default function AboutPage() {
-  const [data, setData] = useState<AboutData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const revalidate = 3600; // Enable ISR: Revalidate every hour
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/content/about");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch: ${res.status}`);
-        }
-        const fetchedData = await res.json();
-        setData(fetchedData);
-      } catch (error) {
-        console.error("Failed to fetch about data:", error);
-        setError(
-          "Failed to load page content. Please contact the administrator."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+export default async function AboutPage() {
+  let data: AboutData | null = null;
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-        </div>
-      </main>
-    );
+  try {
+    data = await getPageContent("about");
+  } catch (error) {
+    console.error("Failed to fetch about data:", error);
   }
 
-  if (error || !data) {
+  if (!data) {
     return (
       <main className="min-h-screen bg-black">
         <Header />
@@ -109,7 +81,7 @@ export default function AboutPage() {
             Content Not Available
           </h2>
           <p className="text-[#888]">
-            {error || "Page content has not been set up yet."}
+            Page content has not been set up yet.
           </p>
         </div>
       </main>

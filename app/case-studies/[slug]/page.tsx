@@ -1,10 +1,8 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { notFound } from "next/navigation"
+import { clientPromise } from "@/lib/mongodb"
 
 interface CaseStudyData {
   id: string
@@ -32,52 +30,40 @@ interface CaseStudyData {
   }
 }
 
-export default function CaseStudyDetailPage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const [caseStudy, setCaseStudy] = useState<CaseStudyData | null>(null)
-  const [loading, setLoading] = useState(true)
+export const revalidate = 3600 // Enable ISR
 
-  useEffect(() => {
-    if (slug) {
-      fetchCaseStudy()
-    }
-  }, [slug])
-
-  const fetchCaseStudy = async () => {
-    try {
-      const res = await fetch(`/api/case-studies/${slug}`)
-      if (res.ok) {
-        const data = await res.json()
-        setCaseStudy(data)
-      }
-    } catch (error) {
-      console.error("Failed to fetch case study")
-    }
-    setLoading(false)
+// Generate static params for all case studies to pre-render them at build time
+export async function generateStaticParams() {
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const studies = await db.collection("case-studies").find({}, { projection: { slug: 1 } }).toArray()
+    return studies.map((study) => ({
+      slug: study.slug,
+    }))
+  } catch (e) {
+    return []
   }
+}
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-      </main>
-    )
+export default async function CaseStudyDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params
+  const { slug } = params
+  let caseStudy: CaseStudyData | null = null
+
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const data = await db.collection("case-studies").findOne({ slug })
+    if (data) {
+      caseStudy = { ...data, id: data._id.toString() } as unknown as CaseStudyData
+    }
+  } catch (error) {
+    console.error("Failed to fetch case study:", error)
   }
 
   if (!caseStudy) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-2">Case Study Not Found</h1>
-            <p className="text-[#888]">The case study you&apos;re looking for doesn&apos;t exist.</p>
-          </div>
-        </div>
-        <Footer />
-      </main>
-    )
+    notFound()
   }
 
   return (
@@ -208,7 +194,7 @@ export default function CaseStudyDetailPage() {
             <ul className="space-y-4">
               {caseStudy.results.map((result, index) => (
                 <li key={index} className="flex items-start gap-4">
-                  <span className="w-8 h-8 bg-[#E63946] text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                  <span className="w-8 h-8 bg-[#E63946] text-white rounded-full flex items-center justify-center shrink-0 font-bold text-sm">
                     {index + 1}
                   </span>
                   <p className="text-[#888] text-lg pt-1">{result}</p>

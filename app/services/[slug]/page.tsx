@@ -1,10 +1,9 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { notFound } from "next/navigation"
+import { clientPromise } from "@/lib/mongodb"
+import { ServiceFaq } from "@/components/service-faq"
 
 interface ServiceData {
   id: string
@@ -21,53 +20,40 @@ interface ServiceData {
   faqs: Array<{ question: string; answer: string }>
 }
 
-export default function ServiceDetailPage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const [service, setService] = useState<ServiceData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [openFaq, setOpenFaq] = useState(0)
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
-  useEffect(() => {
-    if (slug) {
-      fetchService()
-    }
-  }, [slug])
-
-  const fetchService = async () => {
-    try {
-      const res = await fetch(`/api/services/${slug}`)
-      if (res.ok) {
-        const data = await res.json()
-        setService(data)
-      }
-    } catch (error) {
-      console.error("Failed to fetch service")
-    }
-    setLoading(false)
+// Generate static params for all services to pre-render them at build time
+export async function generateStaticParams() {
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const services = await db.collection("services").find({}, { projection: { slug: 1 } }).toArray()
+    return services.map((service) => ({
+      slug: service.slug,
+    }))
+  } catch (e) {
+    return []
   }
+}
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-      </main>
-    )
+export default async function ServiceDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params
+  const { slug } = params
+  let service: ServiceData | null = null
+
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const data = await db.collection("services").findOne({ slug })
+    if (data) {
+      service = { ...data, id: data._id.toString() } as unknown as ServiceData
+    }
+  } catch (error) {
+    console.error("Failed to fetch service:", error)
   }
 
   if (!service) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-2">Service Not Found</h1>
-            <p className="text-[#888]">The service you&apos;re looking for doesn&apos;t exist.</p>
-          </div>
-        </div>
-        <Footer />
-      </main>
-    )
+    notFound()
   }
 
   return (
@@ -208,24 +194,7 @@ export default function ServiceDetailPage() {
             <h2 className="text-2xl font-bold text-white mb-8 text-center">
               Frequently Asked <span className="text-[#E63946]">Questions</span>
             </h2>
-            <div className="space-y-3">
-              {service.faqs.map((faq, index) => (
-                <div key={index} className="bg-[#1a1a1a] rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
-                    className="w-full px-6 py-4 flex items-center justify-between text-left"
-                  >
-                    <span className="text-white text-sm font-medium">{faq.question}</span>
-                    <span className="text-white text-xl">{openFaq === index ? "−" : "+"}</span>
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-6 pb-4">
-                      <p className="text-[#888] text-sm leading-relaxed">{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <ServiceFaq faqs={service.faqs} />
           </div>
         </section>
       )}

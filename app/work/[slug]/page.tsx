@@ -1,10 +1,7 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { clientPromise } from "@/lib/mongodb"
 
 interface WorkData {
   id: string
@@ -26,37 +23,36 @@ interface WorkData {
   showcase: string[]
 }
 
-export default function WorkDetailPage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const [work, setWork] = useState<WorkData | null>(null)
-  const [loading, setLoading] = useState(true)
+export const revalidate = 3600 // Enable ISR
 
-  useEffect(() => {
-    if (slug) {
-      fetchWork()
-    }
-  }, [slug])
-
-  const fetchWork = async () => {
-    try {
-      const res = await fetch(`/api/works/${slug}`)
-      if (res.ok) {
-        const data = await res.json()
-        setWork(data)
-      }
-    } catch (error) {
-      console.error("Failed to fetch work")
-    }
-    setLoading(false)
+// Generate static params for all works to pre-render them at build time
+export async function generateStaticParams() {
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const works = await db.collection("works").find({}, { projection: { slug: 1 } }).toArray()
+    return works.map((work) => ({
+      slug: work.slug,
+    }))
+  } catch (e) {
+    return []
   }
+}
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
-      </main>
-    )
+export default async function WorkDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params
+  const { slug } = params
+  let work: WorkData | null = null
+
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const data = await db.collection("works").findOne({ slug })
+    if (data) {
+      work = { ...data, id: data._id.toString() } as unknown as WorkData
+    }
+  } catch (error) {
+    console.error("Failed to fetch work:", error)
   }
 
   if (!work) {
@@ -162,7 +158,7 @@ export default function WorkDetailPage() {
           <div className="max-w-6xl mx-auto">
             <div className="flex gap-4 overflow-x-auto pb-4">
               {work.gallery.map((img, index) => (
-                <div key={index} className="flex-shrink-0 w-40 h-48 rounded-lg overflow-hidden">
+                <div key={index} className="shrink-0 w-40 h-48 rounded-lg overflow-hidden">
                   <Image
                     src={img || "/placeholder.svg"}
                     alt={`Gallery image ${index + 1}`}

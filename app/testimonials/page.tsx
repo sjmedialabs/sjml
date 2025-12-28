@@ -1,28 +1,32 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import Image from "next/image"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 0 // Disabled - always fetch fresh admin data
+export const revalidate = 3600 // Enable ISR: Revalidate every hour
 
 export default async function TestimonialsPage() {
   let testimonials: any[] = []
-  let content
+  let content: any = null
 
   try {
-    // Fetch page content
-    content = await getPageContent("testimonials")
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+
+    // Fetch page content and testimonials in parallel
+    const [pageContent, testimonialsData] = await Promise.all([
+      getPageContent("testimonials"),
+      db.collection("testimonials").find({ featured: true }).sort({ createdAt: -1 }).toArray(),
+    ])
+
+    content = pageContent
     if (!content) {
       throw new Error("Testimonials page content not found")
     }
-
-    // Fetch testimonials directly from MongoDB
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-    const testimonialsData = await db.collection("testimonials").find({ featured: true }).sort({ createdAt: -1 }).toArray()
     
     // Serialize MongoDB _id
-    testimonials = testimonialsData.map(t => ({
+    testimonials = testimonialsData.map((t) => ({
       ...t,
       _id: t._id.toString()
     }))
@@ -80,9 +84,11 @@ export default async function TestimonialsPage() {
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
-                  <img
+                  <Image
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.author}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
