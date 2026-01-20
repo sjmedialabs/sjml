@@ -135,16 +135,16 @@ export function ImageUpload({
 
   return (
     <div className={className}>
-      {label && <label className="block text-sm text-[#888] mb-2">{label}</label>}
+      {label && <label className="block text-sm admin-text-secondary mb-2">{label}</label>}
 
       <div className="flex items-start gap-4">
         {/* Thumbnail preview */}
         {value && (
-          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-[#333] group">
+          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border admin-border-light group">
             <Image src={value || "/placeholder.svg"} alt="Uploaded image" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <button onClick={handleRemove} className="p-1 bg-red-500 rounded-full hover:bg-red-600" title="Remove">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 admin-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -161,7 +161,7 @@ export function ImageUpload({
           onDrop={handleDrop}
           className={`
             flex-1 relative border-2 border-dashed rounded-lg cursor-pointer transition-colors
-            ${dragActive ? "border-[#E63946] bg-[#E63946]/10" : "border-[#333] hover:border-[#555]"}
+            ${dragActive ? "border-[#E63946] bg-[#E63946]/10" : "admin-border-light hover:border-[#555]"}
             ${uploading ? "pointer-events-none opacity-60" : ""}
           `}
         >
@@ -171,7 +171,7 @@ export function ImageUpload({
             {uploading ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="w-5 h-5 border-2 border-[#E63946] border-t-transparent rounded-full animate-spin" />
-                <span className="text-[#888] text-sm">Uploading...</span>
+                <span className="admin-text-secondary text-sm">Uploading...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-3">
@@ -184,7 +184,7 @@ export function ImageUpload({
                   />
                 </svg>
                 <div className="text-left">
-                  <p className="text-[#888] text-sm">
+                  <p className="admin-text-secondary text-sm">
                     <span className="text-[#E63946]">{value ? "Change image" : "Click to upload"}</span> or drag and
                     drop
                   </p>
@@ -207,7 +207,7 @@ export function ImageUpload({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Or paste image URL..."
-          className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white text-sm focus:outline-none focus:border-[#E63946]"
+          className="w-full px-3 py-2 admin-input rounded-lg  text-sm focus:outline-none focus:border-[#E63946]"
         />
       </div>
     </div>

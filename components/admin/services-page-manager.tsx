@@ -215,8 +215,8 @@ export function ServicesPageManager() {
       <div>
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Services Management</h1>
-            <p className="text-[#888]">Manage services page content and individual services</p>
+            <h1 className="text-2xl font-bold admin-text-primary mb-2">Services Management</h1>
+            <p className="admin-text-secondary">Manage services page content and individual services</p>
           </div>
           {activeTab === "services" && (
             <Button onClick={addNewService} className="bg-[#E63946] hover:bg-[#d32f3d]">
@@ -235,16 +235,16 @@ export function ServicesPageManager() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-[#222] pb-4 mb-6">
+        <div className="flex gap-2 border-b admin-border pb-4 mb-6">
           <button
             onClick={() => setActiveTab('page-content')}
-            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-[#E63946] text-white' : 'bg-[#1a1a1a] text-gray-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Page Content
           </button>
           <button
             onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-[#E63946] text-white' : 'bg-[#1a1a1a] text-gray-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Services List
           </button>
@@ -253,11 +253,11 @@ export function ServicesPageManager() {
         {/* Page Content Tab */}
         {activeTab === 'page-content' && (
           <div className="space-y-6">
-            <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Hero Section</h3>
+            <div className="admin-card border admin-border rounded-xl p-6">
+              <h3 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Background Image</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Background Image</label>
                   <ImageUpload
                     value={pageContent.hero.backgroundImage}
                     onChange={(url) => setPageContent({...pageContent, hero: {...pageContent.hero, backgroundImage: url}})}
@@ -265,51 +265,51 @@ export function ServicesPageManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Hero Title</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Hero Title</label>
                   <Input
                     value={pageContent.hero.title}
                     onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, title: e.target.value}})}
-                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
                     placeholder="Redefining Digital Success..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Watermark Text</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Watermark Text</label>
                   <Input
                     value={pageContent.hero.watermark}
                     onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, watermark: e.target.value}})}
-                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
                     placeholder="SERVICES"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Section Content</h3>
+            <div className="admin-card border admin-border rounded-xl p-6">
+              <h3 className="text-lg font-semibold admin-text-primary mb-4">Section Content</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Section Title</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
                   <Input
                     value={pageContent.section.title}
                     onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, title: e.target.value}})}
-                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Section Subtitle</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Section Subtitle</label>
                   <Input
                     value={pageContent.section.subtitle}
                     onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, subtitle: e.target.value}})}
-                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Section Description</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Section Description</label>
                   <Textarea
                     value={pageContent.section.description}
                     onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, description: e.target.value}})}
-                    className="bg-[#0a0a0a] border-[#333] text-white"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
                     rows={3}
                   />
                 </div>
@@ -323,24 +323,24 @@ export function ServicesPageManager() {
           <>
             {/* Search */}
             <div className="mb-6 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 admin-text-secondary" />
               <Input
                 placeholder="Search services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-[#1a1a1a] border-[#333] text-white w-64"
+                className="pl-10 admin-bg-secondary admin-border-light admin-text-primary w-64"
               />
             </div>
 
             {/* Services Table */}
-            <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+            <div className="admin-card border admin-border rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#222]">
-                <th className="text-left p-4 text-[#888] font-medium">Service</th>
-                <th className="text-left p-4 text-[#888] font-medium">Slug</th>
-                <th className="text-left p-4 text-[#888] font-medium">Status</th>
-                <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+              <tr className="border-b admin-border">
+                <th className="text-left p-4 admin-text-secondary font-medium">Service</th>
+                <th className="text-left p-4 admin-text-secondary font-medium">Slug</th>
+                <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
+                <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -352,16 +352,16 @@ export function ServicesPageManager() {
                 </tr>
               ) : filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-[#666]">
+                  <td colSpan={4} className="p-8 text-center admin-text-muted">
                     No services found
                   </td>
                 </tr>
               ) : (
                 filteredServices.map((service) => (
-                  <tr key={service.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                  <tr key={service.id} className="border-b admin-border hover:admin-bg-secondary">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#222] rounded-lg flex items-center justify-center overflow-hidden">
+                        <div className="w-10 h-10 admin-bg-secondary rounded-lg flex items-center justify-center overflow-hidden">
                           {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
                             <Image
                               src={service.icon}
@@ -375,12 +375,12 @@ export function ServicesPageManager() {
                           )}
                         </div>
                         <div>
-                          <div className="text-white font-medium">{service.title}</div>
-                          <div className="text-[#666] text-sm truncate max-w-xs">{service.description}</div>
+                          <div className="admin-text-primary font-medium">{service.title}</div>
+                          <div className="admin-text-muted text-sm truncate max-w-xs">{service.description}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-[#888]">{service.slug}</td>
+                    <td className="p-4 admin-text-secondary">{service.slug}</td>
                     <td className="p-4">
                       <span
                         className={`px-2 py-1 rounded text-xs ${service.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
@@ -394,7 +394,7 @@ export function ServicesPageManager() {
                           variant="ghost"
                           size="sm"
                           onClick={() => editService(service)}
-                          className="text-gray-400 hover:text-white"
+                          className="admin-text-secondary hover:admin-text-primary"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -416,8 +416,8 @@ export function ServicesPageManager() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-[#222]">
-              <div className="text-sm text-[#888]">
+            <div className="flex items-center justify-between p-4 border-t admin-border">
+              <div className="text-sm admin-text-secondary">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
                 {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </div>
@@ -427,11 +427,11 @@ export function ServicesPageManager() {
                   size="sm"
                   disabled={pagination.page === 1}
                   onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
-                  className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <span className="px-3 py-1 text-white">
+                <span className="px-3 py-1 admin-text-primary">
                   {pagination.page} / {pagination.totalPages}
                 </span>
                 <Button
@@ -439,7 +439,7 @@ export function ServicesPageManager() {
                   size="sm"
                   disabled={pagination.page === pagination.totalPages}
                   onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
-                  className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -464,13 +464,13 @@ export function ServicesPageManager() {
             setEditingService(null)
             setIsNew(false)
           }}
-          className="text-gray-400 hover:text-white"
+          className="admin-text-secondary hover:admin-text-primary"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-white">{isNew ? "Create New Service" : "Edit Service"}</h1>
-          <p className="text-[#888]">Fill in all the details for the service</p>
+          <h1 className="text-2xl font-bold admin-text-primary">{isNew ? "Create New Service" : "Edit Service"}</h1>
+          <p className="admin-text-secondary">Fill in all the details for the service</p>
         </div>
       </div>
 
@@ -481,29 +481,29 @@ export function ServicesPageManager() {
       {editingService && (
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Basic Information</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title *</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title *</label>
                 <Input
                   value={editingService.title}
                   onChange={(e) => updateField("title", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Service title"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Slug *</label>
+                <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
                 <Input
                   value={editingService.slug}
                   onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="service-slug"
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm text-[#888] mb-2">Service Icon</label>
+                <label className="block text-sm admin-text-secondary mb-2">Service Icon</label>
                 <ImageUpload
                   value={editingService.icon}
                   onChange={(url) => updateField("icon", url)}
@@ -513,29 +513,29 @@ export function ServicesPageManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Link Text</label>
+                <label className="block text-sm admin-text-secondary mb-2">Link Text</label>
                 <Input
                   value={editingService.linkText}
                   onChange={(e) => updateField("linkText", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-sm text-[#888] mb-2">Short Description (for card)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Short Description (for card)</label>
               <Textarea
                 value={editingService.description}
                 onChange={(e) => updateField("description", e.target.value)}
-                className="bg-[#0a0a0a] border-[#333] text-white"
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
                 rows={2}
               />
             </div>
             <div className="mt-4">
-              <label className="block text-sm text-[#888] mb-2">Full Description (for detail page)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Full Description (for detail page)</label>
               <Textarea
                 value={editingService.fullDescription}
                 onChange={(e) => updateField("fullDescription", e.target.value)}
-                className="bg-[#0a0a0a] border-[#333] text-white"
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
                 rows={4}
               />
             </div>
@@ -545,17 +545,17 @@ export function ServicesPageManager() {
                 id="isActive"
                 checked={editingService.isActive}
                 onChange={(e) => updateField("isActive", e.target.checked)}
-                className="rounded border-[#333]"
+                className="rounded admin-border-light"
               />
-              <label htmlFor="isActive" className="text-sm text-white">
+              <label htmlFor="isActive" className="text-sm admin-text-primary">
                 Active (visible on website)
               </label>
             </div>
           </div>
 
           {/* Image */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Service Image</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Service Image</h2>
             <ImageUpload
               label="Featured Image"
               value={editingService.image}
@@ -564,8 +564,8 @@ export function ServicesPageManager() {
           </div>
 
           {/* Offerings */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Service Offerings</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Service Offerings</h2>
             <Textarea
               value={editingService.offerings.join("\n")}
               onChange={(e) =>
@@ -577,30 +577,30 @@ export function ServicesPageManager() {
                     .filter(Boolean),
                 )
               }
-              className="bg-[#0a0a0a] border-[#333] text-white"
+              className="admin-bg-tertiary admin-border-light admin-text-primary"
               placeholder="Brand strategy&#10;Visual identity, modern design&#10;Web design and development&#10;(one per line)"
               rows={5}
             />
           </div>
 
           {/* Benefits */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Benefits Section</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Benefits Section</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <Input
                   value={editingService.benefits.title}
                   onChange={(e) => updateField("benefits", { ...editingService.benefits, title: e.target.value })}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Description</label>
+                <label className="block text-sm admin-text-secondary mb-2">Description</label>
                 <Textarea
                   value={editingService.benefits.description}
                   onChange={(e) => updateField("benefits", { ...editingService.benefits, description: e.target.value })}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   rows={3}
                 />
               </div>
@@ -608,19 +608,19 @@ export function ServicesPageManager() {
           </div>
 
           {/* Features */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Key Features</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Key Features</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <Input
                   value={editingService.features.title}
                   onChange={(e) => updateField("features", { ...editingService.features, title: e.target.value })}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Feature Points (comma separated)</label>
+                <label className="block text-sm admin-text-secondary mb-2">Feature Points (comma separated)</label>
                 <Textarea
                   value={editingService.features.points.join(", ")}
                   onChange={(e) =>
@@ -632,7 +632,7 @@ export function ServicesPageManager() {
                         .filter(Boolean),
                     })
                   }
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   rows={2}
                 />
               </div>
@@ -640,25 +640,25 @@ export function ServicesPageManager() {
           </div>
 
           {/* Process */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+          <div className="admin-card border admin-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Process Steps</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Process Steps</h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() =>
                   updateField("process", [...editingService.process, { icon: "", title: "", description: "" }])
                 }
-                className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
               >
                 <Plus className="w-4 h-4 mr-1" /> Add Step
               </Button>
             </div>
             <div className="space-y-4">
               {editingService.process.map((step, index) => (
-                <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg">
+                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-[#888]">Step {index + 1}</span>
+                    <span className="text-sm admin-text-secondary">Step {index + 1}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -682,7 +682,7 @@ export function ServicesPageManager() {
                         updateField("process", newProcess)
                       }}
                       placeholder="Step title"
-                      className="bg-[#111] border-[#333] text-white"
+                      className="admin-card admin-border-light admin-text-primary"
                     />
                     <Input
                       value={step.icon}
@@ -692,7 +692,7 @@ export function ServicesPageManager() {
                         updateField("process", newProcess)
                       }}
                       placeholder="Icon name"
-                      className="bg-[#111] border-[#333] text-white"
+                      className="admin-card admin-border-light admin-text-primary"
                     />
                   </div>
                   <Textarea
@@ -703,7 +703,7 @@ export function ServicesPageManager() {
                       updateField("process", newProcess)
                     }}
                     placeholder="Step description"
-                    className="bg-[#111] border-[#333] text-white mt-2"
+                    className="admin-card admin-border-light admin-text-primary mt-2"
                     rows={2}
                   />
                 </div>
@@ -712,23 +712,23 @@ export function ServicesPageManager() {
           </div>
 
           {/* FAQs */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+          <div className="admin-card border admin-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">FAQs</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">FAQs</h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => updateField("faqs", [...editingService.faqs, { question: "", answer: "" }])}
-                className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
               >
                 <Plus className="w-4 h-4 mr-1" /> Add FAQ
               </Button>
             </div>
             <div className="space-y-4">
               {editingService.faqs.map((faq, index) => (
-                <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg">
+                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-[#888]">FAQ {index + 1}</span>
+                    <span className="text-sm admin-text-secondary">FAQ {index + 1}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -751,7 +751,7 @@ export function ServicesPageManager() {
                       updateField("faqs", newFaqs)
                     }}
                     placeholder="Question"
-                    className="bg-[#111] border-[#333] text-white mb-2"
+                    className="admin-card admin-border-light admin-text-primary mb-2"
                   />
                   <Textarea
                     value={faq.answer}
@@ -761,7 +761,7 @@ export function ServicesPageManager() {
                       updateField("faqs", newFaqs)
                     }}
                     placeholder="Answer"
-                    className="bg-[#111] border-[#333] text-white"
+                    className="admin-card admin-border-light admin-text-primary"
                     rows={2}
                   />
                 </div>
@@ -785,7 +785,7 @@ export function ServicesPageManager() {
                 setEditingService(null)
                 setIsNew(false)
               }}
-              className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+              className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
             >
               Cancel
             </Button>

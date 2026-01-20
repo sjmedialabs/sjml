@@ -373,11 +373,11 @@ export function HomePageManager() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Home Page Content</h2>
+        <h2 className="text-2xl font-bold admin-text-primary">Home Page Content</h2>
         <button
           onClick={saveContent}
           disabled={saving}
-          className="px-6 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80 disabled:opacity-50"
+          className="px-6 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80 disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>
@@ -392,13 +392,13 @@ export function HomePageManager() {
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-[#222] pb-4">
+      <div className="flex flex-wrap gap-2 border-b admin-border pb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === tab.id ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-gray-400 hover:text-white"
+              activeTab === tab.id ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab.label}
@@ -408,11 +408,11 @@ export function HomePageManager() {
 
       {/* Hero Section */}
       {activeTab === "hero" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
-          <h3 className="text-xl font-semibold text-white">Hero Section</h3>
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
+          <h3 className="text-xl font-semibold admin-text-primary">Hero Section</h3>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Background Image</label>
             <ImageUpload
               value={heroData.backgroundImage || ""}
               onChange={(url) => setHeroData({ ...heroData, backgroundImage: url })}
@@ -421,74 +421,74 @@ export function HomePageManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
             <input
               type="text"
               value={heroData.title}
               onChange={(e) => setHeroData({ ...heroData, title: e.target.value })}
-              className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+              className="w-full px-4 py-2 admin-input rounded-lg "
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
             <textarea
               value={heroData.description}
               onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+              className="w-full px-4 py-2 admin-input rounded-lg "
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Rotating Words (comma separated)</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Rotating Words (comma separated)</label>
             <input
               type="text"
               value={rotatingWordsInput}
               onChange={(e) => setRotatingWordsInput(e.target.value)}
               placeholder="Success Story, Digital Experience, Market Leader"
-              className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+              className="w-full px-4 py-2 admin-input rounded-lg "
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Primary Button Text</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Primary Button Text</label>
               <input
                 type="text"
                 value={heroData.primaryButtonText}
                 onChange={(e) => setHeroData({ ...heroData, primaryButtonText: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Primary Button URL</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Primary Button URL</label>
               <input
                 type="text"
                 value={heroData.primaryButtonUrl}
                 onChange={(e) => setHeroData({ ...heroData, primaryButtonUrl: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Secondary Button Text</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Secondary Button Text</label>
               <input
                 type="text"
                 value={heroData.secondaryButtonText}
                 onChange={(e) => setHeroData({ ...heroData, secondaryButtonText: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Secondary Button URL</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Secondary Button URL</label>
               <input
                 type="text"
                 value={heroData.secondaryButtonUrl}
                 onChange={(e) => setHeroData({ ...heroData, secondaryButtonUrl: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
           </div>
@@ -497,16 +497,16 @@ export function HomePageManager() {
 
       {/* Stats Section - Added background image upload */}
       {activeTab === "stats" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Statistics</h3>
-            <button onClick={addStat} className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80">
+            <h3 className="text-xl font-semibold admin-text-primary">Statistics</h3>
+            <button onClick={addStat} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
               Add Stat
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={statsBackgroundImage}
               onChange={(url) => setStatsBackgroundImage(url)}
@@ -515,24 +515,24 @@ export function HomePageManager() {
           </div>
 
           {statsData.map((stat) => (
-            <div key={stat.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333]">
+            <div key={stat.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Value</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Value</label>
                   <input
                     type="text"
                     value={stat.value}
                     onChange={(e) => updateStat(stat.id, "value", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Label</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Label</label>
                   <input
                     type="text"
                     value={stat.label}
                     onChange={(e) => updateStat(stat.id, "label", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
               </div>
@@ -546,15 +546,15 @@ export function HomePageManager() {
 
       {/* Section Settings - Background Images Only */}
       {activeTab === "section-settings" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div>
-            <h3 className="text-xl font-semibold text-white mb-4">Section Background Images</h3>
-            <p className="text-gray-400 text-sm mb-6">Control background images for different sections. Manage actual content (Works, Services, Case Studies) in their respective pages.</p>
+            <h3 className="text-xl font-semibold admin-text-primary mb-4">Section Background Images</h3>
+            <p className="admin-text-secondary text-sm mb-6">Control background images for different sections. Manage actual content (Works, Services, Case Studies) in their respective pages.</p>
           </div>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Case Studies Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Case Studies Section Background</label>
               <ImageUpload
                 value={caseStudiesBackgroundImage}
                 onChange={(url) => setCaseStudiesBackgroundImage(url)}
@@ -563,7 +563,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Services Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Services Section Background</label>
               <ImageUpload
                 value={servicesBackgroundImage}
                 onChange={(url) => setServicesBackgroundImage(url)}
@@ -572,7 +572,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Stats Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Stats Section Background</label>
               <ImageUpload
                 value={statsBackgroundImage}
                 onChange={(url) => setStatsBackgroundImage(url)}
@@ -581,7 +581,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Industries Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Industries Section Background</label>
               <ImageUpload
                 value={industriesBackgroundImage}
                 onChange={(url) => setIndustriesBackgroundImage(url)}
@@ -590,7 +590,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Testimonials Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Testimonials Section Background</label>
               <ImageUpload
                 value={testimonialsBackgroundImage}
                 onChange={(url) => setTestimonialsBackgroundImage(url)}
@@ -599,7 +599,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Insights Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Insights Section Background</label>
               <ImageUpload
                 value={insightsBackgroundImage}
                 onChange={(url) => setInsightsBackgroundImage(url)}
@@ -608,7 +608,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Trusted By Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Trusted By Section Background</label>
               <ImageUpload
                 value={trustedByBackgroundImage}
                 onChange={(url) => setTrustedByBackgroundImage(url)}
@@ -617,7 +617,7 @@ export function HomePageManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Brand Playbook Section Background</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Brand Playbook Section Background</label>
               <ImageUpload
                 value={playbookBackgroundImage}
                 onChange={(url) => setPlaybookBackgroundImage(url)}
@@ -631,19 +631,19 @@ export function HomePageManager() {
 
       {/* Industries Section - Added background image upload */}
       {activeTab === "industries" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Industries</h3>
+            <h3 className="text-xl font-semibold admin-text-primary">Industries</h3>
             <button
               onClick={addIndustry}
-              className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80"
+              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
             >
               Add Industry
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={industriesBackgroundImage}
               onChange={(url) => setIndustriesBackgroundImage(url)}
@@ -652,27 +652,27 @@ export function HomePageManager() {
           </div>
 
           {industriesData.map((industry) => (
-            <div key={industry.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
+            <div key={industry.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
                 <input
                   type="text"
                   value={industry.title}
                   onChange={(e) => updateIndustry(industry.id, "title", e.target.value)}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
                 <textarea
                   value={industry.description}
                   onChange={(e) => updateIndustry(industry.id, "description", e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Image</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Image</label>
                 <ImageUpload
                   value={industry.image}
                   onChange={(url) => updateIndustry(industry.id, "image", url)}
@@ -689,19 +689,19 @@ export function HomePageManager() {
 
       {/* Testimonials Section - Added background image upload */}
       {activeTab === "testimonials" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Testimonials</h3>
+            <h3 className="text-xl font-semibold admin-text-primary">Testimonials</h3>
             <button
               onClick={addTestimonial}
-              className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80"
+              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
             >
               Add Testimonial
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={testimonialsBackgroundImage}
               onChange={(url) => setTestimonialsBackgroundImage(url)}
@@ -710,39 +710,39 @@ export function HomePageManager() {
           </div>
 
           {testimonialsData.map((testimonial) => (
-            <div key={testimonial.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
+            <div key={testimonial.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Author</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Author</label>
                   <input
                     type="text"
                     value={testimonial.author}
                     onChange={(e) => updateTestimonial(testimonial.id, "author", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Company</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Company</label>
                   <input
                     type="text"
                     value={testimonial.company}
                     onChange={(e) => updateTestimonial(testimonial.id, "company", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Quote</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Quote</label>
                 <textarea
                   value={testimonial.quote}
                   onChange={(e) => updateTestimonial(testimonial.id, "quote", e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Profile Image</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Profile Image</label>
                   <ImageUpload
                     value={testimonial.image}
                     onChange={(url) => updateTestimonial(testimonial.id, "image", url)}
@@ -750,14 +750,14 @@ export function HomePageManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Rating (1-5)</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Rating (1-5)</label>
                   <input
                     type="number"
                     min="1"
                     max="5"
                     value={testimonial.rating}
                     onChange={(e) => updateTestimonial(testimonial.id, "rating", Number.parseInt(e.target.value))}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
               </div>
@@ -773,16 +773,16 @@ export function HomePageManager() {
       )}
 
       {activeTab === "insights" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Insights / Blog Posts</h3>
-            <button onClick={addInsight} className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80">
+            <h3 className="text-xl font-semibold admin-text-primary">Insights / Blog Posts</h3>
+            <button onClick={addInsight} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
               Add Insight
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={insightsBackgroundImage}
               onChange={(url) => setInsightsBackgroundImage(url)}
@@ -791,57 +791,57 @@ export function HomePageManager() {
           </div>
 
           {insightsData.map((insight) => (
-            <div key={insight.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
+            <div key={insight.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
                   <input
                     type="text"
                     value={insight.title}
                     onChange={(e) => updateInsight(insight.id, "title", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Category</label>
                   <input
                     type="text"
                     value={insight.category}
                     onChange={(e) => updateInsight(insight.id, "category", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
                 <textarea
                   value={insight.description}
                   onChange={(e) => updateInsight(insight.id, "description", e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Date</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Date</label>
                   <input
                     type="text"
                     value={insight.date}
                     onChange={(e) => updateInsight(insight.id, "date", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Read Time</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Read Time</label>
                   <input
                     type="text"
                     value={insight.readTime}
                     onChange={(e) => updateInsight(insight.id, "readTime", e.target.value)}
-                    className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Image</label>
+                  <label className="block text-sm font-medium admin-text-secondary mb-2">Image</label>
                   <ImageUpload
                     value={insight.image}
                     onChange={(url) => updateInsight(insight.id, "image", url)}
@@ -859,11 +859,11 @@ export function HomePageManager() {
 
       {/* Playbook Section - Added background image upload */}
       {activeTab === "playbook" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
-          <h3 className="text-xl font-semibold text-white">Brand Playbook</h3>
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
+          <h3 className="text-xl font-semibold admin-text-primary">Brand Playbook</h3>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={playbookBackgroundImage}
               onChange={(url) => setPlaybookBackgroundImage(url)}
@@ -872,48 +872,48 @@ export function HomePageManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
             <input
               type="text"
               value={playbookData.title}
               onChange={(e) => setPlaybookData({ ...playbookData, title: e.target.value })}
-              className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+              className="w-full px-4 py-2 admin-input rounded-lg "
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
             <textarea
               value={playbookData.description}
               onChange={(e) => setPlaybookData({ ...playbookData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+              className="w-full px-4 py-2 admin-input rounded-lg "
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Button Text</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Button Text</label>
               <input
                 type="text"
                 value={playbookData.buttonText}
                 onChange={(e) => setPlaybookData({ ...playbookData, buttonText: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Button URL</label>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Button URL</label>
               <input
                 type="text"
                 value={playbookData.buttonUrl}
                 onChange={(e) => setPlaybookData({ ...playbookData, buttonUrl: e.target.value })}
-                className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white"
+                className="w-full px-4 py-2 admin-input rounded-lg "
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">PDF Download URL</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">PDF Download URL</label>
             <ImageUpload
               value={playbookData.pdfUrl || ""}
               onChange={(url) => setPlaybookData({ ...playbookData, pdfUrl: url })}
@@ -926,16 +926,16 @@ export function HomePageManager() {
 
       {/* Partners Section - Added background image upload */}
       {activeTab === "partners" && (
-        <div className="space-y-6 bg-[#141414] p-6 rounded-xl border border-[#222]">
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">Trusted By (Partners)</h3>
-            <button onClick={addPartner} className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/80">
+            <h3 className="text-xl font-semibold admin-text-primary">Trusted By (Partners)</h3>
+            <button onClick={addPartner} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
               Add Partner
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Section Background Image</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
             <ImageUpload
               value={trustedByBackgroundImage}
               onChange={(url) => setTrustedByBackgroundImage(url)}
@@ -944,18 +944,18 @@ export function HomePageManager() {
           </div>
 
           {partnersData.map((partner) => (
-            <div key={partner.id} className="p-4 bg-[#0a0a0a] rounded-lg border border-[#333] space-y-4">
+            <div key={partner.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Name</label>
                 <input
                   type="text"
                   value={partner.name}
                   onChange={(e) => updatePartner(partner.id, "name", e.target.value)}
-                  className="w-full px-4 py-2 bg-[#141414] border border-[#333] rounded-lg text-white"
+                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Logo</label>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">Logo</label>
                 <ImageUpload
                   value={partner.logo}
                   onChange={(url) => updatePartner(partner.id, "logo", url)}

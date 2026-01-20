@@ -74,19 +74,19 @@ export function CaseStudiesManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Case Studies</h1>
-          <p className="text-[#888]">Manage your featured case studies.</p>
+          <h1 className="text-3xl font-bold admin-text-primary mb-2">Case Studies</h1>
+          <p className="admin-text-secondary">Manage your featured case studies.</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={addCaseStudy}
             variant="outline"
-            className="border-[#333] text-white hover:bg-[#1a1a1a] bg-transparent"
+            className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Case Study
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] text-white">
+          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -95,62 +95,62 @@ export function CaseStudiesManager() {
 
       <div className="space-y-6">
         {caseStudies.map((caseStudy) => (
-          <Card key={caseStudy.id} className="bg-[#111] border-[#222]">
+          <Card key={caseStudy.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white">{caseStudy.title || "New Case Study"}</CardTitle>
-              <button onClick={() => removeCaseStudy(caseStudy.id)} className="text-[#888] hover:text-[#E63946]">
+              <CardTitle className="admin-text-primary">{caseStudy.title || "New Case Study"}</CardTitle>
+              <button onClick={() => removeCaseStudy(caseStudy.id)} className="admin-text-secondary hover:text-[#E63946]">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white">Title</Label>
+                  <Label className="admin-text-primary">Title</Label>
                   <Input
                     value={caseStudy.title}
                     onChange={(e) => updateCaseStudy(caseStudy.id, "title", e.target.value)}
-                    className="bg-[#1a1a1a] border-[#333] text-white"
+                    className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white">Image URL</Label>
+                  <Label className="admin-text-primary">Image URL</Label>
                   <div className="flex gap-2">
                     <Input
                       value={caseStudy.image}
                       onChange={(e) => updateCaseStudy(caseStudy.id, "image", e.target.value)}
-                      className="bg-[#1a1a1a] border-[#333] text-white"
+                      className="admin-bg-secondary admin-border-light admin-text-primary"
                     />
-                    <Button variant="outline" className="border-[#333] text-white bg-transparent">
+                    <Button variant="outline" className="admin-border-light admin-text-primary bg-transparent">
                       <ImageIcon className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Description</Label>
+                <Label className="admin-text-primary">Description</Label>
                 <Textarea
                   value={caseStudy.description}
                   onChange={(e) => updateCaseStudy(caseStudy.id, "description", e.target.value)}
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white">Duration</Label>
+                  <Label className="admin-text-primary">Duration</Label>
                   <Input
                     value={caseStudy.duration}
                     onChange={(e) => updateCaseStudy(caseStudy.id, "duration", e.target.value)}
                     placeholder="e.g., 6 Weeks"
-                    className="bg-[#1a1a1a] border-[#333] text-white"
+                    className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white">Team Size</Label>
+                  <Label className="admin-text-primary">Team Size</Label>
                   <Input
                     value={caseStudy.team}
                     onChange={(e) => updateCaseStudy(caseStudy.id, "team", e.target.value)}
                     placeholder="e.g., 8 People"
-                    className="bg-[#1a1a1a] border-[#333] text-white"
+                    className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
               </div>

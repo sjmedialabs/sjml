@@ -54,19 +54,19 @@ export function StatsManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Statistics</h1>
-          <p className="text-[#888]">Manage the statistics displayed on your homepage.</p>
+          <h1 className="text-3xl font-bold admin-text-primary mb-2">Statistics</h1>
+          <p className="admin-text-secondary">Manage the statistics displayed on your homepage.</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={addStat}
             variant="outline"
-            className="border-[#333] text-white hover:bg-[#1a1a1a] bg-transparent"
+            className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Stat
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] text-white">
+          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -75,33 +75,33 @@ export function StatsManager() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.id} className="bg-[#111] border-[#222]">
+          <Card key={stat.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center gap-2">
-                <GripVertical className="w-4 h-4 text-[#666] cursor-grab" />
-                <CardTitle className="text-white text-lg">Statistic</CardTitle>
+                <GripVertical className="w-4 h-4 admin-text-muted cursor-grab" />
+                <CardTitle className="admin-text-primary text-lg">Statistic</CardTitle>
               </div>
-              <button onClick={() => removeStat(stat.id)} className="text-[#888] hover:text-[#E63946]">
+              <button onClick={() => removeStat(stat.id)} className="admin-text-secondary hover:text-[#E63946]">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-white">Value</Label>
+                <Label className="admin-text-primary">Value</Label>
                 <Input
                   value={stat.value}
                   onChange={(e) => updateStat(stat.id, "value", e.target.value)}
                   placeholder="e.g., 500+"
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Label</Label>
+                <Label className="admin-text-primary">Label</Label>
                 <Input
                   value={stat.label}
                   onChange={(e) => updateStat(stat.id, "label", e.target.value)}
                   placeholder="e.g., Projects Completed"
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
             </CardContent>

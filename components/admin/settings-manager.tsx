@@ -59,50 +59,50 @@ export function SettingsManager() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-[#888]">Manage site settings and admin credentials.</p>
+        <h1 className="text-3xl font-bold admin-text-primary mb-2">Settings</h1>
+        <p className="admin-text-secondary">Manage site settings and admin credentials.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Site Settings */}
-        <Card className="bg-[#111] border-[#222]">
+        <Card className="admin-card admin-border">
           <CardHeader>
-            <CardTitle className="text-white">Site Settings</CardTitle>
+            <CardTitle className="admin-text-primary">Site Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-white">Site Name</Label>
+              <Label className="admin-text-primary">Site Name</Label>
               <Input
                 value={settings.siteName}
                 onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Site Tagline</Label>
+              <Label className="admin-text-primary">Site Tagline</Label>
               <Input
                 value={settings.siteTagline}
                 onChange={(e) => setSettings({ ...settings, siteTagline: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Meta Title</Label>
+              <Label className="admin-text-primary">Meta Title</Label>
               <Input
                 value={settings.metaTitle}
                 onChange={(e) => setSettings({ ...settings, metaTitle: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Meta Description</Label>
+              <Label className="admin-text-primary">Meta Description</Label>
               <Input
                 value={settings.metaDescription}
                 onChange={(e) => setSettings({ ...settings, metaDescription: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
-            <Button onClick={handleSaveSettings} className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white">
+            <Button onClick={handleSaveSettings} className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
               <Save className="w-4 h-4 mr-2" />
               Save Settings
             </Button>
@@ -110,42 +110,42 @@ export function SettingsManager() {
         </Card>
 
         {/* Change Password */}
-        <Card className="bg-[#111] border-[#222]">
+        <Card className="admin-card admin-border">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-white">Change Password</CardTitle>
-            <button onClick={() => setShowPasswords(!showPasswords)} className="text-[#888] hover:text-white">
+            <CardTitle className="admin-text-primary">Change Password</CardTitle>
+            <button onClick={() => setShowPasswords(!showPasswords)} className="admin-text-secondary hover:admin-text-primary">
               {showPasswords ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-white">Current Password</Label>
+              <Label className="admin-text-primary">Current Password</Label>
               <Input
                 type={showPasswords ? "text" : "password"}
                 value={passwordData.currentPassword}
                 onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">New Password</Label>
+              <Label className="admin-text-primary">New Password</Label>
               <Input
                 type={showPasswords ? "text" : "password"}
                 value={passwordData.newPassword}
                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Confirm New Password</Label>
+              <Label className="admin-text-primary">Confirm New Password</Label>
               <Input
                 type={showPasswords ? "text" : "password"}
                 value={passwordData.confirmPassword}
                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                className="bg-[#1a1a1a] border-[#333] text-white"
+                className="admin-bg-secondary admin-border-light admin-text-primary"
               />
             </div>
-            <Button onClick={handleChangePassword} className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white">
+            <Button onClick={handleChangePassword} className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
               Change Password
             </Button>
           </CardContent>

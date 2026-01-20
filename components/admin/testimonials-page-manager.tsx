@@ -94,8 +94,8 @@ export function TestimonialsPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Testimonials</h1>
-        <p className="text-[#888]">Manage client testimonials and reviews</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Testimonials</h1>
+        <p className="admin-text-secondary">Manage client testimonials and reviews</p>
       </div>
 
       {message && (
@@ -103,37 +103,37 @@ export function TestimonialsPageManager() {
       )}
 
       {/* Hero Section */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Hero Section</h2>
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-[#888] mb-2">Title</label>
+            <label className="block text-sm admin-text-secondary mb-2">Title</label>
             <input
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#888] mb-2">Subtitle</label>
+            <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
             <input
               type="text"
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
         </div>
       </div>
 
       {/* Testimonials List */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+      <div className="admin-card border admin-border rounded-xl p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Testimonials ({data.testimonials.length})</h2>
+          <h2 className="text-lg font-semibold admin-text-primary">Testimonials ({data.testimonials.length})</h2>
           <button
             onClick={addTestimonial}
-            className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
           >
             + Add Testimonial
           </button>
@@ -141,9 +141,9 @@ export function TestimonialsPageManager() {
 
         <div className="space-y-4">
           {data.testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="p-4 bg-[#0a0a0a] rounded-lg">
+            <div key={testimonial.id} className="p-4 admin-bg-tertiary rounded-lg">
               <div className="flex justify-between items-start mb-3">
-                <span className="text-white font-medium">{testimonial.author || "New Testimonial"}</span>
+                <span className="admin-text-primary font-medium">{testimonial.author || "New Testimonial"}</span>
                 <button
                   onClick={() => deleteTestimonial(testimonial.id)}
                   className="text-red-500 hover:text-red-400 text-sm"
@@ -153,44 +153,44 @@ export function TestimonialsPageManager() {
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Quote</label>
+                  <label className="block text-xs admin-text-muted mb-1">Quote</label>
                   <textarea
                     value={testimonial.quote}
                     onChange={(e) => updateTestimonial(testimonial.id, { quote: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Author</label>
+                    <label className="block text-xs admin-text-muted mb-1">Author</label>
                     <input
                       type="text"
                       value={testimonial.author}
                       onChange={(e) => updateTestimonial(testimonial.id, { author: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Role</label>
+                    <label className="block text-xs admin-text-muted mb-1">Role</label>
                     <input
                       type="text"
                       value={testimonial.role}
                       onChange={(e) => updateTestimonial(testimonial.id, { role: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Company</label>
+                    <label className="block text-xs admin-text-muted mb-1">Company</label>
                     <input
                       type="text"
                       value={testimonial.company}
                       onChange={(e) => updateTestimonial(testimonial.id, { company: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Rating (1-5)</label>
+                    <label className="block text-xs admin-text-muted mb-1">Rating (1-5)</label>
                     <input
                       type="number"
                       min="1"
@@ -199,7 +199,7 @@ export function TestimonialsPageManager() {
                       onChange={(e) =>
                         updateTestimonial(testimonial.id, { rating: Number.parseInt(e.target.value) || 5 })
                       }
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export function TestimonialsPageManager() {
                   value={testimonial.image}
                   onChange={(url) => updateTestimonial(testimonial.id, { image: url })}
                 />
-                <label className="flex items-center gap-2 text-xs text-[#888]">
+                <label className="flex items-center gap-2 text-xs admin-text-secondary">
                   <input
                     type="checkbox"
                     checked={testimonial.featured}
@@ -223,7 +223,7 @@ export function TestimonialsPageManager() {
         </div>
 
         {data.testimonials.length === 0 && (
-          <p className="text-[#666] text-center py-8">
+          <p className="admin-text-muted text-center py-8">
             No testimonials added yet. Click "Add Testimonial" to get started.
           </p>
         )}
@@ -233,7 +233,7 @@ export function TestimonialsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

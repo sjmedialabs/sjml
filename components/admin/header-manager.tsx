@@ -102,8 +102,8 @@ export function HeaderManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Header / Navigation</h1>
-        <p className="text-[#888]">Manage your site header and navigation menu</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Header / Navigation</h1>
+        <p className="admin-text-secondary">Manage your site header and navigation menu</p>
       </div>
 
       {message && (
@@ -111,27 +111,27 @@ export function HeaderManager() {
       )}
 
       {/* Logo Section */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Logo</h2>
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Logo</h2>
         <div className="space-y-4">
           <ImageUpload label="Logo Image" value={data.logo} onChange={(url) => setData({ ...data, logo: url })} />
           <div>
-            <label className="block text-sm text-[#888] mb-2">Logo Text</label>
+            <label className="block text-sm admin-text-secondary mb-2">Logo Text</label>
             <input
               type="text"
               value={data.logoText}
               onChange={(e) => setData({ ...data, logoText: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
         </div>
       </div>
 
       {/* Top Bar */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Announcement Bar</h2>
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Announcement Bar</h2>
         <div className="space-y-4">
-          <label className="flex items-center gap-2 text-sm text-[#888]">
+          <label className="flex items-center gap-2 text-sm admin-text-secondary">
             <input
               type="checkbox"
               checked={data.showTopBar}
@@ -142,13 +142,13 @@ export function HeaderManager() {
           </label>
           {data.showTopBar && (
             <div>
-              <label className="block text-sm text-[#888] mb-2">Announcement Text</label>
+              <label className="block text-sm admin-text-secondary mb-2">Announcement Text</label>
               <input
                 type="text"
                 value={data.topBarText}
                 onChange={(e) => setData({ ...data, topBarText: e.target.value })}
                 placeholder="e.g. 🎉 New service launched! Check it out →"
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
           )}
@@ -156,33 +156,33 @@ export function HeaderManager() {
       </div>
 
       {/* Navigation Items */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Navigation Links</h2>
+          <h2 className="text-lg font-semibold admin-text-primary">Navigation Links</h2>
           <button
             onClick={addNavItem}
-            className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
           >
             + Add Link
           </button>
         </div>
         <div className="space-y-3">
           {data.navItems.map((item, index) => (
-            <div key={item.id} className="flex items-center gap-3 p-3 bg-[#0a0a0a] rounded-lg">
-              <span className="text-[#666] text-sm w-6">{index + 1}</span>
+            <div key={item.id} className="flex items-center gap-3 p-3 admin-bg-tertiary rounded-lg">
+              <span className="admin-text-muted text-sm w-6">{index + 1}</span>
               <input
                 type="text"
                 value={item.label}
                 onChange={(e) => updateNavItem(item.id, { label: e.target.value })}
                 placeholder="Label"
-                className="flex-1 px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                className="flex-1 px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
               />
               <input
                 type="text"
                 value={item.href}
                 onChange={(e) => updateNavItem(item.id, { href: e.target.value })}
                 placeholder="URL"
-                className="flex-1 px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                className="flex-1 px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
               />
               <button onClick={() => removeNavItem(item.id)} className="text-red-500 hover:text-red-400 text-sm px-2">
                 Remove
@@ -193,25 +193,25 @@ export function HeaderManager() {
       </div>
 
       {/* CTA Button */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">CTA Button</h2>
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">CTA Button</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-[#888] mb-2">Button Text</label>
+            <label className="block text-sm admin-text-secondary mb-2">Button Text</label>
             <input
               type="text"
               value={data.ctaButton.text}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, text: e.target.value } })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#888] mb-2">Button Link</label>
+            <label className="block text-sm admin-text-secondary mb-2">Button Link</label>
             <input
               type="text"
               value={data.ctaButton.href}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, href: e.target.value } })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
         </div>
@@ -220,7 +220,7 @@ export function HeaderManager() {
       <button
         onClick={saveData}
         disabled={saving}
-        className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+        className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
       >
         {saving ? "Saving..." : "Save Header Settings"}
       </button>

@@ -249,8 +249,8 @@ export function AboutPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">About Page</h1>
-        <p className="text-[#888]">Manage all sections of your About page</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">About Page</h1>
+        <p className="admin-text-secondary">Manage all sections of your About page</p>
       </div>
 
       {message && (
@@ -263,7 +263,7 @@ export function AboutPageManager() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              activeTab === tab.id ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+              activeTab === tab.id ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab.label}
@@ -271,17 +271,17 @@ export function AboutPageManager() {
         ))}
       </div>
 
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+      <div className="admin-card border admin-border rounded-xl p-6">
         {activeTab === "hero" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Hero Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Title (use pipe | for line breaks)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Title (use pipe | for line breaks)</label>
               <textarea
                 value={data.heroTitle}
                 onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 placeholder="We are Creative Thinkers, | Problem Solvers & Exceptional | Communicators"
               />
             </div>
@@ -295,47 +295,47 @@ export function AboutPageManager() {
 
         {activeTab === "about" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">About Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">About Section</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Badge</label>
+                <label className="block text-sm admin-text-secondary mb-2">Badge</label>
                 <input
                   type="text"
                   value={data.aboutSection.badge}
                   onChange={(e) => setData({ ...data, aboutSection: { ...data.aboutSection, badge: e.target.value } })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <input
                   type="text"
                   value={data.aboutSection.title}
                   onChange={(e) => setData({ ...data, aboutSection: { ...data.aboutSection, title: e.target.value } })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Highlighted Title (red text)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Highlighted Title (red text)</label>
               <input
                 type="text"
                 value={data.aboutSection.highlightedTitle}
                 onChange={(e) =>
                   setData({ ...data, aboutSection: { ...data.aboutSection, highlightedTitle: e.target.value } })
                 }
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <textarea
                 value={data.aboutSection.description}
                 onChange={(e) =>
                   setData({ ...data, aboutSection: { ...data.aboutSection, description: e.target.value } })
                 }
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <ImageUpload
@@ -348,11 +348,11 @@ export function AboutPageManager() {
 
         {activeTab === "stats" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Statistics</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Statistics</h2>
             {data.stats.map((stat, index) => (
-              <div key={index} className="grid grid-cols-2 gap-4 p-4 bg-[#0a0a0a] rounded-lg">
+              <div key={index} className="grid grid-cols-2 gap-4 p-4 admin-bg-tertiary rounded-lg">
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Value</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Value</label>
                   <input
                     type="text"
                     value={stat.value}
@@ -361,11 +361,11 @@ export function AboutPageManager() {
                       newStats[index].value = e.target.value
                       setData({ ...data, stats: newStats })
                     }}
-                    className="w-full px-4 py-3 bg-[#111] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-card border admin-border-light rounded-lg admin-text-primary focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Label</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Label</label>
                   <input
                     type="text"
                     value={stat.label}
@@ -374,7 +374,7 @@ export function AboutPageManager() {
                       newStats[index].label = e.target.value
                       setData({ ...data, stats: newStats })
                     }}
-                    className="w-full px-4 py-3 bg-[#111] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-card border admin-border-light rounded-lg admin-text-primary focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
               </div>
@@ -385,32 +385,32 @@ export function AboutPageManager() {
         {activeTab === "achievements" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Achievements</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Achievements</h2>
               <button
                 onClick={addAchievement}
-                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+                className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
               >
                 + Add Achievement
               </button>
             </div>
 
             {/* Section Settings */}
-            <div className="p-4 bg-[#0a0a0a] rounded-lg space-y-3 mb-4">
-              <h3 className="text-white font-medium">Section Settings</h3>
+            <div className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-4">
+              <h3 className="admin-text-primary font-medium">Section Settings</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Badge</label>
+                  <label className="block text-xs admin-text-muted mb-1">Badge</label>
                   <input
                     type="text"
                     value={data.achievementsSection.badge}
                     onChange={(e) =>
                       setData({ ...data, achievementsSection: { ...data.achievementsSection, badge: e.target.value } })
                     }
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Button Text</label>
+                  <label className="block text-xs admin-text-muted mb-1">Button Text</label>
                   <input
                     type="text"
                     value={data.achievementsSection.buttonText}
@@ -420,23 +420,23 @@ export function AboutPageManager() {
                         achievementsSection: { ...data.achievementsSection, buttonText: e.target.value },
                       })
                     }
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
               </div>
             </div>
 
             {data.achievements.map((achievement, index) => (
-              <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg space-y-3">
+              <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3">
                 <div className="flex justify-between items-start">
-                  <span className="text-[#888] text-sm">Achievement #{index + 1}</span>
+                  <span className="admin-text-secondary text-sm">Achievement #{index + 1}</span>
                   <button onClick={() => removeAchievement(index)} className="text-red-500 hover:text-red-400 text-sm">
                     Remove
                   </button>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Year</label>
+                    <label className="block text-xs admin-text-muted mb-1">Year</label>
                     <input
                       type="text"
                       value={achievement.year}
@@ -446,11 +446,11 @@ export function AboutPageManager() {
                         setData({ ...data, achievements: newAchievements })
                       }}
                       placeholder="2015 - 2016"
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs text-[#666] mb-1">Title</label>
+                    <label className="block text-xs admin-text-muted mb-1">Title</label>
                     <input
                       type="text"
                       value={achievement.title}
@@ -459,12 +459,12 @@ export function AboutPageManager() {
                         newAchievements[index].title = e.target.value
                         setData({ ...data, achievements: newAchievements })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Description</label>
+                  <label className="block text-xs admin-text-muted mb-1">Description</label>
                   <input
                     type="text"
                     value={achievement.description}
@@ -473,7 +473,7 @@ export function AboutPageManager() {
                       newAchievements[index].description = e.target.value
                       setData({ ...data, achievements: newAchievements })
                     }}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
               </div>
@@ -483,49 +483,49 @@ export function AboutPageManager() {
 
         {activeTab === "vision" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Vision Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Vision Section</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Badge</label>
+                <label className="block text-sm admin-text-secondary mb-2">Badge</label>
                 <input
                   type="text"
                   value={data.visionSection.badge}
                   onChange={(e) =>
                     setData({ ...data, visionSection: { ...data.visionSection, badge: e.target.value } })
                   }
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <input
                   type="text"
                   value={data.visionSection.title}
                   onChange={(e) =>
                     setData({ ...data, visionSection: { ...data.visionSection, title: e.target.value } })
                   }
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Highlighted Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Highlighted Title</label>
               <input
                 type="text"
                 value={data.visionSection.highlightedTitle}
                 onChange={(e) =>
                   setData({ ...data, visionSection: { ...data.visionSection, highlightedTitle: e.target.value } })
                 }
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <textarea
                 value={data.vision}
                 onChange={(e) => setData({ ...data, vision: e.target.value })}
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <ImageUpload
@@ -538,49 +538,49 @@ export function AboutPageManager() {
 
         {activeTab === "mission" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Mission Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Mission Section</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Badge</label>
+                <label className="block text-sm admin-text-secondary mb-2">Badge</label>
                 <input
                   type="text"
                   value={data.missionSection.badge}
                   onChange={(e) =>
                     setData({ ...data, missionSection: { ...data.missionSection, badge: e.target.value } })
                   }
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <input
                   type="text"
                   value={data.missionSection.title}
                   onChange={(e) =>
                     setData({ ...data, missionSection: { ...data.missionSection, title: e.target.value } })
                   }
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Highlighted Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Highlighted Title</label>
               <input
                 type="text"
                 value={data.missionSection.highlightedTitle}
                 onChange={(e) =>
                   setData({ ...data, missionSection: { ...data.missionSection, highlightedTitle: e.target.value } })
                 }
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <textarea
                 value={data.mission}
                 onChange={(e) => setData({ ...data, mission: e.target.value })}
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <ImageUpload
@@ -594,46 +594,46 @@ export function AboutPageManager() {
         {activeTab === "team" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Team Members</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Team Members</h2>
               <button
                 onClick={addTeamMember}
-                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+                className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
               >
                 + Add Member
               </button>
             </div>
 
             {/* Section Settings */}
-            <div className="p-4 bg-[#0a0a0a] rounded-lg space-y-3 mb-4">
-              <h3 className="text-white font-medium">Section Settings</h3>
+            <div className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-4">
+              <h3 className="admin-text-primary font-medium">Section Settings</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Badge</label>
+                  <label className="block text-xs admin-text-muted mb-1">Badge</label>
                   <input
                     type="text"
                     value={data.teamSection.badge}
                     onChange={(e) => setData({ ...data, teamSection: { ...data.teamSection, badge: e.target.value } })}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Button Text</label>
+                  <label className="block text-xs admin-text-muted mb-1">Button Text</label>
                   <input
                     type="text"
                     value={data.teamSection.buttonText}
                     onChange={(e) =>
                       setData({ ...data, teamSection: { ...data.teamSection, buttonText: e.target.value } })
                     }
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
               </div>
             </div>
 
             {data.team.map((member, index) => (
-              <div key={member.id} className="p-4 bg-[#0a0a0a] rounded-lg space-y-3">
+              <div key={member.id} className="p-4 admin-bg-tertiary rounded-lg space-y-3">
                 <div className="flex justify-between items-start">
-                  <span className="text-[#888] text-sm">Team Member #{index + 1}</span>
+                  <span className="admin-text-secondary text-sm">Team Member #{index + 1}</span>
                   <button
                     onClick={() => removeTeamMember(member.id)}
                     className="text-red-500 hover:text-red-400 text-sm"
@@ -643,7 +643,7 @@ export function AboutPageManager() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Name</label>
+                    <label className="block text-xs admin-text-muted mb-1">Name</label>
                     <input
                       type="text"
                       value={member.name}
@@ -652,11 +652,11 @@ export function AboutPageManager() {
                         newTeam[index].name = e.target.value
                         setData({ ...data, team: newTeam })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Role</label>
+                    <label className="block text-xs admin-text-muted mb-1">Role</label>
                     <input
                       type="text"
                       value={member.role}
@@ -665,7 +665,7 @@ export function AboutPageManager() {
                         newTeam[index].role = e.target.value
                         setData({ ...data, team: newTeam })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                 </div>
@@ -685,11 +685,11 @@ export function AboutPageManager() {
 
         {activeTab === "values" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Company Values</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Company Values</h2>
             {data.values.map((value, index) => (
-              <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg">
+              <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Value Title</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Value Title</label>
                   <input
                     type="text"
                     value={value.title}
@@ -698,7 +698,7 @@ export function AboutPageManager() {
                       newValues[index].title = e.target.value
                       setData({ ...data, values: newValues })
                     }}
-                    className="w-full px-4 py-3 bg-[#111] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-card border admin-border-light rounded-lg admin-text-primary focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
               </div>
@@ -706,11 +706,11 @@ export function AboutPageManager() {
           </div>
         )}
 
-        <div className="mt-6 pt-6 border-t border-[#222]">
+        <div className="mt-6 pt-6 border-t admin-border">
           <button
             onClick={saveData}
             disabled={saving}
-            className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+            className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>

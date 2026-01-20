@@ -172,3 +172,243 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #e63946;
 }
+
+/* Admin Light Theme Styles */
+.admin-light .admin-sidebar {
+  background-color: #ffffff;
+  border-color: #e5e5e5;
+}
+
+.admin-light .admin-logo-section {
+  border-color: #e5e5e5;
+}
+
+.admin-light .admin-logo-text {
+  color: #0a0a0a;
+}
+
+.admin-light .admin-logo-subtitle {
+  color: #888888;
+}
+
+.admin-light .admin-category-label {
+  color: #666666;
+}
+
+.admin-light .admin-menu-item.admin-menu-active {
+  background-color: #E63946;
+  color: #ffffff;
+}
+
+.admin-light .admin-menu-item.admin-menu-inactive {
+  color: #666666;
+}
+
+.admin-light .admin-menu-item.admin-menu-inactive:hover {
+  color: #0a0a0a;
+  background-color: #f5f5f5;
+}
+
+.admin-light .admin-footer {
+  border-color: #e5e5e5;
+}
+
+.admin-light .admin-action-btn {
+  color: #666666;
+}
+
+.admin-light .admin-action-btn:hover {
+  color: #0a0a0a;
+  background-color: #f5f5f5;
+}
+
+.admin-light .admin-logout-btn:hover {
+  color: #E63946;
+  background-color: #fff5f5;
+}
+
+/* Admin Dark Theme Styles (default) */
+.admin-sidebar {
+  background-color: #111;
+  border-color: #222;
+}
+
+.admin-logo-section {
+  border-color: #222;
+}
+
+.admin-logo-text {
+  color: #ffffff;
+}
+
+.admin-logo-subtitle {
+  color: #666;
+}
+
+.admin-category-label {
+  color: #666;
+}
+
+.admin-menu-item.admin-menu-active {
+  background-color: #E63946;
+  color: #ffffff;
+}
+
+.admin-menu-item.admin-menu-inactive {
+  color: #888;
+}
+
+.admin-menu-item.admin-menu-inactive:hover {
+  color: #ffffff;
+  background-color: #1a1a1a;
+}
+
+.admin-footer {
+  border-color: #222;
+}
+
+.admin-action-btn {
+  color: #888;
+}
+
+.admin-action-btn:hover {
+  color: #ffffff;
+  background-color: #1a1a1a;
+}
+
+.admin-logout-btn:hover {
+  color: #E63946;
+}
+
+/* Admin content area theme support */
+.admin-light .admin-content-area {
+  background-color: #f8f8f8;
+  color: #0a0a0a;
+}
+
+.admin-content-area {
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+/* Admin Light Theme - Card and UI Components */
+.admin-light .admin-card {
+  background-color: #ffffff;
+  border-color: #e5e5e5;
+}
+
+.admin-light .admin-card-title {
+  color: #0a0a0a;
+}
+
+.admin-light .admin-card-subtitle {
+  color: #666666;
+}
+
+.admin-light .admin-text-primary {
+  color: #0a0a0a;
+}
+
+.admin-light .admin-text-secondary {
+  color: #666666;
+}
+
+.admin-light .admin-text-muted {
+  color: #888888;
+}
+
+.admin-light .admin-bg-secondary {
+  background-color: #f5f5f5;
+}
+
+.admin-light .admin-bg-tertiary {
+  background-color: #fafafa;
+}
+
+.admin-light .admin-border {
+  border-color: #e5e5e5;
+}
+
+.admin-light .admin-border-light {
+  border-color: #f0f0f0;
+}
+
+.admin-light .admin-input {
+  background-color: #ffffff;
+  border-color: #e5e5e5;
+  color: #0a0a0a;
+}
+
+.admin-light .admin-input:focus {
+  border-color: #E63946;
+}
+
+.admin-light .admin-button-secondary {
+  background-color: #f5f5f5;
+  color: #0a0a0a;
+}
+
+.admin-light .admin-button-secondary:hover {
+  background-color: #e5e5e5;
+}
+
+/* Admin Dark Theme - Card and UI Components (default) */
+.admin-card {
+  background-color: #111111;
+  border-color: #222222;
+}
+
+.admin-card-title {
+  color: #ffffff;
+}
+
+.admin-card-subtitle {
+  color: #888888;
+}
+
+.admin-text-primary {
+  color: #ffffff;
+}
+
+.admin-text-secondary {
+  color: #888888;
+}
+
+.admin-text-muted {
+  color: #666666;
+}
+
+.admin-bg-secondary {
+  background-color: #1a1a1a;
+}
+
+.admin-bg-tertiary {
+  background-color: #0a0a0a;
+}
+
+.admin-border {
+  border-color: #222222;
+}
+
+.admin-border-light {
+  border-color: #333333;
+}
+
+.admin-input {
+  background-color: #0a0a0a;
+  border-color: #333333;
+  color: #ffffff;
+}
+
+.admin-input:focus {
+  border-color: #E63946;
+}
+
+.admin-button-secondary {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.admin-button-secondary:hover {
+  background-color: #222222;
+}

@@ -112,19 +112,19 @@ export function ServicesManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Services</h1>
-          <p className="text-[#888]">Manage the services displayed on your homepage.</p>
+          <h1 className="text-3xl font-bold admin-text-primary mb-2">Services</h1>
+          <p className="admin-text-secondary">Manage the services displayed on your homepage.</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={addService}
             variant="outline"
-            className="border-[#333] text-white hover:bg-[#1a1a1a] bg-transparent"
+            className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Service
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] text-white">
+          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -133,41 +133,41 @@ export function ServicesManager() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {services.map((service) => (
-          <Card key={service.id} className="bg-[#111] border-[#222]">
+          <Card key={service.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white text-lg">{service.title || "New Service"}</CardTitle>
-              <button onClick={() => removeService(service.id)} className="text-[#888] hover:text-[#E63946]">
+              <CardTitle className="admin-text-primary text-lg">{service.title || "New Service"}</CardTitle>
+              <button onClick={() => removeService(service.id)} className="admin-text-secondary hover:text-[#E63946]">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-white">Title</Label>
+                <Label className="admin-text-primary">Title</Label>
                 <Input
                   value={service.title}
                   onChange={(e) => updateService(service.id, "title", e.target.value)}
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Slug (URL)</Label>
+                <Label className="admin-text-primary">Slug (URL)</Label>
                 <Input
                   value={service.slug || ""}
                   onChange={(e) => updateService(service.id, "slug", e.target.value)}
                   placeholder="e.g., digital-marketing"
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Description</Label>
+                <Label className="admin-text-primary">Description</Label>
                 <Textarea
                   value={service.description}
                   onChange={(e) => updateService(service.id, "description", e.target.value)}
-                  className="bg-[#1a1a1a] border-[#333] text-white"
+                  className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Service Icon</Label>
+                <Label className="admin-text-primary">Service Icon</Label>
                 <ImageUpload
                   value={service.icon}
                   onChange={(url) => updateService(service.id, "icon", url)}
@@ -178,7 +178,7 @@ export function ServicesManager() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Service Image</Label>
+                <Label className="admin-text-primary">Service Image</Label>
                 <ImageUpload
                   value={service.image}
                   onChange={(url) => updateService(service.id, "image", url)}

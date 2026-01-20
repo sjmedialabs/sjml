@@ -90,8 +90,8 @@ export function SeoManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">SEO Settings</h1>
-        <p className="text-[#888]">Manage search engine optimization for your website</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">SEO Settings</h1>
+        <p className="admin-text-secondary">Manage search engine optimization for your website</p>
       </div>
 
       {message && (
@@ -102,7 +102,7 @@ export function SeoManager() {
         <button
           onClick={() => setActiveTab("global")}
           className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-            activeTab === "global" ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+            activeTab === "global" ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
           }`}
         >
           Global Settings
@@ -110,7 +110,7 @@ export function SeoManager() {
         <button
           onClick={() => setActiveTab("pages")}
           className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-            activeTab === "pages" ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+            activeTab === "pages" ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
           }`}
         >
           Page-Specific SEO
@@ -118,65 +118,65 @@ export function SeoManager() {
         <button
           onClick={() => setActiveTab("analytics")}
           className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-            activeTab === "analytics" ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+            activeTab === "analytics" ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
           }`}
         >
           Analytics
         </button>
       </div>
 
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+      <div className="admin-card border admin-border rounded-xl p-6">
         {activeTab === "global" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Global SEO Settings</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Global SEO Settings</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Default Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Default Title</label>
               <input
                 type="text"
                 value={data.globalTitle}
                 onChange={(e) => setData({ ...data, globalTitle: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
-              <p className="text-xs text-[#666] mt-1">Recommended: 50-60 characters</p>
+              <p className="text-xs admin-text-muted mt-1">Recommended: 50-60 characters</p>
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Default Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Default Description</label>
               <textarea
                 value={data.globalDescription}
                 onChange={(e) => setData({ ...data, globalDescription: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
-              <p className="text-xs text-[#666] mt-1">Recommended: 150-160 characters</p>
+              <p className="text-xs admin-text-muted mt-1">Recommended: 150-160 characters</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Favicon URL</label>
+                <label className="block text-sm admin-text-secondary mb-2">Favicon URL</label>
                 <input
                   type="text"
                   value={data.favicon}
                   onChange={(e) => setData({ ...data, favicon: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Default OG Image URL</label>
+                <label className="block text-sm admin-text-secondary mb-2">Default OG Image URL</label>
                 <input
                   type="text"
                   value={data.ogImage}
                   onChange={(e) => setData({ ...data, ogImage: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Twitter Handle</label>
+              <label className="block text-sm admin-text-secondary mb-2">Twitter Handle</label>
               <input
                 type="text"
                 value={data.twitterHandle}
                 onChange={(e) => setData({ ...data, twitterHandle: e.target.value })}
                 placeholder="@yourhandle"
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
           </div>
@@ -184,36 +184,36 @@ export function SeoManager() {
 
         {activeTab === "pages" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Page-Specific SEO</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Page-Specific SEO</h2>
             {data.pages.map((page, index) => (
-              <div key={page.page} className="p-4 bg-[#0a0a0a] rounded-lg">
-                <h3 className="text-white font-medium mb-3">{page.page} Page</h3>
+              <div key={page.page} className="p-4 admin-bg-tertiary rounded-lg">
+                <h3 className="admin-text-primary font-medium mb-3">{page.page} Page</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Title</label>
+                    <label className="block text-xs admin-text-muted mb-1">Title</label>
                     <input
                       type="text"
                       value={page.title}
                       onChange={(e) => updatePageSeo(index, { title: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Description</label>
+                    <label className="block text-xs admin-text-muted mb-1">Description</label>
                     <textarea
                       value={page.description}
                       onChange={(e) => updatePageSeo(index, { description: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Keywords (comma separated)</label>
+                    <label className="block text-xs admin-text-muted mb-1">Keywords (comma separated)</label>
                     <input
                       type="text"
                       value={page.keywords}
                       onChange={(e) => updatePageSeo(index, { keywords: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                 </div>
@@ -224,26 +224,26 @@ export function SeoManager() {
 
         {activeTab === "analytics" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Analytics Integration</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Analytics Integration</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Google Analytics ID</label>
+              <label className="block text-sm admin-text-secondary mb-2">Google Analytics ID</label>
               <input
                 type="text"
                 value={data.googleAnalyticsId}
                 onChange={(e) => setData({ ...data, googleAnalyticsId: e.target.value })}
                 placeholder="G-XXXXXXXXXX"
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
-              <p className="text-xs text-[#666] mt-1">Enter your Google Analytics 4 measurement ID</p>
+              <p className="text-xs admin-text-muted mt-1">Enter your Google Analytics 4 measurement ID</p>
             </div>
           </div>
         )}
 
-        <div className="mt-6 pt-6 border-t border-[#222]">
+        <div className="mt-6 pt-6 border-t admin-border">
           <button
             onClick={saveData}
             disabled={saving}
-            className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+            className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save SEO Settings"}
           </button>

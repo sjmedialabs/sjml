@@ -168,8 +168,8 @@ export function WorkPageManager() {
       <div>
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Portfolio / Works Management</h1>
-            <p className="text-[#888]">Create and manage your portfolio projects. Each work has its own detail page.</p>
+            <h1 className="text-2xl font-bold admin-text-primary mb-2">Portfolio / Works Management</h1>
+            <p className="admin-text-secondary">Create and manage your portfolio projects. Each work has its own detail page.</p>
           </div>
           <Button onClick={addNewWork} className="bg-[#E63946] hover:bg-[#d32f3d]">
             <Plus className="w-4 h-4 mr-2" /> Add Work
@@ -182,25 +182,25 @@ export function WorkPageManager() {
 
         {/* Search */}
         <div className="mb-6 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 admin-text-secondary" />
           <Input
             placeholder="Search works..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#333] text-white w-64"
+            className="pl-10 admin-bg-secondary admin-border-light admin-text-primary w-64"
           />
         </div>
 
         {/* Works Table */}
-        <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+        <div className="admin-card border admin-border rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#222]">
-                <th className="text-left p-4 text-[#888] font-medium">Project</th>
-                <th className="text-left p-4 text-[#888] font-medium">Client</th>
-                <th className="text-left p-4 text-[#888] font-medium">Category</th>
-                <th className="text-left p-4 text-[#888] font-medium">Status</th>
-                <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+              <tr className="border-b admin-border">
+                <th className="text-left p-4 admin-text-secondary font-medium">Project</th>
+                <th className="text-left p-4 admin-text-secondary font-medium">Client</th>
+                <th className="text-left p-4 admin-text-secondary font-medium">Category</th>
+                <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
+                <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -212,16 +212,16 @@ export function WorkPageManager() {
                 </tr>
               ) : filteredWorks.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-[#666]">
+                  <td colSpan={5} className="p-8 text-center admin-text-muted">
                     No works found
                   </td>
                 </tr>
               ) : (
                 filteredWorks.map((work) => (
-                  <tr key={work.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                  <tr key={work.id} className="border-b admin-border hover:admin-bg-secondary">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-[#222] rounded-lg overflow-hidden">
+                        <div className="w-12 h-12 admin-bg-secondary rounded-lg overflow-hidden">
                           <img
                             src={work.image || "/placeholder.svg"}
                             alt={work.title}
@@ -229,16 +229,16 @@ export function WorkPageManager() {
                           />
                         </div>
                         <div>
-                          <div className="text-white font-medium flex items-center gap-2">
+                          <div className="admin-text-primary font-medium flex items-center gap-2">
                             {work.title}
                             {work.isFeatured && <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />}
                           </div>
-                          <div className="text-[#666] text-sm">{work.slug}</div>
+                          <div className="admin-text-muted text-sm">{work.slug}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-[#888]">{work.client || "-"}</td>
-                    <td className="p-4 text-[#888]">{work.category}</td>
+                    <td className="p-4 admin-text-secondary">{work.client || "-"}</td>
+                    <td className="p-4 admin-text-secondary">{work.category}</td>
                     <td className="p-4">
                       <span
                         className={`px-2 py-1 rounded text-xs ${work.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
@@ -252,7 +252,7 @@ export function WorkPageManager() {
                           variant="ghost"
                           size="sm"
                           onClick={() => editWork(work)}
-                          className="text-gray-400 hover:text-white"
+                          className="admin-text-secondary hover:admin-text-primary"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -274,8 +274,8 @@ export function WorkPageManager() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-[#222]">
-              <div className="text-sm text-[#888]">
+            <div className="flex items-center justify-between p-4 border-t admin-border">
+              <div className="text-sm admin-text-secondary">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
                 {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </div>
@@ -285,11 +285,11 @@ export function WorkPageManager() {
                   size="sm"
                   disabled={pagination.page === 1}
                   onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
-                  className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <span className="px-3 py-1 text-white">
+                <span className="px-3 py-1 admin-text-primary">
                   {pagination.page} / {pagination.totalPages}
                 </span>
                 <Button
@@ -297,7 +297,7 @@ export function WorkPageManager() {
                   size="sm"
                   disabled={pagination.page === pagination.totalPages}
                   onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
-                  className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -320,13 +320,13 @@ export function WorkPageManager() {
             setEditingWork(null)
             setIsNew(false)
           }}
-          className="text-gray-400 hover:text-white"
+          className="admin-text-secondary hover:admin-text-primary"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-white">{isNew ? "Create New Work" : "Edit Work"}</h1>
-          <p className="text-[#888]">Fill in all the details for the portfolio item</p>
+          <h1 className="text-2xl font-bold admin-text-primary">{isNew ? "Create New Work" : "Edit Work"}</h1>
+          <p className="admin-text-secondary">Fill in all the details for the portfolio item</p>
         </div>
       </div>
 
@@ -337,91 +337,91 @@ export function WorkPageManager() {
       {editingWork && (
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Basic Information</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title *</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title *</label>
                 <Input
                   value={editingWork.title}
                   onChange={(e) => updateField("title", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Project title"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Slug *</label>
+                <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
                 <Input
                   value={editingWork.slug}
                   onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="project-slug"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Client</label>
+                <label className="block text-sm admin-text-secondary mb-2">Client</label>
                 <Input
                   value={editingWork.client}
                   onChange={(e) => updateField("client", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Client name"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Category</label>
+                <label className="block text-sm admin-text-secondary mb-2">Category</label>
                 <Input
                   value={editingWork.category}
                   onChange={(e) => updateField("category", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Branding, Web Design, etc."
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Industry</label>
+                <label className="block text-sm admin-text-secondary mb-2">Industry</label>
                 <Input
                   value={editingWork.industry}
                   onChange={(e) => updateField("industry", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Role</label>
+                <label className="block text-sm admin-text-secondary mb-2">Role</label>
                 <Input
                   value={editingWork.role}
                   onChange={(e) => updateField("role", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Branding / Web Design"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Technology</label>
+                <label className="block text-sm admin-text-secondary mb-2">Technology</label>
                 <Input
                   value={editingWork.technology}
                   onChange={(e) => updateField("technology", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Web | UI | UX"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Year</label>
+                <label className="block text-sm admin-text-secondary mb-2">Year</label>
                 <Input
                   value={editingWork.year}
                   onChange={(e) => updateField("year", e.target.value)}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-sm text-[#888] mb-2">Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <Textarea
                 value={editingWork.description}
                 onChange={(e) => updateField("description", e.target.value)}
-                className="bg-[#0a0a0a] border-[#333] text-white"
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
                 rows={3}
               />
             </div>
             <div className="mt-4">
-              <label className="block text-sm text-[#888] mb-2">Tags (comma separated)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Tags (comma separated)</label>
               <Input
                 value={editingWork.tags.join(", ")}
                 onChange={(e) =>
@@ -433,7 +433,7 @@ export function WorkPageManager() {
                       .filter(Boolean),
                   )
                 }
-                className="bg-[#0a0a0a] border-[#333] text-white"
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
                 placeholder="Logo & Identity, Web Design, Development"
               />
             </div>
@@ -444,9 +444,9 @@ export function WorkPageManager() {
                   id="isActive"
                   checked={editingWork.isActive}
                   onChange={(e) => updateField("isActive", e.target.checked)}
-                  className="rounded border-[#333]"
+                  className="rounded admin-border-light"
                 />
-                <label htmlFor="isActive" className="text-sm text-white">
+                <label htmlFor="isActive" className="text-sm admin-text-primary">
                   Active (visible on website)
                 </label>
               </div>
@@ -456,9 +456,9 @@ export function WorkPageManager() {
                   id="isFeatured"
                   checked={editingWork.isFeatured}
                   onChange={(e) => updateField("isFeatured", e.target.checked)}
-                  className="rounded border-[#333]"
+                  className="rounded admin-border-light"
                 />
-                <label htmlFor="isFeatured" className="text-sm text-white">
+                <label htmlFor="isFeatured" className="text-sm admin-text-primary">
                   Featured (show on homepage)
                 </label>
               </div>
@@ -466,34 +466,34 @@ export function WorkPageManager() {
           </div>
 
           {/* Image */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Featured Image</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Featured Image</h2>
             <ImageUpload label="Main Image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
           </div>
 
           {/* Overview */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Brand Overview</h2>
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Brand Overview</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Title</label>
                 <Input
                   value={editingWork.overview.title}
                   onChange={(e) => updateField("overview", { ...editingWork.overview, title: e.target.value })}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Description</label>
+                <label className="block text-sm admin-text-secondary mb-2">Description</label>
                 <Textarea
                   value={editingWork.overview.description}
                   onChange={(e) => updateField("overview", { ...editingWork.overview, description: e.target.value })}
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                   rows={4}
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Key Points (comma separated)</label>
+                <label className="block text-sm admin-text-secondary mb-2">Key Points (comma separated)</label>
                 <Input
                   value={editingWork.overview.points.join(", ")}
                   onChange={(e) =>
@@ -505,16 +505,16 @@ export function WorkPageManager() {
                         .filter(Boolean),
                     })
                   }
-                  className="bg-[#0a0a0a] border-[#333] text-white"
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
             </div>
           </div>
 
           {/* Process */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+          <div className="admin-card border admin-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Process Steps</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Process Steps</h2>
               <Button
                 variant="outline"
                 size="sm"
@@ -524,16 +524,16 @@ export function WorkPageManager() {
                     { step: String(editingWork.process.length + 1).padStart(2, "0"), title: "", description: "" },
                   ])
                 }
-                className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
               >
                 <Plus className="w-4 h-4 mr-1" /> Add Step
               </Button>
             </div>
             <div className="space-y-4">
               {editingWork.process.map((step, index) => (
-                <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg">
+                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-[#888]">Step {index + 1}</span>
+                    <span className="text-sm admin-text-secondary">Step {index + 1}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -557,7 +557,7 @@ export function WorkPageManager() {
                         updateField("process", newProcess)
                       }}
                       placeholder="01"
-                      className="bg-[#111] border-[#333] text-white"
+                      className="admin-card admin-border-light admin-text-primary"
                     />
                     <Input
                       value={step.title}
@@ -567,7 +567,7 @@ export function WorkPageManager() {
                         updateField("process", newProcess)
                       }}
                       placeholder="Step title"
-                      className="bg-[#111] border-[#333] text-white"
+                      className="admin-card admin-border-light admin-text-primary"
                     />
                   </div>
                   <Textarea
@@ -578,7 +578,7 @@ export function WorkPageManager() {
                       updateField("process", newProcess)
                     }}
                     placeholder="Step description"
-                    className="bg-[#111] border-[#333] text-white mt-2"
+                    className="admin-card admin-border-light admin-text-primary mt-2"
                     rows={2}
                   />
                 </div>
@@ -587,14 +587,14 @@ export function WorkPageManager() {
           </div>
 
           {/* Gallery */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+          <div className="admin-card border admin-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Gallery Images</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Gallery Images</h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => updateField("gallery", [...editingWork.gallery, ""])}
-                className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
               >
                 <Plus className="w-4 h-4 mr-1" /> Add Image
               </Button>
@@ -645,7 +645,7 @@ export function WorkPageManager() {
                 setEditingWork(null)
                 setIsNew(false)
               }}
-              className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+              className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
             >
               Cancel
             </Button>

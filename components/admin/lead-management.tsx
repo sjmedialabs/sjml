@@ -190,9 +190,9 @@ export function LeadManagement({ token }: LeadManagementProps) {
       case "google_ads":
         return "bg-yellow-500/20 text-yellow-400"
       case "manual":
-        return "bg-gray-500/20 text-gray-400"
+        return "bg-gray-500/20 admin-text-secondary"
       default:
-        return "bg-gray-500/20 text-gray-400"
+        return "bg-gray-500/20 admin-text-secondary"
     }
   }
 
@@ -207,9 +207,9 @@ export function LeadManagement({ token }: LeadManagementProps) {
       case "converted":
         return "bg-emerald-500/20 text-emerald-400"
       case "lost":
-        return "bg-gray-500/20 text-gray-400"
+        return "bg-gray-500/20 admin-text-secondary"
       default:
-        return "bg-gray-500/20 text-gray-400"
+        return "bg-gray-500/20 admin-text-secondary"
     }
   }
 
@@ -234,24 +234,24 @@ export function LeadManagement({ token }: LeadManagementProps) {
     <div className="space-y-6">
       {/* Header Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">Total Leads</p>
-          <p className="text-2xl font-bold text-white">{leads.length}</p>
+        <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
+          <p className="admin-text-secondary text-sm">Total Leads</p>
+          <p className="text-2xl font-bold admin-text-primary">{leads.length}</p>
         </div>
-        <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">New</p>
+        <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
+          <p className="admin-text-secondary text-sm">New</p>
           <p className="text-2xl font-bold text-[#E63946]">{leads.filter((l) => l.status === "new").length}</p>
         </div>
-        <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">Contacted</p>
+        <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
+          <p className="admin-text-secondary text-sm">Contacted</p>
           <p className="text-2xl font-bold text-blue-400">{leads.filter((l) => l.status === "contacted").length}</p>
         </div>
-        <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">Qualified</p>
+        <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
+          <p className="admin-text-secondary text-sm">Qualified</p>
           <p className="text-2xl font-bold text-green-400">{leads.filter((l) => l.status === "qualified").length}</p>
         </div>
-        <div className="bg-[#1a1a1a] border border-[#333] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">Converted</p>
+        <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
+          <p className="admin-text-secondary text-sm">Converted</p>
           <p className="text-2xl font-bold text-emerald-400">{leads.filter((l) => l.status === "converted").length}</p>
         </div>
       </div>
@@ -260,20 +260,20 @@ export function LeadManagement({ token }: LeadManagementProps) {
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex flex-wrap gap-3 items-center">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 admin-text-secondary" />
             <Input
               placeholder="Search leads..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-[#1a1a1a] border-[#333] text-white w-64"
+              className="pl-10 admin-bg-secondary admin-border-light admin-text-primary w-64"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40 bg-[#1a1a1a] border-[#333] text-white">
+            <SelectTrigger className="w-40 admin-bg-secondary admin-border-light admin-text-primary">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-[#333]">
+            <SelectContent className="admin-bg-secondary admin-border-light">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="new">New</SelectItem>
               <SelectItem value="contacted">Contacted</SelectItem>
@@ -283,11 +283,11 @@ export function LeadManagement({ token }: LeadManagementProps) {
             </SelectContent>
           </Select>
           <Select value={sourceFilter} onValueChange={setSourceFilter}>
-            <SelectTrigger className="w-44 bg-[#1a1a1a] border-[#333] text-white">
+            <SelectTrigger className="w-44 admin-bg-secondary admin-border-light admin-text-primary">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Source" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-[#333]">
+            <SelectContent className="admin-bg-secondary admin-border-light">
               <SelectItem value="all">All Sources</SelectItem>
               <SelectItem value="website_popup">Website Popup</SelectItem>
               <SelectItem value="contact_form">Contact Form</SelectItem>
@@ -302,7 +302,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
             variant="outline"
             size="sm"
             onClick={fetchLeads}
-            className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+            className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
@@ -311,7 +311,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
             variant="outline"
             size="sm"
             onClick={exportLeads}
-            className="border-[#333] text-gray-300 hover:bg-[#222] bg-transparent"
+            className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -319,7 +319,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
           <Button
             size="sm"
             onClick={() => setShowAddManual(true)}
-            className="bg-[#E63946] hover:bg-[#d32f3d] text-white"
+            className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Lead
@@ -330,41 +330,41 @@ export function LeadManagement({ token }: LeadManagementProps) {
       {/* Info about Meta/Google Ads integration */}
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
         <h4 className="text-blue-400 font-medium mb-2">Meta & Google Ads Integration</h4>
-        <p className="text-gray-400 text-sm">
+        <p className="admin-text-secondary text-sm">
           To fetch leads from Meta Ads and Google Ads campaigns, you need to set up webhook integrations. Configure your
           ad platforms to send lead data to:{" "}
-          <code className="bg-[#1a1a1a] px-2 py-1 rounded text-[#E63946]">/api/leads/webhook</code>
+          <code className="admin-bg-secondary px-2 py-1 rounded text-[#E63946]">/api/leads/webhook</code>
         </p>
-        <p className="text-gray-400 text-sm mt-2">
+        <p className="admin-text-secondary text-sm mt-2">
           For now, you can manually add leads from ad campaigns using the "Add Lead" button and selecting the
           appropriate source.
         </p>
       </div>
 
       {/* Leads Table */}
-      <div className="bg-[#1a1a1a] border border-[#333] rounded-lg overflow-hidden">
+      <div className="admin-bg-secondary border admin-border-light rounded-lg overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-400">Loading leads...</div>
+          <div className="p-8 text-center admin-text-secondary">Loading leads...</div>
         ) : filteredLeads.length === 0 ? (
-          <div className="p-8 text-center text-gray-400">No leads found</div>
+          <div className="p-8 text-center admin-text-secondary">No leads found</div>
         ) : (
           <Table>
             <TableHeader>
-              <TableRow className="border-[#333] hover:bg-transparent">
-                <TableHead className="text-gray-400">Name</TableHead>
-                <TableHead className="text-gray-400">Contact</TableHead>
-                <TableHead className="text-gray-400">Source</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
-                <TableHead className="text-gray-400">Date</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow className="admin-border-light hover:bg-transparent">
+                <TableHead className="admin-text-secondary">Name</TableHead>
+                <TableHead className="admin-text-secondary">Contact</TableHead>
+                <TableHead className="admin-text-secondary">Source</TableHead>
+                <TableHead className="admin-text-secondary">Status</TableHead>
+                <TableHead className="admin-text-secondary">Date</TableHead>
+                <TableHead className="admin-text-secondary text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredLeads.map((lead) => (
-                <TableRow key={lead.id} className="border-[#333] hover:bg-[#222]">
+                <TableRow key={lead.id} className="admin-border-light hover:admin-bg-secondary">
                   <TableCell>
                     <div>
-                      <p className="text-white font-medium">{lead.name}</p>
+                      <p className="admin-text-primary font-medium">{lead.name}</p>
                       {lead.subject && <p className="text-gray-500 text-sm truncate max-w-[200px]">{lead.subject}</p>}
                     </div>
                   </TableCell>
@@ -385,7 +385,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
                       <SelectTrigger className={`w-32 h-8 text-xs border-0 ${getStatusBadgeColor(lead.status)}`}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#333]">
+                      <SelectContent className="admin-bg-secondary admin-border-light">
                         <SelectItem value="new">New</SelectItem>
                         <SelectItem value="contacted">Contacted</SelectItem>
                         <SelectItem value="qualified">Qualified</SelectItem>
@@ -394,7 +394,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell className="text-gray-400 text-sm">
+                  <TableCell className="admin-text-secondary text-sm">
                     {new Date(lead.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
@@ -403,7 +403,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedLead(lead)}
-                        className="text-gray-400 hover:text-white hover:bg-[#333]"
+                        className="admin-text-secondary hover:admin-text-primary hover:bg-[#333]"
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
@@ -411,7 +411,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteLead(lead.id)}
-                        className="text-gray-400 hover:text-red-500 hover:bg-[#333]"
+                        className="admin-text-secondary hover:text-red-500 hover:bg-[#333]"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -426,7 +426,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
 
       {/* Lead Detail Modal */}
       <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
-        <DialogContent className="bg-[#1a1a1a] border-[#333] text-white max-w-lg">
+        <DialogContent className="admin-bg-secondary admin-border-light admin-text-primary max-w-lg">
           <DialogHeader>
             <DialogTitle>Lead Details</DialogTitle>
           </DialogHeader>
@@ -434,19 +434,19 @@ export function LeadManagement({ token }: LeadManagementProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-gray-400 text-sm">Name</p>
-                  <p className="text-white">{selectedLead.name}</p>
+                  <p className="admin-text-secondary text-sm">Name</p>
+                  <p className="admin-text-primary">{selectedLead.name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Email</p>
-                  <p className="text-white">{selectedLead.email}</p>
+                  <p className="admin-text-secondary text-sm">Email</p>
+                  <p className="admin-text-primary">{selectedLead.email}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Phone</p>
-                  <p className="text-white">{selectedLead.phone || "-"}</p>
+                  <p className="admin-text-secondary text-sm">Phone</p>
+                  <p className="admin-text-primary">{selectedLead.phone || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Source</p>
+                  <p className="admin-text-secondary text-sm">Source</p>
                   <span className={`px-2 py-1 rounded-full text-xs ${getSourceBadgeColor(selectedLead.source)}`}>
                     {formatSource(selectedLead.source)}
                   </span>
@@ -454,40 +454,40 @@ export function LeadManagement({ token }: LeadManagementProps) {
               </div>
               {selectedLead.subject && (
                 <div>
-                  <p className="text-gray-400 text-sm">Subject</p>
-                  <p className="text-white">{selectedLead.subject}</p>
+                  <p className="admin-text-secondary text-sm">Subject</p>
+                  <p className="admin-text-primary">{selectedLead.subject}</p>
                 </div>
               )}
               <div>
-                <p className="text-gray-400 text-sm">Message</p>
-                <p className="text-white bg-[#0d0d0d] p-3 rounded-lg">{selectedLead.message}</p>
+                <p className="admin-text-secondary text-sm">Message</p>
+                <p className="admin-text-primary bg-[#0d0d0d] p-3 rounded-lg">{selectedLead.message}</p>
               </div>
               {(selectedLead.campaign || selectedLead.adSet || selectedLead.adName) && (
-                <div className="border-t border-[#333] pt-4">
-                  <p className="text-gray-400 text-sm mb-2">Campaign Info</p>
+                <div className="border-t admin-border-light pt-4">
+                  <p className="admin-text-secondary text-sm mb-2">Campaign Info</p>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     {selectedLead.platform && (
                       <div>
                         <span className="text-gray-500">Platform:</span>{" "}
-                        <span className="text-white">{selectedLead.platform}</span>
+                        <span className="admin-text-primary">{selectedLead.platform}</span>
                       </div>
                     )}
                     {selectedLead.campaign && (
                       <div>
                         <span className="text-gray-500">Campaign:</span>{" "}
-                        <span className="text-white">{selectedLead.campaign}</span>
+                        <span className="admin-text-primary">{selectedLead.campaign}</span>
                       </div>
                     )}
                     {selectedLead.adSet && (
                       <div>
                         <span className="text-gray-500">Ad Set:</span>{" "}
-                        <span className="text-white">{selectedLead.adSet}</span>
+                        <span className="admin-text-primary">{selectedLead.adSet}</span>
                       </div>
                     )}
                     {selectedLead.adName && (
                       <div>
                         <span className="text-gray-500">Ad Name:</span>{" "}
-                        <span className="text-white">{selectedLead.adName}</span>
+                        <span className="admin-text-primary">{selectedLead.adName}</span>
                       </div>
                     )}
                   </div>
@@ -501,7 +501,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
 
       {/* Add Manual Lead Modal */}
       <Dialog open={showAddManual} onOpenChange={setShowAddManual}>
-        <DialogContent className="bg-[#1a1a1a] border-[#333] text-white max-w-lg">
+        <DialogContent className="admin-bg-secondary admin-border-light admin-text-primary max-w-lg">
           <DialogHeader>
             <DialogTitle>Add Lead Manually</DialogTitle>
           </DialogHeader>
@@ -511,14 +511,14 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Full Name*"
                 value={manualLead.name}
                 onChange={(e) => setManualLead({ ...manualLead, name: e.target.value })}
-                className="bg-[#0d0d0d] border-[#333] text-white"
+                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               />
               <Input
                 type="email"
                 placeholder="Email*"
                 value={manualLead.email}
                 onChange={(e) => setManualLead({ ...manualLead, email: e.target.value })}
-                className="bg-[#0d0d0d] border-[#333] text-white"
+                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -526,13 +526,13 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Phone"
                 value={manualLead.phone}
                 onChange={(e) => setManualLead({ ...manualLead, phone: e.target.value })}
-                className="bg-[#0d0d0d] border-[#333] text-white"
+                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               />
               <Input
                 placeholder="Subject"
                 value={manualLead.subject}
                 onChange={(e) => setManualLead({ ...manualLead, subject: e.target.value })}
-                className="bg-[#0d0d0d] border-[#333] text-white"
+                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -540,10 +540,10 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 value={manualLead.source}
                 onValueChange={(value) => setManualLead({ ...manualLead, source: value })}
               >
-                <SelectTrigger className="bg-[#0d0d0d] border-[#333] text-white">
+                <SelectTrigger className="bg-[#0d0d0d] admin-border-light admin-text-primary">
                   <SelectValue placeholder="Source" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#333]">
+                <SelectContent className="admin-bg-secondary admin-border-light">
                   <SelectItem value="manual">Manual Entry</SelectItem>
                   <SelectItem value="meta_ads">Meta Ads</SelectItem>
                   <SelectItem value="google_ads">Google Ads</SelectItem>
@@ -555,20 +555,20 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Campaign Name (optional)"
                 value={manualLead.campaign}
                 onChange={(e) => setManualLead({ ...manualLead, campaign: e.target.value })}
-                className="bg-[#0d0d0d] border-[#333] text-white"
+                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               />
             </div>
             <Textarea
               placeholder="Message/Notes"
               value={manualLead.message}
               onChange={(e) => setManualLead({ ...manualLead, message: e.target.value })}
-              className="bg-[#0d0d0d] border-[#333] text-white"
+              className="bg-[#0d0d0d] admin-border-light admin-text-primary"
               rows={4}
             />
             <Button
               onClick={addManualLead}
               disabled={!manualLead.name || !manualLead.email}
-              className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white"
+              className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary"
             >
               Add Lead
             </Button>

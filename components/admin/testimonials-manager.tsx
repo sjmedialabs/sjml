@@ -64,19 +64,19 @@ export function TestimonialsManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Testimonials</h1>
-          <p className="text-[#888]">Manage client testimonials displayed on your homepage.</p>
+          <h1 className="text-3xl font-bold admin-text-primary mb-2">Testimonials</h1>
+          <p className="admin-text-secondary">Manage client testimonials displayed on your homepage.</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={addTestimonial}
             variant="outline"
-            className="border-[#333] text-white hover:bg-[#1a1a1a] bg-transparent"
+            className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Testimonial
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] text-white">
+          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -85,42 +85,42 @@ export function TestimonialsManager() {
 
       <div className="space-y-6">
         {testimonials.map((testimonial) => (
-          <Card key={testimonial.id} className="bg-[#111] border-[#222]">
+          <Card key={testimonial.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white">{testimonial.author || "New Testimonial"}</CardTitle>
-              <button onClick={() => removeTestimonial(testimonial.id)} className="text-[#888] hover:text-[#E63946]">
+              <CardTitle className="admin-text-primary">{testimonial.author || "New Testimonial"}</CardTitle>
+              <button onClick={() => removeTestimonial(testimonial.id)} className="admin-text-secondary hover:text-[#E63946]">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-white">Quote</Label>
+                <Label className="admin-text-primary">Quote</Label>
                 <Textarea
                   value={testimonial.quote}
                   onChange={(e) => updateTestimonial(testimonial.id, "quote", e.target.value)}
-                  className="bg-[#1a1a1a] border-[#333] text-white min-h-[100px]"
+                  className="admin-bg-secondary admin-border-light admin-text-primary min-h-[100px]"
                 />
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white">Author Name & Company</Label>
+                  <Label className="admin-text-primary">Author Name & Company</Label>
                   <Input
                     value={testimonial.author}
                     onChange={(e) => updateTestimonial(testimonial.id, "author", e.target.value)}
                     placeholder="e.g., John Doe, Company"
-                    className="bg-[#1a1a1a] border-[#333] text-white"
+                    className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white">Image URL</Label>
+                  <Label className="admin-text-primary">Image URL</Label>
                   <Input
                     value={testimonial.image}
                     onChange={(e) => updateTestimonial(testimonial.id, "image", e.target.value)}
-                    className="bg-[#1a1a1a] border-[#333] text-white"
+                    className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white">Rating (1-5)</Label>
+                  <Label className="admin-text-primary">Rating (1-5)</Label>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button

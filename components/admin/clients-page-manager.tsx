@@ -90,8 +90,8 @@ export function ClientsPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Clients</h1>
-        <p className="text-[#888]">Manage your client logos and information</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Clients</h1>
+        <p className="admin-text-secondary">Manage your client logos and information</p>
       </div>
 
       {message && (
@@ -99,37 +99,37 @@ export function ClientsPageManager() {
       )}
 
       {/* Hero Section */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Hero Section</h2>
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-[#888] mb-2">Title</label>
+            <label className="block text-sm admin-text-secondary mb-2">Title</label>
             <input
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#888] mb-2">Subtitle</label>
+            <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
             <input
               type="text"
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
             />
           </div>
         </div>
       </div>
 
       {/* Clients List */}
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+      <div className="admin-card border admin-border rounded-xl p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Clients ({data.clients.length})</h2>
+          <h2 className="text-lg font-semibold admin-text-primary">Clients ({data.clients.length})</h2>
           <button
             onClick={addClient}
-            className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
           >
             + Add Client
           </button>
@@ -137,21 +137,21 @@ export function ClientsPageManager() {
 
         <div className="grid grid-cols-2 gap-4">
           {data.clients.map((client) => (
-            <div key={client.id} className="p-4 bg-[#0a0a0a] rounded-lg">
+            <div key={client.id} className="p-4 admin-bg-tertiary rounded-lg">
               <div className="flex justify-between items-start mb-3">
-                <span className="text-white font-medium">{client.name}</span>
+                <span className="admin-text-primary font-medium">{client.name}</span>
                 <button onClick={() => deleteClient(client.id)} className="text-red-500 hover:text-red-400 text-sm">
                   Delete
                 </button>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Name</label>
+                  <label className="block text-xs admin-text-muted mb-1">Name</label>
                   <input
                     type="text"
                     value={client.name}
                     onChange={(e) => updateClient(client.id, { name: e.target.value })}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
                 <ImageUpload
@@ -161,25 +161,25 @@ export function ClientsPageManager() {
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Industry</label>
+                    <label className="block text-xs admin-text-muted mb-1">Industry</label>
                     <input
                       type="text"
                       value={client.industry}
                       onChange={(e) => updateClient(client.id, { industry: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Website</label>
+                    <label className="block text-xs admin-text-muted mb-1">Website</label>
                     <input
                       type="text"
                       value={client.website}
                       onChange={(e) => updateClient(client.id, { website: e.target.value })}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                 </div>
-                <label className="flex items-center gap-2 text-xs text-[#888]">
+                <label className="flex items-center gap-2 text-xs admin-text-secondary">
                   <input
                     type="checkbox"
                     checked={client.featured}
@@ -194,7 +194,7 @@ export function ClientsPageManager() {
         </div>
 
         {data.clients.length === 0 && (
-          <p className="text-[#666] text-center py-8">No clients added yet. Click "Add Client" to get started.</p>
+          <p className="admin-text-muted text-center py-8">No clients added yet. Click "Add Client" to get started.</p>
         )}
       </div>
 
@@ -202,7 +202,7 @@ export function ClientsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

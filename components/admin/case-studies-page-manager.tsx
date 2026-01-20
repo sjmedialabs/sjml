@@ -114,8 +114,8 @@ export function CaseStudiesPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Case Studies</h1>
-        <p className="text-[#888]">Manage your case studies</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Case Studies</h1>
+        <p className="admin-text-secondary">Manage your case studies</p>
       </div>
 
       {message && (
@@ -124,45 +124,45 @@ export function CaseStudiesPageManager() {
 
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-white">Case Studies ({data.caseStudies.length})</h2>
-          <p className="text-[#888] text-sm">Manage your case study portfolio</p>
+          <h2 className="text-xl font-semibold admin-text-primary">Case Studies ({data.caseStudies.length})</h2>
+          <p className="admin-text-secondary text-sm">Manage your case study portfolio</p>
         </div>
         <button
           onClick={addCaseStudy}
-          className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+          className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839]"
         >
           + Add Case Study
         </button>
       </div>
 
       {/* Case Studies Table */}
-      <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+      <div className="admin-card border admin-border rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#222]">
-              <th className="text-left p-4 text-[#888] font-medium">Title</th>
-              <th className="text-left p-4 text-[#888] font-medium">Client</th>
-              <th className="text-left p-4 text-[#888] font-medium">Industry</th>
-              <th className="text-left p-4 text-[#888] font-medium">Tags</th>
-              <th className="text-left p-4 text-[#888] font-medium">Featured</th>
-              <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+            <tr className="border-b admin-border">
+              <th className="text-left p-4 admin-text-secondary font-medium">Title</th>
+              <th className="text-left p-4 admin-text-secondary font-medium">Client</th>
+              <th className="text-left p-4 admin-text-secondary font-medium">Industry</th>
+              <th className="text-left p-4 admin-text-secondary font-medium">Tags</th>
+              <th className="text-left p-4 admin-text-secondary font-medium">Featured</th>
+              <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {data.caseStudies.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-[#666]">
+                <td colSpan={6} className="p-8 text-center admin-text-muted">
                   No case studies yet
                 </td>
               </tr>
             ) : (
               data.caseStudies.map((study) => (
-                <tr key={study.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                <tr key={study.id} className="border-b admin-border hover:admin-bg-secondary">
                   <td className="p-4">
-                    <div className="text-white font-medium">{study.title}</div>
+                    <div className="admin-text-primary font-medium">{study.title}</div>
                   </td>
-                  <td className="p-4 text-[#888]">{study.client || "-"}</td>
-                  <td className="p-4 text-[#888]">{study.industry || "-"}</td>
+                  <td className="p-4 admin-text-secondary">{study.client || "-"}</td>
+                  <td className="p-4 admin-text-secondary">{study.industry || "-"}</td>
                   <td className="p-4">
                     <div className="flex gap-1 flex-wrap">
                       {study.tags.slice(0, 2).map((tag, idx) => (
@@ -171,7 +171,7 @@ export function CaseStudiesPageManager() {
                         </span>
                       ))}
                       {study.tags.length > 2 && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-gray-500/20 text-gray-400">
+                        <span className="px-2 py-0.5 rounded text-xs bg-gray-500/20 admin-text-secondary">
                           +{study.tags.length - 2}
                         </span>
                       )}
@@ -180,7 +180,7 @@ export function CaseStudiesPageManager() {
                   <td className="p-4">
                     <span
                       className={`px-2 py-1 rounded text-xs ${
-                        study.featured ? "bg-yellow-500/20 text-yellow-400" : "bg-gray-500/20 text-gray-400"
+                        study.featured ? "bg-yellow-500/20 text-yellow-400" : "bg-gray-500/20 admin-text-secondary"
                       }`}
                     >
                       {study.featured ? "Featured" : "Standard"}
@@ -193,7 +193,7 @@ export function CaseStudiesPageManager() {
                           setEditingStudy(study)
                           setActiveTab("basic")
                         }}
-                        className="text-gray-400 hover:text-white px-2 py-1 text-sm"
+                        className="admin-text-secondary hover:admin-text-primary px-2 py-1 text-sm"
                       >
                         Edit
                       </button>
@@ -215,9 +215,9 @@ export function CaseStudiesPageManager() {
       {/* Edit Modal */}
       {editingStudy && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
+          <div className="admin-card border admin-border rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-white">Edit Case Study</h2>
+              <h2 className="text-xl font-semibold admin-text-primary">Edit Case Study</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => deleteCaseStudy(editingStudy.id)}
@@ -227,7 +227,7 @@ export function CaseStudiesPageManager() {
                 </button>
                 <button
                   onClick={() => setEditingStudy(null)}
-                  className="text-[#888] hover:text-white text-sm px-3 py-1"
+                  className="admin-text-secondary hover:admin-text-primary text-sm px-3 py-1"
                 >
                   Close
                 </button>
@@ -241,7 +241,7 @@ export function CaseStudiesPageManager() {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1.5 rounded text-sm capitalize ${
-                      activeTab === tab ? "bg-[#E63946] text-white" : "bg-[#0a0a0a] text-[#888]"
+                      activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-tertiary admin-text-secondary"
                     }`}
                   >
                     {tab}
@@ -254,35 +254,35 @@ export function CaseStudiesPageManager() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm text-[#888] mb-2">Title</label>
+                        <label className="block text-sm admin-text-secondary mb-2">Title</label>
                         <input
                           type="text"
                           value={editingStudy.title}
                           onChange={(e) => updateCaseStudy({ ...editingStudy, title: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-[#888] mb-2">Client</label>
+                        <label className="block text-sm admin-text-secondary mb-2">Client</label>
                         <input
                           type="text"
                           value={editingStudy.client}
                           onChange={(e) => updateCaseStudy({ ...editingStudy, client: e.target.value })}
-                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Industry</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Industry</label>
                       <input
                         type="text"
                         value={editingStudy.industry}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Tags (comma separated)</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Tags (comma separated)</label>
                       <input
                         type="text"
                         value={editingStudy.tags.join(", ")}
@@ -295,7 +295,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <ImageUpload
@@ -303,7 +303,7 @@ export function CaseStudiesPageManager() {
                       value={editingStudy.image}
                       onChange={(url) => updateCaseStudy({ ...editingStudy, image: url })}
                     />
-                    <label className="flex items-center gap-2 text-sm text-[#888]">
+                    <label className="flex items-center gap-2 text-sm admin-text-secondary">
                       <input
                         type="checkbox"
                         checked={editingStudy.featured}
@@ -318,34 +318,34 @@ export function CaseStudiesPageManager() {
                 {activeTab === "content" && (
                   <>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Description</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Description</label>
                       <textarea
                         value={editingStudy.description}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, description: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Challenge</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Challenge</label>
                       <textarea
                         value={editingStudy.challenge}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, challenge: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Solution</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Solution</label>
                       <textarea
                         value={editingStudy.solution}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, solution: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Results (comma separated)</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Results (comma separated)</label>
                       <input
                         type="text"
                         value={editingStudy.results.join(", ")}
@@ -358,7 +358,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                   </>
@@ -368,7 +368,7 @@ export function CaseStudiesPageManager() {
                   <>
                     <div className="space-y-3">
                       {editingStudy.stats.map((stat, idx) => (
-                        <div key={idx} className="grid grid-cols-2 gap-4 p-3 bg-[#0a0a0a] rounded-lg">
+                        <div key={idx} className="grid grid-cols-2 gap-4 p-3 admin-bg-tertiary rounded-lg">
                           <input
                             type="text"
                             value={stat.label}
@@ -378,7 +378,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Label"
-                            className="px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                            className="px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                           />
                           <input
                             type="text"
@@ -389,7 +389,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Value"
-                            className="px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                            className="px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                           />
                         </div>
                       ))}
@@ -408,7 +408,7 @@ export function CaseStudiesPageManager() {
                 {activeTab === "testimonial" && (
                   <>
                     <div>
-                      <label className="block text-sm text-[#888] mb-2">Quote</label>
+                      <label className="block text-sm admin-text-secondary mb-2">Quote</label>
                       <textarea
                         value={editingStudy.testimonial.quote}
                         onChange={(e) =>
@@ -418,12 +418,12 @@ export function CaseStudiesPageManager() {
                           })
                         }
                         rows={3}
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm text-[#888] mb-2">Author</label>
+                        <label className="block text-sm admin-text-secondary mb-2">Author</label>
                         <input
                           type="text"
                           value={editingStudy.testimonial.author}
@@ -433,11 +433,11 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, author: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-[#888] mb-2">Role</label>
+                        <label className="block text-sm admin-text-secondary mb-2">Role</label>
                         <input
                           type="text"
                           value={editingStudy.testimonial.role}
@@ -447,7 +447,7 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, role: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                     </div>
@@ -462,7 +462,7 @@ export function CaseStudiesPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

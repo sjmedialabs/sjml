@@ -115,8 +115,8 @@ export function CareersPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Careers Page</h1>
-        <p className="text-[#888]">Manage job postings and career page content</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Careers Page</h1>
+        <p className="admin-text-secondary">Manage job postings and career page content</p>
       </div>
 
       {message && (
@@ -130,7 +130,7 @@ export function CareersPageManager() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
-              activeTab === tab ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+              activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab}
@@ -139,25 +139,25 @@ export function CareersPageManager() {
       </div>
 
       {activeTab === "hero" && (
-        <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Hero Section</h2>
+        <div className="admin-card border admin-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-[#888] mb-2">Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Title</label>
               <input
                 type="text"
                 value={data.heroTitle}
                 onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Subtitle</label>
+              <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
               <textarea
                 value={data.heroSubtitle}
                 onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
           </div>
@@ -168,46 +168,46 @@ export function CareersPageManager() {
         <div>
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-white">Job Postings ({data.jobs.length})</h2>
-              <p className="text-[#888] text-sm">Manage job openings and career opportunities</p>
+              <h2 className="text-xl font-semibold admin-text-primary">Job Postings ({data.jobs.length})</h2>
+              <p className="admin-text-secondary text-sm">Manage job openings and career opportunities</p>
             </div>
             <button
               onClick={addJob}
-              className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839]"
             >
               + Add Job
             </button>
           </div>
 
           {/* Jobs Table */}
-          <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+          <div className="admin-card border admin-border rounded-xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#222]">
-                  <th className="text-left p-4 text-[#888] font-medium">Job Title</th>
-                  <th className="text-left p-4 text-[#888] font-medium">Department</th>
-                  <th className="text-left p-4 text-[#888] font-medium">Location</th>
-                  <th className="text-left p-4 text-[#888] font-medium">Type</th>
-                  <th className="text-left p-4 text-[#888] font-medium">Status</th>
-                  <th className="text-right p-4 text-[#888] font-medium">Actions</th>
+                <tr className="border-b admin-border">
+                  <th className="text-left p-4 admin-text-secondary font-medium">Job Title</th>
+                  <th className="text-left p-4 admin-text-secondary font-medium">Department</th>
+                  <th className="text-left p-4 admin-text-secondary font-medium">Location</th>
+                  <th className="text-left p-4 admin-text-secondary font-medium">Type</th>
+                  <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
+                  <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {data.jobs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-[#666]">
+                    <td colSpan={6} className="p-8 text-center admin-text-muted">
                       No job postings yet
                     </td>
                   </tr>
                 ) : (
                   data.jobs.map((job) => (
-                    <tr key={job.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                    <tr key={job.id} className="border-b admin-border hover:admin-bg-secondary">
                       <td className="p-4">
-                        <div className="text-white font-medium">{job.title}</div>
-                        {job.salary && <div className="text-[#666] text-sm">{job.salary}</div>}
+                        <div className="admin-text-primary font-medium">{job.title}</div>
+                        {job.salary && <div className="admin-text-muted text-sm">{job.salary}</div>}
                       </td>
-                      <td className="p-4 text-[#888]">{job.department || "-"}</td>
-                      <td className="p-4 text-[#888]">{job.location || "-"}</td>
+                      <td className="p-4 admin-text-secondary">{job.department || "-"}</td>
+                      <td className="p-4 admin-text-secondary">{job.location || "-"}</td>
                       <td className="p-4">
                         <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400">
                           {job.type}
@@ -218,7 +218,7 @@ export function CareersPageManager() {
                           className={`px-2 py-1 rounded text-xs ${
                             job.published
                               ? "bg-green-500/20 text-green-400"
-                              : "bg-gray-500/20 text-gray-400"
+                              : "bg-gray-500/20 admin-text-secondary"
                           }`}
                         >
                           {job.published ? "Published" : "Draft"}
@@ -228,7 +228,7 @@ export function CareersPageManager() {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => setEditingJob(job)}
-                            className="text-gray-400 hover:text-white px-2 py-1 text-sm"
+                            className="admin-text-secondary hover:admin-text-primary px-2 py-1 text-sm"
                           >
                             Edit
                           </button>
@@ -250,9 +250,9 @@ export function CareersPageManager() {
           {/* Edit Modal/Drawer */}
           {editingJob && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-[#111] border border-[#222] rounded-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-auto">
+              <div className="admin-card border admin-border rounded-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-white">Edit Job Posting</h2>
+                  <h2 className="text-xl font-semibold admin-text-primary">Edit Job Posting</h2>
                   <div className="flex gap-2">
                     <button
                       onClick={() => deleteJob(editingJob.id)}
@@ -262,7 +262,7 @@ export function CareersPageManager() {
                     </button>
                     <button
                       onClick={() => setEditingJob(null)}
-                      className="text-[#888] hover:text-white text-sm px-3 py-1"
+                      className="admin-text-secondary hover:admin-text-primary text-sm px-3 py-1"
                     >
                       Close
                     </button>
@@ -270,40 +270,40 @@ export function CareersPageManager() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-[#888] mb-2">Job Title</label>
+                    <label className="block text-sm admin-text-secondary mb-2">Job Title</label>
                     <input
                       type="text"
                       value={editingJob.title}
                       onChange={(e) => updateJob({ ...editingJob, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-[#888] mb-2">Department</label>
+                    <label className="block text-sm admin-text-secondary mb-2">Department</label>
                     <input
                       type="text"
                       value={editingJob.department}
                       onChange={(e) => updateJob({ ...editingJob, department: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm text-[#888] mb-2">Location</label>
+                    <label className="block text-sm admin-text-secondary mb-2">Location</label>
                     <input
                       type="text"
                       value={editingJob.location}
                       onChange={(e) => updateJob({ ...editingJob, location: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-[#888] mb-2">Type</label>
+                    <label className="block text-sm admin-text-secondary mb-2">Type</label>
                     <select
                       value={editingJob.type}
                       onChange={(e) => updateJob({ ...editingJob, type: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                     >
                       <option value="Full-time">Full-time</option>
                       <option value="Part-time">Part-time</option>
@@ -312,27 +312,27 @@ export function CareersPageManager() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-[#888] mb-2">Salary Range</label>
+                    <label className="block text-sm admin-text-secondary mb-2">Salary Range</label>
                     <input
                       type="text"
                       value={editingJob.salary}
                       onChange={(e) => updateJob({ ...editingJob, salary: e.target.value })}
                       placeholder="e.g. $80k - $120k"
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Description</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Description</label>
                   <textarea
                     value={editingJob.description}
                     onChange={(e) => updateJob({ ...editingJob, description: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">Requirements (comma separated)</label>
+                  <label className="block text-sm admin-text-secondary mb-2">Requirements (comma separated)</label>
                   <textarea
                     value={editingJob.requirements.join(", ")}
                     onChange={(e) =>
@@ -345,10 +345,10 @@ export function CareersPageManager() {
                       })
                     }
                     rows={2}
-                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-[#888]">
+                <label className="flex items-center gap-2 text-sm admin-text-secondary">
                   <input
                     type="checkbox"
                     checked={editingJob.published}
@@ -364,25 +364,25 @@ export function CareersPageManager() {
       )}
 
       {activeTab === "culture" && (
-        <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Company Culture</h2>
+        <div className="admin-card border admin-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Company Culture</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-[#888] mb-2">Section Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
               <input
                 type="text"
                 value={data.culture.title}
                 onChange={(e) => setData({ ...data, culture: { ...data.culture, title: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Description</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <textarea
                 value={data.culture.description}
                 onChange={(e) => setData({ ...data, culture: { ...data.culture, description: e.target.value } })}
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
           </div>
@@ -390,23 +390,23 @@ export function CareersPageManager() {
       )}
 
       {activeTab === "benefits" && (
-        <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+        <div className="admin-card border admin-border rounded-xl p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-white">Employee Benefits</h2>
+            <h2 className="text-lg font-semibold admin-text-primary">Employee Benefits</h2>
             <button
               onClick={() =>
                 setData({ ...data, benefits: [...data.benefits, { icon: "Star", title: "", description: "" }] })
               }
-              className="px-3 py-1.5 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+              className="px-3 py-1.5 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
             >
               + Add Benefit
             </button>
           </div>
           <div className="space-y-4">
             {data.benefits.map((benefit, index) => (
-              <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg">
+              <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="text-[#888] text-sm">Benefit #{index + 1}</span>
+                  <span className="admin-text-secondary text-sm">Benefit #{index + 1}</span>
                   <button
                     onClick={() => setData({ ...data, benefits: data.benefits.filter((_, i) => i !== index) })}
                     className="text-red-500 hover:text-red-400 text-sm"
@@ -416,7 +416,7 @@ export function CareersPageManager() {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Icon</label>
+                    <label className="block text-xs admin-text-muted mb-1">Icon</label>
                     <input
                       type="text"
                       value={benefit.icon}
@@ -425,11 +425,11 @@ export function CareersPageManager() {
                         newBenefits[index].icon = e.target.value
                         setData({ ...data, benefits: newBenefits })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs text-[#666] mb-1">Title</label>
+                    <label className="block text-xs admin-text-muted mb-1">Title</label>
                     <input
                       type="text"
                       value={benefit.title}
@@ -438,12 +438,12 @@ export function CareersPageManager() {
                         newBenefits[index].title = e.target.value
                         setData({ ...data, benefits: newBenefits })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                 </div>
                 <div className="mt-3">
-                  <label className="block text-xs text-[#666] mb-1">Description</label>
+                  <label className="block text-xs admin-text-muted mb-1">Description</label>
                   <input
                     type="text"
                     value={benefit.description}
@@ -452,12 +452,12 @@ export function CareersPageManager() {
                       newBenefits[index].description = e.target.value
                       setData({ ...data, benefits: newBenefits })
                     }}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
               </div>
             ))}
-            {data.benefits.length === 0 && <p className="text-[#666] text-center py-4">No benefits added yet</p>}
+            {data.benefits.length === 0 && <p className="admin-text-muted text-center py-4">No benefits added yet</p>}
           </div>
         </div>
       )}
@@ -466,7 +466,7 @@ export function CareersPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

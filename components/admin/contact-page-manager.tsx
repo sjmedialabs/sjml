@@ -124,8 +124,8 @@ export function ContactPageManager() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Contact Page</h1>
-        <p className="text-[#888]">Manage contact page content, offices, and form settings</p>
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">Contact Page</h1>
+        <p className="admin-text-secondary">Manage contact page content, offices, and form settings</p>
       </div>
 
       {message && (
@@ -138,7 +138,7 @@ export function ContactPageManager() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
-              activeTab === tab ? "bg-[#E63946] text-white" : "bg-[#1a1a1a] text-[#888] hover:text-white"
+              activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab}
@@ -146,26 +146,26 @@ export function ContactPageManager() {
         ))}
       </div>
 
-      <div className="bg-[#111] border border-[#222] rounded-xl p-6">
+      <div className="admin-card border admin-border rounded-xl p-6">
         {activeTab === "hero" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Hero Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Title</label>
               <input
                 type="text"
                 value={data.hero.title}
                 onChange={(e) => setData({ ...data, hero: { ...data.hero, title: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Subtitle</label>
+              <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
               <textarea
                 value={data.hero.subtitle}
                 onChange={(e) => setData({ ...data, hero: { ...data.hero, subtitle: e.target.value } })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <ImageUpload
@@ -178,27 +178,27 @@ export function ContactPageManager() {
 
         {activeTab === "form" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Form Section</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Form Section</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Badge Text</label>
+              <label className="block text-sm admin-text-secondary mb-2">Badge Text</label>
               <input
                 type="text"
                 value={data.form.badge}
                 onChange={(e) => setData({ ...data, form: { ...data.form, badge: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Title</label>
               <input
                 type="text"
                 value={data.form.title}
                 onChange={(e) => setData({ ...data, form: { ...data.form, title: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Highlighted Words (comma separated)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Highlighted Words (comma separated)</label>
               <input
                 type="text"
                 value={data.form.highlightedWords.join(", ")}
@@ -214,17 +214,17 @@ export function ContactPageManager() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 placeholder="touch, with agency"
               />
             </div>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Button Text</label>
+              <label className="block text-sm admin-text-secondary mb-2">Button Text</label>
               <input
                 type="text"
                 value={data.form.buttonText}
                 onChange={(e) => setData({ ...data, form: { ...data.form, buttonText: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
           </div>
@@ -233,25 +233,25 @@ export function ContactPageManager() {
         {activeTab === "offices" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-white">Office Locations</h2>
+              <h2 className="text-lg font-semibold admin-text-primary">Office Locations</h2>
               <button
                 onClick={addOffice}
-                className="px-3 py-1.5 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] text-sm"
+                className="px-3 py-1.5 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
               >
                 + Add Office
               </button>
             </div>
             {data.offices.map((office, index) => (
-              <div key={index} className="p-4 bg-[#0a0a0a] rounded-lg space-y-3">
+              <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3">
                 <div className="flex justify-between items-start">
-                  <span className="text-[#888] text-sm">Office #{index + 1}</span>
+                  <span className="admin-text-secondary text-sm">Office #{index + 1}</span>
                   <button onClick={() => removeOffice(index)} className="text-red-500 hover:text-red-400 text-sm">
                     Remove
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Country</label>
+                    <label className="block text-xs admin-text-muted mb-1">Country</label>
                     <input
                       type="text"
                       value={office.country}
@@ -260,11 +260,11 @@ export function ContactPageManager() {
                         newOffices[index].country = e.target.value
                         setData({ ...data, offices: newOffices })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#666] mb-1">Flag Emoji</label>
+                    <label className="block text-xs admin-text-muted mb-1">Flag Emoji</label>
                     <input
                       type="text"
                       value={office.flag}
@@ -273,13 +273,13 @@ export function ContactPageManager() {
                         newOffices[index].flag = e.target.value
                         setData({ ...data, offices: newOffices })
                       }}
-                      className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                       placeholder="🇮🇳"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Full Address</label>
+                  <label className="block text-xs admin-text-muted mb-1">Full Address</label>
                   <textarea
                     value={office.address}
                     onChange={(e) => {
@@ -288,7 +288,7 @@ export function ContactPageManager() {
                       setData({ ...data, offices: newOffices })
                     }}
                     rows={2}
-                    className="w-full px-3 py-2 bg-[#111] border border-[#333] rounded text-white text-sm"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
                   />
                 </div>
               </div>
@@ -298,44 +298,44 @@ export function ContactPageManager() {
 
         {activeTab === "contact" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-white mb-4">Contact Information</h2>
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Contact Information</h2>
             <div>
-              <label className="block text-sm text-[#888] mb-2">Section Title</label>
+              <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
               <input
                 type="text"
                 value={data.contact.title}
                 onChange={(e) => setData({ ...data, contact: { ...data.contact, title: e.target.value } })}
-                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Phone Number</label>
+                <label className="block text-sm admin-text-secondary mb-2">Phone Number</label>
                 <input
                   type="text"
                   value={data.contact.phone}
                   onChange={(e) => setData({ ...data, contact: { ...data.contact, phone: e.target.value } })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Email Address</label>
+                <label className="block text-sm admin-text-secondary mb-2">Email Address</label>
                 <input
                   type="email"
                   value={data.contact.email}
                   onChange={(e) => setData({ ...data, contact: { ...data.contact, email: e.target.value } })}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg text-white focus:outline-none focus:border-[#E63946]"
+                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
                 />
               </div>
             </div>
           </div>
         )}
 
-        <div className="mt-6 pt-6 border-t border-[#222]">
+        <div className="mt-6 pt-6 border-t admin-border">
           <button
             onClick={saveData}
             disabled={saving}
-            className="px-6 py-3 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+            className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>

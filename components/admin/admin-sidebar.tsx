@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import type { JSX } from "react" // Import JSX to fix the undeclared variable error
+import { useAdminTheme } from "@/hooks/use-admin-theme"
 
 interface AdminSidebarProps {
   activeSection: string
@@ -18,13 +18,13 @@ const menuCategories = [
     items: [
       { id: "home", label: "Home Page", icon: "Home" },
       { id: "about", label: "About Page", icon: "Users" },
-      { id: "work", label: "Work/Portfolio", icon: "FolderOpen" },
+      { id: "work", label: "Work Page", icon: "FolderOpen" },
       { id: "services", label: "Services Page", icon: "Layers" },
       { id: "case-studies", label: "Case Studies", icon: "Briefcase" },
-      { id: "insights", label: "Insights/Blog", icon: "FileText" },
+      { id: "insights", label: "Insights", icon: "Lightbulb" },
       { id: "clients", label: "Clients", icon: "Building" },
-      { id: "testimonials", label: "Testimonials", icon: "MessageSquare" },
-      { id: "careers", label: "Careers", icon: "GraduationCap" },
+      { id: "testimonials", label: "Testimonials", icon: "MessageCircle" },
+      { id: "careers", label: "Careers", icon: "Briefcase" },
       { id: "contact", label: "Contact Page", icon: "Mail" },
     ],
   },
@@ -43,8 +43,7 @@ const menuCategories = [
   },
 ]
 
-// Simple icon components
-const icons: { [key: string]: JSX.Element } = {
+const icons: Record<string, React.ReactNode> = {
   LayoutDashboard: (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -93,7 +92,7 @@ const icons: { [key: string]: JSX.Element } = {
     >
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
-      <path d="M22 12-8.58 3.91a2 2 0 0 0-3-3.87" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   ),
@@ -124,9 +123,9 @@ const icons: { [key: string]: JSX.Element } = {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
-      <path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12" />
-      <path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17" />
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
     </svg>
   ),
   Briefcase: (
@@ -143,19 +142,9 @@ const icons: { [key: string]: JSX.Element } = {
     >
       <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-      <path d="M9 22v-4h6v4" />
-      <path d="M8 6h.01" />
-      <path d="M16 6h.01" />
-      <path d="M12 6h.01" />
-      <path d="M12 10h.01" />
-      <path d="M12 14h.01" />
-      <path d="M16 10h.01" />
-      <path d="M16 14h.01" />
-      <path d="M8 10h.01" />
-      <path d="M8 14h.01" />
     </svg>
   ),
-  FileText: (
+  Lightbulb: (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="18"
@@ -167,11 +156,9 @@ const icons: { [key: string]: JSX.Element } = {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" x2="8" y1="13" y2="13" />
-      <line x1="16" x2="8" y1="17" y2="17" />
-      <line x1="10" x2="8" y1="9" y2="9" />
+      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
     </svg>
   ),
   Building: (
@@ -199,7 +186,7 @@ const icons: { [key: string]: JSX.Element } = {
       <path d="M8 14h.01" />
     </svg>
   ),
-  MessageSquare: (
+  MessageCircle: (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="18"
@@ -211,24 +198,7 @@ const icons: { [key: string]: JSX.Element } = {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
-  ),
-  GraduationCap: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
     </svg>
   ),
   Mail: (
@@ -244,8 +214,7 @@ const icons: { [key: string]: JSX.Element } = {
       strokeLinejoin="round"
     >
       <rect width="20" height="16" x="2" y="4" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
   ),
   Inbox: (
@@ -363,10 +332,49 @@ const icons: { [key: string]: JSX.Element } = {
       <line x1="21" x2="9" y1="12" y2="12" />
     </svg>
   ),
+  Sun: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2" />
+      <path d="M12 20v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="m17.66 17.66 1.41 1.41" />
+      <path d="M2 12h2" />
+      <path d="M20 12h2" />
+      <path d="m6.34 17.66-1.41 1.41" />
+      <path d="m19.07 4.93-1.41 1.41" />
+    </svg>
+  ),
+  Moon: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </svg>
+  ),
 }
 
-export function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarProps) {
+export default function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarProps) {
   const router = useRouter()
+  const { theme, toggleTheme } = useAdminTheme()
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken")
@@ -374,16 +382,16 @@ export function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarPr
   }
 
   return (
-    <aside className="w-64 bg-[#111] border-r border-[#222] flex flex-col min-h-screen">
+    <aside className="admin-sidebar w-64 border-r flex flex-col min-h-screen">
       {/* Logo */}
-      <div className="p-6 border-b border-[#222]">
+      <div className="admin-logo-section p-6 border-b">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#E63946] rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">SJ</span>
+            <span className="admin-text-primary font-bold text-sm">SJ</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-bold text-sm leading-tight">SJ MEDIA LABS</span>
-            <span className="text-[#666] text-[10px] tracking-wider">CMS DASHBOARD</span>
+            <span className="admin-logo-text font-bold text-sm leading-tight">SJ MEDIA LABS</span>
+            <span className="admin-logo-subtitle text-[10px] tracking-wider">CMS DASHBOARD</span>
           </div>
         </div>
       </div>
@@ -392,16 +400,16 @@ export function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarPr
       <nav className="flex-1 p-4 overflow-auto">
         {menuCategories.map((category, catIndex) => (
           <div key={catIndex} className="mb-6">
-            <h3 className="text-[#666] text-xs font-semibold uppercase tracking-wider mb-2 px-4">{category.label}</h3>
+            <h3 className="admin-category-label text-xs font-semibold uppercase tracking-wider mb-2 px-4">{category.label}</h3>
             <ul className="space-y-1">
               {category.items.map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => setActiveSection(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors ${
+                    className={`admin-menu-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors ${
                       activeSection === item.id
-                        ? "bg-[#E63946] text-white"
-                        : "text-[#888] hover:text-white hover:bg-[#1a1a1a]"
+                        ? "admin-menu-active"
+                        : "admin-menu-inactive"
                     }`}
                   >
                     {icons[item.icon]}
@@ -414,12 +422,20 @@ export function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarPr
         ))}
       </nav>
 
-      {/* View Site & Logout */}
-      <div className="p-4 border-t border-[#222] space-y-2">
+      {/* Theme Toggle, View Site & Logout */}
+      <div className="admin-footer p-4 border-t space-y-2">
+        <button
+          onClick={toggleTheme}
+          className="admin-action-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? icons.Sun : icons.Moon}
+          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        </button>
         <a
           href="/"
           target="_blank"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-[#888] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+          className="admin-action-btn flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
           rel="noreferrer"
         >
           {icons.Globe}
@@ -427,7 +443,7 @@ export function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarPr
         </a>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-[#888] hover:text-[#E63946] hover:bg-[#1a1a1a] transition-colors"
+          className="admin-action-btn admin-logout-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
         >
           {icons.LogOut}
           Logout

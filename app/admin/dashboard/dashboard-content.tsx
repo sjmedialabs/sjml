@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
-import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import AdminSidebar from "@/components/admin/admin-sidebar"
 import { DashboardOverview } from "@/components/admin/dashboard-overview"
 
 // Loading fallback for dynamic components
@@ -91,9 +91,9 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a]">
+    <div className="flex min-h-screen admin-content-area">
       <AdminSidebar activeSection={activeSection} setActiveSection={handleSectionChange} />
-      <main className="flex-1">
+      <main className="admin-content-area flex-1">
         <div className="p-8">{renderContent()}</div>
       </main>
     </div>
