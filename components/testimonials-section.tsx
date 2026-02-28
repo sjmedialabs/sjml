@@ -89,7 +89,7 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
 
   return (
     <section
-      className="py-20 bg-[#0a0a0a] relative"
+      className="py-20 bg-background relative"
       style={{
         backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
         backgroundSize: "cover",
@@ -113,7 +113,7 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
           <p className="text-gray-400">Don't just take our word for it. Hear from the brands we've helped transform.</p>
         </div>
 
-        <div className="bg-[#0f0f0f] rounded-3xl p-8 md:p-12 border border-[#E63946]/50">
+        <div className="bg-background rounded-3xl p-8 md:p-12 border border-[#E63946]/50">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Profile Image with Quote Badge */}
             <div className="relative flex-shrink-0">
@@ -135,7 +135,7 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
             <div className="flex-1 text-left">
               <p className="text-gray-300 text-lg md:text-xl mb-6 leading-relaxed">{current?.quote}</p>
 
-              <p className="text-white font-bold text-lg mb-1">{current?.author}</p>
+              <p className="text-foreground font-bold text-lg mb-1">{current?.author}</p>
               <p className="text-[#E63946] text-sm mb-4">{current?.company}</p>
 
               <div className="inline-flex items-center gap-1 bg-[#333] rounded px-2 py-1 mb-6">
@@ -149,21 +149,21 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
                   onClick={prevTestimonial}
                   className="w-12 h-12 rounded-full bg-[#444] flex items-center justify-center hover:bg-[#555] transition-colors"
                 >
-                  <ArrowLeftIcon className="w-5 h-5 text-white" />
+                  <ArrowLeftIcon className="w-5 h-5 text-foreground" />
                 </button>
                 <button
                   onClick={nextTestimonial}
                   className="w-12 h-12 rounded-full bg-[#444] flex items-center justify-center hover:bg-[#555] transition-colors"
                 >
-                  <ArrowRightIcon className="w-5 h-5 text-white" />
+                  <ArrowRightIcon className="w-5 h-5 text-foreground" />
                 </button>
               </div>
             </div>
           </div>
 
           {/* View All Industries Link */}
-          <div className="text-center mt-8 pt-6 border-t border-[#222]">
-            <a href="#" className="text-white font-medium hover:text-[#E63946] transition-colors">
+          <div className="text-center mt-8 pt-6 border-t border-border">
+            <a href="#" className="text-foreground font-medium hover:text-[#E63946] transition-colors">
               View All Industries
             </a>
           </div>

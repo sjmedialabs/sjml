@@ -4,7 +4,8 @@ import Image from "next/image"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 export default async function TestimonialsPage() {
   let testimonials: any[] = []
@@ -33,10 +34,10 @@ export default async function TestimonialsPage() {
   } catch (error) {
     console.error("Failed to fetch testimonials:", error)
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center px-4">
-          <h2 className="text-2xl font-bold text-white mb-4">Content Not Available</h2>
-          <p className="text-[#888]">Testimonials page content has not been set up yet. Please contact the administrator.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
+          <p className="text-muted-foreground">Testimonials page content has not been set up yet. Please contact the administrator.</p>
         </div>
       </main>
     )
@@ -45,13 +46,13 @@ export default async function TestimonialsPage() {
   const hero = content.hero
   const cta = content.cta
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             {hero.title.includes("Clients Say") ? (
               <>
                 What Our <span className="text-[#E63946]">Clients Say</span>
@@ -60,7 +61,7 @@ export default async function TestimonialsPage() {
               hero.title
             )}
           </h1>
-          <p className="text-xl text-[#888] max-w-3xl mx-auto">{hero.subtitle}</p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">{hero.subtitle}</p>
         </div>
       </section>
 
@@ -69,7 +70,7 @@ export default async function TestimonialsPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-[#111] border border-[#222] rounded-2xl p-8">
+              <div key={testimonial.id} className="bg-card border border-border rounded-2xl p-8">
                 {/* Rating */}
                 <div className="flex gap-1 mb-6">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -92,8 +93,8 @@ export default async function TestimonialsPage() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <div className="text-white font-medium">{testimonial.author}</div>
-                    <div className="text-[#888] text-sm">
+                    <div className="text-foreground font-medium">{testimonial.author}</div>
+                    <div className="text-muted-foreground text-sm">
                       {testimonial.role}, {testimonial.company}
                     </div>
                   </div>
@@ -106,12 +107,12 @@ export default async function TestimonialsPage() {
 
       {/* CTA */}
       <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto bg-[#111] border border-[#222] rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">{cta.title}</h2>
-          <p className="text-[#888] mb-8">{cta.description}</p>
+        <div className="max-w-4xl mx-auto bg-card border border-border rounded-2xl p-12 text-center">
+          <h2 className="text-3xl font-bold text-foreground mb-4">{cta.title}</h2>
+          <p className="text-muted-foreground mb-8">{cta.description}</p>
           <a
             href={cta.buttonUrl}
-            className="inline-block px-8 py-4 bg-[#E63946] text-white rounded-full font-medium hover:bg-[#d62839] transition-colors"
+            className="inline-block px-8 py-4 bg-[#E63946] text-foreground rounded-full font-medium hover:bg-[#d62839] transition-colors"
           >
             {cta.buttonText}
           </a>

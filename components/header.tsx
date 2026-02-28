@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ContactPopup } from "@/components/contact-popup"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface HeaderData {
   logo?: string
@@ -92,7 +93,7 @@ export function Header({ data: propData }: HeaderProps = {}) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-[#222]">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -112,8 +113,8 @@ export function Header({ data: propData }: HeaderProps = {}) {
                     <span className="text-white font-bold text-sm">SJ</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-white font-bold text-sm leading-tight">{logoText}</span>
-                    <span className="text-[#666] text-[10px] tracking-wider">DIGITAL AGENCY</span>
+                    <span className="text-foreground font-bold text-sm leading-tight">{logoText}</span>
+                    <span className="text-muted-foreground text-[10px] tracking-wider">DIGITAL AGENCY</span>
                   </div>
                 </>
               )}
@@ -128,7 +129,7 @@ export function Header({ data: propData }: HeaderProps = {}) {
                     key={link.name}
                     href={link.href}
                     className={`text-sm transition-colors ${
-                      isActive ? "text-[#E63946] font-medium" : "text-[#999] hover:text-white"
+                      isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {link.name}
@@ -137,8 +138,9 @@ export function Header({ data: propData }: HeaderProps = {}) {
               })}
             </nav>
 
-            {/* CTA Button */}
-            <div className="hidden lg:block">
+            {/* Right side actions */}
+            <div className="hidden lg:flex items-center gap-2">
+              <ThemeToggle />
               <Button
                 className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full px-6"
                 onClick={() => setContactPopupOpen(true)}
@@ -147,16 +149,19 @@ export function Header({ data: propData }: HeaderProps = {}) {
               </Button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button className="lg:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <XIcon /> : <MenuIcon />}
-            </button>
+            {/* Mobile actions */}
+            <div className="flex lg:hidden items-center gap-2">
+              <ThemeToggle />
+              <button className="text-foreground" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? <XIcon /> : <MenuIcon />}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#0a0a0a] border-t border-[#222]">
+          <div className="lg:hidden bg-background border-t border-border">
             <nav className="flex flex-col p-4 gap-3">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href
@@ -165,7 +170,7 @@ export function Header({ data: propData }: HeaderProps = {}) {
                     key={link.name}
                     href={link.href}
                     className={`text-sm py-2 ${
-                      isActive ? "text-[#E63946] font-medium" : "text-[#999] hover:text-white"
+                      isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

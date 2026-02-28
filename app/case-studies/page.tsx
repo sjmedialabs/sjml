@@ -5,7 +5,8 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 function FlowerDecoration() {
   return (
@@ -82,10 +83,10 @@ export default async function CaseStudiesPage() {
   } catch (error) {
     console.error("Failed to fetch case studies:", error)
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center px-4">
-          <h2 className="text-2xl font-bold text-white mb-4">Content Not Available</h2>
-          <p className="text-[#888]">Case studies page content has not been set up yet. Please contact the administrator.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
+          <p className="text-muted-foreground">Case studies page content has not been set up yet. Please contact the administrator.</p>
         </div>
       </main>
     )
@@ -95,7 +96,7 @@ export default async function CaseStudiesPage() {
   const section = content.section
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -103,12 +104,12 @@ export default async function CaseStudiesPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
-              <h1 className="text-4xl md:text-5xl font-light text-white mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-light text-foreground mb-6 leading-tight">
                 {hero.title.split(" ").slice(0, 1).join(" ")}
                 <br />
                 {hero.title.split(" ").slice(1).join(" ")}
               </h1>
-              <p className="text-[#888] leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {hero.subtitle}
                 <br />
                 <br />
@@ -127,7 +128,7 @@ export default async function CaseStudiesPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] italic mb-4">{section.title}</h2>
-            <p className="text-[#888] max-w-2xl mx-auto">{section.description}</p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">{section.description}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -170,7 +171,7 @@ export default async function CaseStudiesPage() {
 
                   <Link
                     href={`/case-studies/${study.slug}`}
-                    className="block w-full py-3 bg-[#E63946] text-white text-center rounded-full text-sm font-medium hover:bg-[#d62839] transition-colors"
+                    className="block w-full py-3 bg-[#E63946] text-foreground text-center rounded-full text-sm font-medium hover:bg-[#d62839] transition-colors"
                   >
                     View Case Study
                   </Link>

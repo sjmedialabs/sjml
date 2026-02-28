@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
 
@@ -29,6 +30,11 @@ export async function PUT(request: NextRequest) {
     }
     const { caseStudies } = await request.json()
     const updated = await updateHomeContent("caseStudies", caseStudies)
+    
+    // Revalidate homepage and case-studies page cache
+    revalidatePath("/")
+    revalidatePath("/case-studies")
+    
     return NextResponse.json(updated?.caseStudies)
   } catch (error) {
     console.error("Update case studies error:", error)

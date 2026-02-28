@@ -1,0 +1,114 @@
+import { type NextRequest, NextResponse } from "next/server"
+import { verifyToken } from "@/lib/jwt"
+import { getHomeContent, updateHomeContent } from "@/lib/models/content"
+
+export async function GET() {
+  try {
+    const content = await getHomeContent()
+
+    if (content) {
+      return NextResponse.json(content)
+    }
+
+    return NextResponse.json({ error: "Content not found" }, { status: 404 })
+  } catch (error) {
+    console.error("Get home content error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("Authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const token = authHeader.split(" ")[1]
+    if (!verifyToken(token)) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+    }
+
+    const content = await request.json()
+
+    // Update each section
+    const sections = [
+      "hero",
+      "stats",
+      "caseStudies",
+      "services",
+      "industries",
+      "testimonials",
+      "insights",
+      "playbook",
+      "partners",
+      "statsBackgroundImage",
+      "servicesBackgroundImage",
+      "industriesBackgroundImage",
+      "caseStudiesBackgroundImage",
+      "testimonialsBackgroundImage",
+      "insightsBackgroundImage",
+      "trustedByBackgroundImage",
+      "playbookBackgroundImage",
+    ]
+
+    for (const section of sections) {
+      if (content[section] !== undefined) {
+        await updateHomeContent(section, content[section])
+      }
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Update home content error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("Authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const token = authHeader.split(" ")[1]
+    if (!verifyToken(token)) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+    }
+
+    const { section, data } = await request.json()
+
+    const validSections = [
+      "hero",
+      "stats",
+      "caseStudies",
+      "services",
+      "industries",
+      "testimonials",
+      "insights",
+      "playbook",
+      "partners",
+      "footer",
+      "settings",
+      "statsBackgroundImage",
+      "servicesBackgroundImage",
+      "industriesBackgroundImage",
+      "caseStudiesBackgroundImage",
+      "testimonialsBackgroundImage",
+      "insightsBackgroundImage",
+      "trustedByBackgroundImage",
+      "playbookBackgroundImage",
+    ]
+
+    if (!validSections.includes(section)) {
+      return NextResponse.json({ error: "Invalid section" }, { status: 400 })
+    }
+
+    const updatedContent = await updateHomeContent(section, data)
+    return NextResponse.json(updatedContent)
+  } catch (error) {
+    console.error("Update home content error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}

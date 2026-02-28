@@ -2,9 +2,10 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
 
 :root {
-  /* SJ Media Labs Dark Theme */
+  /* Default Dark Theme */
   --background: #0a0a0a;
   --foreground: #ffffff;
   --card: #111111;
@@ -26,12 +27,6 @@
   --ring: #e63946;
   --radius: 0.5rem;
 
-  /* Light section backgrounds */
-  --light-bg: #f8f8f8;
-  --light-card: #ffffff;
-  --light-foreground: #0a0a0a;
-  --light-muted: #666666;
-
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -47,7 +42,65 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Light Mode Theme */
+.light {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #e63946;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
+  --accent: #e63946;
+  --accent-foreground: #ffffff;
+  --destructive: #e63946;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #f5f5f5;
+  --ring: #e63946;
+
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Dark Mode Theme (explicit) */
 .dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #111111;
+  --card-foreground: #ffffff;
+  --popover: #111111;
+  --popover-foreground: #ffffff;
+  --primary: #e63946;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
+  --muted-foreground: #888888;
+  --accent: #e63946;
+  --accent-foreground: #ffffff;
+  --destructive: #e63946;
+  --destructive-foreground: #ffffff;
+  --border: #222222;
+  --input: #1a1a1a;
+  --ring: #e63946;
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -64,10 +117,8 @@
 }
 
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --font-sans: "Inter", "Inter Fallback", sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback";
-  /* Added Playfair Display serif font */
   --font-serif: "Playfair Display", "Playfair Display Fallback", serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -107,308 +158,76 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  button,
-  [role="button"],
-  [type="button"],
-  [type="submit"],
-  [type="reset"] {
-    cursor: pointer;
-  }
-  button:disabled,
-  [role="button"]:disabled,
-  [type="button"]:disabled,
-  [type="submit"]:disabled,
-  [type="reset"]:disabled {
-    cursor: not-allowed;
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
-/* Custom animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Admin Light Mode Compatibility (keep for backwards compatibility) */
+.admin-light {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --border: #e5e5e5;
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
 }
 
-@keyframes typewriter {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
+/* Image adjustments for light mode */
+.light img:not([src*="logo"]):not([class*="no-invert"]) {
+  filter: brightness(0.9) contrast(1.1);
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+/* Optional: Invert dark images in light mode */
+.light .invert-on-light {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* Keep logos and specific images normal */
+.light [class*="logo"],
+.light [alt*="logo"],
+.light [alt*="Logo"] {
+  filter: none !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #0a0a0a;
+/* Hero section overlays that adapt to theme */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
 }
 
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
+.light .hero-overlay {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.75));
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #e63946;
+/* Hero backgrounds with better contrast */
+.hero-section {
+  position: relative;
+  background-color: var(--background);
 }
 
-/* Admin Light Theme Styles */
-.admin-light .admin-sidebar {
-  background-color: #ffffff;
-  border-color: #e5e5e5;
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(128, 128, 128, 0.15) 1px, transparent 0);
+  background-size: 40px 40px;
+  opacity: 0.5;
 }
 
-.admin-light .admin-logo-section {
-  border-color: #e5e5e5;
-}
-
-.admin-light .admin-logo-text {
-  color: #0a0a0a;
-}
-
-.admin-light .admin-logo-subtitle {
-  color: #888888;
-}
-
-.admin-light .admin-category-label {
-  color: #666666;
-}
-
-.admin-light .admin-menu-item.admin-menu-active {
-  background-color: #E63946;
-  color: #ffffff;
-}
-
-.admin-light .admin-menu-item.admin-menu-inactive {
-  color: #666666;
-}
-
-.admin-light .admin-menu-item.admin-menu-inactive:hover {
-  color: #0a0a0a;
-  background-color: #f5f5f5;
-}
-
-.admin-light .admin-footer {
-  border-color: #e5e5e5;
-}
-
-.admin-light .admin-action-btn {
-  color: #666666;
-}
-
-.admin-light .admin-action-btn:hover {
-  color: #0a0a0a;
-  background-color: #f5f5f5;
-}
-
-.admin-light .admin-logout-btn:hover {
-  color: #E63946;
-  background-color: #fff5f5;
-}
-
-/* Admin Dark Theme Styles (default) */
-.admin-sidebar {
-  background-color: #111;
-  border-color: #222;
-}
-
-.admin-logo-section {
-  border-color: #222;
-}
-
-.admin-logo-text {
-  color: #ffffff;
-}
-
-.admin-logo-subtitle {
-  color: #666;
-}
-
-.admin-category-label {
-  color: #666;
-}
-
-.admin-menu-item.admin-menu-active {
-  background-color: #E63946;
-  color: #ffffff;
-}
-
-.admin-menu-item.admin-menu-inactive {
-  color: #888;
-}
-
-.admin-menu-item.admin-menu-inactive:hover {
-  color: #ffffff;
-  background-color: #1a1a1a;
-}
-
-.admin-footer {
-  border-color: #222;
-}
-
-.admin-action-btn {
-  color: #888;
-}
-
-.admin-action-btn:hover {
-  color: #ffffff;
-  background-color: #1a1a1a;
-}
-
-.admin-logout-btn:hover {
-  color: #E63946;
-}
-
-/* Admin content area theme support */
-.admin-light .admin-content-area {
-  background-color: #f8f8f8;
-  color: #0a0a0a;
-}
-
-.admin-content-area {
-  background-color: #0a0a0a;
-  color: #ffffff;
-}
-
-/* Admin Light Theme - Card and UI Components */
-.admin-light .admin-card {
-  background-color: #ffffff;
-  border-color: #e5e5e5;
-}
-
-.admin-light .admin-card-title {
-  color: #0a0a0a;
-}
-
-.admin-light .admin-card-subtitle {
-  color: #666666;
-}
-
-.admin-light .admin-text-primary {
-  color: #0a0a0a;
-}
-
-.admin-light .admin-text-secondary {
-  color: #666666;
-}
-
-.admin-light .admin-text-muted {
-  color: #888888;
-}
-
-.admin-light .admin-bg-secondary {
-  background-color: #f5f5f5;
-}
-
-.admin-light .admin-bg-tertiary {
-  background-color: #fafafa;
-}
-
-.admin-light .admin-border {
-  border-color: #e5e5e5;
-}
-
-.admin-light .admin-border-light {
-  border-color: #f0f0f0;
-}
-
-.admin-light .admin-input {
-  background-color: #ffffff;
-  border-color: #e5e5e5;
-  color: #0a0a0a;
-}
-
-.admin-light .admin-input:focus {
-  border-color: #E63946;
-}
-
-.admin-light .admin-button-secondary {
-  background-color: #f5f5f5;
-  color: #0a0a0a;
-}
-
-.admin-light .admin-button-secondary:hover {
-  background-color: #e5e5e5;
-}
-
-/* Admin Dark Theme - Card and UI Components (default) */
-.admin-card {
-  background-color: #111111;
-  border-color: #222222;
-}
-
-.admin-card-title {
-  color: #ffffff;
-}
-
-.admin-card-subtitle {
-  color: #888888;
-}
-
-.admin-text-primary {
-  color: #ffffff;
-}
-
-.admin-text-secondary {
-  color: #888888;
-}
-
-.admin-text-muted {
-  color: #666666;
-}
-
-.admin-bg-secondary {
-  background-color: #1a1a1a;
-}
-
-.admin-bg-tertiary {
-  background-color: #0a0a0a;
-}
-
-.admin-border {
-  border-color: #222222;
-}
-
-.admin-border-light {
-  border-color: #333333;
-}
-
-.admin-input {
-  background-color: #0a0a0a;
-  border-color: #333333;
-  color: #ffffff;
-}
-
-.admin-input:focus {
-  border-color: #E63946;
-}
-
-.admin-button-secondary {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
-
-.admin-button-secondary:hover {
-  background-color: #222222;
+.light .hero-section::before {
+  background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.05) 1px, transparent 0);
 }

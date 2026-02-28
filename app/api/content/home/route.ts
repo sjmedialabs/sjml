@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
 
@@ -58,6 +59,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Revalidate homepage cache
+    revalidatePath("/")
+    revalidatePath("/", "page")
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Update home content error:", error)
@@ -106,6 +111,11 @@ export async function PUT(request: NextRequest) {
     }
 
     const updatedContent = await updateHomeContent(section, data)
+    
+    // Revalidate homepage cache
+    revalidatePath("/")
+    revalidatePath("/", "page")
+    
     return NextResponse.json(updatedContent)
   } catch (error) {
     console.error("Update home content error:", error)

@@ -1,15 +1,11 @@
 "use client"
 
-import { AdminThemeProvider } from "@/hooks/use-admin-theme"
-
+// Admin layout doesn't need its own ThemeProvider anymore
+// It inherits from the root layout's ThemeProvider
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <AdminThemeProvider>
-      {children}
-    </AdminThemeProvider>
-  )
+  return <>{children}</>
 }

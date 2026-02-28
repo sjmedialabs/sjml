@@ -49,7 +49,7 @@ export function PlaybookSection({ data, backgroundImage }: PlaybookSectionProps)
 
   return (
     <>
-      <section className="relative py-20 bg-[#111]">
+      <section className="relative py-20 bg-card">
         {backgroundImage && (
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -58,11 +58,11 @@ export function PlaybookSection({ data, backgroundImage }: PlaybookSectionProps)
         )}
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{playbook.title}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{playbook.title}</h2>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">{playbook.description}</p>
           <Button
             onClick={handleDownloadClick}
-            className="bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full px-8 py-6 text-lg"
+            className="bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-full px-8 py-6 text-lg"
           >
             <DownloadIcon className="mr-2" />
             {playbook.buttonText}

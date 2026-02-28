@@ -12,7 +12,8 @@ import { Footer } from "@/components/footer"
 import { getHomeContent } from "@/lib/models/content"
 import { clientPromise } from "@/lib/mongodb"
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 export default async function HomePage() {
   let content
@@ -47,10 +48,10 @@ export default async function HomePage() {
   } catch (error) {
     console.error("Failed to fetch home content:", error)
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center px-4">
-          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
-          <p className="text-[#888]">Home page content has not been set up yet. Please contact the administrator.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h1>
+          <p className="text-muted-foreground">Home page content has not been set up yet. Please contact the administrator.</p>
         </div>
       </main>
     )

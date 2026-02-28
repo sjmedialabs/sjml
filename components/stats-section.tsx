@@ -17,7 +17,7 @@ export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
   const stats = data;
 
   return (
-    <section className="relative py-2" style={{ top: "-170px" }}>
+    <section className="relative py-2 bg-background" style={{ top: "-170px" }}>
       {backgroundImage ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -49,7 +49,7 @@ export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
               >
                 {stat.value}
               </div>
-              <div className="text-white text-sm md:text-base font-medium">
+              <div className="text-foreground text-sm md:text-base font-medium">
                 {stat.label}
               </div>
             </div>

@@ -7,7 +7,7 @@ interface Insight {
   title: string
   description?: string
   excerpt?: string
-  image: string
+  image?: string
   date: string
   category: string
   readTime?: string
@@ -22,10 +22,11 @@ interface InsightsSectionProps {
 }
 
 export function InsightsSection({ data, backgroundImage }: InsightsSectionProps) {
-  const insights = data || []
+  // Filter out any undefined, null, or invalid insights
+  const insights = (data || []).filter(insight => insight && insight.id && insight.title)
 
   return (
-    <section className="relative py-20 bg-[#0a0a0a]">
+    <section className="relative py-20 bg-background">
       {backgroundImage && (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -64,7 +65,7 @@ export function InsightsSection({ data, backgroundImage }: InsightsSectionProps)
 
         {/* View All Link */}
         <div className="text-center mt-10">
-          <Link href="/insights" className="text-white font-medium hover:text-[#E63946] transition-colors">
+          <Link href="/insights" className="text-foreground font-medium hover:text-[#E63946] transition-colors">
             View All Insights
           </Link>
         </div>

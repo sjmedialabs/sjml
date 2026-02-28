@@ -53,7 +53,7 @@ export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProp
   }, [isPaused])
 
   return (
-    <section className="relative py-16 bg-[#0a0a0a]">
+    <section className="relative py-16 bg-background">
       {backgroundImage && (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -64,7 +64,7 @@ export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProp
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Trusted by Industry Leaders</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Trusted by Industry Leaders</h2>
           <p className="text-gray-400">Partnering with forward-thinking brands worldwide</p>
         </div>
 
@@ -95,7 +95,7 @@ export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProp
                     className="object-contain opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
                   />
                 ) : (
-                  <span className="text-xl font-bold text-gray-500 hover:text-white transition-colors whitespace-nowrap">
+                  <span className="text-xl font-bold text-gray-500 hover:text-foreground transition-colors whitespace-nowrap">
                     {partner.name}
                   </span>
                 )}

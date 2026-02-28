@@ -23,7 +23,8 @@ interface WorkData {
   showcase: string[]
 }
 
-export const revalidate = 3600 // Enable ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR
 
 // Generate static params for all works to pre-render them at build time
 export async function generateStaticParams() {
@@ -57,12 +58,12 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
 
   if (!work) {
     return (
-      <main className="min-h-screen bg-black">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-2">Project Not Found</h1>
-            <p className="text-[#888]">The project you&apos;re looking for doesn&apos;t exist.</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Project Not Found</h1>
+            <p className="text-muted-foreground">The project you&apos;re looking for doesn&apos;t exist.</p>
           </div>
         </div>
         <Footer />
@@ -71,7 +72,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -86,7 +87,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
               {work.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="px-4 py-1.5 bg-transparent border border-[#444] rounded-full text-[#888] text-xs"
+                  className="px-4 py-1.5 bg-transparent border border-[#444] rounded-full text-muted-foreground text-xs"
                 >
                   {tag}
                 </span>
@@ -94,32 +95,32 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-12">{work.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-12">{work.title}</h1>
 
           {/* Meta Info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
             {work.industry && (
               <div className="text-center">
-                <p className="text-[#666] text-xs mb-1">Industry</p>
-                <p className="text-white text-sm">{work.industry}</p>
+                <p className="text-muted-foreground text-xs mb-1">Industry</p>
+                <p className="text-foreground text-sm">{work.industry}</p>
               </div>
             )}
             {work.role && (
               <div className="text-center">
-                <p className="text-[#666] text-xs mb-1">Role</p>
-                <p className="text-white text-sm">{work.role}</p>
+                <p className="text-muted-foreground text-xs mb-1">Role</p>
+                <p className="text-foreground text-sm">{work.role}</p>
               </div>
             )}
             {work.technology && (
               <div className="text-center">
-                <p className="text-[#666] text-xs mb-1">Technology</p>
-                <p className="text-white text-sm">{work.technology}</p>
+                <p className="text-muted-foreground text-xs mb-1">Technology</p>
+                <p className="text-foreground text-sm">{work.technology}</p>
               </div>
             )}
             {work.year && (
               <div className="text-center">
-                <p className="text-[#666] text-xs mb-1">Year</p>
-                <p className="text-white text-sm">{work.year}</p>
+                <p className="text-muted-foreground text-xs mb-1">Year</p>
+                <p className="text-foreground text-sm">{work.year}</p>
               </div>
             )}
           </div>
@@ -135,12 +136,12 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
             </div>
             <div>
               {work.overview.description && (
-                <p className="text-[#888] mb-6 leading-relaxed">{work.overview.description}</p>
+                <p className="text-muted-foreground mb-6 leading-relaxed">{work.overview.description}</p>
               )}
               {work.overview.points && work.overview.points.length > 0 && (
                 <ul className="space-y-3">
                   {work.overview.points.map((point, index) => (
-                    <li key={index} className="flex items-center gap-3 text-white">
+                    <li key={index} className="flex items-center gap-3 text-foreground">
                       <span className="w-2 h-2 bg-white rounded-full"></span>
                       {point}
                     </li>
@@ -177,7 +178,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
       {work.description && (
         <section className="py-16 px-4">
           <div className="max-w-3xl mx-auto">
-            <p className="text-white text-xl leading-relaxed">{work.description}</p>
+            <p className="text-foreground text-xl leading-relaxed">{work.description}</p>
           </div>
         </section>
       )}
@@ -186,15 +187,15 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
       {work.process && work.process.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-8">
               Our <span className="text-[#E63946]">Process</span>
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
               {work.process.map((step, index) => (
                 <div key={index}>
                   <p className="text-[#E63946] text-sm mb-2">{step.step}.</p>
-                  <h3 className="text-white font-semibold mb-3">{step.title}</h3>
-                  <p className="text-[#666] text-sm leading-relaxed">{step.description}</p>
+                  <h3 className="text-foreground font-semibold mb-3">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
                 </div>
               ))}
             </div>

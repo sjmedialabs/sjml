@@ -12,7 +12,7 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function AdminThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark")
+  const [theme, setTheme] = useState<Theme>("light")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -20,6 +20,9 @@ export function AdminThemeProvider({ children }: { children: React.ReactNode }) 
     const savedTheme = localStorage.getItem("admin-theme") as Theme
     if (savedTheme) {
       setTheme(savedTheme)
+    } else {
+      // Set default to light mode
+      setTheme("light")
     }
   }, [])
 

@@ -6,7 +6,8 @@ import { getPageContent, type CareersPageData } from "@/lib/models/content"
 import { JobApplicationForm } from "@/components/job-application-form"
 import { notFound } from "next/navigation"
 
-export const revalidate = 3600 // Enable ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR
 
 // Pre-render all published job pages at build time
 export async function generateStaticParams() {
@@ -35,7 +36,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Back Link */}
@@ -43,7 +44,7 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
         <div className="max-w-6xl mx-auto">
           <Link
             href="/careers"
-            className="inline-flex items-center gap-2 text-[#888] hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft size={16} />
             Back to Careers
@@ -54,22 +55,22 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
       {/* Job Header */}
       <section className="pt-8 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{job.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{job.title}</h1>
           <div className="flex flex-wrap gap-4">
-            <span className="flex items-center gap-2 text-[#888]">
+            <span className="flex items-center gap-2 text-muted-foreground">
               <Briefcase size={16} className="text-[#E63946]" />
               {job.department}
             </span>
-            <span className="flex items-center gap-2 text-[#888]">
+            <span className="flex items-center gap-2 text-muted-foreground">
               <MapPin size={16} className="text-[#E63946]" />
               {job.location}
             </span>
-            <span className="flex items-center gap-2 text-[#888]">
+            <span className="flex items-center gap-2 text-muted-foreground">
               <Clock size={16} className="text-[#E63946]" />
               {job.type}
             </span>
             {job.salary && (
-              <span className="flex items-center gap-2 text-[#888]">
+              <span className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign size={16} className="text-[#E63946]" />
                 {job.salary}
               </span>
@@ -84,16 +85,16 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
           {/* Job Details */}
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <h2 className="text-xl font-bold text-white mb-4">About the Role</h2>
-              <p className="text-[#888] leading-relaxed">{job.description}</p>
+              <h2 className="text-xl font-bold text-foreground mb-4">About the Role</h2>
+              <p className="text-muted-foreground leading-relaxed">{job.description}</p>
             </div>
 
             {job.requirements && job.requirements.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold text-white mb-4">Requirements</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">Requirements</h2>
                 <ul className="space-y-3">
                   {job.requirements.map((req: string, index: number) => (
-                    <li key={index} className="flex items-start gap-3 text-[#888]">
+                    <li key={index} className="flex items-start gap-3 text-muted-foreground">
                       <CheckCircle size={16} className="text-[#E63946] mt-1 shrink-0" />
                       {req}
                     </li>
@@ -104,10 +105,10 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
 
             {job.benefits && (job.benefits as string[]).length > 0 && (
               <div>
-                <h2 className="text-xl font-bold text-white mb-4">Benefits</h2>
+                <h2 className="text-xl font-bold text-foreground mb-4">Benefits</h2>
                 <ul className="space-y-3">
                   {(job.benefits as string[]).map((benefit, index) => (
-                    <li key={index} className="flex items-start gap-3 text-[#888]">
+                    <li key={index} className="flex items-start gap-3 text-muted-foreground">
                       <CheckCircle size={16} className="text-[#E63946] mt-1 shrink-0" />
                       {benefit}
                     </li>
@@ -119,8 +120,8 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
 
           {/* Application Form */}
           <div className="lg:col-span-1">
-            <div className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-xl p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-white mb-6">Apply Now</h2>
+            <div className="bg-background border border-border rounded-xl p-6 sticky top-24">
+              <h2 className="text-xl font-bold text-foreground mb-6">Apply Now</h2>
               <JobApplicationForm />
             </div>
           </div>

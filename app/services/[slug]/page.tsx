@@ -20,7 +20,8 @@ interface ServiceData {
   faqs: Array<{ question: string; answer: string }>
 }
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 // Generate static params for all services to pre-render them at build time
 export async function generateStaticParams() {
@@ -57,7 +58,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -74,7 +75,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
         <div className="relative max-w-6xl mx-auto px-4 text-center pt-16">
           {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) && (
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-[#1a1a1a] rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center">
                 <Image
                   src={service.icon}
                   alt={service.title}
@@ -88,7 +89,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
               </div>
             </div>
           )}
-          <h1 className="text-4xl md:text-5xl font-bold text-white">{service.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">{service.title}</h1>
         </div>
       </section>
 
@@ -111,12 +112,12 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.offerings && service.offerings.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-xl font-semibold text-white mb-6">Services We Offer:</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-6">Services We Offer:</h2>
             <div className="flex flex-wrap gap-3">
               {service.offerings.map((offering, index) => (
                 <span
                   key={index}
-                  className="px-4 py-2 border border-[#333] rounded-full text-white text-sm hover:border-[#E63946] transition-colors inline-flex items-center gap-2"
+                  className="px-4 py-2 border border-border rounded-full text-foreground text-sm hover:border-[#E63946] transition-colors inline-flex items-center gap-2"
                 >
                   {offering} <span className="text-[#E63946]">→</span>
                 </span>
@@ -130,10 +131,10 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.benefits && service.benefits.title && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               <span className="text-[#E63946]">Benefits</span> {service.benefits.title}
             </h2>
-            <p className="text-[#888] leading-relaxed">{service.benefits.description}</p>
+            <p className="text-muted-foreground leading-relaxed">{service.benefits.description}</p>
           </div>
         </section>
       )}
@@ -142,7 +143,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.fullDescription && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <p className="text-[#888] leading-relaxed">{service.fullDescription}</p>
+            <p className="text-muted-foreground leading-relaxed">{service.fullDescription}</p>
           </div>
         </section>
       )}
@@ -151,11 +152,11 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.features && service.features.points && service.features.points.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
               Key <span className="text-[#E63946]">Features</span>{" "}
               {service.features.title && `of ${service.features.title}`}
             </h2>
-            <ul className="space-y-2 text-[#888]">
+            <ul className="space-y-2 text-muted-foreground">
               {service.features.points.map((point, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#E63946] rounded-full"></span>
@@ -171,15 +172,15 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.process && service.process.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-8">
               Our <span className="text-[#E63946]">Process</span>
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {service.process.map((step, index) => (
-                <div key={index} className="border border-[#333] rounded-xl p-6">
+                <div key={index} className="border border-border rounded-xl p-6">
                   <div className="text-[#E63946] text-2xl font-bold mb-4">{String(index + 1).padStart(2, "0")}</div>
-                  <h3 className="text-white font-semibold mb-2">{step.title}</h3>
-                  <p className="text-[#666] text-sm">{step.description}</p>
+                  <h3 className="text-foreground font-semibold mb-2">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm">{step.description}</p>
                 </div>
               ))}
             </div>
@@ -191,7 +192,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.faqs && service.faqs.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-8 text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
               Frequently Asked <span className="text-[#E63946]">Questions</span>
             </h2>
             <ServiceFaq faqs={service.faqs} />

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -61,6 +62,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Case study not found" }, { status: 404 })
     }
 
+    // Revalidate homepage, case-studies page, and specific case study page cache
+    revalidatePath("/")
+    revalidatePath("/case-studies")
+    if (data.slug) {
+      revalidatePath(`/case-studies/${data.slug}`)
+    }
+
     return NextResponse.json({ ...updateData, id })
   } catch (error) {
     console.error("Update case study error:", error)
@@ -83,10 +91,20 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
+    // Get case study slug before deleting for cache invalidation
+    const caseStudy = await db.collection("case-studies").findOne({ id })
+
     const result = await db.collection("case-studies").deleteOne({ id })
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Case study not found" }, { status: 404 })
+    }
+
+    // Revalidate homepage, case-studies page, and specific case study page cache
+    revalidatePath("/")
+    revalidatePath("/case-studies")
+    if (caseStudy?.slug) {
+      revalidatePath(`/case-studies/${caseStudy.slug}`)
     }
 
     return NextResponse.json({ success: true })

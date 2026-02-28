@@ -460,7 +460,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
               )}
               <div>
                 <p className="admin-text-secondary text-sm">Message</p>
-                <p className="admin-text-primary bg-[#0d0d0d] p-3 rounded-lg">{selectedLead.message}</p>
+                <p className="admin-text-primary bg-background p-3 rounded-lg">{selectedLead.message}</p>
               </div>
               {(selectedLead.campaign || selectedLead.adSet || selectedLead.adName) && (
                 <div className="border-t admin-border-light pt-4">
@@ -511,14 +511,14 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Full Name*"
                 value={manualLead.name}
                 onChange={(e) => setManualLead({ ...manualLead, name: e.target.value })}
-                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+                className="bg-background admin-border-light admin-text-primary"
               />
               <Input
                 type="email"
                 placeholder="Email*"
                 value={manualLead.email}
                 onChange={(e) => setManualLead({ ...manualLead, email: e.target.value })}
-                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+                className="bg-background admin-border-light admin-text-primary"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -526,13 +526,13 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Phone"
                 value={manualLead.phone}
                 onChange={(e) => setManualLead({ ...manualLead, phone: e.target.value })}
-                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+                className="bg-background admin-border-light admin-text-primary"
               />
               <Input
                 placeholder="Subject"
                 value={manualLead.subject}
                 onChange={(e) => setManualLead({ ...manualLead, subject: e.target.value })}
-                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+                className="bg-background admin-border-light admin-text-primary"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -540,7 +540,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 value={manualLead.source}
                 onValueChange={(value) => setManualLead({ ...manualLead, source: value })}
               >
-                <SelectTrigger className="bg-[#0d0d0d] admin-border-light admin-text-primary">
+                <SelectTrigger className="bg-background admin-border-light admin-text-primary">
                   <SelectValue placeholder="Source" />
                 </SelectTrigger>
                 <SelectContent className="admin-bg-secondary admin-border-light">
@@ -555,14 +555,14 @@ export function LeadManagement({ token }: LeadManagementProps) {
                 placeholder="Campaign Name (optional)"
                 value={manualLead.campaign}
                 onChange={(e) => setManualLead({ ...manualLead, campaign: e.target.value })}
-                className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+                className="bg-background admin-border-light admin-text-primary"
               />
             </div>
             <Textarea
               placeholder="Message/Notes"
               value={manualLead.message}
               onChange={(e) => setManualLead({ ...manualLead, message: e.target.value })}
-              className="bg-[#0d0d0d] admin-border-light admin-text-primary"
+              className="bg-background admin-border-light admin-text-primary"
               rows={4}
             />
             <Button

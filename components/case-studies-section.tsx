@@ -45,7 +45,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
   const caseStudies = data || []
 
   return (
-    <section className="relative py-20 bg-[#0a0a0a]">
+    <section className="relative py-20 bg-background">
       {backgroundImage && (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -67,7 +67,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
           {caseStudies.map((study) => (
             <div
               key={study.id}
-              className="group bg-[#111] rounded-2xl overflow-hidden border border-[#222] hover:border-[#E63946]/50 transition-all duration-300"
+              className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-[#E63946]/50 transition-all duration-300"
             >
               {/* Image */}
               <div className="relative h-56 overflow-hidden">
@@ -82,7 +82,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
                   {study.tags?.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs rounded-full"
+                      className="px-3 py-1 bg-foreground/10 dark:bg-white/10 backdrop-blur-sm text-foreground border border-border text-xs rounded-full"
                     >
                       {tag}
                     </span>
@@ -92,7 +92,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#E63946] transition-colors">
+                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-[#E63946] transition-colors">
                   {study.title}
                 </h3>
                 <p className="text-gray-400 text-sm mb-4 line-clamp-2">{study.description}</p>
@@ -116,7 +116,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
                 {/* Link */}
                 <Link
                   href={`/case-studies/${study.slug || study.id}`}
-                  className="inline-flex items-center gap-2 text-white text-sm font-medium hover:text-[#E63946] transition-colors"
+                  className="inline-flex items-center gap-2 text-foreground text-sm font-medium hover:text-[#E63946] transition-colors"
                 >
                   View Case Study
                   <ArrowRightIcon className="w-4 h-4" />
@@ -131,7 +131,7 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
           <Link href="/case-studies">
             <Button
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-black rounded-full px-8 bg-transparent"
+              className="border-border text-foreground hover:bg-accent rounded-full px-8 bg-transparent"
             >
               View All Case Studies
             </Button>

@@ -11,7 +11,7 @@ interface Insight {
   title: string
   description?: string
   excerpt?: string
-  image: string
+  image?: string
   date: string
   category: string
   readTime?: string
@@ -44,11 +44,18 @@ interface InsightCardProps {
 export function InsightCard({ insight }: InsightCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // Handle case where insight is undefined or null
+  if (!insight) {
+    return null
+  }
+
   const handleReadMore = () => {
     if (insight.pdfUrl) {
       setIsModalOpen(true)
     }
   }
+
+  const imageUrl = insight.image || `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(insight.title || 'insight')}`
 
   return (
     <>
@@ -56,8 +63,8 @@ export function InsightCard({ insight }: InsightCardProps) {
         {/* Image */}
         <div className="relative h-56">
           <Image
-            src={insight.image || "/placeholder.svg?height=300&width=400&query=" + insight.title}
-            alt={insight.title}
+            src={imageUrl}
+            alt={insight.title || 'Insight'}
             fill
             className="object-cover"
           />
@@ -68,9 +75,9 @@ export function InsightCard({ insight }: InsightCardProps) {
           {/* Meta Row */}
           <div className="flex items-center gap-2 mb-3">
             <span className="px-2.5 py-0.5 border border-[#E63946]/30 text-[#E63946] text-[11px] font-medium rounded-full">
-              {insight.category}
+              {insight.category || 'General'}
             </span>
-            <span className="text-gray-400 text-[11px]">{insight.date}</span>
+            <span className="text-gray-400 text-[11px]">{insight.date || ''}</span>
             <div className="flex items-center gap-1 text-gray-400">
               <ClockIcon className="w-3 h-3" />
               <span className="text-[11px]">{insight.readTime || "5 min read"}</span>
@@ -78,15 +85,15 @@ export function InsightCard({ insight }: InsightCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="text-gray-900 text-lg font-bold mb-2 leading-tight">{insight.title}</h3>
+          <h3 className="text-gray-900 text-lg font-bold mb-2 leading-tight">{insight.title || 'Untitled'}</h3>
 
           {/* Description */}
-          <p className="text-gray-500 text-sm mb-4 flex-1 line-clamp-3">{insight.excerpt || insight.description}</p>
+          <p className="text-gray-500 text-sm mb-4 flex-1 line-clamp-3">{insight.excerpt || insight.description || ''}</p>
 
           {/* Button */}
           <Button 
             onClick={handleReadMore}
-            className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-xl py-5"
+            className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-xl py-5"
           >
             Read More
           </Button>
@@ -98,7 +105,7 @@ export function InsightCard({ insight }: InsightCardProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         pdfUrl={insight.pdfUrl || ""}
-        insightTitle={insight.title}
+        insightTitle={insight.title || 'Insight'}
       />
     </>
   )

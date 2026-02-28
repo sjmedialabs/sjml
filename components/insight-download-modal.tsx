@@ -103,11 +103,11 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative bg-[#0f0f0f] rounded-2xl p-8 max-w-md w-full mx-4 border border-[#E63946]/30">
+      <div className="relative bg-background rounded-2xl p-8 max-w-md w-full mx-4 border border-[#E63946]/30">
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-foreground transition-colors"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -116,7 +116,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
         </button>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-white mb-2">Download Insight</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Download Insight</h2>
         <p className="text-gray-400 mb-6">
           {step === "form"
             ? "Enter your details to receive this insight"
@@ -144,7 +144,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333] rounded-lg text-white focus:border-[#E63946] focus:outline-none"
+                className="w-full px-4 py-3 bg-secondary border border-[#333] rounded-lg text-foreground focus:border-[#E63946] focus:outline-none"
                 placeholder="Enter your name"
               />
             </div>
@@ -156,7 +156,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333] rounded-lg text-white focus:border-[#E63946] focus:outline-none"
+                className="w-full px-4 py-3 bg-secondary border border-[#333] rounded-lg text-foreground focus:border-[#E63946] focus:outline-none"
                 placeholder="+1234567890"
               />
               <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +1 for US). You'll receive OTP on WhatsApp.</p>
@@ -165,7 +165,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-lg py-6 text-lg font-medium"
+              className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-lg py-6 text-lg font-medium"
             >
               {loading ? "Sending OTP..." : "Send OTP"}
             </Button>
@@ -180,7 +180,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 required
                 maxLength={6}
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333] rounded-lg text-white focus:border-[#E63946] focus:outline-none text-center text-2xl tracking-widest"
+                className="w-full px-4 py-3 bg-secondary border border-[#333] rounded-lg text-foreground focus:border-[#E63946] focus:outline-none text-center text-2xl tracking-widest"
                 placeholder="000000"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -198,7 +198,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
             <Button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-lg py-6 text-lg font-medium disabled:opacity-50"
+              className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-lg py-6 text-lg font-medium disabled:opacity-50"
             >
               {loading ? "Verifying..." : "Verify & Download"}
             </Button>
@@ -207,7 +207,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
               type="button"
               onClick={handleSendOtp}
               disabled={loading}
-              className="w-full text-sm text-gray-400 hover:text-white transition-colors"
+              className="w-full text-sm text-gray-400 hover:text-foreground transition-colors"
             >
               Didn't receive OTP? Resend
             </button>

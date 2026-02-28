@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useAdminTheme } from "@/hooks/use-admin-theme"
+import { useTheme } from "@/hooks/use-theme"
 
 interface AdminSidebarProps {
   activeSection: string
@@ -374,7 +374,7 @@ const icons: Record<string, React.ReactNode> = {
 
 export default function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarProps) {
   const router = useRouter()
-  const { theme, toggleTheme } = useAdminTheme()
+  const { theme, toggleTheme } = useTheme()
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken")

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -75,6 +76,11 @@ export async function POST(request: NextRequest) {
     }
 
     await db.collection("services").insertOne(service)
+    
+    // Revalidate homepage and services page cache
+    revalidatePath("/")
+    revalidatePath("/services")
+    
     return NextResponse.json(service, { status: 201 })
   } catch (error) {
     console.error("Create service error:", error)

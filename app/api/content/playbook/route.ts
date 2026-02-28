@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
 
@@ -29,6 +30,10 @@ export async function PUT(request: NextRequest) {
     }
     const data = await request.json()
     const updated = await updateHomeContent("playbook", data)
+    
+    // Revalidate homepage cache
+    revalidatePath("/")
+    
     return NextResponse.json(updated?.playbook)
   } catch (error) {
     console.error("Update playbook error:", error)

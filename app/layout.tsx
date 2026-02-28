@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Geist_Mono, Playfair_Display } from "next/font/google"
 import "./globals.css"
+import { generateSeoMetadata } from "@/lib/seo"
+import { ThemeProvider } from "@/hooks/use-theme"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,12 +21,9 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
 })
 
-export const metadata: Metadata = {
-  title: "SJ Media Labs | Transform Your Brand",
-  description:
-    "Strategic brand development, identity design, and brand management to create memorable brand experiences.",
-  keywords: "branding, digital marketing, web development, advertising, brand strategy",
-    generator: 'SJ Media Labs'
+// Generate metadata dynamically from database
+export async function generateMetadata(): Promise<Metadata> {
+  return await generateSeoMetadata("Home")
 }
 
 export default function RootLayout({
@@ -33,9 +32,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistMono.variable} ${playfair.variable} font-sans antialiased`}>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

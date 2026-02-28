@@ -9,8 +9,8 @@ interface Service {
   slug?: string
   title: string
   description: string
-  icon: string
-  image: string
+  icon?: string
+  image?: string
 }
 
 // Services are now fully dynamic from the database
@@ -38,12 +38,18 @@ interface ServicesSectionProps {
 }
 
 export function ServicesSection({ data, backgroundImage }: ServicesSectionProps) {
-  const services = data || []
-  const [activeService, setActiveService] = useState(services[1]?.id || services[0]?.id)
+  // Filter out invalid services
+  const services = (data || []).filter(s => s && s.id && s.title)
+  const [activeService, setActiveService] = useState(services[1]?.id || services[0]?.id || '')
   const activeServiceData = services.find((s) => s.id === activeService) || services[0]
 
+  // If no valid services, don't render the section
+  if (services.length === 0 || !activeServiceData) {
+    return null
+  }
+
   return (
-    <section className="relative py-20 bg-[#0a0a0a]">
+    <section className="relative py-20 bg-background">
       {backgroundImage ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -86,8 +92,8 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
                 onClick={() => setActiveService(service.id)}
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl border transition-all text-left ${
                   activeService === service.id
-                    ? "bg-[#0a0a0a] border-[#E63946]"
-                    : "bg-[#0a0a0a] border-[#2a2a2a] hover:border-[#444]"
+                    ? "bg-background border-[#E63946]"
+                    : "bg-background border-[#2a2a2a] hover:border-[#444]"
                 }`}
               >
                 <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
@@ -103,7 +109,7 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
                     <div className="w-8 h-8 bg-white/10 rounded" />
                   )}
                 </div>
-                <span className="text-white font-medium flex-1">{service.title}</span>
+                <span className="text-foreground font-medium flex-1">{service.title}</span>
                 <ArrowRightIcon
                   className={`w-5 h-5 transition-colors ${activeService === service.id ? "text-[#E63946]" : "text-[#E63946]/60"}`}
                 />
@@ -116,7 +122,7 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
             {/* Main Image */}
             <Image
               src={activeServiceData.image || "/placeholder.svg?height=600&width=800&query=service"}
-              alt={activeServiceData.title}
+              alt={activeServiceData.title || 'Service'}
               fill
               className="object-cover"
             />
@@ -125,10 +131,10 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
             <div className="absolute bottom-4 right-4 left-4 md:left-auto md:w-[500px] bg-[rgba(15,15,20,0.9)] backdrop-blur-sm rounded-2xl p-6 border border-[#E63946]/30 shadow-[0_0_30px_rgba(230,57,70,0.15)]">
               {/* Icon */}
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4">
-                {activeServiceData?.icon && (activeServiceData.icon.startsWith('/') || activeServiceData.icon.startsWith('http')) ? (
+                {activeServiceData.icon && (activeServiceData.icon.startsWith('/') || activeServiceData.icon.startsWith('http')) ? (
                   <Image
                     src={activeServiceData.icon}
-                    alt={activeServiceData.title}
+                    alt={activeServiceData.title || 'Service'}
                     width={28}
                     height={28}
                     className="object-contain"
@@ -146,7 +152,7 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
               <h3 className="text-[#E63946] text-xl font-semibold mb-2">{activeServiceData.title}</h3>
 
               {/* Description */}
-              <p className="text-gray-300 text-sm mb-4">{activeServiceData.description}</p>
+              <p className="text-gray-300 text-sm mb-4">{activeServiceData.description || ''}</p>
 
               {/* Link */}
               <Link

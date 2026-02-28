@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
 
@@ -29,6 +30,11 @@ export async function PUT(request: NextRequest) {
     }
     const { insights } = await request.json()
     const updated = await updateHomeContent("insights", insights)
+    
+    // Revalidate homepage and insights page cache
+    revalidatePath("/")
+    revalidatePath("/insights")
+    
     return NextResponse.json(updated?.insights)
   } catch (error) {
     console.error("Update insights error:", error)

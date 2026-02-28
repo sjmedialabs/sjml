@@ -1,3 +1,9 @@
+import { generateSeoMetadata } from "@/lib/seo"
+
+export async function generateMetadata() {
+  return await generateSeoMetadata("About")
+}
+
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Image from "next/image";
@@ -61,7 +67,8 @@ interface AboutData {
   achievements: Array<{ year: string; title: string; description: string }>;
 }
 
-export const revalidate = 3600; // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0; // Enable ISR: Revalidate every hour
 
 export default async function AboutPage() {
   let data: AboutData | null = null;
@@ -74,13 +81,13 @@ export default async function AboutPage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-black">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
             Content Not Available
           </h2>
-          <p className="text-[#888]">
+          <p className="text-muted-foreground">
             Page content has not been set up yet.
           </p>
         </div>
@@ -89,11 +96,11 @@ export default async function AboutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 relative overflow-hidden">
+      <section className="pt-32 pb-16 px-4 relative overflow-hidden bg-background">
         {data.heroBackgroundImage && (
           <>
             <div
@@ -104,7 +111,7 @@ export default async function AboutPage() {
           </>
         )}
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
             {data.heroTitle ||
               "We are Creative Thinkers, Problem Solvers & Exceptional Communicators"}
           </h1>
@@ -127,7 +134,7 @@ export default async function AboutPage() {
           </div>
           <div>
             <p className="text-[#E63946] text-sm mb-2">About Us</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
               A team of{" "}
               <span className="text-[#E63946]">
                 creative
@@ -137,7 +144,7 @@ export default async function AboutPage() {
             </h2>
             {data.about?.description &&
               typeof data.about.description === "string" && (
-                <p className="text-[#888] mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   {data.about.description}
                 </p>
               )}
@@ -146,7 +153,7 @@ export default async function AboutPage() {
                 {data.about.values.map((value, index) => (
                   <li
                     key={index}
-                    className="flex items-center gap-3 text-[#888]"
+                    className="flex items-center gap-3 text-muted-foreground"
                   >
                     <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
                     {value.title}
@@ -163,13 +170,13 @@ export default async function AboutPage() {
         <div className="max-w-6xl mx-auto">
           {/* Stats */}
           {data.stats && data.stats.length > 0 && (
-            <div className="grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-[#222]">
+            <div className="grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-border">
               {data.stats.map((stat, index) => (
                 <div key={index}>
-                  <div className="text-4xl font-bold text-white">
+                  <div className="text-4xl font-bold text-foreground">
                     {stat.value}
                   </div>
-                  <div className="text-[#888] text-sm">{stat.label}</div>
+                  <div className="text-muted-foreground text-sm">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -182,10 +189,10 @@ export default async function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-12">
             <div>
-              <p className="text-[#888] text-sm mb-2">
+              <p className="text-muted-foreground text-sm mb-2">
                 {data.achievementsSection?.badge || "Our Achievements"}
               </p>
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-3xl font-bold text-foreground mb-4">
                 {data.achievementsSection?.title || "proud moments"}
                 <br />&{" "}
                 <span className="text-[#E63946]">
@@ -194,11 +201,11 @@ export default async function AboutPage() {
               </h2>
               {data.achievementsSection?.description &&
                 typeof data.achievementsSection.description === "string" && (
-                  <p className="text-[#888] text-sm mb-6 leading-relaxed">
+                  <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                     {data.achievementsSection.description}
                   </p>
                 )}
-              <button className="px-6 py-3 bg-[#E63946] text-white rounded-full text-sm hover:bg-[#d62839] transition-colors">
+              <button className="px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
                 {data.achievementsSection?.buttonText || "Let's discuss →"}
               </button>
             </div>
@@ -207,10 +214,10 @@ export default async function AboutPage() {
                 {data.achievements.map((item, index) => (
                   <div key={index}>
                     <p className="text-[#E63946] text-sm mb-1">{item.year}</p>
-                    <h3 className="text-white font-semibold mb-2">
+                    <h3 className="text-foreground font-semibold mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-[#666] text-sm">{item.description}</p>
+                    <p className="text-muted-foreground text-sm">{item.description}</p>
                   </div>
                 ))}
               </div>
@@ -237,7 +244,7 @@ export default async function AboutPage() {
             <p className="text-[#E63946] text-sm mb-2">
               {data.vision?.badge || "Our Vision"}
             </p>
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
               {data.vision?.title || "Driving the"}
               <br />
               {data.vision?.title?.includes("Future") ? "Future of" : ""}{" "}
@@ -247,7 +254,7 @@ export default async function AboutPage() {
             </h2>
             {data.vision?.description &&
               typeof data.vision.description === "string" && (
-                <p className="text-[#888] mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   {data.vision.description}
                 </p>
               )}
@@ -256,7 +263,7 @@ export default async function AboutPage() {
                 {data.vision.values.map((value, index) => (
                   <li
                     key={index}
-                    className="flex items-center gap-3 text-[#888]"
+                    className="flex items-center gap-3 text-muted-foreground"
                   >
                     <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
                     {typeof value === "string" ? value : value?.title || ""}
@@ -275,7 +282,7 @@ export default async function AboutPage() {
             <p className="text-[#E63946] text-sm mb-2">
               {data.mission?.badge || "Our Mission"}
             </p>
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
               {data.mission?.title || "Bringing ideas to"}
               <br />
               {data.mission?.title?.includes("life") ? "life through" : ""}{" "}
@@ -285,11 +292,11 @@ export default async function AboutPage() {
             </h2>
             {data.mission?.description && (
               typeof data.mission.description === "string" ? (
-                <p className="text-[#888] mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   {data.mission.description}
                 </p>
               ) : data.mission.description?.description ? (
-                <p className="text-[#888] mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   {data.mission.description.description}
                 </p>
               ) : null
@@ -300,7 +307,7 @@ export default async function AboutPage() {
                 {(data.mission?.values || data.mission?.description?.values || []).map((value, index) => (
                   <li
                     key={index}
-                    className="flex items-center gap-3 text-[#888]"
+                    className="flex items-center gap-3 text-muted-foreground"
                   >
                     <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
                     {typeof value === "string" ? value : value?.title || ""}
@@ -331,14 +338,14 @@ export default async function AboutPage() {
               <p className="text-[#E63946] text-sm mb-2">
                 {data.team?.badge || "Our Team"}
               </p>
-              <h2 className="text-3xl font-bold text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 {data.team?.title || "The minds behind the"}{" "}
                 <span className="text-[#E63946]">
                   {data.team?.highlightedTitle || "magic"}
                 </span>
               </h2>
             </div>
-            <button className="px-6 py-3 bg-[#E63946] text-white rounded-full text-sm hover:bg-[#d62839] transition-colors">
+            <button className="px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
               {data.team?.buttonText || "All Team Members →"}
             </button>
           </div>
@@ -360,7 +367,7 @@ export default async function AboutPage() {
                     className="w-full aspect-[3/4] object-cover"
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <h3 className="text-white font-semibold">{member.name}</h3>
+                    <h3 className="text-foreground font-semibold">{member.name}</h3>
                     <p className="text-[#E63946] text-sm">{member.role}</p>
                   </div>
                 </div>

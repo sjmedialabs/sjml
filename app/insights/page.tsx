@@ -4,7 +4,8 @@ import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import InsightsClient from "./insights-client"
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 export default async function InsightsPage() {
   let posts: any[] = []
@@ -41,10 +42,10 @@ export default async function InsightsPage() {
   } catch (error) {
     console.error("Failed to fetch insights:", error)
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center px-4">
-          <h2 className="text-2xl font-bold text-white mb-4">Content Not Available</h2>
-          <p className="text-[#888]">Insights page content has not been set up yet. Please contact the administrator.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
+          <p className="text-muted-foreground">Insights page content has not been set up yet. Please contact the administrator.</p>
         </div>
       </main>
     )
@@ -53,7 +54,7 @@ export default async function InsightsPage() {
   const hero = content.hero
   const newsletter = content.newsletter
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background">
       <Header />
       <InsightsClient posts={posts} categories={categories} hero={hero} newsletter={newsletter} />
       <Footer />

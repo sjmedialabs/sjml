@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
 
@@ -31,6 +32,10 @@ export async function PUT(request: NextRequest) {
 
     const data = await request.json()
     const updated = await updateHomeContent("hero", data)
+    
+    // Revalidate homepage cache
+    revalidatePath("/")
+    
     return NextResponse.json(updated?.hero)
   } catch (error) {
     console.error("Update hero error:", error)

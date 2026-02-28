@@ -1,155 +1,244 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Save, Eye, EyeOff } from "lucide-react"
+
+interface SettingsData {
+  contactEmail: string
+  contactPhone: string
+  socialMedia: {
+    facebook: string
+    twitter: string
+    instagram: string
+    linkedin: string
+    youtube: string
+  }
+  businessHours: string
+  address: string
+  phone: string
+  footerLogo: string
+}
+
+const defaultSettings: SettingsData = {
+  contactEmail: "info@sjmedialabs.com",
+  contactPhone: "+91 1234567890",
+  socialMedia: {
+    facebook: "",
+    twitter: "",
+    instagram: "",
+    linkedin: "",
+    youtube: ""
+  },
+  businessHours: "Mon-Fri: 9:00 AM - 6:00 PM",
+  address: "Hyderabad, India",
+  phone: "",
+  footerLogo: ""
+}
 
 export function SettingsManager() {
-  const [settings, setSettings] = useState({
-    siteName: "SJ Media Labs",
-    siteTagline: "Digital Agency",
-    metaTitle: "SJ Media Labs | Transform Your Brand",
-    metaDescription: "Strategic brand development, identity design, and brand management.",
-  })
+  const [settings, setSettings] = useState<SettingsData>(defaultSettings)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState("")
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  })
+  useEffect(() => {
+    fetchSettings()
+  }, [])
 
-  const [showPasswords, setShowPasswords] = useState(false)
-
-  const handleSaveSettings = async () => {
-    const token = localStorage.getItem("adminToken")
+  const fetchSettings = async () => {
     try {
-      await fetch("/api/content/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(settings),
-      })
-      alert("Settings saved successfully!")
+      const res = await fetch("/api/content/settings")
+      if (res.ok) {
+        const data = await res.json()
+        setSettings({ ...defaultSettings, ...data })
+      }
     } catch (error) {
-      alert("Failed to save settings")
+      console.error("Failed to fetch settings:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleChangePassword = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("New passwords do not match")
-      return
-    }
-    const token = localStorage.getItem("adminToken")
+  const handleSave = async () => {
+    setSaving(true)
+    setMessage("")
+    
     try {
-      await fetch("/api/auth/change-password", {
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch("/api/content/settings", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(passwordData),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(settings),
       })
-      alert("Password changed successfully!")
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+
+      if (res.ok) {
+        setMessage("✅ Settings saved successfully!")
+        setTimeout(() => setMessage(""), 3000)
+      } else {
+        setMessage("❌ Failed to save settings")
+      }
     } catch (error) {
-      alert("Failed to change password")
+      console.error("Save error:", error)
+      setMessage("❌ Error saving settings")
+    } finally {
+      setSaving(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E63946] mx-auto mb-4"></div>
+            <p className="admin-text-secondary">Loading settings...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold admin-text-primary mb-2">Settings</h1>
-        <p className="admin-text-secondary">Manage site settings and admin credentials.</p>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold admin-text-primary mb-2">General Website Settings</h1>
+        <p className="admin-text-secondary">
+          Manage contact information and social media links
+        </p>
+        <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/50 rounded-lg text-sm text-blue-400">
+          ℹ️ For SEO settings (page titles, descriptions, meta tags), go to <strong>SEO Settings</strong> section
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Site Settings */}
-        <Card className="admin-card admin-border">
-          <CardHeader>
-            <CardTitle className="admin-text-primary">Site Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Site Name</Label>
-              <Input
-                value={settings.siteName}
-                onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Site Tagline</Label>
-              <Input
-                value={settings.siteTagline}
-                onChange={(e) => setSettings({ ...settings, siteTagline: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Meta Title</Label>
-              <Input
-                value={settings.metaTitle}
-                onChange={(e) => setSettings({ ...settings, metaTitle: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Meta Description</Label>
-              <Input
-                value={settings.metaDescription}
-                onChange={(e) => setSettings({ ...settings, metaDescription: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
-              />
-            </div>
-            <Button onClick={handleSaveSettings} className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
-              <Save className="w-4 h-4 mr-2" />
-              Save Settings
-            </Button>
-          </CardContent>
-        </Card>
+      {message && (
+        <div className={`mb-6 p-4 rounded-lg ${
+          message.includes("✅") 
+            ? "bg-green-500/20 border border-green-500/50 text-green-400" 
+            : "bg-red-500/20 border border-red-500/50 text-red-400"
+        }`}>
+          {message}
+        </div>
+      )}
 
-        {/* Change Password */}
-        <Card className="admin-card admin-border">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="admin-text-primary">Change Password</CardTitle>
-            <button onClick={() => setShowPasswords(!showPasswords)} className="admin-text-secondary hover:admin-text-primary">
-              {showPasswords ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Current Password</Label>
+      <div className="space-y-8 max-w-3xl">
+        {/* Contact Info */}
+        <div className="admin-card p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Contact Information</h2>
+          <div className="space-y-4">
+            <div>
+              <Label>Contact Email</Label>
               <Input
-                type={showPasswords ? "text" : "password"}
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
+                type="email"
+                value={settings.contactEmail}
+                onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+                placeholder="info@sjmedialabs.com"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="admin-text-primary">New Password</Label>
+            <div>
+              <Label>Contact Phone</Label>
               <Input
-                type={showPasswords ? "text" : "password"}
-                value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
+                value={settings.contactPhone}
+                onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
+                placeholder="+91 1234567890"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="admin-text-primary">Confirm New Password</Label>
+            <div>
+              <Label>Business Hours</Label>
               <Input
-                type={showPasswords ? "text" : "password"}
-                value={passwordData.confirmPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                className="admin-bg-secondary admin-border-light admin-text-primary"
+                value={settings.businessHours}
+                onChange={(e) => setSettings({ ...settings, businessHours: e.target.value })}
+                placeholder="Mon-Fri: 9:00 AM - 6:00 PM"
               />
             </div>
-            <Button onClick={handleChangePassword} className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
-              Change Password
-            </Button>
-          </CardContent>
-        </Card>
+            <div>
+              <Label>Address</Label>
+              <textarea
+                className="admin-input min-h-[60px]"
+                value={settings.address}
+                onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+                placeholder="Hyderabad, India"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Social Media */}
+        <div className="admin-card p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Social Media Links</h2>
+          <div className="space-y-4">
+            <div>
+              <Label>Facebook URL</Label>
+              <Input
+                value={settings.socialMedia.facebook}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  socialMedia: { ...settings.socialMedia, facebook: e.target.value }
+                })}
+                placeholder="https://facebook.com/sjmedialabs"
+              />
+            </div>
+            <div>
+              <Label>Twitter/X URL</Label>
+              <Input
+                value={settings.socialMedia.twitter}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  socialMedia: { ...settings.socialMedia, twitter: e.target.value }
+                })}
+                placeholder="https://twitter.com/sjmedialabs"
+              />
+            </div>
+            <div>
+              <Label>Instagram URL</Label>
+              <Input
+                value={settings.socialMedia.instagram}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  socialMedia: { ...settings.socialMedia, instagram: e.target.value }
+                })}
+                placeholder="https://instagram.com/sjmedialabs"
+              />
+            </div>
+            <div>
+              <Label>LinkedIn URL</Label>
+              <Input
+                value={settings.socialMedia.linkedin}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  socialMedia: { ...settings.socialMedia, linkedin: e.target.value }
+                })}
+                placeholder="https://linkedin.com/company/sjmedialabs"
+              />
+            </div>
+            <div>
+              <Label>YouTube URL</Label>
+              <Input
+                value={settings.socialMedia.youtube}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  socialMedia: { ...settings.socialMedia, youtube: e.target.value }
+                })}
+                placeholder="https://youtube.com/@sjmedialabs"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-[#E63946] hover:bg-[#d62839] text-white px-8"
+          >
+            {saving ? "Saving..." : "Save Settings"}
+          </Button>
+        </div>
       </div>
     </div>
   )

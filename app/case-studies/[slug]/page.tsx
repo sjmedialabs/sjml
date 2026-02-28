@@ -30,7 +30,8 @@ interface CaseStudyData {
   }
 }
 
-export const revalidate = 3600 // Enable ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR
 
 // Generate static params for all case studies to pre-render them at build time
 export async function generateStaticParams() {
@@ -67,7 +68,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
@@ -95,29 +96,29 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-6">{caseStudy.title}</h1>
-          <p className="text-xl text-[#888] text-center max-w-3xl mx-auto mb-12">{caseStudy.description}</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-6">{caseStudy.title}</h1>
+          <p className="text-xl text-muted-foreground text-center max-w-3xl mx-auto mb-12">{caseStudy.description}</p>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
             <div className="text-center">
               <p className="text-[#E63946] text-3xl font-bold mb-1">{caseStudy.stat1Value}</p>
-              <p className="text-[#888] text-sm">{caseStudy.stat1Label}</p>
+              <p className="text-muted-foreground text-sm">{caseStudy.stat1Label}</p>
             </div>
             <div className="text-center">
               <p className="text-[#E63946] text-3xl font-bold mb-1">{caseStudy.stat2Value}</p>
-              <p className="text-[#888] text-sm">{caseStudy.stat2Label}</p>
+              <p className="text-muted-foreground text-sm">{caseStudy.stat2Label}</p>
             </div>
             {caseStudy.industry && (
               <div className="text-center">
-                <p className="text-white text-sm font-semibold mb-1">Industry</p>
-                <p className="text-[#888] text-sm">{caseStudy.industry}</p>
+                <p className="text-foreground text-sm font-semibold mb-1">Industry</p>
+                <p className="text-muted-foreground text-sm">{caseStudy.industry}</p>
               </div>
             )}
             {caseStudy.year && (
               <div className="text-center">
-                <p className="text-white text-sm font-semibold mb-1">Year</p>
-                <p className="text-[#888] text-sm">{caseStudy.year}</p>
+                <p className="text-foreground text-sm font-semibold mb-1">Year</p>
+                <p className="text-muted-foreground text-sm">{caseStudy.year}</p>
               </div>
             )}
           </div>
@@ -127,7 +128,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
       {/* Main Image */}
       <section className="py-8 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="rounded-2xl overflow-hidden border border-[#222]">
+          <div className="rounded-2xl overflow-hidden border border-border">
             <Image
               src={caseStudy.image || "/placeholder.svg"}
               alt={caseStudy.title}
@@ -143,22 +144,22 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
       {caseStudy.challenge && (
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
               The <span className="text-[#E63946]">Challenge</span>
             </h2>
-            <p className="text-[#888] text-lg leading-relaxed">{caseStudy.challenge}</p>
+            <p className="text-muted-foreground text-lg leading-relaxed">{caseStudy.challenge}</p>
           </div>
         </section>
       )}
 
       {/* Solution Section */}
       {caseStudy.solution && (
-        <section className="py-16 px-4 bg-[#111]">
+        <section className="py-16 px-4 bg-card">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
               Our <span className="text-[#E63946]">Solution</span>
             </h2>
-            <p className="text-[#888] text-lg leading-relaxed">{caseStudy.solution}</p>
+            <p className="text-muted-foreground text-lg leading-relaxed">{caseStudy.solution}</p>
           </div>
         </section>
       )}
@@ -169,7 +170,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-6">
               {caseStudy.gallery.map((img, index) => (
-                <div key={index} className="rounded-2xl overflow-hidden border border-[#222]">
+                <div key={index} className="rounded-2xl overflow-hidden border border-border">
                   <Image
                     src={img || "/placeholder.svg"}
                     alt={`Gallery image ${index + 1}`}
@@ -188,16 +189,16 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
       {caseStudy.results && caseStudy.results.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-8">
               The <span className="text-[#E63946]">Results</span>
             </h2>
             <ul className="space-y-4">
               {caseStudy.results.map((result, index) => (
                 <li key={index} className="flex items-start gap-4">
-                  <span className="w-8 h-8 bg-[#E63946] text-white rounded-full flex items-center justify-center shrink-0 font-bold text-sm">
+                  <span className="w-8 h-8 bg-[#E63946] text-foreground rounded-full flex items-center justify-center shrink-0 font-bold text-sm">
                     {index + 1}
                   </span>
-                  <p className="text-[#888] text-lg pt-1">{result}</p>
+                  <p className="text-muted-foreground text-lg pt-1">{result}</p>
                 </li>
               ))}
             </ul>
@@ -207,13 +208,13 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Testimonial */}
       {caseStudy.testimonial && (
-        <section className="py-16 px-4 bg-[#111]">
+        <section className="py-16 px-4 bg-card">
           <div className="max-w-4xl mx-auto">
             <div className="border-l-4 border-[#E63946] pl-8">
-              <p className="text-white text-xl italic mb-6">&quot;{caseStudy.testimonial.quote}&quot;</p>
+              <p className="text-foreground text-xl italic mb-6">&quot;{caseStudy.testimonial.quote}&quot;</p>
               <div>
-                <p className="text-white font-semibold">{caseStudy.testimonial.author}</p>
-                <p className="text-[#888] text-sm">
+                <p className="text-foreground font-semibold">{caseStudy.testimonial.author}</p>
+                <p className="text-muted-foreground text-sm">
                   {caseStudy.testimonial.role}, {caseStudy.testimonial.company}
                 </p>
               </div>

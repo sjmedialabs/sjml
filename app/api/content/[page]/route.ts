@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getPageContent, updatePageContent } from "@/lib/models/content"
 
@@ -19,6 +20,25 @@ const validPages = [
   "header",
   "seo",
 ]
+
+// Map page keys to their URL paths for revalidation
+const pagePathMap: Record<string, string[]> = {
+  home: ["/"],
+  about: ["/about"],
+  work: ["/work"],
+  services: ["/services"],
+  "case-studies": ["/case-studies"],
+  "case-studies-page": ["/case-studies"],
+  careers: ["/careers"],
+  contact: ["/contact"],
+  insights: ["/insights"],
+  "insights-page": ["/insights"],
+  testimonials: ["/testimonials"],
+  "testimonials-page": ["/testimonials"],
+  clients: ["/clients"],
+  header: ["/", "/about", "/work", "/services", "/case-studies", "/careers", "/contact", "/insights", "/testimonials", "/clients"],
+  seo: ["/", "/about", "/work", "/services", "/case-studies", "/careers", "/contact", "/insights", "/testimonials", "/clients"],
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ page: string }> }) {
   try {
@@ -62,6 +82,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const updated = await updatePageContent(page, body)
+
+    // Revalidate the affected page paths
+    const pathsToRevalidate = pagePathMap[page] || [`/${page}`]
+    for (const path of pathsToRevalidate) {
+      revalidatePath(path)
+    }
+
     return NextResponse.json(updated)
   } catch (error) {
     console.error("Update page content error:", error)

@@ -4,7 +4,8 @@ import { getPageContent, type ClientsPageData } from "@/lib/models/content"
 import { clientPromise } from "@/lib/mongodb"
 import { ClientsList } from "@/components/clients-list"
 
-export const revalidate = 3600 // Enable ISR: Revalidate every hour
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Enable ISR: Revalidate every hour
 
 export default async function ClientsPage() {
   let content: ClientsPageData | null = null
@@ -31,11 +32,11 @@ export default async function ClientsPage() {
 
   if (!content) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a]">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
-          <h1 className="text-2xl font-bold text-white mb-4">Content Not Available</h1>
-          <p className="text-[#888]">Page content has not been set up yet.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h1>
+          <p className="text-muted-foreground">Page content has not been set up yet.</p>
         </div>
       </main>
     )
@@ -45,13 +46,13 @@ export default async function ClientsPage() {
   const stats = content.stats || []
   const cta = content.cta
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             {hero.title ? (
               hero.title
             ) : (
@@ -60,7 +61,7 @@ export default async function ClientsPage() {
               </>
             )}
           </h1>
-          <p className="text-xl text-[#888] max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {hero.subtitle || "Trusted by industry leaders worldwide to deliver exceptional results."}
           </p>
         </div>
@@ -70,13 +71,13 @@ export default async function ClientsPage() {
 
       {/* Stats */}
       {stats.length > 0 && (
-        <section className="py-16 px-4 bg-[#111]">
+        <section className="py-16 px-4 bg-card">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {stats.map((stat, index) => (
                 <div key={index}>
                   <div className="text-4xl font-bold text-[#E63946] mb-2">{stat.value}</div>
-                  <div className="text-[#888]">{stat.label}</div>
+                  <div className="text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -88,8 +89,8 @@ export default async function ClientsPage() {
       {cta && (
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto bg-gradient-to-r from-[#E63946] to-[#d62839] rounded-2xl p-12 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">{cta.title}</h2>
-            <p className="text-white/80 mb-8">{cta.description}</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">{cta.title}</h2>
+            <p className="text-foreground/80 mb-8">{cta.description}</p>
             <a
               href={cta.buttonUrl}
               className="inline-block px-8 py-4 bg-white text-[#E63946] rounded-full font-medium hover:bg-gray-100 transition-colors"

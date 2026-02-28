@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -85,6 +86,11 @@ export async function POST(request: NextRequest) {
     }
 
     await db.collection("case-studies").insertOne(caseStudy)
+    
+    // Revalidate homepage and case-studies page cache
+    revalidatePath("/")
+    revalidatePath("/case-studies")
+    
     return NextResponse.json(caseStudy, { status: 201 })
   } catch (error) {
     console.error("Create case study error:", error)

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -61,6 +62,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Service not found" }, { status: 404 })
     }
 
+    // Revalidate homepage, services page, and specific service page cache
+    revalidatePath("/")
+    revalidatePath("/services")
+    if (data.slug) {
+      revalidatePath(`/services/${data.slug}`)
+    }
+
     return NextResponse.json({ ...updateData, id })
   } catch (error) {
     console.error("Update service error:", error)
@@ -83,10 +91,20 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
+    // Get service slug before deleting for cache invalidation
+    const service = await db.collection("services").findOne({ id })
+    
     const result = await db.collection("services").deleteOne({ id })
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 })
+    }
+
+    // Revalidate homepage, services page, and specific service page cache
+    revalidatePath("/")
+    revalidatePath("/services")
+    if (service?.slug) {
+      revalidatePath(`/services/${service.slug}`)
     }
 
     return NextResponse.json({ success: true })

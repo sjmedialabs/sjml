@@ -65,9 +65,9 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-[#0d0d0d] border border-[#222] rounded-2xl w-full max-w-lg mx-4 p-8 animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-background border border-border rounded-2xl w-full max-w-lg mx-4 p-8 animate-in fade-in zoom-in duration-200">
         {/* Close button */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-foreground transition-colors">
           <X className="w-6 h-6" />
         </button>
 
@@ -78,7 +78,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Thank You!</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Thank You!</h3>
             <p className="text-gray-400">We'll get back to you shortly.</p>
           </div>
         ) : (
@@ -86,7 +86,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
             {/* Header */}
             <div className="text-center mb-6">
               <span className="text-[#E63946] text-sm font-medium">Start a Project</span>
-              <h2 className="text-2xl font-bold text-white mt-2">
+              <h2 className="text-2xl font-bold text-foreground mt-2">
                 Let's Create Something <span className="text-[#E63946]">Amazing</span>
               </h2>
               <p className="text-gray-400 text-sm mt-2">
@@ -102,7 +102,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
+                  className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
                 />
                 <Input
                   type="email"
@@ -110,7 +110,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
+                  className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -119,14 +119,14 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                   placeholder="Phone Number"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
+                  className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
                 />
                 <Input
                   placeholder="Subject*"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   required
-                  className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
+                  className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
                 />
               </div>
               <Textarea
@@ -135,12 +135,12 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 required
                 rows={4}
-                className="bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500 focus:border-[#E63946] rounded-lg resize-none"
+                className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg resize-none"
               />
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-full py-6 text-base font-medium"
+                className="w-full bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-full py-6 text-base font-medium"
               >
                 {isSubmitting ? "Sending..." : "Let's Get Started →"}
               </Button>

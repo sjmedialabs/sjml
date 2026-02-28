@@ -18,7 +18,7 @@ export function IndustriesSection({ data, backgroundImage }: IndustriesSectionPr
   const industries = data || []
 
   return (
-    <section className="relative py-20 bg-[#0a0a0a]">
+    <section className="relative py-20 bg-background">
       {backgroundImage && (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -38,7 +38,7 @@ export function IndustriesSection({ data, backgroundImage }: IndustriesSectionPr
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {industries.map((industry) => (
-            <div key={industry.id} className="rounded-2xl border border-[#E63946]/40 overflow-hidden bg-[#0a0a0a]">
+            <div key={industry.id} className="rounded-2xl border border-[#E63946]/40 overflow-hidden bg-background">
               {/* Image */}
               <div className="relative h-48 w-full">
                 <Image
@@ -50,7 +50,7 @@ export function IndustriesSection({ data, backgroundImage }: IndustriesSectionPr
               </div>
               {/* Text Content */}
               <div className="p-5">
-                <h3 className="text-white text-lg font-semibold mb-2">{industry.title}</h3>
+                <h3 className="text-foreground text-lg font-semibold mb-2">{industry.title}</h3>
                 <p className="text-gray-400 text-sm">{industry.description}</p>
               </div>
             </div>
