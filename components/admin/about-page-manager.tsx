@@ -148,9 +148,14 @@ export function AboutPageManager() {
       const res = await fetch("/api/content/about")
       if (res.ok) {
         const fetchedData = await res.json()
+        const hero = fetchedData.hero || {}
         setData({ 
           ...defaultAboutData, 
           ...fetchedData,
+          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultAboutData.heroTitle,
+          heroSubtitle: hero.description ?? fetchedData.heroSubtitle ?? defaultAboutData.heroSubtitle,
+          heroDescription: hero.description ?? fetchedData.heroDescription ?? defaultAboutData.heroDescription,
+          heroBackgroundImage: hero.image ?? fetchedData.heroBackgroundImage ?? defaultAboutData.heroBackgroundImage,
           aboutSection: fetchedData.about || defaultAboutData.aboutSection,
           mission: fetchedData.mission?.description || fetchedData.mission || defaultAboutData.mission,
           vision: fetchedData.vision?.description || fetchedData.vision || defaultAboutData.vision,
@@ -176,6 +181,11 @@ export function AboutPageManager() {
       // Transform data to match frontend structure
       const transformedData = {
         ...data,
+        hero: {
+          title: data.heroTitle,
+          description: data.heroDescription || data.heroSubtitle || "",
+          image: data.heroBackgroundImage || ""
+        },
         about: {
           ...data.aboutSection,
           values: data.values
@@ -276,13 +286,23 @@ export function AboutPageManager() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
             <div>
-              <label className="block text-sm admin-text-secondary mb-2">Title (use pipe | for line breaks)</label>
+              <label className="block text-sm admin-text-secondary mb-2">Title</label>
               <textarea
                 value={data.heroTitle}
                 onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
+                rows={2}
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+                placeholder="We are Creative Thinkers, Problem Solvers & Exceptional Communicators"
+              />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
+              <textarea
+                value={data.heroDescription}
+                onChange={(e) => setData({ ...data, heroDescription: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-                placeholder="We are Creative Thinkers, | Problem Solvers & Exceptional | Communicators"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+                placeholder="A team of creative thinkers dedicated to design that moves brands from good to unforgettable."
               />
             </div>
             <ImageUpload

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { PageHero } from "@/components/page-hero"
 
 interface Post {
   id: string
@@ -19,7 +20,9 @@ interface InsightsClientProps {
   categories: string[]
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
+    description?: string
+    image?: string
   }
   newsletter: {
     title: string
@@ -36,23 +39,11 @@ export default function InsightsClient({ posts, categories, hero, newsletter }: 
     ? posts 
     : posts.filter(post => post.category === selectedCategory)
 
+  const heroDescription = hero.description || hero.subtitle || ""
+
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-24 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            {hero.title.includes("Resources") ? (
-              <>
-                Insights & <span className="text-[#E63946]">Resources</span>
-              </>
-            ) : (
-              hero.title
-            )}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">{hero.subtitle}</p>
-        </div>
-      </section>
+      <PageHero title={hero.title} description={heroDescription} image={hero.image} />
 
       {/* Filters */}
       <section className="px-4 pb-8">

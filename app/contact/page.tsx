@@ -6,9 +6,9 @@ export async function generateMetadata() {
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import Image from "next/image"
 import { getPageContent, type ContactPageData } from "@/lib/models/content"
 import { ContactForm } from "@/components/contact-form"
+import { PageHero } from "@/components/page-hero"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -42,33 +42,14 @@ export default async function ContactPage() {
     return <span dangerouslySetInnerHTML={{ __html: result }} />
   }
 
+  const heroImage = data.hero.image || data.hero.backgroundImage || ""
+  const heroDescription = data.hero.description || data.hero.subtitle || ""
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src={data.hero.backgroundImage || "/placeholder.svg?height=500&width=1920"}
-            alt="Contact background"
-            fill
-            className="object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/50 to-[#0a0a0a]" />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center pt-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-wide">
-            {data.hero.title.split(",").map((part, i) => (
-              <span key={i}>
-                {part}
-                {i < data.hero.title.split(",").length - 1 && ","}
-                <br />
-              </span>
-            ))}
-          </h1>
-        </div>
-      </section>
+      <PageHero title={data.hero.title} description={heroDescription} image={heroImage} />
 
       {/* Contact Form Section */}
       <section className="py-16 px-4">

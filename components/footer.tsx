@@ -4,14 +4,19 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 
-interface FooterData {
+export interface FooterData {
   logo?: string
   companyName?: string
+  siteName?: string
   tagline?: string
+  siteTagline?: string
   address?: string
   phone?: string
   email?: string
   copyright?: string
+  newsletterText?: string
+  companyLinks?: Array<{ name: string; href: string }>
+  serviceLinks?: Array<{ name: string; href: string }>
   socialLinks?: {
     facebook?: string
     instagram?: string
@@ -47,58 +52,59 @@ function MapPinIcon({ className }: { className?: string }) {
   )
 }
 
-const companyLinks = [
-  { name: "About Us", href: "/about" },
-  { name: "Our Work", href: "/work" },
-  { name: "Careers", href: "/careers" },
-  { name: "Contact", href: "/contact" },
-]
+interface FooterProps {
+  data?: FooterData | null
+}
 
-// Only working service links
-const serviceLinks = [
-  { name: "Branding", href: "/services/brand-strategy." },
-  { name: "Digital Marketing", href: "/services/digital-marketing" },
-  { name: "Web Development", href: "/services/web-design-development" },
-]
-
-const socialLinks = [
-  { name: "Facebook", icon: "f" },
-  { name: "Instagram", icon: "📷" },
-  { name: "LinkedIn", icon: "in" },
-  { name: "Twitter", icon: "𝕏" },
-  { name: "YouTube", icon: "▶" },
-]
-
-export function Footer() {
-  const [footerData, setFooterData] = useState<FooterData>({
-    companyName: "SJ MEDIA LABS",
-    tagline: "IGNITING BRILLIANCE",
-    email: "info@sjmedialabs.com",
-    copyright: "© 2025 SJ Media Labs. All Rights Reserved",
-    address: "",
-    phone: "",
-  })
+export function Footer({ data: propData }: FooterProps = {}) {
+  const [footerData, setFooterData] = useState<FooterData | null>(propData ?? null)
 
   useEffect(() => {
-    // Fetch footer settings from API
-    fetch("/api/content/settings")
-      .then((res) => res.json())
+    if (propData) {
+      setFooterData(propData)
+      return
+    }
+    fetch("/api/content/footer")
+      .then((res) => {
+        if (!res.ok) return null
+        return res.json()
+      })
       .then((data) => {
-        if (data) {
+        if (data && !data.error) {
           setFooterData({
-            logo: data.footerLogo || data.logo,
-            companyName: data.siteName || "SJ MEDIA LABS",
-            tagline: data.siteTagline || "IGNITING BRILLIANCE",
-            address: data.address || "",
-            phone: data.phone || "",
-            email: data.email || "info@sjmedialabs.com",
-            copyright: data.copyright || "© 2025 SJ Media Labs. All Rights Reserved",
-            socialLinks: data.socialMedia || {},
+            address: data.address,
+            phone: data.phone,
+            email: data.email,
+            copyright: data.copyright,
+            newsletterText: data.newsletterText,
+            siteName: data.siteName,
+            siteTagline: data.siteTagline,
+            companyName: data.siteName || data.companyName,
+            tagline: data.siteTagline || data.tagline,
+            companyLinks: data.companyLinks || [],
+            serviceLinks: data.serviceLinks || [],
+            socialLinks: data.socialLinks || {},
           })
         }
       })
-      .catch((err) => console.error("Failed to fetch footer settings:", err))
-  }, [])
+      .catch(() => setFooterData(null))
+  }, [propData])
+
+  if (!footerData) {
+    return (
+      <footer className="bg-background pt-8 pb-8 border-t border-border">
+        <div className="max-w-7xl mx-auto px-4 text-center text-muted-foreground text-sm">
+          Configure footer content in admin dashboard.
+        </div>
+      </footer>
+    )
+  }
+
+  const companyLinks = footerData.companyLinks || []
+  const serviceLinks = footerData.serviceLinks || []
+  const socialLinks = footerData.socialLinks || {}
+  const companyName = footerData.companyName || footerData.siteName || ""
+  const tagline = footerData.tagline || footerData.siteTagline || ""
 
   return (
     <footer className="bg-background pt-16 pb-8 border-t border-border">
@@ -108,19 +114,21 @@ export function Footer() {
           <div>
             <Link href="/" className="flex items-center gap-2 mb-6">
               {footerData.logo ? (
-                <Image src={footerData.logo} alt={footerData.companyName || ""} width={120} height={40} className="h-10 w-auto" />
+                <Image src={footerData.logo} alt={companyName} width={120} height={40} className="h-10 w-auto" />
               ) : (
-                <>
-                  <div className="w-10 h-10 bg-[#E63946] rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L4 6v12l8 4 8-4V6l-8-4z" />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-foreground font-bold text-lg leading-tight">{footerData.companyName}</span>
-                    <span className="text-muted-foreground text-[9px] tracking-[0.2em]">{footerData.tagline}</span>
-                  </div>
-                </>
+                companyName && (
+                  <>
+                    <div className="w-10 h-10 bg-[#E63946] rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L4 6v12l8 4 8-4V6l-8-4z" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-foreground font-bold text-lg leading-tight">{companyName}</span>
+                      {tagline && <span className="text-muted-foreground text-[9px] tracking-[0.2em]">{tagline}</span>}
+                    </div>
+                  </>
+                )
               )}
             </Link>
 
@@ -137,67 +145,65 @@ export function Footer() {
                   {footerData.phone}
                 </p>
               )}
-              <p className="flex items-center gap-2">
-                <MailIcon className="w-4 h-4 text-[#E63946]" />
-                {footerData.email}
-              </p>
+              {footerData.email && (
+                <p className="flex items-center gap-2">
+                  <MailIcon className="w-4 h-4 text-[#E63946]" />
+                  {footerData.email}
+                </p>
+              )}
             </div>
 
-            <div className="flex gap-3 mt-6">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors"
-                >
-                  {social.icon}
-                </a>
-              ))}
+            {(socialLinks.facebook || socialLinks.instagram || socialLinks.linkedin || socialLinks.twitter || socialLinks.youtube) && (
+              <div className="flex gap-3 mt-6">
+                {socialLinks.facebook && <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors">f</a>}
+                {socialLinks.instagram && <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors">📷</a>}
+                {socialLinks.linkedin && <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors">in</a>}
+                {socialLinks.twitter && <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors">𝕏</a>}
+                {socialLinks.youtube && <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-secondary hover:bg-[#E63946] rounded flex items-center justify-center text-foreground text-xs transition-colors">▶</a>}
+              </div>
+            )}
+          </div>
+
+          {/* Company Links - from DB */}
+          {companyLinks.length > 0 && (
+            <div>
+              <h3 className="text-[#E63946] font-semibold mb-4">Company</h3>
+              <ul className="space-y-2">
+                {companyLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link href={link.href} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
+          )}
 
-          {/* Company Links */}
-          <div>
-            <h3 className="text-[#E63946] font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
-              {companyLinks.map((link, index) => (
-                <li key={index}>
-                  <Link href={link.href} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Services Links */}
-          <div>
-            <h3 className="text-[#E63946] font-semibold mb-4">Services</h3>
-            <ul className="space-y-2">
-              {serviceLinks.map((link, index) => (
-                <li key={index}>
-                  <Link href={link.href} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Services Links - from DB */}
+          {serviceLinks.length > 0 && (
+            <div>
+              <h3 className="text-[#E63946] font-semibold mb-4">Services</h3>
+              <ul className="space-y-2">
+                {serviceLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link href={link.href} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Copyright */}
         <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm">{footerData.copyright}</p>
+          {footerData.copyright && <p className="text-muted-foreground text-sm">{footerData.copyright}</p>}
           <div className="flex gap-6 text-muted-foreground text-sm">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/cookies" className="hover:text-foreground transition-colors">
-              Cookie Policy
-            </Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <Link href="/cookies" className="hover:text-foreground transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>

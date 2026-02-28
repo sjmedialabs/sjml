@@ -74,7 +74,7 @@ export function ServicesPageManager() {
   const [editingService, setEditingService] = useState<ServiceItem | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [pageContent, setPageContent] = useState<PageContent>({
-    hero: { title: "", highlightedWords: [], backgroundImage: "", watermark: "SERVICES" },
+    hero: { title: "", description: "", highlightedWords: [], backgroundImage: "", watermark: "SERVICES" } as PageContent["hero"],
     section: { title: "", subtitle: "", description: "" }
   })
   const [pageContentSaving, setPageContentSaving] = useState(false)
@@ -106,7 +106,14 @@ export function ServicesPageManager() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ pageKey: 'services', ...pageContent })
+        body: JSON.stringify({
+          pageKey: 'services',
+          ...pageContent,
+          hero: {
+            ...pageContent.hero,
+            image: pageContent.hero.backgroundImage ?? (pageContent.hero as any).image ?? ''
+          }
+        })
       })
       if (res.ok) {
         setMessage('Page content saved successfully!')
@@ -271,6 +278,16 @@ export function ServicesPageManager() {
                     onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, title: e.target.value}})}
                     className="admin-bg-tertiary admin-border-light admin-text-primary"
                     placeholder="Redefining Digital Success..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Hero Description</label>
+                  <Textarea
+                    value={(pageContent.hero as any).description ?? ""}
+                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, description: e.target.value}})}
+                    rows={3}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Comprehensive solutions to elevate your brand..."
                   />
                 </div>
                 <div>

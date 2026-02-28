@@ -12,6 +12,9 @@ import {
   defaultInsightsContent,
   defaultTestimonialsContent,
   defaultClientsContent,
+  defaultHeaderContent,
+  defaultSettingsContent,
+  defaultSeoContent,
 } from "@/lib/defaults"
 
 export async function POST() {
@@ -48,6 +51,9 @@ export async function POST() {
       { key: "insights", data: defaultInsightsContent },
       { key: "testimonials", data: defaultTestimonialsContent },
       { key: "clients", data: defaultClientsContent },
+      { key: "header", data: defaultHeaderContent },
+      { key: "settings", data: defaultSettingsContent },
+      { key: "seo", data: defaultSeoContent },
     ]
 
     for (const page of pages) {

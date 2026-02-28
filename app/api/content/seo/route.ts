@@ -11,20 +11,9 @@ export async function GET() {
     const seoData = await collection.findOne({ pageKey: "seo" })
     
     if (!seoData) {
-      // Return default SEO data if not found
-      return NextResponse.json({
-        globalTitle: "SJ Media Labs | Transform Your Brand",
-        globalDescription: "Strategic brand development, identity design, and brand management to create memorable brand experiences.",
-        siteName: "SJ Media Labs",
-        siteTagline: "Transform Your Brand",
-        favicon: "/favicon.ico",
-        ogImage: "/og-image.jpg",
-        twitterHandle: "@sjmedialabs",
-        googleAnalyticsId: "",
-        pages: []
-      })
+      return NextResponse.json({ error: "SEO not found. Configure in admin." }, { status: 404 })
     }
-    
+
     return NextResponse.json(seoData)
   } catch (error) {
     console.error("Get SEO error:", error)

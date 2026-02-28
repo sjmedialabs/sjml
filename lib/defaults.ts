@@ -174,6 +174,20 @@ export const defaultHomeContent = {
     email: "support@sjmedialabs.com",
     copyright: "© 2025 sjmedialabs All rights reserved.",
     newsletterText: "Subscribe to get the latest insights and updates.",
+    siteName: "SJ Media Labs",
+    siteTagline: "Igniting Brilliance",
+    companyLinks: [
+      { name: "About Us", href: "/about" },
+      { name: "Our Work", href: "/work" },
+      { name: "Careers", href: "/careers" },
+      { name: "Contact", href: "/contact" },
+    ],
+    serviceLinks: [
+      { name: "Branding", href: "/services/branding" },
+      { name: "Digital Marketing", href: "/services/digital-marketing" },
+      { name: "Web & Experience", href: "/services/web-experience" },
+    ],
+    socialLinks: { facebook: "", instagram: "", linkedin: "", twitter: "", youtube: "" },
   },
   settings: {
     siteName: "SJ Media Labs",
@@ -187,8 +201,15 @@ export const defaultAboutContent = {
   pageKey: "about",
   hero: {
     title: "We are Creative Thinkers, Problem Solvers & Exceptional Communicators",
+    description: "A team of creative thinkers dedicated to design that moves brands from good to unforgettable.",
+    image: "",
     highlightedText: "Creative Thinkers",
   },
+  heroTitle: "We are Creative Thinkers, Problem Solvers & Exceptional Communicators",
+  heroSubtitle: "",
+  heroDescription: "",
+  heroImage: "",
+  heroBackgroundImage: "",
   about: {
     badge: "About Us",
     title: "A team of",
@@ -273,6 +294,8 @@ export const defaultServicesContent = {
   pageKey: "services",
   hero: {
     title: "Redefining Digital Success with Strategy, Design, and Development",
+    description: "Comprehensive solutions to elevate your brand and drive business growth across all channels.",
+    image: "/business-people-working-on-laptops-hands-typing-pr.jpg",
     highlightedWords: ["Success", "Strategy, Design"],
     backgroundImage: "/business-people-working-on-laptops-hands-typing-pr.jpg",
     watermark: "SERVICES",
@@ -355,7 +378,8 @@ export const defaultWorkContent = {
   hero: {
     title: "Elevate Beyond the Ordinary.",
     subtitle: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
-    description: "We craft everything from branding and web design to 3D, motion, and UI/UX.",
+    description: "We're a creative agency dedicated to design that moves brands from good to unforgettable. We craft everything from branding and web design to 3D, motion, and UI/UX.",
+    image: "",
   },
   portfolio: {
     title: "Our Portfolio",
@@ -391,7 +415,8 @@ export const defaultCaseStudiesContent = {
   hero: {
     title: "Case Studies",
     subtitle: "Explore our success stories",
-    description: "Discover how we've helped brands achieve extraordinary results.",
+    description: "Discover how we've helped brands achieve extraordinary results through innovative strategies and creative execution.",
+    image: "",
   },
   section: {
     title: "Our Case Studies",
@@ -417,6 +442,11 @@ export const defaultCareersContent = {
   pageKey: "careers",
   heroTitle: "Join Our Team",
   heroSubtitle: "Build your career with us",
+  hero: {
+    title: "Join Our Team",
+    description: "Build your career with us. We believe in fostering creativity, collaboration, and continuous growth.",
+    image: "",
+  },
   culture: {
     title: "Our Culture",
     description: "We believe in fostering creativity, collaboration, and continuous growth.",
@@ -446,6 +476,8 @@ export const defaultContactContent = {
   hero: {
     title: "Let's Work Together",
     subtitle: "Get in touch with us",
+    description: "Get in touch with us. We'd love to hear about your project and how we can help.",
+    image: "/contact-hero-bg.jpg",
     backgroundImage: "/contact-hero-bg.jpg",
   },
   form: {
@@ -468,6 +500,8 @@ export const defaultInsightsContent = {
   hero: {
     title: "Insights & Resources",
     subtitle: "Expert perspectives on branding, marketing, and digital transformation.",
+    description: "Expert perspectives on branding, marketing, and digital transformation.",
+    image: "",
   },
   posts: [
     {
@@ -520,6 +554,8 @@ export const defaultTestimonialsContent = {
   hero: {
     title: "What Our Clients Say",
     subtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
+    description: "Don't just take our word for it. Hear from the brands we've helped transform.",
+    image: "",
   },
   testimonials: [
     {
@@ -566,6 +602,8 @@ export const defaultClientsContent = {
   hero: {
     title: "Our Clients",
     subtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
+    description: "Trusted by industry leaders worldwide to deliver exceptional results.",
+    image: "",
   },
   clients: [
     { id: "1", name: "TechCorp", logo: "/tech-company-logo.jpg", industry: "Technology" },
@@ -608,6 +646,32 @@ export const defaultHeaderContent = {
   ctaButton: { text: "Start a project", href: "/contact" },
   showTopBar: false,
   topBarText: "",
+}
+
+export const defaultSettingsContent = {
+  pageKey: "settings",
+  siteName: "SJ Media Labs",
+  siteTagline: "Igniting Brilliance",
+  metaTitle: "SJ Media Labs - Full-Service Creative Agency",
+  metaDescription: "Transforming brands through innovative design, compelling storytelling, and strategic marketing.",
+  address: "",
+  phone: "",
+  email: "support@sjmedialabs.com",
+  copyright: "© 2025 SJ Media Labs. All rights reserved.",
+  socialMedia: { facebook: "", twitter: "", instagram: "", linkedin: "", youtube: "" },
+}
+
+export const defaultSeoContent = {
+  pageKey: "seo",
+  globalTitle: "SJ Media Labs | Transform Your Brand",
+  globalDescription: "Strategic brand development, identity design, and brand management.",
+  siteName: "SJ Media Labs",
+  siteTagline: "Transform Your Brand",
+  favicon: "/favicon.ico",
+  ogImage: "/og-image.jpg",
+  twitterHandle: "",
+  googleAnalyticsId: "",
+  pages: [] as Array<{ path: string; title: string; description: string }>,
 }
 
 export function getDefaultPageContent(page: string) {

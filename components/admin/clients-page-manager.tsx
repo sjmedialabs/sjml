@@ -15,12 +15,15 @@ interface Client {
 interface ClientsData {
   heroTitle: string
   heroSubtitle: string
+  heroImage?: string
+  hero?: { title: string; subtitle?: string; description?: string; image?: string }
   clients: Client[]
 }
 
 const defaultData: ClientsData = {
   heroTitle: "Our Clients",
   heroSubtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
+  heroImage: "",
   clients: [],
 }
 
@@ -38,7 +41,14 @@ export function ClientsPageManager() {
       const res = await fetch("/api/content/clients")
       if (res.ok) {
         const fetchedData = await res.json()
-        setData({ ...defaultData, ...fetchedData })
+        const hero = fetchedData.hero || {}
+        setData({
+          ...defaultData,
+          ...fetchedData,
+          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
+          heroSubtitle: hero.description ?? hero.subtitle ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
+          heroImage: hero.image ?? fetchedData.heroImage ?? "",
+        })
       }
     } catch (error) {
       console.error("Failed to fetch clients data")
@@ -49,13 +59,21 @@ export function ClientsPageManager() {
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
+      const payload = {
+        ...data,
+        hero: {
+          title: data.heroTitle,
+          description: data.heroSubtitle,
+          image: data.heroImage ?? data.hero?.image ?? "",
+        },
+      }
       const res = await fetch("/api/content/clients", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         setMessage("Clients saved successfully!")
@@ -101,25 +119,30 @@ export function ClientsPageManager() {
       {/* Hero Section */}
       <div className="admin-card border admin-border rounded-xl p-6 mb-6">
         <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Title</label>
             <input
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
             />
           </div>
           <div>
-            <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
-            <input
-              type="text"
+            <label className="block text-sm admin-text-secondary mb-2">Description</label>
+            <textarea
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+              rows={3}
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
             />
           </div>
+          <ImageUpload
+            label="Hero Background Image"
+            value={data.heroImage ?? ""}
+            onChange={(url) => setData({ ...data, heroImage: url })}
+          />
         </div>
       </div>
 

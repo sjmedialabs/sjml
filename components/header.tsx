@@ -88,8 +88,8 @@ export function Header({ data: propData }: HeaderProps = {}) {
   }
 
   const navLinks = headerData.navItems?.map((item) => ({ name: item.label, href: item.href })) || []
-  const logoText = headerData.logoText || "SJ MEDIA LABS"
-  const ctaText = headerData.ctaButton?.text || "Start a project"
+  const logoText = headerData.logoText ?? ""
+  const ctaText = headerData.ctaButton?.text ?? ""
 
   return (
     <>

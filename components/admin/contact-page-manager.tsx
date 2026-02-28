@@ -160,18 +160,18 @@ export function ContactPageManager() {
               />
             </div>
             <div>
-              <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description / Subtitle</label>
               <textarea
-                value={data.hero.subtitle}
-                onChange={(e) => setData({ ...data, hero: { ...data.hero, subtitle: e.target.value } })}
+                value={data.hero.description ?? data.hero.subtitle ?? ""}
+                onChange={(e) => setData({ ...data, hero: { ...data.hero, description: e.target.value, subtitle: e.target.value } })}
                 rows={3}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <ImageUpload
-              label="Background Image"
-              value={data.hero.backgroundImage}
-              onChange={(url) => setData({ ...data, hero: { ...data.hero, backgroundImage: url } })}
+              label="Hero Background Image"
+              value={data.hero.backgroundImage ?? (data.hero as any).image ?? ""}
+              onChange={(url) => setData({ ...data, hero: { ...data.hero, backgroundImage: url, image: url } })}
             />
           </div>
         )}

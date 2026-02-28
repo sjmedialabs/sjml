@@ -10,6 +10,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
+import { PageHero } from "@/components/page-hero"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -52,41 +53,15 @@ export default async function ServicesPage() {
 
   const hero = content.hero
   const section = content.section
+  const heroImage = hero.image || hero.backgroundImage || ""
+  const heroTitle = hero.title || ""
+  const heroDescription = hero.description || ""
 
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[450px] overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src={hero.backgroundImage || "/business-people-working-on-laptops-hands-typing-pr.jpg"}
-            alt="Services background"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none">
-            <span className="text-[200px] font-bold text-foreground/5 tracking-wider">{hero.watermark || "SERVICES"}</span>
-          </div>
-        </div>
-
-        <div className="relative h-full flex items-center justify-center">
-          <div className="text-center px-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
-              <span className="text-foreground">Redefining Digital </span>
-              <span className="text-[#E63946]">Success</span>
-              <br />
-              <span className="text-foreground">with </span>
-              <span className="text-[#E63946]">Strategy, Design</span>
-              <span className="text-foreground">,</span>
-              <br />
-              <span className="text-foreground">and Development</span>
-            </h1>
-          </div>
-        </div>
-      </section>
+      <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
       {/* Services Grid Section */}
       <section className="py-20 px-4 bg-background">

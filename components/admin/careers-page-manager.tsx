@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { ImageUpload } from "./image-upload"
 
 interface JobPosting {
   id: string
@@ -18,6 +19,8 @@ interface JobPosting {
 interface CareersData {
   heroTitle: string
   heroSubtitle: string
+  heroImage?: string
+  hero?: { title: string; description: string; image: string }
   culture: {
     title: string
     description: string
@@ -56,7 +59,14 @@ export function CareersPageManager() {
       const res = await fetch("/api/content/careers")
       if (res.ok) {
         const fetchedData = await res.json()
-        setData({ ...defaultData, ...fetchedData })
+        const hero = fetchedData.hero || {}
+        setData({
+          ...defaultData,
+          ...fetchedData,
+          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
+          heroSubtitle: hero.description ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
+          heroImage: hero.image ?? fetchedData.heroImage ?? "",
+        })
       }
     } catch (error) {
       console.error("Failed to fetch careers data")
@@ -67,13 +77,21 @@ export function CareersPageManager() {
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
+      const payload = {
+        ...data,
+        hero: {
+          title: data.heroTitle,
+          description: data.heroSubtitle,
+          image: data.heroImage ?? data.hero?.image ?? "",
+        },
+      }
       const res = await fetch("/api/content/careers", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         setMessage("Careers page saved successfully!")
@@ -148,18 +166,23 @@ export function CareersPageManager() {
                 type="text"
                 value={data.heroTitle}
                 onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
               />
             </div>
             <div>
-              <label className="block text-sm admin-text-secondary mb-2">Subtitle</label>
+              <label className="block text-sm admin-text-secondary mb-2">Description</label>
               <textarea
                 value={data.heroSubtitle}
                 onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
               />
             </div>
+            <ImageUpload
+              label="Hero Background Image"
+              value={data.heroImage ?? data.hero?.image ?? ""}
+              onChange={(url) => setData({ ...data, heroImage: url })}
+            />
           </div>
         </div>
       )}

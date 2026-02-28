@@ -8,12 +8,14 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Image from "next/image";
 import { getPageContent } from "@/lib/models/content";
+import { PageHero } from "@/components/page-hero";
 
 interface AboutData {
-  heroTitle: string;
-  heroSubtitle: string;
-  heroDescription: string;
-  heroImage: string;
+  hero?: { title?: string; description?: string; image?: string };
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroDescription?: string;
+  heroImage?: string;
   heroBackgroundImage?: string;
   about?: {
     badge?: string;
@@ -95,75 +97,56 @@ export default async function AboutPage() {
     );
   }
 
+  const heroTitle = data.hero?.title || data.heroTitle || "";
+  const heroDescription = data.hero?.description || data.heroDescription || data.heroSubtitle || "";
+  const heroImage = data.hero?.image || data.heroBackgroundImage || "";
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 relative overflow-hidden bg-background">
-        {data.heroBackgroundImage && (
-          <>
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-              style={{ backgroundImage: `url(${data.heroBackgroundImage})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black" />
-          </>
-        )}
-        <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-            {data.heroTitle ||
-              "We are Creative Thinkers, Problem Solvers & Exceptional Communicators"}
-          </h1>
-        </div>
-      </section>
+      <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
-      {/* About Us Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
-          <div className="relative">
-            {data.about?.image && (
-              <Image
-                src={data.about.image}
-                alt="Our Team"
-                width={500}
-                height={400}
-                className="rounded-2xl w-full"
-              />
-            )}
-          </div>
-          <div>
-            <p className="text-[#E63946] text-sm mb-2">About Us</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              A team of{" "}
-              <span className="text-[#E63946]">
-                creative
-                <br />
-                thinkers
-              </span>
-            </h2>
-            {data.about?.description &&
-              typeof data.about.description === "string" && (
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  {data.about.description}
-                </p>
+      {/* About Us Section - only when about content exists in DB */}
+      {(data.about?.image || data.about?.title || data.about?.description || (data.about?.values && data.about.values.length > 0)) && (
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+            <div className="relative">
+              {data.about?.image && (
+                <Image
+                  src={data.about.image}
+                  alt="Our Team"
+                  width={500}
+                  height={400}
+                  className="rounded-2xl w-full"
+                />
               )}
-            {data.about?.values && data.about.values.length > 0 && (
-              <ul className="space-y-3">
-                {data.about.values.map((value, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center gap-3 text-muted-foreground"
-                  >
-                    <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
-                    {value.title}
-                  </li>
-                ))}
-              </ul>
-            )}
+            </div>
+            <div>
+              {data.about?.badge && <p className="text-[#E63946] text-sm mb-2">{data.about.badge}</p>}
+              {(data.about?.title || data.about?.highlightedTitle) && (
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                  {data.about.title || ""}{" "}
+                  {data.about.highlightedTitle && <span className="text-[#E63946]">{data.about.highlightedTitle}</span>}
+                </h2>
+              )}
+              {data.about?.description && typeof data.about.description === "string" && (
+                <p className="text-muted-foreground mb-6 leading-relaxed">{data.about.description}</p>
+              )}
+              {data.about?.values && data.about.values.length > 0 && (
+                <ul className="space-y-3">
+                  {data.about.values.map((value, index) => (
+                    <li key={index} className="flex items-center gap-3 text-muted-foreground">
+                      <span className="w-2 h-2 bg-[#E63946] rounded-full"></span>
+                      {value.title}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Description & Stats */}
       <section className="py-16 px-4">
@@ -189,15 +172,16 @@ export default async function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-12">
             <div>
-              <p className="text-muted-foreground text-sm mb-2">
-                {data.achievementsSection?.badge || "Our Achievements"}
-              </p>
+              {data.achievementsSection?.badge && (
+                <p className="text-muted-foreground text-sm mb-2">{data.achievementsSection.badge}</p>
+              )}
               <h2 className="text-3xl font-bold text-foreground mb-4">
-                {data.achievementsSection?.title || "proud moments"}
-                <br />&{" "}
-                <span className="text-[#E63946]">
-                  {data.achievementsSection?.highlightedTitle || "milestones"}
-                </span>
+                {data.achievementsSection?.title || ""}
+                {data.achievementsSection?.highlightedTitle && (
+                  <>
+                    <br />& <span className="text-[#E63946]">{data.achievementsSection.highlightedTitle}</span>
+                  </>
+                )}
               </h2>
               {data.achievementsSection?.description &&
                 typeof data.achievementsSection.description === "string" && (
@@ -205,9 +189,11 @@ export default async function AboutPage() {
                     {data.achievementsSection.description}
                   </p>
                 )}
-              <button className="px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
-                {data.achievementsSection?.buttonText || "Let's discuss →"}
-              </button>
+              {data.achievementsSection?.buttonText && (
+                <a href="/contact" className="inline-block px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
+                  {data.achievementsSection.buttonText}
+                </a>
+              )}
             </div>
             {data.achievements && data.achievements.length > 0 && (
               <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
@@ -241,16 +227,10 @@ export default async function AboutPage() {
             )}
           </div>
           <div>
-            <p className="text-[#E63946] text-sm mb-2">
-              {data.vision?.badge || "Our Vision"}
-            </p>
+            {data.vision?.badge && <p className="text-[#E63946] text-sm mb-2">{data.vision.badge}</p>}
             <h2 className="text-3xl font-bold text-foreground mb-6">
-              {data.vision?.title || "Driving the"}
-              <br />
-              {data.vision?.title?.includes("Future") ? "Future of" : ""}{" "}
-              <span className="text-[#E63946]">
-                {data.vision?.highlightedTitle || "Creativity"}
-              </span>
+              {data.vision?.title || ""}{" "}
+              {data.vision?.highlightedTitle && <span className="text-[#E63946]">{data.vision.highlightedTitle}</span>}
             </h2>
             {data.vision?.description &&
               typeof data.vision.description === "string" && (
@@ -279,16 +259,10 @@ export default async function AboutPage() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-[#E63946] text-sm mb-2">
-              {data.mission?.badge || "Our Mission"}
-            </p>
+            {data.mission?.badge && <p className="text-[#E63946] text-sm mb-2">{data.mission.badge}</p>}
             <h2 className="text-3xl font-bold text-foreground mb-6">
-              {data.mission?.title || "Bringing ideas to"}
-              <br />
-              {data.mission?.title?.includes("life") ? "life through" : ""}{" "}
-              <span className="text-[#E63946]">
-                {data.mission?.highlightedTitle || "creativity"}
-              </span>
+              {data.mission?.title || ""}{" "}
+              {data.mission?.highlightedTitle && <span className="text-[#E63946]">{data.mission.highlightedTitle}</span>}
             </h2>
             {data.mission?.description && (
               typeof data.mission.description === "string" ? (

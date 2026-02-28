@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer"
 import { Briefcase, MapPin, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { getPageContent, type CareersPageData } from "@/lib/models/content"
+import { PageHero } from "@/components/page-hero"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -30,27 +31,16 @@ export default async function CareersPage() {
   // Filter only published jobs
   const publishedJobs = data.jobs?.filter((job: any) => job.published) || []
 
+  const hero = data.hero
+  const heroTitle = hero?.title || data.heroTitle || ""
+  const heroDescription = hero?.description || data.heroSubtitle || ""
+  const heroImage = hero?.image || ""
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 relative">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
-            {data.heroTitle.split(" ").map((word, i) =>
-              word.toLowerCase() === "team" ? (
-                <span key={i} className="text-[#E63946]">
-                  {word}{" "}
-                </span>
-              ) : (
-                word + " "
-              ),
-            )}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">{data.heroSubtitle}</p>
-        </div>
-      </section>
+      <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
       {/* Culture Section */}
       <section className="py-16 px-4 bg-background">

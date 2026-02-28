@@ -1,5 +1,12 @@
 import { getCollection, type ObjectId } from "@/lib/mongodb"
 
+/** Unified hero section for all inner pages (About, Work, Services, etc.). Stored in DB. */
+export interface PageHeroData {
+  title: string
+  description: string
+  image: string
+}
+
 // Interfaces
 export interface ContentData {
   _id?: ObjectId
@@ -79,6 +86,11 @@ export interface ContentData {
     email: string
     copyright: string
     newsletterText: string
+    companyLinks?: Array<{ name: string; href: string }>
+    serviceLinks?: Array<{ name: string; href: string }>
+    socialLinks?: { facebook?: string; instagram?: string; linkedin?: string; twitter?: string; youtube?: string }
+    siteName?: string
+    siteTagline?: string
   }
   settings: {
     siteName: string
@@ -105,9 +117,12 @@ export interface AboutPageData {
   heroDescription?: string
   heroImage?: string
   heroBackgroundImage?: string
+  /** Unified hero (title, description, image) - used by PageHero. Preferred over heroTitle/heroBackgroundImage. */
   hero: {
     title: string
-    highlightedText: string
+    description: string
+    image: string
+    highlightedText?: string
   }
   about: {
     badge: string
@@ -155,8 +170,9 @@ export interface WorkPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
     description: string
+    image?: string
   }
   portfolio: {
     title: string
@@ -189,9 +205,11 @@ export interface ServicesPageData {
   pageKey: string
   hero: {
     title: string
-    highlightedWords: string[]
-    backgroundImage: string
-    watermark: string
+    description?: string
+    image?: string
+    highlightedWords?: string[]
+    backgroundImage?: string
+    watermark?: string
   }
   section: {
     title: string
@@ -223,8 +241,9 @@ export interface CaseStudiesPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
     description: string
+    image?: string
   }
   section: {
     title: string
@@ -248,8 +267,14 @@ export interface CaseStudiesPageData {
 export interface CareersPageData {
   _id?: ObjectId
   pageKey: string
-  heroTitle: string
-  heroSubtitle: string
+  heroTitle?: string
+  heroSubtitle?: string
+  /** Unified hero (title, description, image) - used by PageHero. */
+  hero?: {
+    title: string
+    description: string
+    image: string
+  }
   culture: {
     title: string
     description: string
@@ -275,8 +300,10 @@ export interface ContactPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
-    backgroundImage: string
+    subtitle?: string
+    description?: string
+    image?: string
+    backgroundImage?: string
   }
   form: {
     badge: string
@@ -302,7 +329,9 @@ export interface InsightsPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
+    description?: string
+    image?: string
   }
   posts: Array<{
     id: string
@@ -329,7 +358,9 @@ export interface TestimonialsPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
+    description?: string
+    image?: string
   }
   testimonials: Array<{
     id: string
@@ -354,7 +385,9 @@ export interface ClientsPageData {
   pageKey: string
   hero: {
     title: string
-    subtitle: string
+    subtitle?: string
+    description?: string
+    image?: string
   }
   clients: Array<{
     id: string

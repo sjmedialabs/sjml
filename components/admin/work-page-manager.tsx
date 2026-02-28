@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, Star } from "lucide-react"
 
+interface WorkPageHero {
+  title: string
+  description: string
+  image: string
+}
+
 interface WorkItem {
   id: string
   slug: string
@@ -64,13 +70,80 @@ export function WorkPageManager() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [view, setView] = useState<"list" | "edit">("list")
+  const [view, setView] = useState<"list" | "edit" | "hero">("list")
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
   const [isNew, setIsNew] = useState(false)
+  const [pageContent, setPageContent] = useState<{ hero?: WorkPageHero; portfolio?: any } | null>(null)
+  const [heroData, setHeroData] = useState<WorkPageHero>({
+    title: "Elevate Beyond the Ordinary.",
+    description: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
+    image: "",
+  })
+  const [heroSaving, setHeroSaving] = useState(false)
 
   useEffect(() => {
     fetchWorks()
   }, [pagination.page])
+
+  useEffect(() => {
+    if (view === "hero") fetchWorkPageContent()
+  }, [view])
+
+  const fetchWorkPageContent = async () => {
+    try {
+      const res = await fetch("/api/content/work")
+      if (res.ok) {
+        const data = await res.json()
+        setPageContent(data)
+        const hero = data?.hero || {}
+        setHeroData({
+          title: hero.title || "Elevate Beyond the Ordinary.",
+          description: hero.description || hero.subtitle || "",
+          image: hero.image || "",
+        })
+      }
+    } catch {
+      console.error("Failed to fetch work page content")
+    }
+  }
+
+  const saveHero = async () => {
+    setHeroSaving(true)
+    try {
+      let content = pageContent
+      if (!content) {
+        const r = await fetch("/api/content/work")
+        if (r.ok) content = await r.json()
+      }
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch("/api/content/work", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          pageKey: "work",
+          ...content,
+          hero: {
+            ...content?.hero,
+            title: heroData.title,
+            description: heroData.description,
+            image: heroData.image,
+          },
+        }),
+      })
+      if (res.ok) {
+        setMessage("Hero saved successfully!")
+        setTimeout(() => setMessage(""), 3000)
+      } else {
+        setMessage("Failed to save hero")
+      }
+    } catch {
+      setMessage("Failed to save hero")
+    }
+    setHeroSaving(false)
+  }
 
   const fetchWorks = async () => {
     setLoading(true)
@@ -162,6 +235,56 @@ export function WorkPageManager() {
       w.category?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  // Hero View
+  if (view === "hero") {
+    return (
+      <div>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold admin-text-primary mb-2">Work Page Hero</h1>
+            <p className="admin-text-secondary">Edit the hero section (title, description, image) shown on the Work page.</p>
+          </div>
+          <Button variant="outline" onClick={() => setView("list")} className="admin-border">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to list
+          </Button>
+        </div>
+        {message && (
+          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
+        )}
+        <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Title</label>
+            <Input
+              value={heroData.title}
+              onChange={(e) => setHeroData({ ...heroData, title: e.target.value })}
+              className="admin-input"
+              placeholder="Elevate Beyond the Ordinary."
+            />
+          </div>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Description</label>
+            <Textarea
+              value={heroData.description}
+              onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
+              rows={4}
+              className="admin-input"
+              placeholder="We're a creative agency dedicated to design..."
+            />
+          </div>
+          <ImageUpload
+            label="Hero Background Image"
+            value={heroData.image}
+            onChange={(url) => setHeroData({ ...heroData, image: url })}
+          />
+          <Button onClick={saveHero} disabled={heroSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">
+            {heroSaving ? "Saving..." : "Save Hero"}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   // List View
   if (view === "list") {
     return (
@@ -171,9 +294,14 @@ export function WorkPageManager() {
             <h1 className="text-2xl font-bold admin-text-primary mb-2">Portfolio / Works Management</h1>
             <p className="admin-text-secondary">Create and manage your portfolio projects. Each work has its own detail page.</p>
           </div>
-          <Button onClick={addNewWork} className="bg-[#E63946] hover:bg-[#d32f3d]">
-            <Plus className="w-4 h-4 mr-2" /> Add Work
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setView("hero")} className="admin-border">
+              Edit Page Hero
+            </Button>
+            <Button onClick={addNewWork} className="bg-[#E63946] hover:bg-[#d32f3d]">
+              <Plus className="w-4 h-4 mr-2" /> Add Work
+            </Button>
+          </div>
         </div>
 
         {message && (

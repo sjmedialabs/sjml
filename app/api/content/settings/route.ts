@@ -11,26 +11,9 @@ export async function GET() {
     const settingsData = await collection.findOne({ pageKey: "settings" })
     
     if (!settingsData) {
-      // Return default settings if not found
-      return NextResponse.json({
-        siteName: "SJ Media Labs",
-        siteTagline: "Transform Your Brand",
-        metaTitle: "SJ Media Labs | Transform Your Brand",
-        metaDescription: "Strategic brand development, identity design, and brand management.",
-        contactEmail: "info@sjmedialabs.com",
-        contactPhone: "+91 1234567890",
-        socialMedia: {
-          facebook: "",
-          twitter: "@sjmedialabs",
-          instagram: "",
-          linkedin: "",
-          youtube: ""
-        },
-        businessHours: "Mon-Fri: 9:00 AM - 6:00 PM",
-        address: "Hyderabad, India"
-      })
+      return NextResponse.json({ error: "Settings not found. Configure in admin." }, { status: 404 })
     }
-    
+
     return NextResponse.json(settingsData)
   } catch (error) {
     console.error("Get settings error:", error)

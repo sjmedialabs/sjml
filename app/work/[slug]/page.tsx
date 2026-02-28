@@ -132,7 +132,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-3xl font-bold text-[#E63946] mb-6">{work.overview.title || "Brand Overview"}</h2>
+              {work.overview.title && <h2 className="text-3xl font-bold text-[#E63946] mb-6">{work.overview.title}</h2>}
             </div>
             <div>
               {work.overview.description && (

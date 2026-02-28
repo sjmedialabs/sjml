@@ -23,6 +23,9 @@ interface CaseStudy {
 interface CaseStudiesData {
   heroTitle: string
   heroSubtitle: string
+  heroImage?: string
+  hero?: { title: string; subtitle?: string; description?: string; image?: string }
+  section?: { title: string; description: string }
   categories: string[]
   caseStudies: CaseStudy[]
 }
@@ -31,6 +34,8 @@ const defaultData: CaseStudiesData = {
   heroTitle: "Case Studies",
   heroSubtitle:
     "Discover how we've helped brands achieve extraordinary results through innovative strategies and creative execution.",
+  heroImage: "",
+  section: { title: "Our Case Studies", description: "Real results for real businesses." },
   categories: ["All", "Branding", "Digital Marketing", "Web Development", "Advertising"],
   caseStudies: [],
 }
@@ -48,10 +53,18 @@ export function CaseStudiesPageManager() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/content/case-studies-page")
+      const res = await fetch("/api/content/case-studies")
       if (res.ok) {
         const fetchedData = await res.json()
-        setData({ ...defaultData, ...fetchedData })
+        const hero = fetchedData.hero || {}
+        setData({
+          ...defaultData,
+          ...fetchedData,
+          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
+          heroSubtitle: hero.description ?? hero.subtitle ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
+          heroImage: hero.image ?? fetchedData.heroImage ?? "",
+          section: fetchedData.section ?? defaultData.section,
+        })
       }
     } catch (error) {
       console.error("Failed to fetch case studies data")
@@ -62,13 +75,24 @@ export function CaseStudiesPageManager() {
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
-      const res = await fetch("/api/content/case-studies-page", {
+      const payload = {
+        pageKey: "case-studies",
+        hero: {
+          title: data.heroTitle,
+          description: data.heroSubtitle,
+          image: data.heroImage ?? data.hero?.image ?? "",
+        },
+        section: data.section ?? defaultData.section,
+        categories: data.categories,
+        caseStudies: data.caseStudies,
+      }
+      const res = await fetch("/api/content/case-studies", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         setMessage("Case studies saved successfully!")
@@ -121,6 +145,36 @@ export function CaseStudiesPageManager() {
       {message && (
         <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
       )}
+
+      {/* Hero Section */}
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Title</label>
+            <input
+              type="text"
+              value={data.heroTitle}
+              onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Description</label>
+            <textarea
+              value={data.heroSubtitle}
+              onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+            />
+          </div>
+          <ImageUpload
+            label="Hero Background Image"
+            value={data.heroImage ?? ""}
+            onChange={(url) => setData({ ...data, heroImage: url })}
+          />
+        </div>
+      </div>
 
       <div className="flex justify-between items-center mb-6">
         <div>

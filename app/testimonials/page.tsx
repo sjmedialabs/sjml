@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer"
 import Image from "next/image"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
+import { PageHero } from "@/components/page-hero"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -45,25 +46,13 @@ export default async function TestimonialsPage() {
 
   const hero = content.hero
   const cta = content.cta
+  const heroDescription = hero.description || hero.subtitle || ""
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="py-24 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            {hero.title.includes("Clients Say") ? (
-              <>
-                What Our <span className="text-[#E63946]">Clients Say</span>
-              </>
-            ) : (
-              hero.title
-            )}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">{hero.subtitle}</p>
-        </div>
-      </section>
+      <PageHero title={hero.title} description={heroDescription} image={hero.image} />
 
       {/* Testimonials Grid */}
       <section className="py-8 px-4">
