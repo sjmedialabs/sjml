@@ -75,37 +75,52 @@ export default async function ServicesPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            {services.map((service: any) => (
-              <div
-                key={service.id}
-                className="bg-background border border-border rounded-2xl p-6 hover:border-border transition-colors"
-              >
-                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mb-5 overflow-hidden">
-                  {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
-                    <Image
-                      src={service.icon}
-                      alt={service.title}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                      style={{
-                        filter: 'brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2255%) hue-rotate(337deg) brightness(91%) contrast(91%)'
-                      }}
-                    />
-                  ) : (
-                    <div className="w-8 h-8 bg-[#E63946] rounded" />
-                  )}
-                </div>
-                <h3 className="text-[#E63946] font-semibold text-lg mb-3">{service.title}</h3>
-                <p className="text-gray-500 text-sm mb-5 leading-relaxed">{service.description}</p>
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="text-[#E63946] text-sm font-medium hover:underline inline-flex items-center gap-2"
+            {services.map((service: any) => {
+              const iconSrc =
+                service.icon && (service.icon.startsWith("/") || service.icon.startsWith("http"))
+                  ? service.icon
+                  : service.icon
+                    ? "/icon.svg"
+                    : null
+              const imageSrc = service.image && (service.image.startsWith("/") || service.image.startsWith("http")) ? service.image : null
+              const hasVisual = iconSrc || imageSrc
+              return (
+                <div
+                  key={service.id || service._id || service.slug}
+                  className="bg-background border border-border rounded-2xl p-6 hover:border-border transition-colors"
                 >
-                  {service.linkText || ""} <span className="text-lg">→</span>
-                </Link>
-              </div>
-            ))}
+                  <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-5 overflow-hidden bg-secondary/50">
+                    {hasVisual ? (
+                      imageSrc ? (
+                        <Image
+                          src={imageSrc}
+                          alt={service.title}
+                          width={64}
+                          height={64}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <Image
+                          src={iconSrc!}
+                          alt={service.title}
+                          width={40}
+                          height={40}
+                          className="object-contain"
+                        />
+                      )
+                    ) : null}
+                  </div>
+                  <h3 className="text-[#E63946] font-semibold text-lg mb-3">{service.title}</h3>
+                  <p className="text-gray-500 text-sm mb-5 leading-relaxed">{service.description}</p>
+                  <Link
+                    href={`/services/${service.slug}`}
+                    className="text-[#E63946] text-sm font-medium hover:underline inline-flex items-center gap-2"
+                  >
+                    {service.linkText || "Read More"} <span className="text-lg">→</span>
+                  </Link>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
