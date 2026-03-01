@@ -27,10 +27,11 @@ export default async function TestimonialsPage() {
       throw new Error("Testimonials page content not found")
     }
     
-    // Serialize MongoDB _id
+    // Serialize MongoDB _id and ensure id for key
     testimonials = testimonialsData.map((t) => ({
       ...t,
-      _id: t._id.toString()
+      _id: t._id.toString(),
+      id: t._id.toString(),
     }))
   } catch (error) {
     console.error("Failed to fetch testimonials:", error)

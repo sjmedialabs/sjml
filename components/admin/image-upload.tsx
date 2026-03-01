@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useRef, useCallback } from "react"
 import Image from "next/image"
+import { uploadImageAction } from "@/app/actions/upload"
 
 interface ImageUploadProps {
   value: string
@@ -20,9 +21,9 @@ export function ImageUpload({
   onChange,
   label,
   className = "",
-  maxSizeMB = 2,
-  maxWidth = 1920,
-  maxHeight = 1080,
+  maxSizeMB = 10,
+  maxWidth = 4096,
+  maxHeight = 4096,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -68,23 +69,45 @@ export function ImageUpload({
       setError("")
       setUploading(true)
 
+      const formData = new FormData()
+      formData.append("file", file)
+
       try {
-        const formData = new FormData()
-        formData.append("file", file)
+        // Prefer Server Action so serverActions.bodySizeLimit (10mb) applies
+        const result = await uploadImageAction(formData)
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        })
-
-        if (res.ok) {
-          const data = await res.json()
-          onChange(data.url)
-        } else {
-          setError("Upload failed. Please try again.")
+        if (result.url) {
+          onChange(result.url)
+          setUploading(false)
+          return
         }
-      } catch {
-        setError("Upload failed. Please try again.")
+        // If action failed, try Route Handler (good fallback)
+        const fallbackForm = new FormData()
+        fallbackForm.append("file", file)
+        const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
+        const data = await res.json().catch(() => ({}))
+        if (res.ok && data.url) {
+          onChange(data.url)
+          setUploading(false)
+          return
+        }
+        setError(result?.error || data?.error || data?.detail || "Upload failed. Please try again.")
+      } catch (e) {
+        try {
+          const fallbackForm = new FormData()
+          fallbackForm.append("file", file)
+          const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
+          const data = await res.json().catch(() => ({}))
+          if (res.ok && data.url) {
+            onChange(data.url)
+            setUploading(false)
+            return
+          }
+          setError(data?.error || data?.detail || "Upload failed. Please try again.")
+        } catch {
+          const msg = e instanceof Error ? e.message : "Upload failed. Please try again."
+          setError(msg)
+        }
       }
 
       setUploading(false)
@@ -199,17 +222,6 @@ export function ImageUpload({
       </div>
 
       {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-
-      {/* URL Input Fallback */}
-      <div className="mt-2">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Or paste image URL..."
-          className="w-full px-3 py-2 admin-input rounded-lg  text-sm focus:outline-none focus:border-[#E63946]"
-        />
-      </div>
     </div>
   )
 }

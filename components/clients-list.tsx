@@ -37,8 +37,8 @@ export function ClientsList({ initialClients }: ClientsListProps) {
 
   return (
     <>
-      {/* Filters */}
-      <section className="px-4 pb-8">
+      {/* Filters - extra space below hero and above grid */}
+      <section className="px-4 pt-12 pb-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-wrap justify-center gap-3">
             {industries.map((industry) => (
@@ -58,8 +58,8 @@ export function ClientsList({ initialClients }: ClientsListProps) {
         </div>
       </section>
 
-      {/* Clients Grid */}
-      <section className="py-8 px-4">
+      {/* Clients Grid - space below tabs */}
+      <section className="pt-4 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredClients.map((client, index) => (

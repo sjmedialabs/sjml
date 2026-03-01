@@ -12,9 +12,11 @@ interface Partner {
 interface TrustedBySectionProps {
   data: Partner[]
   backgroundImage?: string
+  title?: string
+  description?: string
 }
 
-export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProps) {
+export function TrustedBySection({ data, backgroundImage, title, description }: TrustedBySectionProps) {
   if (!data || data.length === 0) {
     return null
   }
@@ -64,16 +66,12 @@ export function TrustedBySection({ data, backgroundImage }: TrustedBySectionProp
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Trusted by Industry Leaders</h2>
-          <p className="text-gray-400">Partnering with forward-thinking brands worldwide</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{title || "Trusted by Industry Leaders"}</h2>
+          <p className="text-gray-400">{description || "Partnering with forward-thinking brands worldwide"}</p>
         </div>
 
         {/* Carousel Container */}
         <div className="relative">
-          {/* Gradient Fades */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-
           {/* Scrolling Container */}
           <div
             ref={scrollRef}

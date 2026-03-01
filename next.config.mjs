@@ -9,6 +9,11 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   generateBuildId: async () => {
     return 'build-' + Date.now()
   },

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getCollection } from "@/lib/mongodb"
 
@@ -112,6 +113,9 @@ export async function PUT(request: NextRequest) {
       categories: ["All", "Branding", "Digital Marketing", "Web Development", "Advertising"],
       caseStudies: transformedStudies,
     }
+
+    revalidatePath("/")
+    revalidatePath("/case-studies")
 
     return NextResponse.json(responseData)
   } catch (error) {

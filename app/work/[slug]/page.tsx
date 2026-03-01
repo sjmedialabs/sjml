@@ -75,7 +75,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
+      {/* Hero Section - white text for visibility on all backgrounds */}
       <section className="pt-24 pb-16 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-gray-800/50 to-black">
           <Image src={work.image || "/placeholder.svg"} alt={work.title} fill className="object-cover opacity-30" />
@@ -87,7 +87,8 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
               {work.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="px-4 py-1.5 bg-transparent border border-[#444] rounded-full text-muted-foreground text-xs"
+                  className="px-4 py-1.5 bg-white/10 border border-white/40 rounded-full text-white text-xs"
+                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
                 >
                   {tag}
                 </span>
@@ -95,32 +96,37 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-12">{work.title}</h1>
+          <h1
+            className="text-4xl md:text-5xl font-bold text-white text-center mb-12"
+            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)" }}
+          >
+            {work.title}
+          </h1>
 
           {/* Meta Info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
             {work.industry && (
               <div className="text-center">
-                <p className="text-muted-foreground text-xs mb-1">Industry</p>
-                <p className="text-foreground text-sm">{work.industry}</p>
+                <p className="text-white/90 text-xs mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Industry</p>
+                <p className="text-white text-sm font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{work.industry}</p>
               </div>
             )}
             {work.role && (
               <div className="text-center">
-                <p className="text-muted-foreground text-xs mb-1">Role</p>
-                <p className="text-foreground text-sm">{work.role}</p>
+                <p className="text-white/90 text-xs mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Role</p>
+                <p className="text-white text-sm font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{work.role}</p>
               </div>
             )}
             {work.technology && (
               <div className="text-center">
-                <p className="text-muted-foreground text-xs mb-1">Technology</p>
-                <p className="text-foreground text-sm">{work.technology}</p>
+                <p className="text-white/90 text-xs mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Technology</p>
+                <p className="text-white text-sm font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{work.technology}</p>
               </div>
             )}
             {work.year && (
               <div className="text-center">
-                <p className="text-muted-foreground text-xs mb-1">Year</p>
-                <p className="text-foreground text-sm">{work.year}</p>
+                <p className="text-white/90 text-xs mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Year</p>
+                <p className="text-white text-sm font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{work.year}</p>
               </div>
             )}
           </div>

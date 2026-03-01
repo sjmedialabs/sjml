@@ -37,9 +37,11 @@ function DownloadIcon({ className }: { className?: string }) {
 interface PlaybookSectionProps {
   data: PlaybookData
   backgroundImage?: string
+  sectionTitle?: string
+  sectionDescription?: string
 }
 
-export function PlaybookSection({ data, backgroundImage }: PlaybookSectionProps) {
+export function PlaybookSection({ data, backgroundImage, sectionTitle, sectionDescription }: PlaybookSectionProps) {
   const playbook = data
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -58,8 +60,8 @@ export function PlaybookSection({ data, backgroundImage }: PlaybookSectionProps)
         )}
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{playbook.title}</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">{playbook.description}</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{sectionTitle || playbook.title}</h2>
+          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">{sectionDescription || playbook.description}</p>
           <Button
             onClick={handleDownloadClick}
             className="bg-[#E63946] hover:bg-[#d32f3d] text-foreground rounded-full px-8 py-6 text-lg"

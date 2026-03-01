@@ -93,7 +93,7 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
   return (
     <div className="flex min-h-screen admin-content-area">
       <AdminSidebar activeSection={activeSection} setActiveSection={handleSectionChange} />
-      <main className="admin-content-area flex-1">
+      <main className="admin-content-area flex-1 min-w-0 ml-64">
         <div className="p-8">{renderContent()}</div>
       </main>
     </div>

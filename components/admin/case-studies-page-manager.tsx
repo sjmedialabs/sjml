@@ -46,6 +46,7 @@ export function CaseStudiesPageManager() {
   const [message, setMessage] = useState("")
   const [editingStudy, setEditingStudy] = useState<CaseStudy | null>(null)
   const [activeTab, setActiveTab] = useState("basic")
+  const [modalError, setModalError] = useState("")
 
   useEffect(() => {
     fetchData()
@@ -53,7 +54,8 @@ export function CaseStudiesPageManager() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/content/case-studies")
+      // Use case-studies-page API so we read from the same case-studies collection the website uses (no static/separate source)
+      const res = await fetch("/api/content/case-studies-page")
       if (res.ok) {
         const fetchedData = await res.json()
         const hero = fetchedData.hero || {}
@@ -75,8 +77,9 @@ export function CaseStudiesPageManager() {
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
+      // Save to case-studies-page API so we write to the same case-studies collection the website uses
       const payload = {
-        pageKey: "case-studies",
+        caseStudies: data.caseStudies,
         hero: {
           title: data.heroTitle,
           description: data.heroSubtitle,
@@ -84,9 +87,8 @@ export function CaseStudiesPageManager() {
         },
         section: data.section ?? defaultData.section,
         categories: data.categories,
-        caseStudies: data.caseStudies,
       }
-      const res = await fetch("/api/content/case-studies", {
+      const res = await fetch("/api/content/case-studies-page", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +119,7 @@ export function CaseStudiesPageManager() {
       results: [],
       image: "/placeholder.svg?height=400&width=600",
       gallery: [],
-      stats: [{ label: "Growth", value: "250%" }],
+      stats: [],
       testimonial: { quote: "", author: "", role: "" },
       featured: false,
     }
@@ -244,7 +246,7 @@ export function CaseStudiesPageManager() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          setEditingStudy(study)
+                          setEditingStudy(study); setModalError("")
                           setActiveTab("basic")
                         }}
                         className="admin-text-secondary hover:admin-text-primary px-2 py-1 text-sm"
@@ -269,24 +271,28 @@ export function CaseStudiesPageManager() {
       {/* Edit Modal */}
       {editingStudy && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="admin-card border admin-border rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold admin-text-primary">Edit Case Study</h2>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Edit Case Study</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => deleteCaseStudy(editingStudy.id)}
-                  className="text-red-500 hover:text-red-400 text-sm px-3 py-1"
+                  className="text-red-600 hover:text-red-700 text-sm px-3 py-1"
                 >
                   Delete
                 </button>
                 <button
-                  onClick={() => setEditingStudy(null)}
-                  className="admin-text-secondary hover:admin-text-primary text-sm px-3 py-1"
+                  onClick={() => { setEditingStudy(null); setModalError("") }}
+                  className="text-gray-600 hover:text-gray-900 text-sm px-3 py-1"
                 >
                   Close
                 </button>
               </div>
             </div>
+            <div className="p-6 overflow-auto flex-1">
+            {modalError && (
+              <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{modalError}</p>
+            )}
 
               {/* Tabs */}
               <div className="flex gap-2 mb-4">
@@ -295,7 +301,7 @@ export function CaseStudiesPageManager() {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1.5 rounded text-sm capitalize ${
-                      activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-tertiary admin-text-secondary"
+                      activeTab === tab ? "bg-[#E63946] text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                   >
                     {tab}
@@ -308,35 +314,36 @@ export function CaseStudiesPageManager() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm admin-text-secondary mb-2">Title</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Title <span className="text-red-500">*</span></label>
                         <input
                           type="text"
                           value={editingStudy.title}
-                          onChange={(e) => updateCaseStudy({ ...editingStudy, title: e.target.value })}
-                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                          onChange={(e) => { updateCaseStudy({ ...editingStudy, title: e.target.value }); setModalError("") }}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946] focus:ring-1 focus:ring-[#E63946]"
+                          placeholder="Required"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm admin-text-secondary mb-2">Client</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Client</label>
                         <input
                           type="text"
                           value={editingStudy.client}
                           onChange={(e) => updateCaseStudy({ ...editingStudy, client: e.target.value })}
-                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Industry</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
                       <input
                         type="text"
                         value={editingStudy.industry}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Tags (comma separated)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
                       <input
                         type="text"
                         value={editingStudy.tags.join(", ")}
@@ -349,7 +356,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <ImageUpload
@@ -357,7 +364,7 @@ export function CaseStudiesPageManager() {
                       value={editingStudy.image}
                       onChange={(url) => updateCaseStudy({ ...editingStudy, image: url })}
                     />
-                    <label className="flex items-center gap-2 text-sm admin-text-secondary">
+                    <label className="flex items-center gap-2 text-sm text-gray-700">
                       <input
                         type="checkbox"
                         checked={editingStudy.featured}
@@ -372,34 +379,34 @@ export function CaseStudiesPageManager() {
                 {activeTab === "content" && (
                   <>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Description</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                       <textarea
                         value={editingStudy.description}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, description: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Challenge</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Challenge</label>
                       <textarea
                         value={editingStudy.challenge}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, challenge: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Solution</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Solution</label>
                       <textarea
                         value={editingStudy.solution}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, solution: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Results (comma separated)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Results (comma separated)</label>
                       <input
                         type="text"
                         value={editingStudy.results.join(", ")}
@@ -412,7 +419,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                   </>
@@ -422,7 +429,7 @@ export function CaseStudiesPageManager() {
                   <>
                     <div className="space-y-3">
                       {editingStudy.stats.map((stat, idx) => (
-                        <div key={idx} className="grid grid-cols-2 gap-4 p-3 admin-bg-tertiary rounded-lg">
+                        <div key={idx} className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-lg">
                           <input
                             type="text"
                             value={stat.label}
@@ -432,7 +439,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Label"
-                            className="px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
+                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-[#E63946]"
                           />
                           <input
                             type="text"
@@ -443,7 +450,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Value"
-                            className="px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
+                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-[#E63946]"
                           />
                         </div>
                       ))}
@@ -451,7 +458,7 @@ export function CaseStudiesPageManager() {
                         onClick={() =>
                           updateCaseStudy({ ...editingStudy, stats: [...editingStudy.stats, { label: "", value: "" }] })
                         }
-                        className="text-[#E63946] text-sm"
+                        className="text-[#E63946] text-sm hover:underline"
                       >
                         + Add Stat
                       </button>
@@ -462,7 +469,7 @@ export function CaseStudiesPageManager() {
                 {activeTab === "testimonial" && (
                   <>
                     <div>
-                      <label className="block text-sm admin-text-secondary mb-2">Quote</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Quote</label>
                       <textarea
                         value={editingStudy.testimonial.quote}
                         onChange={(e) =>
@@ -472,12 +479,12 @@ export function CaseStudiesPageManager() {
                           })
                         }
                         rows={3}
-                        className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm admin-text-secondary mb-2">Author</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
                         <input
                           type="text"
                           value={editingStudy.testimonial.author}
@@ -487,11 +494,11 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, author: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm admin-text-secondary mb-2">Role</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
                         <input
                           type="text"
                           value={editingStudy.testimonial.role}
@@ -501,13 +508,36 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, role: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
                         />
                       </div>
                     </div>
                   </>
                 )}
               </div>
+            </div>
+            <div className="flex justify-end gap-2 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+              <button
+                onClick={() => { setEditingStudy(null); setModalError("") }}
+                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const title = editingStudy.title?.trim()
+                  if (!title) {
+                    setModalError("Title is required.")
+                    return
+                  }
+                  setModalError("")
+                  setEditingStudy(null)
+                }}
+                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -304,52 +304,52 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <p className="text-[#E63946] text-sm mb-2">
-                {data.team?.badge || "Our Team"}
-              </p>
-              <h2 className="text-3xl font-bold text-foreground">
-                {data.team?.title || "The minds behind the"}{" "}
-                <span className="text-[#E63946]">
-                  {data.team?.highlightedTitle || "magic"}
-                </span>
-              </h2>
+      {/* Team Section - content from admin only */}
+      {data.team && (data.team.members?.length > 0 || data.team.badge || data.team.title) && (
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                {data.team.badge && <p className="text-[#E63946] text-sm mb-2">{data.team.badge}</p>}
+                {(data.team.title || data.team.highlightedTitle) && (
+                  <h2 className="text-3xl font-bold text-foreground">
+                    {data.team.title || ""}{" "}
+                    {data.team.highlightedTitle && <span className="text-[#E63946]">{data.team.highlightedTitle}</span>}
+                  </h2>
+                )}
+              </div>
+              {data.team.buttonText && (
+                <a href="/contact" className="inline-block px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
+                  {data.team.buttonText}
+                </a>
+              )}
             </div>
-            <button className="px-6 py-3 bg-[#E63946] text-foreground rounded-full text-sm hover:bg-[#d62839] transition-colors">
-              {data.team?.buttonText || "All Team Members →"}
-            </button>
-          </div>
-          {data.team?.members && data.team.members.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {data.team.members.map((member) => (
-                <div
-                  key={member.id}
-                  className="relative group overflow-hidden rounded-2xl"
-                >
-                  <Image
-                    src={
-                      member.image ||
-                      "/placeholder.svg?height=350&width=300&query=professional headshot"
-                    }
-                    alt={member.name}
-                    width={300}
-                    height={350}
-                    className="w-full aspect-[3/4] object-cover"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <h3 className="text-foreground font-semibold">{member.name}</h3>
-                    <p className="text-[#E63946] text-sm">{member.role}</p>
+            {data.team.members && data.team.members.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {data.team.members.map((member) => (
+                  <div key={member.id} className="relative group overflow-hidden rounded-2xl">
+                    {member.image ? (
+                      <Image
+                        src={member.image}
+                        alt={member.name || ""}
+                        width={300}
+                        height={350}
+                        className="w-full aspect-[3/4] object-cover"
+                      />
+                    ) : (
+                      <div className="w-full aspect-[3/4] bg-muted rounded-2xl" />
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      {member.name && <h3 className="text-foreground font-semibold">{member.name}</h3>}
+                      {member.role && <p className="text-[#E63946] text-sm">{member.role}</p>}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <Footer />
     </main>

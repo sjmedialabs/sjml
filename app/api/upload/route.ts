@@ -1,30 +1,38 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { uploadToGridFS, listGridFSFiles } from "@/lib/gridfs"
 
+export const dynamic = "force-dynamic"
+// Allow larger body for image uploads (Next.js may still apply global limit from next.config)
+export const maxDuration = 60
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 
-    if (!file) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image" }, { status: 400 })
+      return NextResponse.json({ error: "File must be an image (PNG, JPG, GIF, WebP)" }, { status: 400 })
     }
 
-    // Validate file size (10MB max)
+    // 10MB max
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: "File must be less than 10MB" }, { status: 400 })
     }
 
-    // Convert file to buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Upload to GridFS
+    if (buffer.length === 0) {
+      return NextResponse.json(
+        { error: "File is empty or too large. Check next.config serverActions.bodySizeLimit (e.g. 10mb)." },
+        { status: 400 },
+      )
+    }
+
     const { fileId, url } = await uploadToGridFS(buffer, file.name, file.type)
 
     return NextResponse.json({
@@ -36,8 +44,12 @@ export async function POST(request: NextRequest) {
       type: file.type,
     })
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Upload failed"
     console.error("Upload error:", error)
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Upload failed", detail: message },
+      { status: 500 },
+    )
   }
 }
 

@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
     const service = {
       ...data,
       id: Date.now().toString(),
+      heroImage: data.heroImage ?? "",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,

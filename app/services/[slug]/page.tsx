@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { clientPromise } from "@/lib/mongodb"
+import { sanitizeHtml } from "@/lib/sanitize-html"
 import { ServiceFaq } from "@/components/service-faq"
 
 interface ServiceData {
@@ -11,6 +12,7 @@ interface ServiceData {
   title: string
   description: string
   icon: string
+  heroImage?: string
   image: string
   fullDescription: string
   offerings: string[]
@@ -57,39 +59,43 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
     notFound()
   }
 
+  // Resolve icon: use URL if path/http, otherwise treat as key and use generic icon (admin can set full URL later)
+  const iconSrc =
+    service.icon && (service.icon.startsWith("/") || service.icon.startsWith("http"))
+      ? service.icon
+      : service.icon
+        ? "/icon.svg"
+        : null
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
+      {/* Hero Section - uses hero image (different from content image below) */}
       <section className="pt-24 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={service.image || "/placeholder.svg?height=400&width=1920"}
+            src={service.heroImage || service.image || "/placeholder.svg?height=400&width=1920"}
             alt={service.title}
             fill
-            className="object-cover opacity-30"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black" />
         </div>
         <div className="relative max-w-6xl mx-auto px-4 text-center pt-16">
-          {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) && (
+          {iconSrc && (
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20">
                 <Image
-                  src={service.icon}
+                  src={iconSrc}
                   alt={service.title}
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   className="object-contain"
-                  style={{
-                    filter: 'brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2255%) hue-rotate(337deg) brightness(91%) contrast(91%)'
-                  }}
                 />
               </div>
             </div>
           )}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground">{service.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md">{service.title}</h1>
         </div>
       </section>
 
@@ -134,7 +140,14 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
             <h2 className="text-2xl font-bold text-foreground mb-4">
               <span className="text-[#E63946]">Benefits</span> {service.benefits.title}
             </h2>
-            <p className="text-muted-foreground leading-relaxed">{service.benefits.description}</p>
+            {service.benefits.description && /<[a-zA-Z][^>]*>/.test(service.benefits.description) ? (
+              <div
+                className="service-detail-rich text-muted-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.benefits.description) }}
+              />
+            ) : (
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{service.benefits.description}</p>
+            )}
           </div>
         </section>
       )}
@@ -143,7 +156,14 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       {service.fullDescription && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
-            <p className="text-muted-foreground leading-relaxed">{service.fullDescription}</p>
+            {/<[a-zA-Z][^>]*>/.test(service.fullDescription) ? (
+              <div
+                className="service-detail-rich text-muted-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(service.fullDescription) }}
+              />
+            ) : (
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{service.fullDescription}</p>
+            )}
           </div>
         </section>
       )}

@@ -51,6 +51,14 @@ export async function POST(request: NextRequest) {
       "insightsBackgroundImage",
       "trustedByBackgroundImage",
       "playbookBackgroundImage",
+      "statsSection",
+      "caseStudiesSection",
+      "servicesSection",
+      "industriesSection",
+      "testimonialsSection",
+      "insightsSection",
+      "playbookSection",
+      "trustedBySection",
     ]
 
     for (const section of sections) {
@@ -104,6 +112,14 @@ export async function PUT(request: NextRequest) {
       "insightsBackgroundImage",
       "trustedByBackgroundImage",
       "playbookBackgroundImage",
+      "statsSection",
+      "caseStudiesSection",
+      "servicesSection",
+      "industriesSection",
+      "testimonialsSection",
+      "insightsSection",
+      "playbookSection",
+      "trustedBySection",
     ]
 
     if (!validSections.includes(section)) {

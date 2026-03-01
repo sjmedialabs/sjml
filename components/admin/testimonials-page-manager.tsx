@@ -40,16 +40,15 @@ export function TestimonialsPageManager() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/content/testimonials")
+      const res = await fetch("/api/content/testimonials-page")
       if (res.ok) {
         const fetchedData = await res.json()
-        const hero = fetchedData.hero || {}
         setData({
           ...defaultData,
-          ...fetchedData,
-          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
-          heroSubtitle: hero.description ?? hero.subtitle ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
-          heroImage: hero.image ?? fetchedData.heroImage ?? "",
+          heroTitle: fetchedData.heroTitle ?? defaultData.heroTitle,
+          heroSubtitle: fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
+          heroImage: fetchedData.heroImage ?? "",
+          testimonials: Array.isArray(fetchedData.testimonials) ? fetchedData.testimonials : [],
         })
       }
     } catch (error) {
@@ -62,14 +61,12 @@ export function TestimonialsPageManager() {
     try {
       const token = localStorage.getItem("adminToken")
       const payload = {
-        ...data,
-        hero: {
-          title: data.heroTitle,
-          description: data.heroSubtitle,
-          image: data.heroImage ?? data.hero?.image ?? "",
-        },
+        heroTitle: data.heroTitle,
+        heroSubtitle: data.heroSubtitle,
+        heroImage: data.heroImage ?? "",
+        testimonials: data.testimonials,
       }
-      const res = await fetch("/api/content/testimonials", {
+      const res = await fetch("/api/content/testimonials-page", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

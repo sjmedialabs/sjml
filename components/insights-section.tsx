@@ -19,9 +19,11 @@ interface Insight {
 interface InsightsSectionProps {
   data?: Insight[] | null
   backgroundImage?: string
+  title?: string
+  description?: string
 }
 
-export function InsightsSection({ data, backgroundImage }: InsightsSectionProps) {
+export function InsightsSection({ data, backgroundImage, title, description }: InsightsSectionProps) {
   // Filter out any undefined, null, or invalid insights
   const insights = (data || []).filter(insight => insight && insight.id && insight.title)
 
@@ -50,9 +52,9 @@ export function InsightsSection({ data, backgroundImage }: InsightsSectionProps)
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#E63946] italic mb-4">Latest Insights</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "Latest Insights"}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Expert perspectives on branding, marketing, and digital transformation.
+            {description || "Expert perspectives on branding, marketing, and digital transformation."}
           </p>
         </div>
 

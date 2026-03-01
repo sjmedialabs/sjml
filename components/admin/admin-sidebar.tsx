@@ -382,9 +382,9 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
   }
 
   return (
-    <aside className="admin-sidebar w-64 border-r flex flex-col min-h-screen">
+    <aside className="admin-sidebar fixed left-0 top-0 z-30 h-screen w-64 border-r flex flex-col bg-inherit">
       {/* Logo */}
-      <div className="admin-logo-section p-6 border-b">
+      <div className="admin-logo-section flex-shrink-0 p-6 border-b">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#E63946] rounded flex items-center justify-center">
             <span className="admin-text-primary font-bold text-sm">SJ</span>
@@ -396,8 +396,8 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 overflow-auto">
+      {/* Navigation - scrollable when content overflows */}
+      <nav className="flex-1 min-h-0 p-4 overflow-y-auto overflow-x-hidden">
         {menuCategories.map((category, catIndex) => (
           <div key={catIndex} className="mb-6">
             <h3 className="admin-category-label text-xs font-semibold uppercase tracking-wider mb-2 px-4">{category.label}</h3>
@@ -423,7 +423,7 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
       </nav>
 
       {/* Theme Toggle, View Site & Logout */}
-      <div className="admin-footer p-4 border-t space-y-2">
+      <div className="admin-footer flex-shrink-0 p-4 border-t space-y-2">
         <button
           onClick={toggleTheme}
           className="admin-action-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"

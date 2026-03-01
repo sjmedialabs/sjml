@@ -71,7 +71,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
+      {/* Hero Section - white text for visibility on all backgrounds */}
       <section className="pt-24 pb-16 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-gray-800/50 to-[#0a0a0a]">
           <Image
@@ -88,7 +88,8 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
               {caseStudy.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="px-4 py-1.5 bg-[#E63946]/10 text-[#E63946] rounded-full text-xs border border-[#E63946]/20"
+                  className="px-4 py-1.5 bg-white/10 text-white rounded-full text-xs border border-white/40"
+                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
                 >
                   {tag}
                 </span>
@@ -96,29 +97,39 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-6">{caseStudy.title}</h1>
-          <p className="text-xl text-muted-foreground text-center max-w-3xl mx-auto mb-12">{caseStudy.description}</p>
+          <h1
+            className="text-4xl md:text-5xl font-bold text-white text-center mb-6"
+            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)" }}
+          >
+            {caseStudy.title}
+          </h1>
+          <p
+            className="text-xl text-white text-center max-w-3xl mx-auto mb-12"
+            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+          >
+            {caseStudy.description}
+          </p>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
             <div className="text-center">
-              <p className="text-[#E63946] text-3xl font-bold mb-1">{caseStudy.stat1Value}</p>
-              <p className="text-muted-foreground text-sm">{caseStudy.stat1Label}</p>
+              <p className="text-[#E63946] text-3xl font-bold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat1Value}</p>
+              <p className="text-white/90 text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat1Label}</p>
             </div>
             <div className="text-center">
-              <p className="text-[#E63946] text-3xl font-bold mb-1">{caseStudy.stat2Value}</p>
-              <p className="text-muted-foreground text-sm">{caseStudy.stat2Label}</p>
+              <p className="text-[#E63946] text-3xl font-bold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat2Value}</p>
+              <p className="text-white/90 text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat2Label}</p>
             </div>
             {caseStudy.industry && (
               <div className="text-center">
-                <p className="text-foreground text-sm font-semibold mb-1">Industry</p>
-                <p className="text-muted-foreground text-sm">{caseStudy.industry}</p>
+                <p className="text-white/90 text-sm font-semibold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Industry</p>
+                <p className="text-white text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.industry}</p>
               </div>
             )}
             {caseStudy.year && (
               <div className="text-center">
-                <p className="text-foreground text-sm font-semibold mb-1">Year</p>
-                <p className="text-muted-foreground text-sm">{caseStudy.year}</p>
+                <p className="text-white/90 text-sm font-semibold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Year</p>
+                <p className="text-white text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.year}</p>
               </div>
             )}
           </div>

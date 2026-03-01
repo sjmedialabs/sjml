@@ -106,6 +106,15 @@ export interface ContentData {
   insightsBackgroundImage?: string
   trustedByBackgroundImage?: string
   playbookBackgroundImage?: string
+  /** Section metadata (title, description, background) for home page sections */
+  statsSection?: { title: string; description: string; backgroundImage?: string }
+  caseStudiesSection?: { title: string; description: string; backgroundImage?: string }
+  servicesSection?: { title: string; description: string; backgroundImage?: string }
+  industriesSection?: { title: string; description: string; backgroundImage?: string }
+  testimonialsSection?: { title: string; description: string; backgroundImage?: string }
+  insightsSection?: { title: string; description: string; backgroundImage?: string }
+  playbookSection?: { title: string; description: string; backgroundImage?: string }
+  trustedBySection?: { title: string; description: string; backgroundImage?: string }
   updatedAt?: Date
 }
 

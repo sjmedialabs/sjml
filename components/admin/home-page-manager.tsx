@@ -82,6 +82,12 @@ interface InsightItem {
   readTime: string
 }
 
+interface SectionMeta {
+  title: string
+  description: string
+  backgroundImage: string
+}
+
 interface HomeContent {
   hero: HeroData
   stats: StatItem[]
@@ -92,7 +98,6 @@ interface HomeContent {
   partners: PartnerItem[]
   testimonials?: TestimonialItem[]
   insights?: InsightItem[]
-  // Background images for each section
   statsBackgroundImage?: string
   servicesBackgroundImage?: string
   industriesBackgroundImage?: string
@@ -101,6 +106,14 @@ interface HomeContent {
   insightsBackgroundImage?: string
   trustedByBackgroundImage?: string
   playbookBackgroundImage?: string
+  statsSection?: SectionMeta
+  caseStudiesSection?: SectionMeta
+  servicesSection?: SectionMeta
+  industriesSection?: SectionMeta
+  testimonialsSection?: SectionMeta
+  insightsSection?: SectionMeta
+  playbookSection?: SectionMeta
+  trustedBySection?: SectionMeta
 }
 
 export function HomePageManager() {
@@ -138,6 +151,16 @@ export function HomePageManager() {
   const [trustedByBackgroundImage, setTrustedByBackgroundImage] = useState("")
   const [playbookBackgroundImage, setPlaybookBackgroundImage] = useState("")
 
+  const defaultSection = (): SectionMeta => ({ title: "", description: "", backgroundImage: "" })
+  const [statsSection, setStatsSection] = useState<SectionMeta>(defaultSection)
+  const [caseStudiesSection, setCaseStudiesSection] = useState<SectionMeta>(defaultSection)
+  const [servicesSection, setServicesSection] = useState<SectionMeta>(defaultSection)
+  const [industriesSection, setIndustriesSection] = useState<SectionMeta>(defaultSection)
+  const [testimonialsSection, setTestimonialsSection] = useState<SectionMeta>(defaultSection)
+  const [insightsSection, setInsightsSection] = useState<SectionMeta>(defaultSection)
+  const [playbookSection, setPlaybookSection] = useState<SectionMeta>(defaultSection)
+  const [trustedBySection, setTrustedBySection] = useState<SectionMeta>(defaultSection)
+
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
   const [rotatingWordsInput, setRotatingWordsInput] = useState("")
@@ -171,6 +194,15 @@ export function HomePageManager() {
         if (data.insightsBackgroundImage) setInsightsBackgroundImage(data.insightsBackgroundImage)
         if (data.trustedByBackgroundImage) setTrustedByBackgroundImage(data.trustedByBackgroundImage)
         if (data.playbookBackgroundImage) setPlaybookBackgroundImage(data.playbookBackgroundImage)
+        const withBg = (s?: SectionMeta, flat?: string) => ({ title: s?.title ?? "", description: s?.description ?? "", backgroundImage: s?.backgroundImage ?? flat ?? "" })
+        if (data.statsSection || data.statsBackgroundImage) setStatsSection(withBg(data.statsSection, data.statsBackgroundImage))
+        if (data.caseStudiesSection || data.caseStudiesBackgroundImage) setCaseStudiesSection(withBg(data.caseStudiesSection, data.caseStudiesBackgroundImage))
+        if (data.servicesSection || data.servicesBackgroundImage) setServicesSection(withBg(data.servicesSection, data.servicesBackgroundImage))
+        if (data.industriesSection || data.industriesBackgroundImage) setIndustriesSection(withBg(data.industriesSection, data.industriesBackgroundImage))
+        if (data.testimonialsSection || data.testimonialsBackgroundImage) setTestimonialsSection(withBg(data.testimonialsSection, data.testimonialsBackgroundImage))
+        if (data.insightsSection || data.insightsBackgroundImage) setInsightsSection(withBg(data.insightsSection, data.insightsBackgroundImage))
+        if (data.playbookSection || data.playbookBackgroundImage) setPlaybookSection(withBg(data.playbookSection, data.playbookBackgroundImage))
+        if (data.trustedBySection || data.trustedByBackgroundImage) setTrustedBySection(withBg(data.trustedBySection, data.trustedByBackgroundImage))
       }
     } catch (error) {
       console.error("Error fetching content:", error)
@@ -199,7 +231,7 @@ export function HomePageManager() {
           services: servicesData,
           industries: industriesData,
           playbook: playbookData,
-          partners: partnersData,
+          partners: [], // Trusted by section uses clients from Pages → Clients
           testimonials: testimonialsData,
           insights: insightsData,
           statsBackgroundImage,
@@ -210,6 +242,14 @@ export function HomePageManager() {
           insightsBackgroundImage,
           trustedByBackgroundImage,
           playbookBackgroundImage,
+          statsSection,
+          caseStudiesSection,
+          servicesSection,
+          industriesSection,
+          testimonialsSection,
+          insightsSection,
+          playbookSection,
+          trustedBySection,
         }),
       })
       if (response.ok) {
@@ -226,12 +266,13 @@ export function HomePageManager() {
   const tabs = [
     { id: "hero", label: "Hero Section" },
     { id: "stats", label: "Statistics" },
-    { id: "section-settings", label: "Section Settings" },
-    { id: "industries", label: "Industries" },
-    { id: "testimonials", label: "Testimonials" },
-    { id: "insights", label: "Insights" },
-    { id: "playbook", label: "Brand Playbook" },
-    { id: "partners", label: "Trusted By" },
+    { id: "case-studies", label: "Case Studies" },
+    { id: "services", label: "Our Services" },
+    { id: "industries", label: "Industries We Serve" },
+    { id: "testimonials", label: "What Our Clients Say" },
+    { id: "insights", label: "Latest Insights" },
+    { id: "playbook", label: "Get Our Brand Strategy Playbook" },
+    { id: "partners", label: "Trusted by Industry Leaders" },
   ]
 
   const addStat = () => {
@@ -505,13 +546,20 @@ export function HomePageManager() {
             </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={statsBackgroundImage}
-              onChange={(url) => setStatsBackgroundImage(url)}
-              label="Upload Background"
-            />
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header (optional)</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={statsSection.title} onChange={(e) => setStatsSection({ ...statsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="e.g. By the numbers" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={statsSection.description} onChange={(e) => setStatsSection({ ...statsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Optional subtitle" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={statsSection.backgroundImage} onChange={(url) => setStatsSection({ ...statsSection, backgroundImage: url })} label="Upload Background" />
+            </div>
           </div>
 
           {statsData.map((stat) => (
@@ -544,96 +592,55 @@ export function HomePageManager() {
         </div>
       )}
 
-      {/* Section Settings - Background Images Only */}
-      {activeTab === "section-settings" && (
+      {/* Case Studies Section - section header + background only; items from Case Studies page/collection */}
+      {activeTab === "case-studies" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div>
-            <h3 className="text-xl font-semibold admin-text-primary mb-4">Section Background Images</h3>
-            <p className="admin-text-secondary text-sm mb-6">Control background images for different sections. Manage actual content (Works, Services, Case Studies) in their respective pages.</p>
-          </div>
-
-          <div className="space-y-6">
+          <h3 className="text-xl font-semibold admin-text-primary">Case Studies</h3>
+          <p className="admin-text-secondary text-sm">Section title, description and background. Case study items are managed on the Case Studies page.</p>
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
             <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Case Studies Section Background</label>
-              <ImageUpload
-                value={caseStudiesBackgroundImage}
-                onChange={(url) => setCaseStudiesBackgroundImage(url)}
-                label="Upload Background"
-              />
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={caseStudiesSection.title} onChange={(e) => setCaseStudiesSection({ ...caseStudiesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Case Studies" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Services Section Background</label>
-              <ImageUpload
-                value={servicesBackgroundImage}
-                onChange={(url) => setServicesBackgroundImage(url)}
-                label="Upload Background"
-              />
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={caseStudiesSection.description} onChange={(e) => setCaseStudiesSection({ ...caseStudiesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Explore our portfolio of successful brand transformations." />
             </div>
-
             <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Stats Section Background</label>
-              <ImageUpload
-                value={statsBackgroundImage}
-                onChange={(url) => setStatsBackgroundImage(url)}
-                label="Upload Background"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Industries Section Background</label>
-              <ImageUpload
-                value={industriesBackgroundImage}
-                onChange={(url) => setIndustriesBackgroundImage(url)}
-                label="Upload Background"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Testimonials Section Background</label>
-              <ImageUpload
-                value={testimonialsBackgroundImage}
-                onChange={(url) => setTestimonialsBackgroundImage(url)}
-                label="Upload Background"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Insights Section Background</label>
-              <ImageUpload
-                value={insightsBackgroundImage}
-                onChange={(url) => setInsightsBackgroundImage(url)}
-                label="Upload Background"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Trusted By Section Background</label>
-              <ImageUpload
-                value={trustedByBackgroundImage}
-                onChange={(url) => setTrustedByBackgroundImage(url)}
-                label="Upload Background"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Brand Playbook Section Background</label>
-              <ImageUpload
-                value={playbookBackgroundImage}
-                onChange={(url) => setPlaybookBackgroundImage(url)}
-                label="Upload Background"
-              />
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={caseStudiesSection.backgroundImage} onChange={(url) => setCaseStudiesSection({ ...caseStudiesSection, backgroundImage: url })} label="Upload Background" />
             </div>
           </div>
         </div>
       )}
 
+      {/* Our Services Section - section header + background only; items from Services collection */}
+      {activeTab === "services" && (
+        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
+          <h3 className="text-xl font-semibold admin-text-primary">Our Services</h3>
+          <p className="admin-text-secondary text-sm">Section title, description and background. Service items are managed on the Services page.</p>
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={servicesSection.title} onChange={(e) => setServicesSection({ ...servicesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Our Services" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={servicesSection.description} onChange={(e) => setServicesSection({ ...servicesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Comprehensive solutions to elevate your brand." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={servicesSection.backgroundImage} onChange={(url) => setServicesSection({ ...servicesSection, backgroundImage: url })} label="Upload Background" />
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Industries Section - Added background image upload */}
+      {/* Industries Section */}
       {activeTab === "industries" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Industries</h3>
+            <h3 className="text-xl font-semibold admin-text-primary">Industries We Serve</h3>
             <button
               onClick={addIndustry}
               className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
@@ -642,13 +649,20 @@ export function HomePageManager() {
             </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={industriesBackgroundImage}
-              onChange={(url) => setIndustriesBackgroundImage(url)}
-              label="Upload Background"
-            />
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={industriesSection.title} onChange={(e) => setIndustriesSection({ ...industriesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Industries We Serve" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={industriesSection.description} onChange={(e) => setIndustriesSection({ ...industriesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Deep industry expertise delivering tailored solutions." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={industriesSection.backgroundImage} onChange={(url) => setIndustriesSection({ ...industriesSection, backgroundImage: url })} label="Upload Background" />
+            </div>
           </div>
 
           {industriesData.map((industry) => (
@@ -687,11 +701,11 @@ export function HomePageManager() {
         </div>
       )}
 
-      {/* Testimonials Section - Added background image upload */}
+      {/* Testimonials Section */}
       {activeTab === "testimonials" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Testimonials</h3>
+            <h3 className="text-xl font-semibold admin-text-primary">What Our Clients Say</h3>
             <button
               onClick={addTestimonial}
               className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
@@ -700,13 +714,20 @@ export function HomePageManager() {
             </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={testimonialsBackgroundImage}
-              onChange={(url) => setTestimonialsBackgroundImage(url)}
-              label="Upload Background"
-            />
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={testimonialsSection.title} onChange={(e) => setTestimonialsSection({ ...testimonialsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="What Our Clients Say" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={testimonialsSection.description} onChange={(e) => setTestimonialsSection({ ...testimonialsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Hear from the brands we've helped transform." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={testimonialsSection.backgroundImage} onChange={(url) => setTestimonialsSection({ ...testimonialsSection, backgroundImage: url })} label="Upload Background" />
+            </div>
           </div>
 
           {testimonialsData.map((testimonial) => (
@@ -775,19 +796,26 @@ export function HomePageManager() {
       {activeTab === "insights" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Insights / Blog Posts</h3>
+            <h3 className="text-xl font-semibold admin-text-primary">Latest Insights</h3>
             <button onClick={addInsight} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
               Add Insight
             </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={insightsBackgroundImage}
-              onChange={(url) => setInsightsBackgroundImage(url)}
-              label="Upload Background"
-            />
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={insightsSection.title} onChange={(e) => setInsightsSection({ ...insightsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Latest Insights" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={insightsSection.description} onChange={(e) => setInsightsSection({ ...insightsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Expert perspectives on branding and digital transformation." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={insightsSection.backgroundImage} onChange={(url) => setInsightsSection({ ...insightsSection, backgroundImage: url })} label="Upload Background" />
+            </div>
           </div>
 
           {insightsData.map((insight) => (
@@ -857,22 +885,29 @@ export function HomePageManager() {
         </div>
       )}
 
-      {/* Playbook Section - Added background image upload */}
+      {/* Playbook Section */}
       {activeTab === "playbook" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Brand Playbook</h3>
+          <h3 className="text-xl font-semibold admin-text-primary">Get Our Brand Strategy Playbook</h3>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={playbookBackgroundImage}
-              onChange={(url) => setPlaybookBackgroundImage(url)}
-              label="Upload Background"
-            />
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header (shown above the CTA)</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={playbookSection.title} onChange={(e) => setPlaybookSection({ ...playbookSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="e.g. Get Our Brand Strategy Playbook" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={playbookSection.description} onChange={(e) => setPlaybookSection({ ...playbookSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Optional section subtitle" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={playbookSection.backgroundImage} onChange={(url) => setPlaybookSection({ ...playbookSection, backgroundImage: url })} label="Upload Background" />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
+            <label className="block text-sm font-medium admin-text-secondary mb-2">CTA Title</label>
             <input
               type="text"
               value={playbookData.title}
@@ -924,49 +959,29 @@ export function HomePageManager() {
         </div>
       )}
 
-      {/* Partners Section - Added background image upload */}
+      {/* Trusted by Section – uses same clients as Clients page; no separate upload */}
       {activeTab === "partners" && (
         <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Trusted By (Partners)</h3>
-            <button onClick={addPartner} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
-              Add Partner
-            </button>
-          </div>
+          <h3 className="text-xl font-semibold admin-text-primary">Trusted by Industry Leaders</h3>
+          <p className="text-sm admin-text-muted">
+            This section shows the same clients as the <strong>Clients</strong> page. Manage client logos and names under <strong>Pages → Clients</strong>. No need to upload here.
+          </p>
 
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-            <ImageUpload
-              value={trustedByBackgroundImage}
-              onChange={(url) => setTrustedByBackgroundImage(url)}
-              label="Upload Background"
-            />
-          </div>
-
-          {partnersData.map((partner) => (
-            <div key={partner.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Name</label>
-                <input
-                  type="text"
-                  value={partner.name}
-                  onChange={(e) => updatePartner(partner.id, "name", e.target.value)}
-                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Logo</label>
-                <ImageUpload
-                  value={partner.logo}
-                  onChange={(url) => updatePartner(partner.id, "logo", url)}
-                  label="Upload Logo"
-                />
-              </div>
-              <button onClick={() => removePartner(partner.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
+          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
+            <h4 className="admin-text-primary font-medium">Section header</h4>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
+              <input type="text" value={trustedBySection.title} onChange={(e) => setTrustedBySection({ ...trustedBySection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Trusted by Industry Leaders" />
             </div>
-          ))}
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
+              <textarea value={trustedBySection.description} onChange={(e) => setTrustedBySection({ ...trustedBySection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Partnering with forward-thinking brands worldwide" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
+              <ImageUpload value={trustedBySection.backgroundImage} onChange={(url) => setTrustedBySection({ ...trustedBySection, backgroundImage: url })} label="Upload Background" />
+            </div>
+          </div>
         </div>
       )}
     </div>

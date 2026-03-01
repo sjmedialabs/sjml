@@ -35,9 +35,11 @@ function ArrowRightIcon({ className }: { className?: string }) {
 interface ServicesSectionProps {
   data?: Service[] | null
   backgroundImage?: string
+  title?: string
+  description?: string
 }
 
-export function ServicesSection({ data, backgroundImage }: ServicesSectionProps) {
+export function ServicesSection({ data, backgroundImage, title, description }: ServicesSectionProps) {
   // Filter out invalid services
   const services = (data || []).filter(s => s && s.id && s.title)
   const [activeService, setActiveService] = useState(services[1]?.id || services[0]?.id || '')
@@ -76,9 +78,9 @@ export function ServicesSection({ data, backgroundImage }: ServicesSectionProps)
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#E63946] mb-4">Our Services</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "Our Services"}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Comprehensive solutions to elevate your brand and drive business growth across all channels.
+            {description || "Comprehensive solutions to elevate your brand and drive business growth across all channels."}
           </p>
         </div>
 

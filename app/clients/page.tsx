@@ -1,37 +1,22 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { getPageContent, type ClientsPageData } from "@/lib/models/content"
-import { clientPromise } from "@/lib/mongodb"
+import { getClientsPageData } from "@/lib/data/clients-page"
 import { ClientsList } from "@/components/clients-list"
 import { PageHero } from "@/components/page-hero"
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0 // Enable ISR: Revalidate every hour
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export default async function ClientsPage() {
-  let content: ClientsPageData | null = null
-  let clients: any[] = []
+  let data: Awaited<ReturnType<typeof getClientsPageData>> | null = null
 
   try {
-    const client = await clientPromise
-    const db = client.db("sjmedialabs")
-
-    const [pageContent, clientsData] = await Promise.all([
-      getPageContent("clients"),
-      db.collection("clients").find({}).toArray(),
-    ])
-
-    content = pageContent as ClientsPageData
-    clients = clientsData.map((c) => ({
-      ...c,
-      id: c._id.toString(),
-      _id: c._id.toString(),
-    }))
+    data = await getClientsPageData()
   } catch (error) {
     console.error("Failed to fetch clients data:", error)
   }
 
-  if (!content) {
+  if (!data) {
     return (
       <main className="min-h-screen bg-background">
         <Header />
@@ -43,17 +28,14 @@ export default async function ClientsPage() {
     )
   }
 
-  const hero = content.hero
-  const stats = content.stats || []
-  const cta = content.cta
-  const heroTitle = hero.title || ""
-  const heroDescription = hero.description || hero.subtitle || ""
+  const { heroTitle, heroSubtitle, heroImage, clients, stats, cta } = data
+  const heroDescription = heroSubtitle || ""
 
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
-      <PageHero title={heroTitle} description={heroDescription} image={hero.image} />
+      <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
       <ClientsList initialClients={clients} />
 

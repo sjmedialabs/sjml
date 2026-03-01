@@ -39,9 +39,11 @@ function ArrowRightIcon({ className }: { className?: string }) {
 interface CaseStudiesSectionProps {
   data?: CaseStudy[] | null
   backgroundImage?: string
+  title?: string
+  description?: string
 }
 
-export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSectionProps) {
+export function CaseStudiesSection({ data, backgroundImage, title, description }: CaseStudiesSectionProps) {
   const caseStudies = data || []
 
   return (
@@ -56,9 +58,9 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#E63946] italic mb-4">Case Studies</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "Case Studies"}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Explore our portfolio of successful brand transformations and digital experiences.
+            {description || "Explore our portfolio of successful brand transformations and digital experiences."}
           </p>
         </div>
 
@@ -77,12 +79,13 @@ export function CaseStudiesSection({ data, backgroundImage }: CaseStudiesSection
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                {/* Tags */}
+                {/* Tags - white text so visible on any image (light or dark) */}
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                   {study.tags?.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-foreground/10 dark:bg-white/10 backdrop-blur-sm text-foreground border border-border text-xs rounded-full"
+                      className="px-3 py-1 bg-black/50 backdrop-blur-sm text-white border border-white/30 text-xs rounded-full"
+                      style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
                     >
                       {tag}
                     </span>

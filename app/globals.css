@@ -185,6 +185,53 @@ body {
   --muted-foreground: #666666;
 }
 
+/* Admin form inputs: light border + border radius (high specificity so they always apply) */
+.admin-content-area input,
+.admin-content-area textarea,
+.admin-content-area .admin-input,
+.admin-content-area input.admin-input,
+.admin-content-area textarea.admin-input {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 0.5rem !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.admin-content-area input:focus,
+.admin-content-area textarea:focus,
+.admin-content-area .admin-input:focus,
+.admin-content-area input.admin-input:focus,
+.admin-content-area textarea.admin-input:focus {
+  outline: none !important;
+  border-color: #E63946 !important;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.25) !important;
+}
+/* Light admin (when .light is on an ancestor) */
+.admin-light input,
+.admin-light textarea,
+.light .admin-content-area input,
+.light .admin-content-area textarea,
+.light .admin-content-area .admin-input,
+.light .admin-content-area input.admin-input,
+.light .admin-content-area textarea.admin-input {
+  border-color: #d1d5db !important;
+  background: #f9fafb !important;
+}
+.light .admin-content-area input:focus,
+.light .admin-content-area textarea:focus,
+.light .admin-content-area .admin-input:focus,
+.light .admin-content-area input.admin-input:focus,
+.light .admin-content-area textarea.admin-input:focus {
+  border-color: #E63946 !important;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2) !important;
+}
+/* Admin border utility */
+.admin-border-light {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.admin-content-area .admin-border-light {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* Image adjustments for light mode */
 .light img:not([src*="logo"]):not([class*="no-invert"]) {
   filter: brightness(0.9) contrast(1.1);
@@ -231,3 +278,26 @@ body {
 .light .hero-section::before {
   background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.05) 1px, transparent 0);
 }
+
+/* Admin rich text editor */
+.rich-text-editor-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+}
+.rich-text-editor-content h2 { font-size: 1.25rem; font-weight: 700; margin: 1em 0 0.5em; }
+.rich-text-editor-content h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75em 0 0.25em; }
+.rich-text-editor-content ul, .rich-text-editor-content ol { margin: 0.5em 0; padding-left: 1.5em; }
+.rich-text-editor-content p { margin: 0.5em 0; }
+.rich-text-editor-content p:first-child { margin-top: 0; }
+
+/* Service detail page rich text (same structure as admin editor) */
+.service-detail-rich h2 { font-size: 1.25rem; font-weight: 700; margin: 1em 0 0.5em; color: inherit; }
+.service-detail-rich h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75em 0 0.25em; color: inherit; }
+.service-detail-rich ul { list-style: disc; margin: 0.5em 0; padding-left: 1.5em; }
+.service-detail-rich ol { list-style: decimal; margin: 0.5em 0; padding-left: 1.5em; }
+.service-detail-rich li { margin: 0.25em 0; }
+.service-detail-rich p { margin: 0.75em 0; }
+.service-detail-rich p:first-child { margin-top: 0; }
+.service-detail-rich a { color: #E63946; text-decoration: underline; }
+.service-detail-rich strong { font-weight: 700; }
+.service-detail-rich blockquote { border-left: 4px solid #E63946; padding-left: 1rem; margin: 1em 0; opacity: 0.9; }

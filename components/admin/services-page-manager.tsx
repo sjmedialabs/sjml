@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ImageUpload } from "./image-upload"
+import { RichTextEditor } from "./rich-text-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -16,6 +17,7 @@ interface ServiceItem {
   icon: string
   linkText: string
   fullDescription: string
+  heroImage: string
   image: string
   offerings: string[]
   benefits: { title: string; description: string }
@@ -39,6 +41,7 @@ const emptyService: Omit<ServiceItem, "id"> = {
   icon: "",
   linkText: "Explore Service",
   fullDescription: "",
+  heroImage: "",
   image: "",
   offerings: [],
   benefits: { title: "", description: "" },
@@ -549,11 +552,12 @@ export function ServicesPageManager() {
             </div>
             <div className="mt-4">
               <label className="block text-sm admin-text-secondary mb-2">Full Description (for detail page)</label>
-              <Textarea
-                value={editingService.fullDescription}
-                onChange={(e) => updateField("fullDescription", e.target.value)}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                rows={4}
+              <p className="text-xs admin-text-muted mb-2">Use the toolbar for headings, lists, and bold/italic. Formatting will appear the same on the website.</p>
+              <RichTextEditor
+                value={editingService.fullDescription ?? ""}
+                onChange={(html) => updateField("fullDescription", html)}
+                placeholder="Write your service description with headings, lists, and paragraphs…"
+                minHeight="240px"
               />
             </div>
             <div className="mt-4 flex items-center gap-2">
@@ -570,11 +574,17 @@ export function ServicesPageManager() {
             </div>
           </div>
 
-          {/* Image */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Service Image</h2>
+          {/* Images */}
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Images</h2>
+            <p className="text-sm admin-text-muted -mt-2">Use different images for the hero (top banner) and the content section below so the page doesn’t repeat the same image.</p>
             <ImageUpload
-              label="Featured Image"
+              label="Hero image (top banner on detail page)"
+              value={editingService.heroImage ?? ""}
+              onChange={(url) => updateField("heroImage", url)}
+            />
+            <ImageUpload
+              label="Service / content image (section below hero)"
               value={editingService.image}
               onChange={(url) => updateField("image", url)}
             />
@@ -614,11 +624,11 @@ export function ServicesPageManager() {
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Description</label>
-                <Textarea
-                  value={editingService.benefits.description}
-                  onChange={(e) => updateField("benefits", { ...editingService.benefits, description: e.target.value })}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  rows={3}
+                <RichTextEditor
+                  value={editingService.benefits.description ?? ""}
+                  onChange={(html) => updateField("benefits", { ...editingService.benefits, description: html })}
+                  placeholder="Benefits description (headings and lists supported)"
+                  minHeight="120px"
                 />
               </div>
             </div>

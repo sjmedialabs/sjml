@@ -12,9 +12,11 @@ interface Industry {
 interface IndustriesSectionProps {
   data?: Industry[] | null
   backgroundImage?: string
+  title?: string
+  description?: string
 }
 
-export function IndustriesSection({ data, backgroundImage }: IndustriesSectionProps) {
+export function IndustriesSection({ data, backgroundImage, title, description }: IndustriesSectionProps) {
   const industries = data || []
 
   return (
@@ -29,9 +31,9 @@ export function IndustriesSection({ data, backgroundImage }: IndustriesSectionPr
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#E63946] italic mb-4">Industries We Serve</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "Industries We Serve"}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Deep industry expertise delivering tailored solutions across diverse sectors.
+            {description || "Deep industry expertise delivering tailored solutions across diverse sectors."}
           </p>
         </div>
 

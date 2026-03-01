@@ -38,16 +38,15 @@ export function ClientsPageManager() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/content/clients")
+      const res = await fetch("/api/content/clients-page")
       if (res.ok) {
         const fetchedData = await res.json()
-        const hero = fetchedData.hero || {}
         setData({
           ...defaultData,
-          ...fetchedData,
-          heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
-          heroSubtitle: hero.description ?? hero.subtitle ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
-          heroImage: hero.image ?? fetchedData.heroImage ?? "",
+          heroTitle: fetchedData.heroTitle ?? defaultData.heroTitle,
+          heroSubtitle: fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
+          heroImage: fetchedData.heroImage ?? "",
+          clients: Array.isArray(fetchedData.clients) ? fetchedData.clients : [],
         })
       }
     } catch (error) {
@@ -60,14 +59,12 @@ export function ClientsPageManager() {
     try {
       const token = localStorage.getItem("adminToken")
       const payload = {
-        ...data,
-        hero: {
-          title: data.heroTitle,
-          description: data.heroSubtitle,
-          image: data.heroImage ?? data.hero?.image ?? "",
-        },
+        heroTitle: data.heroTitle,
+        heroSubtitle: data.heroSubtitle,
+        heroImage: data.heroImage ?? "",
+        clients: data.clients,
       }
-      const res = await fetch("/api/content/clients", {
+      const res = await fetch("/api/content/clients-page", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -76,8 +73,17 @@ export function ClientsPageManager() {
         body: JSON.stringify(payload),
       })
       if (res.ok) {
+        const saved = await res.json()
         setMessage("Clients saved successfully!")
         setTimeout(() => setMessage(""), 3000)
+        // Reload from server so admin and website show the same data
+        setData({
+          ...data,
+          heroTitle: saved.heroTitle ?? data.heroTitle,
+          heroSubtitle: saved.heroSubtitle ?? data.heroSubtitle,
+          heroImage: saved.heroImage ?? data.heroImage,
+          clients: Array.isArray(saved.clients) ? saved.clients : data.clients,
+        })
       }
     } catch {
       setMessage("Failed to save")

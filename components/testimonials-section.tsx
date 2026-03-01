@@ -71,11 +71,17 @@ function ArrowRightIcon({ className }: { className?: string }) {
 interface TestimonialsSectionProps {
   data?: Testimonial[] | null
   backgroundImage?: string | null
+  title?: string
+  description?: string
 }
 
-export function TestimonialsSection({ data, backgroundImage }: TestimonialsSectionProps) {
+export function TestimonialsSection({ data, backgroundImage, title, description }: TestimonialsSectionProps) {
   const testimonials = data || []
   const [currentIndex, setCurrentIndex] = useState(0)
+
+  if (testimonials.length === 0) {
+    return null
+  }
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length)
@@ -109,8 +115,8 @@ export function TestimonialsSection({ data, backgroundImage }: TestimonialsSecti
 
       <div className="max-w-5xl mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] italic mb-4">What Our Clients Say</h2>
-          <p className="text-gray-400">Don't just take our word for it. Hear from the brands we've helped transform.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "What Our Clients Say"}</h2>
+          <p className="text-gray-400">{description || "Don't just take our word for it. Hear from the brands we've helped transform."}</p>
         </div>
 
         <div className="bg-background rounded-3xl p-8 md:p-12 border border-[#E63946]/50">

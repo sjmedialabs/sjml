@@ -4,6 +4,11 @@
 
 All website content is **driven by the database**. There is **no static or mock copy** on the public site. Content is updated only via the **admin dashboard** and stored in MongoDB.
 
+### Hero sections (all pages except home)
+
+- **Image:** Every inner page (About, Work, Services, Case Studies, Insights, Clients, Testimonials, Careers, Contact) has a **Hero image upload** in admin. The hero background image is stored in the DB and shown on the site with **no overlay**.
+- **Title (black + red):** Hero title uses a black and red combination. In admin, use a pipe `|` in the hero title to split: text **before** `|` is black, text **after** `|` is red. Example: `Our Work | Portfolio` shows "Our Work " in black and "Portfolio" in red.
+
 ---
 
 ## QA Checklist (Senior QA Test Lead)

@@ -102,7 +102,7 @@ export default async function ServicesPage() {
                   href={`/services/${service.slug}`}
                   className="text-[#E63946] text-sm font-medium hover:underline inline-flex items-center gap-2"
                 >
-                  {service.linkText || "Explore Service"} <span className="text-lg">→</span>
+                  {service.linkText || ""} <span className="text-lg">→</span>
                 </Link>
               </div>
             ))}

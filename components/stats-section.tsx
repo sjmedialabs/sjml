@@ -7,9 +7,11 @@ interface Stat {
 interface StatsSectionProps {
   data: Stat[];
   backgroundImage?: string;
+  title?: string;
+  description?: string;
 }
 
-export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
+export function StatsSection({ data, backgroundImage, title, description }: StatsSectionProps) {
   if (!data || data.length === 0) {
     return null;
   }
@@ -17,7 +19,7 @@ export function StatsSection({ data, backgroundImage }: StatsSectionProps) {
   const stats = data;
 
   return (
-    <section className="relative py-2 bg-background" style={{ top: "-170px" }}>
+    <section className="relative py-2 bg-background" style={{ top: "-170px" }} aria-label={title || "Statistics"}>
       {backgroundImage ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
