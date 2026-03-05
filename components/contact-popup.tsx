@@ -116,13 +116,14 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder="Phone Number*"
+                  required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="bg-secondary border-border text-foreground placeholder:text-gray-500 focus:border-[#E63946] rounded-lg"
                 />
                 <Input
-                  placeholder="Subject*"
+                  placeholder="Subject"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   required
