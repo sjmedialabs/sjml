@@ -80,10 +80,7 @@ export function HeroSection({ data }: HeroSectionProps) {
         className="relative z-10 max-w-7xl mx-auto px-4 text-center"
         style={{ top: "-50px" }}
       >
-        <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-          style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.8)" }}
-        >
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black dark:text-white mb-6 leading-tight">
           {heroData.title}{" "}
           <div
             className={`text-[#E63946] block transition-all duration-300 ${
@@ -91,16 +88,12 @@ export function HeroSection({ data }: HeroSectionProps) {
                 ? "opacity-0 translate-y-2"
                 : "opacity-100 translate-y-0"
             }`}
-            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)" }}
           >
             {heroData.rotatingWords[currentWordIndex]}
           </div>
         </h1>
 
-        <p
-          className="text-white text-lg md:text-xl max-w-2xl mx-auto mb-10"
-          style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)" }}
-        >
+        <p className="text-black dark:text-white text-lg md:text-xl max-w-2xl mx-auto mb-10">
           {heroData.description}
         </p>
 
@@ -113,8 +106,7 @@ export function HeroSection({ data }: HeroSectionProps) {
           <Link href={heroData.secondaryButtonUrl || "/work"}>
             <Button
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white/10 rounded-full px-8 py-6 text-lg bg-transparent font-medium"
-              style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+              className="border-2 border-black dark:border-white text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-full px-8 py-6 text-lg bg-transparent font-medium"
             >
               <PlayIcon className="w-6 h-6 mr-2" />
               {heroData.secondaryButtonText}
