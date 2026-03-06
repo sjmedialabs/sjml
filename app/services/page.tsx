@@ -11,6 +11,7 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import { PageHero } from "@/components/page-hero"
+import { Breadcrumbs } from "@/components/breadcrumbs"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -26,7 +27,7 @@ export default async function ServicesPage() {
     // Fetch page content and services in parallel
     const [pageContent, servicesData] = await Promise.all([
       getPageContent("services"),
-      db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray(),
+      db.collection("services").find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 }).toArray(),
     ])
 
     content = pageContent
@@ -62,6 +63,10 @@ export default async function ServicesPage() {
       <Header />
 
       <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
+
+      <section className="px-4 py-2 max-w-6xl mx-auto">
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Services" }]} />
+      </section>
 
       {/* Services Grid Section */}
       <section className="py-20 px-4 bg-background">

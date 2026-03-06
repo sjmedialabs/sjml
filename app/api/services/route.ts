@@ -16,8 +16,12 @@ export async function GET(request: NextRequest) {
     const db = client.db("sjmedialabs")
 
     if (all) {
-      // Return all active services for frontend
-      const services = await db.collection("services").find({ isActive: true }).sort({ createdAt: -1 }).toArray()
+      // Return all active parent services for frontend, sorted by displayOrder then createdAt
+      const services = await db
+        .collection("services")
+        .find({ isActive: true })
+        .sort({ displayOrder: 1, createdAt: -1 })
+        .toArray()
       // Convert MongoDB _id to string for JSON serialization
       const serializedServices = services.map(service => ({
         ...service,

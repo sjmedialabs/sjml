@@ -27,6 +27,7 @@ export async function GET() {
       stats: doc.stats || [],
       testimonial: doc.testimonial || { quote: "", author: "", role: "" },
       featured: doc.featured || false,
+      visibility: doc.visibility || "public",
     }))
 
     const data = {
@@ -81,6 +82,7 @@ export async function PUT(request: NextRequest) {
         stat2Label: study.stats?.[1]?.label || "",
         testimonial: study.testimonial || { quote: "", author: "", role: "" },
         featured: study.featured || false,
+        visibility: study.visibility || "public",
         createdAt: new Date(),
         updatedAt: new Date(),
       }))
@@ -105,6 +107,7 @@ export async function PUT(request: NextRequest) {
       stats: doc.stats || [],
       testimonial: doc.testimonial || { quote: "", author: "", role: "" },
       featured: doc.featured || false,
+      visibility: doc.visibility || "public",
     }))
 
     const responseData = {

@@ -31,10 +31,12 @@ export default async function InsightsPage() {
     const categoriesSet = new Set<string>()
     posts = insightsData.map((insight) => {
       if (insight.category) categoriesSet.add(insight.category)
+      const id = insight._id.toString()
       return {
         ...insight,
-        _id: insight._id.toString(),
-        id: insight._id.toString(),
+        _id: id,
+        id,
+        slug: insight.slug || id,
       }
     })
     

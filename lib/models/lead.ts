@@ -10,7 +10,8 @@ export interface Lead {
   message?: string
   service?: string
   budget?: string
-  source: "website" | "website_popup" | "contact_form" | "meta_ads" | "google_ads" | "manual" | "other"
+  source: "website" | "website_popup" | "contact_form" | "meta_ads" | "google_ads" | "manual" | "other" | "insight" | "case_study"
+  page?: string
   status: "new" | "contacted" | "qualified" | "converted" | "lost"
   campaign?: {
     platform?: string

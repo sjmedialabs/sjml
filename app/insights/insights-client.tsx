@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { PageHero } from "@/components/page-hero"
+import { InsightLeadPopup } from "@/components/insight-lead-popup"
 
 interface Post {
   id: string
+  slug: string
   title: string
   excerpt: string
   image: string
@@ -33,6 +36,8 @@ interface InsightsClientProps {
 
 export default function InsightsClient({ posts, categories, hero, newsletter }: InsightsClientProps) {
   const [selectedCategory, setSelectedCategory] = useState("All")
+  const [leadSlug, setLeadSlug] = useState<string | null>(null)
+  const router = useRouter()
 
   // Filter posts based on selected category
   const filteredPosts = selectedCategory === "All" 
@@ -104,7 +109,7 @@ export default function InsightsClient({ posts, categories, hero, newsletter }: 
                           <div className="text-muted-foreground text-xs">{post.date}</div>
                         </div>
                       </div>
-                      <button className="text-[#E63946] text-sm hover:underline">Read More →</button>
+                      <button type="button" onClick={() => setLeadSlug(post.slug)} className="text-[#E63946] text-sm hover:underline">Read More →</button>
                     </div>
                   </div>
                 </article>
@@ -113,6 +118,13 @@ export default function InsightsClient({ posts, categories, hero, newsletter }: 
           )}
         </div>
       </section>
+
+      <InsightLeadPopup
+        isOpen={leadSlug !== null}
+        onClose={() => setLeadSlug(null)}
+        insightSlug={leadSlug || ""}
+        onSuccess={() => router.push("/insights/" + leadSlug)}
+      />
 
       {/* Newsletter */}
       <section className="py-16 px-4">

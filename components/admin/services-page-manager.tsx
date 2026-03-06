@@ -7,7 +7,7 @@ import { RichTextEditor } from "./rich-text-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft } from "lucide-react"
+import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, X } from "lucide-react"
 
 interface ServiceItem {
   id: string
@@ -25,6 +25,9 @@ interface ServiceItem {
   process: Array<{ icon: string; title: string; description: string }>
   faqs: Array<{ question: string; answer: string }>
   isActive: boolean
+  displayOrder?: number
+  portfolioUrl?: string
+  brochureUrl?: string
 }
 
 interface Pagination {
@@ -49,6 +52,9 @@ const emptyService: Omit<ServiceItem, "id"> = {
   process: [],
   faqs: [],
   isActive: true,
+  displayOrder: 0,
+  portfolioUrl: "",
+  brochureUrl: "",
 }
 
 interface PageContent {
@@ -65,9 +71,25 @@ interface PageContent {
   }
 }
 
+interface SubServiceItem {
+  id: string
+  _id?: string
+  parentSlug: string
+  slug: string
+  name: string
+  bannerImage: string
+  shortDescription: string
+  fullDescription: string
+  portfolioUrl: string
+  brochureUrl: string
+  displayOrder: number
+  isActive: boolean
+}
+
 export function ServicesPageManager() {
-  const [activeTab, setActiveTab] = useState<"services" | "page-content">("services")
+  const [activeTab, setActiveTab] = useState<"services" | "page-content" | "sub-services">("services")
   const [services, setServices] = useState<ServiceItem[]>([])
+  const [allServicesForParent, setAllServicesForParent] = useState<ServiceItem[]>([])
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -81,11 +103,104 @@ export function ServicesPageManager() {
     section: { title: "", subtitle: "", description: "" }
   })
   const [pageContentSaving, setPageContentSaving] = useState(false)
+  const [subServices, setSubServices] = useState<SubServiceItem[]>([])
+  const [subPagination, setSubPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
+  const [subLoading, setSubLoading] = useState(false)
+  const [subSaving, setSubSaving] = useState(false)
+  const [editingSub, setEditingSub] = useState<SubServiceItem | null>(null)
+  const [subView, setSubView] = useState<"list" | "edit">("list")
+  const [subParentFilter, setSubParentFilter] = useState("")
+  const [subIsNew, setSubIsNew] = useState(false)
 
   useEffect(() => {
     fetchServices()
     fetchPageContent()
   }, [pagination.page])
+
+  useEffect(() => {
+    if (activeTab === "sub-services") {
+      fetchSubServices()
+      fetch("/api/services?all=true").then((r) => r.ok && r.json().then((arr) => setAllServicesForParent(Array.isArray(arr) ? arr : [])))
+    }
+  }, [activeTab, subPagination.page, subParentFilter])
+
+  const fetchSubServices = async () => {
+    setSubLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(subPagination.page), limit: String(subPagination.limit) })
+      if (subParentFilter) params.set("parent", subParentFilter)
+      const res = await fetch(`/api/sub-services?${params}`)
+      if (res.ok) {
+        const data = await res.json()
+        setSubServices(data.subServices || [])
+        setSubPagination((p) => ({ ...p, ...data.pagination, total: data.pagination?.total ?? 0, totalPages: data.pagination?.totalPages ?? 0 }))
+      }
+    } catch (_) {}
+    setSubLoading(false)
+  }
+
+  const saveSubService = async () => {
+    if (!editingSub) return
+    setSubSaving(true)
+    try {
+      const token = localStorage.getItem("adminToken")
+      const url = subIsNew ? "/api/sub-services" : `/api/sub-services/${editingSub.id}`
+      const method = subIsNew ? "POST" : "PUT"
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editingSub),
+      })
+      if (res.ok) {
+        setMessage(subIsNew ? "Sub-service created." : "Sub-service updated.")
+        setTimeout(() => setMessage(""), 3000)
+        fetchSubServices()
+        setSubView("list")
+        setEditingSub(null)
+        setSubIsNew(false)
+      } else setMessage("Failed to save sub-service")
+    } catch (_) {
+      setMessage("Failed to save sub-service")
+    }
+    setSubSaving(false)
+  }
+
+  const deleteSubService = async (id: string) => {
+    if (!confirm("Delete this sub-service?")) return
+    try {
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch(`/api/sub-services/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) {
+        setMessage("Sub-service deleted.")
+        setTimeout(() => setMessage(""), 3000)
+        fetchSubServices()
+      }
+    } catch (_) {}
+  }
+
+  const addNewSubService = () => {
+    setEditingSub({
+      id: "",
+      parentSlug: subParentFilter || (allServicesForParent[0]?.slug ?? ""),
+      slug: "",
+      name: "",
+      bannerImage: "",
+      shortDescription: "",
+      fullDescription: "",
+      portfolioUrl: "",
+      brochureUrl: "",
+      displayOrder: 0,
+      isActive: true,
+    })
+    setSubIsNew(true)
+    setSubView("edit")
+  }
+
+  const editSubService = (sub: SubServiceItem) => {
+    setEditingSub({ ...sub })
+    setSubIsNew(false)
+    setSubView("edit")
+  }
 
   const fetchPageContent = async () => {
     try {
@@ -233,6 +348,11 @@ export function ServicesPageManager() {
               <Plus className="w-4 h-4 mr-2" /> Add Service
             </Button>
           )}
+          {activeTab === "sub-services" && (
+            <Button onClick={addNewSubService} className="bg-[#E63946] hover:bg-[#d32f3d]">
+              <Plus className="w-4 h-4 mr-2" /> Add Sub-Service
+            </Button>
+          )}
           {activeTab === "page-content" && (
             <Button onClick={savePageContent} disabled={pageContentSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">
               {pageContentSaving ? 'Saving...' : 'Save Page Content'}
@@ -257,6 +377,12 @@ export function ServicesPageManager() {
             className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Services List
+          </button>
+          <button
+            onClick={() => setActiveTab('sub-services')}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'sub-services' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
+          >
+            Sub-Services
           </button>
         </div>
 
@@ -469,6 +595,151 @@ export function ServicesPageManager() {
         </div>
           </>
         )}
+
+        {/* Sub-Services Tab */}
+        {activeTab === "sub-services" && subView === "list" && (
+          <>
+            <div className="mb-6 flex gap-4 items-center">
+              <label className="text-sm admin-text-secondary">Parent service:</label>
+              <select
+                value={subParentFilter}
+                onChange={(e) => setSubParentFilter(e.target.value)}
+                className="admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
+              >
+                <option value="">All</option>
+                {allServicesForParent.map((s) => (
+                  <option key={s.id} value={s.slug}>{s.title}</option>
+                ))}
+              </select>
+            </div>
+            <div className="admin-card border admin-border rounded-xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b admin-border">
+                    <th className="text-left p-4 admin-text-secondary font-medium">Parent</th>
+                    <th className="text-left p-4 admin-text-secondary font-medium">Name</th>
+                    <th className="text-left p-4 admin-text-secondary font-medium">Slug</th>
+                    <th className="text-left p-4 admin-text-secondary font-medium">Order</th>
+                    <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
+                    <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subLoading ? (
+                    <tr><td colSpan={6} className="p-8 text-center"><div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" /></td></tr>
+                  ) : subServices.length === 0 ? (
+                    <tr><td colSpan={6} className="p-8 text-center admin-text-muted">No sub-services found</td></tr>
+                  ) : (
+                    subServices.map((sub) => (
+                      <tr key={sub.id} className="border-b admin-border hover:admin-bg-secondary">
+                        <td className="p-4 admin-text-secondary">{sub.parentSlug}</td>
+                        <td className="p-4 admin-text-primary font-medium">{sub.name}</td>
+                        <td className="p-4 admin-text-secondary">{sub.slug}</td>
+                        <td className="p-4 admin-text-secondary">{sub.displayOrder ?? 0}</td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded text-xs ${sub.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                            {sub.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right">
+                          <Button variant="ghost" size="sm" onClick={() => editSubService(sub)} className="admin-text-secondary hover:admin-text-primary"><Pencil className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => deleteSubService(sub.id)} className="text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4" /></Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+              {subPagination.totalPages > 1 && (
+                <div className="flex justify-between p-4 border-t admin-border">
+                  <span className="text-sm admin-text-secondary">{subPagination.total} total</span>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" disabled={subPagination.page === 1} onClick={() => setSubPagination((p) => ({ ...p, page: p.page - 1 }))} className="admin-border-light text-gray-300"> <ChevronLeft className="w-4 h-4" /> </Button>
+                    <span className="px-3 py-1 admin-text-primary">{subPagination.page} / {subPagination.totalPages}</span>
+                    <Button variant="outline" size="sm" disabled={subPagination.page >= subPagination.totalPages} onClick={() => setSubPagination((p) => ({ ...p, page: p.page + 1 }))} className="admin-border-light text-gray-300"> <ChevronRight className="w-4 h-4" /> </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === "sub-services" && subView === "edit" && editingSub && (
+          <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold admin-text-primary">{subIsNew ? "New Sub-Service" : "Edit Sub-Service"}</h2>
+              <Button variant="ghost" onClick={() => { setSubView("list"); setEditingSub(null); }} className="admin-text-secondary">Cancel</Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Parent Service *</label>
+                <select
+                  value={editingSub.parentSlug}
+                  onChange={(e) => setEditingSub({ ...editingSub, parentSlug: e.target.value })}
+                  className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
+                >
+                  {allServicesForParent.map((s) => (
+                    <option key={s.id} value={s.slug}>{s.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
+                <Input type="number" value={editingSub.displayOrder ?? 0} onChange={(e) => setEditingSub({ ...editingSub, displayOrder: Number(e.target.value) || 0 })} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Name *</label>
+                <Input value={editingSub.name} onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="Logo Design" />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
+                <Input value={editingSub.slug} onChange={(e) => setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Banner Image</label>
+              <ImageUpload value={editingSub.bannerImage} onChange={(url) => setEditingSub({ ...editingSub, bannerImage: url })} />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
+              <Textarea value={editingSub.shortDescription} onChange={(e) => setEditingSub({ ...editingSub, shortDescription: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" rows={2} />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Full Description</label>
+              <RichTextEditor value={editingSub.fullDescription ?? ""} onChange={(html) => setEditingSub({ ...editingSub, fullDescription: html })} placeholder="Full description…" minHeight="160px" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
+                <Input value={editingSub.portfolioUrl ?? ""} onChange={(e) => setEditingSub({ ...editingSub, portfolioUrl: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="https://..." />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
+                <div className="flex items-center gap-2">
+                  <Input type="file" accept="application/pdf" className="admin-bg-tertiary admin-border-light max-w-xs" onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const form = new FormData()
+                    form.append("file", file)
+                    try {
+                      const token = localStorage.getItem("adminToken")
+                      const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
+                      const data = await res.json()
+                      if (data?.url) setEditingSub((s) => s ? { ...s, brochureUrl: data.url } : s)
+                    } catch (_) {}
+                    e.target.value = ""
+                  }} />
+                  {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View</a>}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="subActive" checked={editingSub.isActive} onChange={(e) => setEditingSub({ ...editingSub, isActive: e.target.checked })} className="rounded admin-border-light" />
+              <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
+            </div>
+            <Button onClick={saveSubService} disabled={subSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">{subSaving ? "Saving…" : "Save Sub-Service"}</Button>
+          </div>
+        )}
       </div>
     )
   }
@@ -560,6 +831,56 @@ export function ServicesPageManager() {
                 minHeight="240px"
               />
             </div>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
+                <Input
+                  type="number"
+                  value={editingService.displayOrder ?? 0}
+                  onChange={(e) => updateField("displayOrder", Number(e.target.value) || 0)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="0"
+                />
+                <p className="text-xs admin-text-muted mt-1">Lower numbers appear first on /services</p>
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
+                <Input
+                  value={editingService.portfolioUrl ?? ""}
+                  onChange={(e) => updateField("portfolioUrl", e.target.value)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="https://..."
+                />
+                <p className="text-xs admin-text-muted mt-1">Shows &quot;View Portfolio&quot; when set</p>
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Input
+                    type="file"
+                    accept="application/pdf"
+                    className="admin-bg-tertiary admin-border-light admin-text-primary max-w-xs"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const form = new FormData()
+                      form.append("file", file)
+                      try {
+                        const token = localStorage.getItem("adminToken")
+                        const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
+                        const data = await res.json()
+                        if (data?.url) updateField("brochureUrl", data.url)
+                      } catch (_) {}
+                      e.target.value = ""
+                    }}
+                  />
+                  {editingService.brochureUrl && (
+                    <a href={editingService.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View current</a>
+                  )}
+                </div>
+                <p className="text-xs admin-text-muted mt-1">Shows &quot;Download Brochure&quot; when set</p>
+              </div>
+            </div>
             <div className="mt-4 flex items-center gap-2">
               <input
                 type="checkbox"
@@ -593,20 +914,51 @@ export function ServicesPageManager() {
           {/* Offerings */}
           <div className="admin-card border admin-border rounded-xl p-6">
             <h2 className="text-lg font-semibold admin-text-primary mb-4">Service Offerings</h2>
-            <Textarea
-              value={editingService.offerings.join("\n")}
-              onChange={(e) =>
-                updateField(
-                  "offerings",
-                  e.target.value
-                    .split("\n")
-                    .map((o) => o.trim())
-                    .filter(Boolean),
-                )
-              }
+            <p className="text-sm admin-text-muted mb-3">Add offerings as tags. Type an offering (multiple words allowed) and press Enter to add.</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {editingService.offerings.map((offering, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E63946]/10 border border-[#E63946]/30 text-foreground text-sm"
+                >
+                  {offering}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateField(
+                        "offerings",
+                        editingService.offerings.filter((_, i) => i !== index),
+                      )
+                    }
+                    className="p-0.5 rounded hover:bg-[#E63946]/20 text-muted-foreground hover:text-foreground"
+                    aria-label="Remove"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <Input
+              placeholder="e.g. Brand strategy, Visual identity, Web design and development"
               className="admin-bg-tertiary admin-border-light admin-text-primary"
-              placeholder="Brand strategy&#10;Visual identity, modern design&#10;Web design and development&#10;(one per line)"
-              rows={5}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  const input = e.currentTarget
+                  const value = input.value.trim()
+                  if (value) {
+                    updateField("offerings", [...editingService.offerings, value])
+                    input.value = ""
+                  }
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value.trim()
+                if (value) {
+                  updateField("offerings", [...editingService.offerings, value])
+                  e.target.value = ""
+                }
+              }}
             />
           </div>
 

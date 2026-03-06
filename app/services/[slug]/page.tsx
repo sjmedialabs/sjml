@@ -1,10 +1,12 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import { clientPromise } from "@/lib/mongodb"
 import { sanitizeHtml } from "@/lib/sanitize-html"
 import { ServiceFaq } from "@/components/service-faq"
+import { Breadcrumbs } from "@/components/breadcrumbs"
 
 interface ServiceData {
   id: string
@@ -20,6 +22,17 @@ interface ServiceData {
   features: { title: string; points: string[] }
   process: Array<{ icon: string; title: string; description: string }>
   faqs: Array<{ question: string; answer: string }>
+  portfolioUrl?: string
+  brochureUrl?: string
+}
+
+interface SubServiceData {
+  id: string
+  slug: string
+  name: string
+  shortDescription: string
+  portfolioUrl?: string
+  brochureUrl?: string
 }
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +57,7 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
   const { slug } = params
   let service: ServiceData | null = null
 
+  let subServices: SubServiceData[] = []
   try {
     const client = await clientPromise
     const db = client.db("sjmedialabs")
@@ -51,6 +65,8 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
     if (data) {
       service = { ...data, id: data._id.toString() } as unknown as ServiceData
     }
+    const subs = await db.collection("sub-services").find({ parentSlug: slug, isActive: true }).sort({ displayOrder: 1, createdAt: -1 }).toArray()
+    subServices = subs.map((s: any) => ({ id: s._id.toString(), slug: s.slug, name: s.name, shortDescription: s.shortDescription || "", portfolioUrl: s.portfolioUrl, brochureUrl: s.brochureUrl }))
   } catch (error) {
     console.error("Failed to fetch service:", error)
   }
@@ -70,6 +86,10 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
   return (
     <main className="min-h-screen bg-background">
       <Header />
+
+      <section className="px-4 py-2 max-w-6xl mx-auto pt-20">
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }, { label: service.title }]} />
+      </section>
 
       {/* Hero Section - uses hero image (different from content image below) */}
       <section className="pt-24 pb-16 relative overflow-hidden">
@@ -96,6 +116,18 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
             </div>
           )}
           <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md">{service.title}</h1>
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            {service.portfolioUrl && (
+              <a href={service.portfolioUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors">
+                View Portfolio <span>→</span>
+              </a>
+            )}
+            {service.brochureUrl && (
+              <a href={service.brochureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-[#E63946] hover:bg-[#d32f3d] text-white rounded-lg font-medium transition-colors">
+                Download Brochure <span>↓</span>
+              </a>
+            )}
+          </div>
         </div>
       </section>
 
@@ -113,6 +145,24 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
           </div>
         </div>
       </section>
+
+      {/* Sub-Services */}
+      {subServices.length > 0 && (
+        <section className="py-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-xl font-semibold text-foreground mb-6">What we offer</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {subServices.map((sub) => (
+                <Link key={sub.id} href={`/services/${service.slug}/${sub.slug}`} className="block border border-border rounded-xl p-5 hover:border-[#E63946] transition-colors">
+                  <h3 className="text-[#E63946] font-semibold mb-2">{sub.name}</h3>
+                  <p className="text-muted-foreground text-sm">{sub.shortDescription}</p>
+                  <span className="text-[#E63946] text-sm font-medium mt-2 inline-flex items-center gap-1">Read more →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Service Offerings */}
       {service.offerings && service.offerings.length > 0 && (
