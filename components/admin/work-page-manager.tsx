@@ -13,6 +13,13 @@ interface WorkPageHero {
   image: string
 }
 
+interface WorkSection4 {
+  caption?: string
+  rectangleImage?: string
+  squareImage1?: string
+  squareImage2?: string
+}
+
 interface WorkItem {
   id: string
   slug: string
@@ -28,6 +35,9 @@ interface WorkItem {
   tags: string[]
   overview: { title: string; description: string; points: string[] }
   logoVariations: string[]
+  mobileCarouselImages: string[]
+  mobileCarouselCaption?: string
+  section4: WorkSection4
   gallery: string[]
   process: Array<{ step: string; title: string; description: string }>
   showcase: string[]
@@ -54,8 +64,11 @@ const emptyWork: Omit<WorkItem, "id"> = {
   technology: "",
   year: new Date().getFullYear().toString(),
   tags: [],
-  overview: { title: "Brand Overview", description: "", points: [] },
-  logoVariations: [],
+  overview: { title: "Brand overview", description: "", points: [] },
+  logoVariations: ["", "", ""],
+  mobileCarouselImages: [],
+  mobileCarouselCaption: "",
+  section4: { caption: "", rectangleImage: "", squareImage1: "", squareImage2: "" },
   gallery: [],
   process: [],
   showcase: [],
@@ -218,7 +231,23 @@ export function WorkPageManager() {
   }
 
   const editWork = (work: WorkItem) => {
-    setEditingWork({ ...work })
+    const logos = [...(work.logoVariations || [])]
+    while (logos.length < 3) logos.push("")
+    setEditingWork({
+      ...work,
+      logoVariations: logos.slice(0, 3),
+      mobileCarouselImages: work.mobileCarouselImages || work.gallery || [],
+      mobileCarouselCaption: work.mobileCarouselCaption || "",
+      section4: {
+        caption: "",
+        rectangleImage: "",
+        squareImage1: "",
+        squareImage2: "",
+        ...work.section4,
+      },
+      overview: work.overview || emptyWork.overview,
+      process: work.process || [],
+    })
     setIsNew(false)
     setView("edit")
   }
@@ -593,22 +622,24 @@ export function WorkPageManager() {
             </div>
           </div>
 
-          {/* Image */}
+          {/* Hero background */}
           <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Featured Image</h2>
-            <ImageUpload label="Main Image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Detail Page Hero</h2>
+            <p className="text-sm admin-text-muted mb-4">Background for the project detail hero (min 650px). Upload a wide image.</p>
+            <ImageUpload label="Hero Background Image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
           </div>
 
-          {/* Overview */}
+          {/* Brand overview */}
           <div className="admin-card border admin-border rounded-xl p-6">
             <h2 className="text-lg font-semibold admin-text-primary mb-4">Brand Overview</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
                 <Input
                   value={editingWork.overview.title}
                   onChange={(e) => updateField("overview", { ...editingWork.overview, title: e.target.value })}
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="Brand overview"
                 />
               </div>
               <div>
@@ -621,28 +652,127 @@ export function WorkPageManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Key Points (comma separated)</label>
-                <Input
-                  value={editingWork.overview.points.join(", ")}
+                <label className="block text-sm admin-text-secondary mb-2">Key Points (one per line)</label>
+                <Textarea
+                  value={editingWork.overview.points.join("\n")}
                   onChange={(e) =>
                     updateField("overview", {
                       ...editingWork.overview,
                       points: e.target.value
-                        .split(",")
+                        .split("\n")
                         .map((p) => p.trim())
                         .filter(Boolean),
                     })
                   }
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  rows={4}
+                  placeholder="Branding and identity&#10;Websites and digital platforms"
                 />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Circular Images (up to 3, square uploads)</label>
+                <p className="text-xs admin-text-muted mb-3">Shown as circles on the site. Leave empty to hide.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[0, 1, 2].map((i) => (
+                    <ImageUpload
+                      key={i}
+                      label={`Circle ${i + 1}`}
+                      value={editingWork.logoVariations[i] || ""}
+                      onChange={(url) => {
+                        const next = [...editingWork.logoVariations]
+                        while (next.length < 3) next.push("")
+                        next[i] = url
+                        updateField("logoVariations", next)
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Process */}
+          {/* Section 3 — mobile carousel */}
           <div className="admin-card border admin-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Process Steps</h2>
+              <div>
+                <h2 className="text-lg font-semibold admin-text-primary">Section 3 — Mobile Mock Carousel</h2>
+                <p className="text-sm admin-text-muted mt-1">Images slide inside the phone mock on the detail page.</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateField("mobileCarouselImages", [...editingWork.mobileCarouselImages, ""])}
+                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
+              >
+                <Plus className="w-4 h-4 mr-1" /> Add Slide
+              </Button>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm admin-text-secondary mb-2">Caption (optional, bottom-left on section)</label>
+              <Textarea
+                value={editingWork.mobileCarouselCaption || ""}
+                onChange={(e) => updateField("mobileCarouselCaption", e.target.value)}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                rows={2}
+              />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {editingWork.mobileCarouselImages.map((img, index) => (
+                <div key={index} className="relative">
+                  <ImageUpload
+                    label={`Slide ${index + 1}`}
+                    value={img}
+                    onChange={(url) => {
+                      const next = [...editingWork.mobileCarouselImages]
+                      next[index] = url
+                      updateField("mobileCarouselImages", next)
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      updateField(
+                        "mobileCarouselImages",
+                        editingWork.mobileCarouselImages.filter((_, i) => i !== index),
+                      )
+                    }
+                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 4 */}
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Section 4 — Images &amp; Process</h2>
+            <p className="text-sm admin-text-muted mb-4">One wide rectangle and two square images. Process steps appear as three columns above the images.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <ImageUpload
+                label="Rectangle (wide)"
+                value={editingWork.section4.rectangleImage || ""}
+                onChange={(url) => updateField("section4", { ...editingWork.section4, rectangleImage: url })}
+              />
+              <ImageUpload
+                label="Square 1"
+                value={editingWork.section4.squareImage1 || ""}
+                onChange={(url) => updateField("section4", { ...editingWork.section4, squareImage1: url })}
+              />
+              <ImageUpload
+                label="Square 2"
+                value={editingWork.section4.squareImage2 || ""}
+                onChange={(url) => updateField("section4", { ...editingWork.section4, squareImage2: url })}
+              />
+            </div>
+          </div>
+
+          {/* Process (Section 4 content) */}
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold admin-text-primary">Section 4 — Process Steps (3 columns)</h2>
               <Button
                 variant="outline"
                 size="sm"
@@ -709,49 +839,6 @@ export function WorkPageManager() {
                     className="admin-card admin-border-light admin-text-primary mt-2"
                     rows={2}
                   />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Gallery */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Gallery Images</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => updateField("gallery", [...editingWork.gallery, ""])}
-                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-              >
-                <Plus className="w-4 h-4 mr-1" /> Add Image
-              </Button>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {editingWork.gallery.map((img, index) => (
-                <div key={index} className="relative">
-                  <ImageUpload
-                    label={`Image ${index + 1}`}
-                    value={img}
-                    onChange={(url) => {
-                      const newGallery = [...editingWork.gallery]
-                      newGallery[index] = url
-                      updateField("gallery", newGallery)
-                    }}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateField(
-                        "gallery",
-                        editingWork.gallery.filter((_, i) => i !== index),
-                      )
-                    }
-                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               ))}
             </div>
