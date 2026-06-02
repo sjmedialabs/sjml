@@ -144,8 +144,8 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       )}
 
       {layout.imageEnabled && (
-        <section className="py-8 px-4">
-          <div className="max-w-4xl mx-auto">
+        <section className="py-4 px-4">
+          <div className="max-w-6xl mx-auto">
             <div className="rounded-2xl overflow-hidden">
               <Image
                 src={service.image || "/placeholder.svg?height=400&width=800"}
@@ -159,35 +159,21 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
         </section>
       )}
 
-      {layout.offeringsEnabled && service.offerings && service.offerings.length > 0 && (
-        <section className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            {layout.offeringsTitle && (
-              <h2 className="text-2xl font-bold text-foreground mb-6">{layout.offeringsTitle}</h2>
-            )}
+      {layout.offeringsEnabled && subServices.length > 0 && (
+        <section className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="service-offerings-heading mb-6">
+              {layout.offeringsTitle || "Services We offer:"}
+            </h2>
             <div className="flex flex-wrap gap-3">
-              {service.offerings.map((offering, index) => (
-                <span
-                  key={index}
-                  className="px-4 py-2 border border-border rounded-full text-foreground text-sm hover:border-[#E63946] transition-colors inline-flex items-center gap-2"
-                >
-                  {offering} <span className="text-[#E63946]">→</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {subServices.length > 0 && (
-        <section className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-4">
               {subServices.map((sub) => (
-                <Link key={sub.id} href={`/services/${service.slug}/${sub.slug}`} className="block border border-border rounded-xl p-5 hover:border-[#E63946] transition-colors">
-                  <h3 className="text-[#E63946] font-semibold mb-2">{sub.name}</h3>
-                  <p className="text-muted-foreground text-sm">{sub.shortDescription}</p>
-                  <span className="text-[#E63946] text-sm font-medium mt-2 inline-flex items-center gap-1">Read more →</span>
+                <Link
+                  key={sub.id}
+                  href={`/services/${service.slug}/${sub.slug}`}
+                  className="service-offering-pill"
+                >
+                  {sub.name}
+                  <span aria-hidden="true">→</span>
                 </Link>
               ))}
             </div>
@@ -198,10 +184,10 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
       <ServiceContentSections sections={sections} />
 
       {layout.faqEnabled && service.faqs && service.faqs.length > 0 && (
-        <section className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
+        <section className="py-4 px-4">
+          <div className="max-w-6xl mx-auto">
             {(layout.faqTitle || layout.faqSubtitle) && (
-              <div className="mb-6">
+              <div className="mb-2">
                 {layout.faqTitle && (
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground">{layout.faqTitle}</h2>
                 )}

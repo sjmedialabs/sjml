@@ -11,13 +11,16 @@ import { ServiceSectionsEditor } from "./service-sections-editor"
 import {
   createEmptySections,
   createDefaultPageLayout,
+  createDefaultSubServicePageLayout,
   normalizeServiceSections,
   normalizeSubServiceSections,
   normalizeServicePageLayout,
+  normalizeSubServicePageLayout,
   PARENT_SERVICE_SECTION_HINTS,
   SUB_SERVICE_SECTION_HINTS,
   type ServiceContentSection,
   type ServicePageLayout,
+  type SubServicePageLayout,
 } from "@/lib/service-sections"
 import { SectionEnableToggle } from "./section-enable-toggle"
 
@@ -101,6 +104,7 @@ interface SubServiceItem {
   displayOrder: number
   isActive: boolean
   sections: ServiceContentSection[]
+  pageLayout: SubServicePageLayout
 }
 
 export function ServicesPageManager() {
@@ -218,6 +222,7 @@ export function ServicesPageManager() {
       displayOrder: 0,
       isActive: true,
       sections: createEmptySections(),
+      pageLayout: createDefaultSubServicePageLayout(),
     })
     setSubIsNew(true)
     setSubView("edit")
@@ -228,6 +233,7 @@ export function ServicesPageManager() {
     setEditingSub({
       ...sub,
       sections: normalizeSubServiceSections(sub as unknown as Record<string, unknown>),
+      pageLayout: normalizeSubServicePageLayout(sub as unknown as Record<string, unknown>),
     })
     setSubIsNew(false)
     setSubView("edit")
@@ -379,6 +385,14 @@ export function ServicesPageManager() {
     })
   }
 
+  const updateSubPageLayout = (updates: Partial<SubServicePageLayout>) => {
+    if (!editingSub) return
+    setEditingSub({
+      ...editingSub,
+      pageLayout: { ...editingSub.pageLayout, ...updates },
+    })
+  }
+
   const filteredServices = services.filter(
     (s) =>
       s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -452,7 +466,156 @@ export function ServicesPageManager() {
             sections={editingSub.sections ?? createEmptySections()}
             onChange={(sections) => setEditingSub({ ...editingSub, sections })}
             hints={SUB_SERVICE_SECTION_HINTS}
+            sectionNumberStart={1}
           />
+
+          {/* Section 5: Gallery images */}
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold admin-text-primary">Section 5: Images</h2>
+                <p className="text-sm admin-text-muted mt-1">Gallery grid shown after content sections.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <SectionEnableToggle
+                  id="sub-gallery-enabled"
+                  enabled={editingSub.pageLayout.galleryEnabled}
+                  onChange={(enabled) => updateSubPageLayout({ galleryEnabled: enabled })}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    updateSubPageLayout({
+                      galleryImages: [...editingSub.pageLayout.galleryImages, ""],
+                    })
+                  }
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add Image
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {editingSub.pageLayout.galleryImages.map((img, index) => (
+                <div key={index} className="relative">
+                  <ImageUpload
+                    label={`Image ${index + 1}`}
+                    value={img}
+                    onChange={(url) => {
+                      const next = [...editingSub.pageLayout.galleryImages]
+                      next[index] = url
+                      updateSubPageLayout({ galleryImages: next })
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      updateSubPageLayout({
+                        galleryImages: editingSub.pageLayout.galleryImages.filter((_, i) => i !== index),
+                      })
+                    }
+                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 6: Discover more */}
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold admin-text-primary">Section 6: Discover More</h2>
+                <p className="text-sm admin-text-muted mt-1">
+                  Active parent services appear as clickable pills automatically on the website.
+                </p>
+              </div>
+              <SectionEnableToggle
+                id="sub-discover-enabled"
+                enabled={editingSub.pageLayout.discoverEnabled}
+                onChange={(enabled) => updateSubPageLayout({ discoverEnabled: enabled })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Section title</label>
+              <Input
+                value={editingSub.pageLayout.discoverTitle}
+                onChange={(e) => updateSubPageLayout({ discoverTitle: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder="Discover more about SJ Media Labs"
+              />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Section subtitle</label>
+              <Input
+                value={editingSub.pageLayout.discoverSubtitle}
+                onChange={(e) => updateSubPageLayout({ discoverSubtitle: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder="Optional subtitle"
+              />
+            </div>
+          </div>
+
+          {/* Section 7: Thumbnail images */}
+          <div className="admin-card border admin-border rounded-xl p-6">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold admin-text-primary">Section 7: Images</h2>
+                <p className="text-sm admin-text-muted mt-1">Shown as 100×100 px thumbnails on the website.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <SectionEnableToggle
+                  id="sub-bottom-images-enabled"
+                  enabled={editingSub.pageLayout.bottomImagesEnabled}
+                  onChange={(enabled) => updateSubPageLayout({ bottomImagesEnabled: enabled })}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    updateSubPageLayout({
+                      bottomThumbnailImages: [...editingSub.pageLayout.bottomThumbnailImages, ""],
+                    })
+                  }
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add Thumbnail
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+              {editingSub.pageLayout.bottomThumbnailImages.map((img, index) => (
+                <div key={index} className="relative">
+                  <ImageUpload
+                    label={`Thumbnail ${index + 1}`}
+                    value={img}
+                    onChange={(url) => {
+                      const next = [...editingSub.pageLayout.bottomThumbnailImages]
+                      next[index] = url
+                      updateSubPageLayout({ bottomThumbnailImages: next })
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      updateSubPageLayout({
+                        bottomThumbnailImages: editingSub.pageLayout.bottomThumbnailImages.filter((_, i) => i !== index),
+                      })
+                    }
+                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
@@ -1024,52 +1187,11 @@ export function ServicesPageManager() {
                 placeholder="Services We Offer"
               />
             </div>
-            <p className="text-sm admin-text-muted mb-3">Add offerings as tags. Press Enter to add each item.</p>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {editingService.offerings.map((offering, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E63946]/10 border border-[#E63946]/30 text-foreground text-sm"
-                >
-                  {offering}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateField(
-                        "offerings",
-                        editingService.offerings.filter((_, i) => i !== index),
-                      )
-                    }
-                    className="p-0.5 rounded hover:bg-[#E63946]/20 text-muted-foreground hover:text-foreground"
-                    aria-label="Remove"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </span>
-              ))}
-            </div>
-            <Input
-              placeholder="e.g. Brand strategy, Visual identity, Web design and development"
-              className="admin-bg-tertiary admin-border-light admin-text-primary"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  const input = e.currentTarget
-                  const value = input.value.trim()
-                  if (value) {
-                    updateField("offerings", [...editingService.offerings, value])
-                    input.value = ""
-                  }
-                }
-              }}
-              onBlur={(e) => {
-                const value = e.target.value.trim()
-                if (value) {
-                  updateField("offerings", [...editingService.offerings, value])
-                  e.target.value = ""
-                }
-              }}
-            />
+            <p className="text-sm admin-text-muted">
+              Sub-services are managed in the <strong className="admin-text-primary">Sub-Services</strong> tab. Active
+              sub-services linked to this parent service appear here automatically on the website and link to their
+              detail pages.
+            </p>
           </div>
 
           {/* Sections 4–7: Custom content */}

@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       shortDescription: data.shortDescription ?? "",
       fullDescription: data.fullDescription ?? "",
       sections: Array.isArray(data.sections) ? data.sections : [],
+      pageLayout: data.pageLayout ?? {},
       portfolioUrl: data.portfolioUrl ?? "",
       brochureUrl: data.brochureUrl ?? "",
       displayOrder: typeof data.displayOrder === "number" ? data.displayOrder : 0,

@@ -17,6 +17,16 @@ export interface ServicePageLayout {
   faqSubtitle: string
 }
 
+export interface SubServicePageLayout {
+  galleryEnabled: boolean
+  galleryImages: string[]
+  discoverEnabled: boolean
+  discoverTitle: string
+  discoverSubtitle: string
+  bottomImagesEnabled: boolean
+  bottomThumbnailImages: string[]
+}
+
 /** Admin hints — maps to the four legacy content blocks on service detail pages. */
 export const PARENT_SERVICE_SECTION_HINTS = [
   "Overview (formerly full description)",
@@ -44,6 +54,18 @@ export function createDefaultPageLayout(): ServicePageLayout {
   }
 }
 
+export function createDefaultSubServicePageLayout(): SubServicePageLayout {
+  return {
+    galleryEnabled: true,
+    galleryImages: [],
+    discoverEnabled: true,
+    discoverTitle: "Discover more about SJ Media Labs",
+    discoverSubtitle: "",
+    bottomImagesEnabled: true,
+    bottomThumbnailImages: [],
+  }
+}
+
 export function normalizeServicePageLayout(data: Record<string, unknown>): ServicePageLayout {
   const layout = data.pageLayout as Partial<ServicePageLayout> | undefined
   return {
@@ -55,6 +77,40 @@ export function normalizeServicePageLayout(data: Record<string, unknown>): Servi
     faqTitle: layout?.faqTitle ?? "",
     faqSubtitle: layout?.faqSubtitle ?? "",
   }
+}
+
+export function normalizeSubServicePageLayout(data: Record<string, unknown>): SubServicePageLayout {
+  const layout = data.pageLayout as Partial<SubServicePageLayout> | undefined
+  const galleryImages = Array.isArray(layout?.galleryImages)
+    ? layout.galleryImages.filter((img): img is string => typeof img === "string" && img.trim() !== "")
+    : []
+
+  const legacyBottomImages = [
+    layout?.bottomRectangleImage,
+    layout?.bottomSquareImage1,
+    layout?.bottomSquareImage2,
+  ].filter((img): img is string => typeof img === "string" && img.trim() !== "")
+
+  const bottomThumbnailImages = Array.isArray(layout?.bottomThumbnailImages)
+    ? layout.bottomThumbnailImages.filter((img): img is string => typeof img === "string" && img.trim() !== "")
+    : legacyBottomImages
+
+  return {
+    galleryEnabled: layout?.galleryEnabled !== false,
+    galleryImages,
+    discoverEnabled: layout?.discoverEnabled !== false,
+    discoverTitle: layout?.discoverTitle ?? "Discover more about SJ Media Labs",
+    discoverSubtitle: layout?.discoverSubtitle ?? "",
+    bottomImagesEnabled: layout?.bottomImagesEnabled !== false,
+    bottomThumbnailImages,
+  }
+}
+
+export function validSubServiceImages(images: string[] | undefined): string[] {
+  if (!images?.length) return []
+  return images.filter(
+    (url) => url.trim() !== "" && !url.includes("placeholder.svg"),
+  )
 }
 
 export function createEmptySections(): ServiceContentSection[] {

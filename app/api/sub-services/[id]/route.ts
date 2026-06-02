@@ -59,6 +59,7 @@ export async function PUT(
       shortDescription: data.shortDescription,
       fullDescription: data.fullDescription,
       sections: data.sections,
+      pageLayout: data.pageLayout,
       portfolioUrl: data.portfolioUrl,
       brochureUrl: data.brochureUrl,
       displayOrder: data.displayOrder,

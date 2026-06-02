@@ -20,8 +20,8 @@ export function ServiceContentSections({ sections }: ServiceContentSectionsProps
   return (
     <>
       {visibleSections.map((section, index) => (
-        <section key={index} className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
+        <section key={index} className="py-4 px-4">
+          <div className="max-w-6xl mx-auto">
             {section.title && (
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{section.title}</h2>
             )}
