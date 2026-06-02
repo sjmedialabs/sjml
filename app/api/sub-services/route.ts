@@ -35,6 +35,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(list.map(serialize))
     }
 
+    const nav = searchParams.get("nav") === "true"
+    if (nav) {
+      const list = await db
+        .collection(COLLECTION)
+        .find({ isActive: true })
+        .sort({ parentSlug: 1, displayOrder: 1, createdAt: -1 })
+        .toArray()
+      return NextResponse.json(list.map(serialize))
+    }
+
     // Admin: all sub-services, optionally filter by parent
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "20")
@@ -82,6 +92,7 @@ export async function POST(request: NextRequest) {
       bannerImage: data.bannerImage ?? "",
       shortDescription: data.shortDescription ?? "",
       fullDescription: data.fullDescription ?? "",
+      sections: Array.isArray(data.sections) ? data.sections : [],
       portfolioUrl: data.portfolioUrl ?? "",
       brochureUrl: data.brochureUrl ?? "",
       displayOrder: typeof data.displayOrder === "number" ? data.displayOrder : 0,
@@ -93,7 +104,10 @@ export async function POST(request: NextRequest) {
     const result = await db.collection(COLLECTION).insertOne(doc)
     const inserted = await db.collection(COLLECTION).findOne({ _id: result.insertedId })
     revalidatePath("/services")
-    if (doc.parentSlug) revalidatePath(`/services/${doc.parentSlug}`)
+    if (doc.parentSlug) {
+      revalidatePath(`/services/${doc.parentSlug}`)
+      if (doc.slug) revalidatePath(`/services/${doc.parentSlug}/${doc.slug}`)
+    }
     return NextResponse.json(serialize(inserted), { status: 201 })
   } catch (error) {
     console.error("Create sub-service error:", error)

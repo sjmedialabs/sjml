@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
@@ -17,6 +17,37 @@ interface HeaderData {
 
 interface HeaderProps {
   data?: HeaderData | null
+}
+
+interface NavService {
+  slug: string
+  title: string
+  displayOrder?: number
+}
+
+interface NavSubService {
+  parentSlug: string
+  slug: string
+  name: string
+  displayOrder?: number
+}
+
+function ChevronDownIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  )
 }
 
 function MenuIcon({ className }: { className?: string }) {
@@ -61,8 +92,11 @@ function XIcon({ className }: { className?: string }) {
 export function Header({ data: propData }: HeaderProps = {}) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [expandedMobileNav, setExpandedMobileNav] = useState<string | null>(null)
   const [contactPopupOpen, setContactPopupOpen] = useState(false)
   const [headerData, setHeaderData] = useState<HeaderData | null>(propData || null)
+  const [navServices, setNavServices] = useState<NavService[]>([])
+  const [navSubServices, setNavSubServices] = useState<NavSubService[]>([])
 
   useEffect(() => {
     // Only fetch if data wasn't provided via props
@@ -81,6 +115,203 @@ export function Header({ data: propData }: HeaderProps = {}) {
       fetchHeaderData()
     }
   }, [propData])
+
+  useEffect(() => {
+    const fetchNavServices = async () => {
+      try {
+        const [servicesRes, subServicesRes] = await Promise.all([
+          fetch("/api/services?all=true"),
+          fetch("/api/sub-services?nav=true"),
+        ])
+        if (servicesRes.ok) {
+          const services = await servicesRes.json()
+          if (Array.isArray(services)) {
+            setNavServices(
+              services.map((service: NavService & { displayOrder?: number }) => ({
+                slug: service.slug,
+                title: service.title,
+                displayOrder: service.displayOrder,
+              })),
+            )
+          }
+        }
+        if (subServicesRes.ok) {
+          const subs = await subServicesRes.json()
+          if (Array.isArray(subs)) setNavSubServices(subs)
+        }
+      } catch (error) {
+        console.error("Failed to fetch navigation services:", error)
+      }
+    }
+    fetchNavServices()
+  }, [])
+
+  const subServicesByParent = useMemo(() => {
+    const map: Record<string, NavSubService[]> = {}
+    navSubServices.forEach((sub) => {
+      if (!map[sub.parentSlug]) map[sub.parentSlug] = []
+      map[sub.parentSlug].push(sub)
+    })
+    return map
+  }, [navSubServices])
+
+  const sortedNavServices = useMemo(
+    () => [...navServices].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)),
+    [navServices],
+  )
+
+  const getServiceSlugFromHref = (href: string) => {
+    const match = href.match(/^\/services\/([^/]+)\/?$/)
+    return match ? match[1] : null
+  }
+
+  const getNavDropdownItems = (href: string) => {
+    if (href === "/services") {
+      if (sortedNavServices.length === 0) return null
+
+      return sortedNavServices.map((service) => ({
+        service,
+        subServices: subServicesByParent[service.slug] || [],
+      }))
+    }
+
+    const parentSlug = getServiceSlugFromHref(href)
+    if (!parentSlug) return null
+
+    const subServices = subServicesByParent[parentSlug] || []
+    if (subServices.length === 0) return null
+
+    const parentService = sortedNavServices.find((service) => service.slug === parentSlug)
+    return [
+      {
+        service: parentService || { slug: parentSlug, title: parentSlug },
+        subServices,
+      },
+    ]
+  }
+
+  const isNavLinkActive = (href: string) => {
+    if (href === "/") return pathname === "/"
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
+
+  const linkClassName = (href: string) =>
+    `text-sm transition-colors ${
+      isNavLinkActive(href) ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+    }`
+
+  const renderDesktopDropdownPanel = (href: string) => {
+    const groups = getNavDropdownItems(href)
+    if (!groups || groups.length === 0) return null
+
+    return (
+      <div className="absolute top-full left-0 pt-2 min-w-[240px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+        <div className="rounded-lg border border-border bg-background shadow-lg py-2">
+          {href === "/services" && (
+            <>
+              <Link
+                href="/services"
+                className="block px-4 py-2 text-sm text-foreground hover:bg-muted/50 font-medium"
+              >
+                All Services
+              </Link>
+              <div className="my-1 border-t border-border" />
+            </>
+          )}
+          {groups.map(({ service, subServices }) => (
+            <div key={service.slug} className="py-1">
+              {href === "/services" && (
+                <Link
+                  href={`/services/${service.slug}`}
+                  className="block px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/50"
+                >
+                  {service.title}
+                </Link>
+              )}
+              {subServices.map((sub) => (
+                <Link
+                  key={sub.slug}
+                  href={`/services/${service.slug}/${sub.slug}`}
+                  className={`block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 ${
+                    href === "/services" ? "pl-6" : ""
+                  }`}
+                >
+                  {sub.name}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  const renderMobileDropdownItems = (href: string, label: string) => {
+    const groups = getNavDropdownItems(href)
+    if (!groups || groups.length === 0) return null
+
+    const isExpanded = expandedMobileNav === label
+
+    return (
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={href}
+            className={`flex-1 text-sm py-2 ${linkClassName(href)}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {label}
+          </Link>
+          <button
+            type="button"
+            className="p-2 text-muted-foreground hover:text-foreground"
+            aria-label={`Expand ${label} menu`}
+            onClick={() => setExpandedMobileNav(isExpanded ? null : label)}
+          >
+            <ChevronDownIcon className={`transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+        {isExpanded && (
+          <div className="pl-3 pb-2 space-y-1 border-l border-border ml-1">
+            {href === "/services" && (
+              <Link
+                href="/services"
+                className="block text-sm py-1.5 text-muted-foreground hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                All Services
+              </Link>
+            )}
+            {groups.map(({ service, subServices }) => (
+              <div key={service.slug} className="space-y-1">
+                {href === "/services" && (
+                  <Link
+                    href={`/services/${service.slug}`}
+                    className="block text-sm py-1.5 font-medium text-foreground hover:text-[#E63946]"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {service.title}
+                  </Link>
+                )}
+                {subServices.map((sub) => (
+                  <Link
+                    key={sub.slug}
+                    href={`/services/${service.slug}/${sub.slug}`}
+                    className={`block text-sm py-1.5 text-muted-foreground hover:text-foreground ${
+                      href === "/services" ? "pl-3" : ""
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {sub.name}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   // Don't render header if no data available
   if (!headerData) {
@@ -123,15 +354,21 @@ export function Header({ data: propData }: HeaderProps = {}) {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-6">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href
+                const dropdown = renderDesktopDropdownPanel(link.href)
+                if (dropdown) {
+                  return (
+                    <div key={link.name} className="relative group">
+                      <Link href={link.href} className={`inline-flex items-center gap-1 ${linkClassName(link.href)}`}>
+                        {link.name}
+                        <ChevronDownIcon className="opacity-70" />
+                      </Link>
+                      {dropdown}
+                    </div>
+                  )
+                }
+
                 return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`text-sm transition-colors ${
-                      isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
+                  <Link key={link.name} href={link.href} className={linkClassName(link.href)}>
                     {link.name}
                   </Link>
                 )
@@ -164,14 +401,14 @@ export function Header({ data: propData }: HeaderProps = {}) {
           <div className="lg:hidden bg-background border-t border-border">
             <nav className="flex flex-col p-4 gap-3">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href
+                const mobileDropdown = renderMobileDropdownItems(link.href, link.name)
+                if (mobileDropdown) return <div key={link.name}>{mobileDropdown}</div>
+
                 return (
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`text-sm py-2 ${
-                      isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`text-sm py-2 ${linkClassName(link.href)}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.name}

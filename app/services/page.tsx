@@ -11,7 +11,6 @@ import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
 import { PageHero } from "@/components/page-hero"
-import { Breadcrumbs } from "@/components/breadcrumbs"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour
@@ -64,18 +63,14 @@ export default async function ServicesPage() {
 
       <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
-      <section className="px-4 py-2 max-w-6xl mx-auto">
-        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Services" }]} />
-      </section>
-
       {/* Services Grid Section */}
       <section className="py-20 px-4 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-2">
-              <span className="text-[#E63946] italic">{section.title}</span>
+              <span className="text-[#E63946] ">{section.title}</span>
             </h2>
-            <h3 className="text-2xl md:text-3xl text-[#E63946] italic mb-6">{section.subtitle}</h3>
+            <h3 className="text-2xl md:text-3xl text-[#E63946]  mb-6">{section.subtitle}</h3>
             <p className="text-gray-400 max-w-2xl mx-auto text-sm">{section.description}</p>
           </div>
 
@@ -116,7 +111,7 @@ export default async function ServicesPage() {
                     ) : null}
                   </div>
                   <h3 className="text-[#E63946] font-semibold text-lg mb-3">{service.title}</h3>
-                  <p className="text-gray-500 text-sm mb-5 leading-relaxed">{service.description}</p>
+                  <p className="text-gray-500 text-sm mb-5 leading-relaxed line-clamp-3">{service.description}</p>
                   <Link
                     href={`/services/${service.slug}`}
                     className="text-[#E63946] text-sm font-medium hover:underline inline-flex items-center gap-2"

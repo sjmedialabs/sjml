@@ -3,11 +3,23 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ImageUpload } from "./image-upload"
-import { RichTextEditor } from "./rich-text-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, X } from "lucide-react"
+import { ServiceSectionsEditor } from "./service-sections-editor"
+import {
+  createEmptySections,
+  createDefaultPageLayout,
+  normalizeServiceSections,
+  normalizeSubServiceSections,
+  normalizeServicePageLayout,
+  PARENT_SERVICE_SECTION_HINTS,
+  SUB_SERVICE_SECTION_HINTS,
+  type ServiceContentSection,
+  type ServicePageLayout,
+} from "@/lib/service-sections"
+import { SectionEnableToggle } from "./section-enable-toggle"
 
 interface ServiceItem {
   id: string
@@ -28,6 +40,8 @@ interface ServiceItem {
   displayOrder?: number
   portfolioUrl?: string
   brochureUrl?: string
+  sections: ServiceContentSection[]
+  pageLayout: ServicePageLayout
 }
 
 interface Pagination {
@@ -55,6 +69,8 @@ const emptyService: Omit<ServiceItem, "id"> = {
   displayOrder: 0,
   portfolioUrl: "",
   brochureUrl: "",
+  sections: createEmptySections(),
+  pageLayout: createDefaultPageLayout(),
 }
 
 interface PageContent {
@@ -84,6 +100,7 @@ interface SubServiceItem {
   brochureUrl: string
   displayOrder: number
   isActive: boolean
+  sections: ServiceContentSection[]
 }
 
 export function ServicesPageManager() {
@@ -123,6 +140,14 @@ export function ServicesPageManager() {
       fetch("/api/services?all=true").then((r) => r.ok && r.json().then((arr) => setAllServicesForParent(Array.isArray(arr) ? arr : [])))
     }
   }, [activeTab, subPagination.page, subParentFilter])
+
+  useEffect(() => {
+    if (subView === "edit" && allServicesForParent.length === 0) {
+      fetch("/api/services?all=true")
+        .then((r) => r.ok && r.json())
+        .then((arr) => setAllServicesForParent(Array.isArray(arr) ? arr : []))
+    }
+  }, [subView, allServicesForParent.length])
 
   const fetchSubServices = async () => {
     setSubLoading(true)
@@ -179,6 +204,7 @@ export function ServicesPageManager() {
   }
 
   const addNewSubService = () => {
+    setActiveTab("sub-services")
     setEditingSub({
       id: "",
       parentSlug: subParentFilter || (allServicesForParent[0]?.slug ?? ""),
@@ -191,13 +217,18 @@ export function ServicesPageManager() {
       brochureUrl: "",
       displayOrder: 0,
       isActive: true,
+      sections: createEmptySections(),
     })
     setSubIsNew(true)
     setSubView("edit")
   }
 
   const editSubService = (sub: SubServiceItem) => {
-    setEditingSub({ ...sub })
+    setActiveTab("sub-services")
+    setEditingSub({
+      ...sub,
+      sections: normalizeSubServiceSections(sub as unknown as Record<string, unknown>),
+    })
     setSubIsNew(false)
     setSubView("edit")
   }
@@ -293,23 +324,31 @@ export function ServicesPageManager() {
     setSaving(false)
   }
 
-  const deleteService = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this service?")) return
+  const toggleServiceActive = async (service: ServiceItem) => {
     try {
       const token = localStorage.getItem("adminToken")
-      const res = await fetch(`/api/services/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`/api/services/${service.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...service, isActive: !service.isActive }),
       })
       if (res.ok) {
-        setMessage("Service deleted successfully!")
+        setMessage(service.isActive ? "Service disabled." : "Service enabled.")
         setTimeout(() => setMessage(""), 3000)
         fetchServices()
+      } else {
+        setMessage("Failed to update service status")
       }
     } catch {
-      setMessage("Failed to delete service")
+      setMessage("Failed to update service status")
     }
   }
+
+  const getParentServiceTitle = (parentSlug: string) =>
+    allServicesForParent.find((s) => s.slug === parentSlug)?.title || parentSlug
 
   const addNewService = () => {
     setEditingService({ ...emptyService, id: "" } as ServiceItem)
@@ -318,7 +357,11 @@ export function ServicesPageManager() {
   }
 
   const editService = (service: ServiceItem) => {
-    setEditingService({ ...service })
+    setEditingService({
+      ...service,
+      sections: normalizeServiceSections(service as unknown as Record<string, unknown>),
+      pageLayout: normalizeServicePageLayout(service as unknown as Record<string, unknown>),
+    })
     setIsNew(false)
     setView("edit")
   }
@@ -328,11 +371,125 @@ export function ServicesPageManager() {
     setEditingService({ ...editingService, [field]: value })
   }
 
+  const updatePageLayout = (updates: Partial<ServicePageLayout>) => {
+    if (!editingService) return
+    setEditingService({
+      ...editingService,
+      pageLayout: { ...editingService.pageLayout, ...updates },
+    })
+  }
+
   const filteredServices = services.filter(
     (s) =>
       s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.slug.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  const cancelSubServiceEdit = () => {
+    setSubView("list")
+    setEditingSub(null)
+    setSubIsNew(false)
+  }
+
+  // Sub-Service Edit View
+  if (subView === "edit" && editingSub) {
+    return (
+      <div>
+        <div className="mb-8 flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={cancelSubServiceEdit}
+            className="admin-text-secondary hover:admin-text-primary"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold admin-text-primary">{subIsNew ? "Add Sub-Service" : "Edit Sub-Service"}</h1>
+            <p className="admin-text-secondary">Fill in all the details for the sub-service</p>
+          </div>
+        </div>
+
+        {message && (
+          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
+        )}
+
+        <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Parent Service *</label>
+              <select
+                value={editingSub.parentSlug}
+                onChange={(e) => setEditingSub({ ...editingSub, parentSlug: e.target.value })}
+                className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
+              >
+                {allServicesForParent.map((s) => (
+                  <option key={s.id} value={s.slug}>{s.title}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
+              <Input type="number" value={editingSub.displayOrder ?? 0} onChange={(e) => setEditingSub({ ...editingSub, displayOrder: Number(e.target.value) || 0 })} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Name *</label>
+              <Input value={editingSub.name} onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="Logo Design" />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
+              <Input value={editingSub.slug} onChange={(e) => setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Banner Image</label>
+            <ImageUpload value={editingSub.bannerImage} onChange={(url) => setEditingSub({ ...editingSub, bannerImage: url })} />
+          </div>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
+            <Textarea value={editingSub.shortDescription} onChange={(e) => setEditingSub({ ...editingSub, shortDescription: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" rows={2} />
+          </div>
+          <ServiceSectionsEditor
+            sections={editingSub.sections ?? createEmptySections()}
+            onChange={(sections) => setEditingSub({ ...editingSub, sections })}
+            hints={SUB_SERVICE_SECTION_HINTS}
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
+              <Input value={editingSub.portfolioUrl ?? ""} onChange={(e) => setEditingSub({ ...editingSub, portfolioUrl: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="https://..." />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
+              <div className="flex items-center gap-2">
+                <Input type="file" accept="application/pdf" className="admin-bg-tertiary admin-border-light max-w-xs" onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  const form = new FormData()
+                  form.append("file", file)
+                  try {
+                    const token = localStorage.getItem("adminToken")
+                    const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
+                    const data = await res.json()
+                    if (data?.url) setEditingSub((s) => s ? { ...s, brochureUrl: data.url } : s)
+                  } catch (_) {}
+                  e.target.value = ""
+                }} />
+                {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View</a>}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <input type="checkbox" id="subActive" checked={editingSub.isActive} onChange={(e) => setEditingSub({ ...editingSub, isActive: e.target.checked })} className="rounded admin-border-light" />
+            <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
+          </div>
+          <div className="flex gap-4">
+            <Button onClick={saveSubService} disabled={subSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">{subSaving ? "Saving…" : subIsNew ? "Create Sub-Service" : "Save Sub-Service"}</Button>
+            <Button variant="outline" onClick={cancelSubServiceEdit} className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent">Cancel</Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // List View
   if (view === "list") {
@@ -547,10 +704,10 @@ export function ServicesPageManager() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteService(service.id)}
-                          className="text-red-400 hover:text-red-300"
+                          onClick={() => toggleServiceActive(service)}
+                          className={service.isActive ? "text-amber-400 hover:text-amber-300" : "text-green-400 hover:text-green-300"}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {service.isActive ? "Disable" : "Enable"}
                         </Button>
                       </div>
                     </td>
@@ -597,7 +754,7 @@ export function ServicesPageManager() {
         )}
 
         {/* Sub-Services Tab */}
-        {activeTab === "sub-services" && subView === "list" && (
+        {activeTab === "sub-services" && (
           <>
             <div className="mb-6 flex gap-4 items-center">
               <label className="text-sm admin-text-secondary">Parent service:</label>
@@ -632,7 +789,10 @@ export function ServicesPageManager() {
                   ) : (
                     subServices.map((sub) => (
                       <tr key={sub.id} className="border-b admin-border hover:admin-bg-secondary">
-                        <td className="p-4 admin-text-secondary">{sub.parentSlug}</td>
+                        <td className="p-4 admin-text-secondary">
+                          <div className="admin-text-primary font-medium">{getParentServiceTitle(sub.parentSlug)}</div>
+                          <div className="admin-text-muted text-xs">{sub.parentSlug}</div>
+                        </td>
                         <td className="p-4 admin-text-primary font-medium">{sub.name}</td>
                         <td className="p-4 admin-text-secondary">{sub.slug}</td>
                         <td className="p-4 admin-text-secondary">{sub.displayOrder ?? 0}</td>
@@ -662,83 +822,6 @@ export function ServicesPageManager() {
               )}
             </div>
           </>
-        )}
-
-        {activeTab === "sub-services" && subView === "edit" && editingSub && (
-          <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">{subIsNew ? "New Sub-Service" : "Edit Sub-Service"}</h2>
-              <Button variant="ghost" onClick={() => { setSubView("list"); setEditingSub(null); }} className="admin-text-secondary">Cancel</Button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Parent Service *</label>
-                <select
-                  value={editingSub.parentSlug}
-                  onChange={(e) => setEditingSub({ ...editingSub, parentSlug: e.target.value })}
-                  className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
-                >
-                  {allServicesForParent.map((s) => (
-                    <option key={s.id} value={s.slug}>{s.title}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
-                <Input type="number" value={editingSub.displayOrder ?? 0} onChange={(e) => setEditingSub({ ...editingSub, displayOrder: Number(e.target.value) || 0 })} className="admin-bg-tertiary admin-border-light admin-text-primary" />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Name *</label>
-                <Input value={editingSub.name} onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="Logo Design" />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
-                <Input value={editingSub.slug} onChange={(e) => setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Banner Image</label>
-              <ImageUpload value={editingSub.bannerImage} onChange={(url) => setEditingSub({ ...editingSub, bannerImage: url })} />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
-              <Textarea value={editingSub.shortDescription} onChange={(e) => setEditingSub({ ...editingSub, shortDescription: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" rows={2} />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Full Description</label>
-              <RichTextEditor value={editingSub.fullDescription ?? ""} onChange={(html) => setEditingSub({ ...editingSub, fullDescription: html })} placeholder="Full description…" minHeight="160px" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
-                <Input value={editingSub.portfolioUrl ?? ""} onChange={(e) => setEditingSub({ ...editingSub, portfolioUrl: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="https://..." />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
-                <div className="flex items-center gap-2">
-                  <Input type="file" accept="application/pdf" className="admin-bg-tertiary admin-border-light max-w-xs" onChange={async (e) => {
-                    const file = e.target.files?.[0]
-                    if (!file) return
-                    const form = new FormData()
-                    form.append("file", file)
-                    try {
-                      const token = localStorage.getItem("adminToken")
-                      const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
-                      const data = await res.json()
-                      if (data?.url) setEditingSub((s) => s ? { ...s, brochureUrl: data.url } : s)
-                    } catch (_) {}
-                    e.target.value = ""
-                  }} />
-                  {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View</a>}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="subActive" checked={editingSub.isActive} onChange={(e) => setEditingSub({ ...editingSub, isActive: e.target.checked })} className="rounded admin-border-light" />
-              <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
-            </div>
-            <Button onClick={saveSubService} disabled={subSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">{subSaving ? "Saving…" : "Save Sub-Service"}</Button>
-          </div>
         )}
       </div>
     )
@@ -821,16 +904,6 @@ export function ServicesPageManager() {
                 rows={2}
               />
             </div>
-            <div className="mt-4">
-              <label className="block text-sm admin-text-secondary mb-2">Full Description (for detail page)</label>
-              <p className="text-xs admin-text-muted mb-2">Use the toolbar for headings, lists, and bold/italic. Formatting will appear the same on the website.</p>
-              <RichTextEditor
-                value={editingService.fullDescription ?? ""}
-                onChange={(html) => updateField("fullDescription", html)}
-                placeholder="Write your service description with headings, lists, and paragraphs…"
-                minHeight="240px"
-              />
-            </div>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
@@ -895,26 +968,63 @@ export function ServicesPageManager() {
             </div>
           </div>
 
-          {/* Images */}
-          <div className="admin-card border admin-border rounded-xl p-6 space-y-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Images</h2>
-            <p className="text-sm admin-text-muted -mt-2">Use different images for the hero (top banner) and the content section below so the page doesn’t repeat the same image.</p>
+          {/* Section 1: Hero */}
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-semibold admin-text-primary">Section 1: Hero</h2>
+              <SectionEnableToggle
+                id="hero-section-enabled"
+                enabled={editingService.pageLayout.heroEnabled}
+                onChange={(enabled) => updatePageLayout({ heroEnabled: enabled })}
+              />
+            </div>
+            <p className="text-sm admin-text-muted">
+              Uses the service title, icon, and portfolio/brochure links from Basic Information.
+            </p>
             <ImageUpload
-              label="Hero image (top banner on detail page)"
+              label="Hero background image"
               value={editingService.heroImage ?? ""}
               onChange={(url) => updateField("heroImage", url)}
             />
+          </div>
+
+          {/* Section 2: Image */}
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-semibold admin-text-primary">Section 2: Image</h2>
+              <SectionEnableToggle
+                id="image-section-enabled"
+                enabled={editingService.pageLayout.imageEnabled}
+                onChange={(enabled) => updatePageLayout({ imageEnabled: enabled })}
+              />
+            </div>
             <ImageUpload
-              label="Service / content image (section below hero)"
+              label="Content image"
               value={editingService.image}
               onChange={(url) => updateField("image", url)}
             />
           </div>
 
-          {/* Offerings */}
+          {/* Section 3: Services We Offer */}
           <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Service Offerings</h2>
-            <p className="text-sm admin-text-muted mb-3">Add offerings as tags. Type an offering (multiple words allowed) and press Enter to add.</p>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="text-lg font-semibold admin-text-primary">Section 3: Services We Offer</h2>
+              <SectionEnableToggle
+                id="offerings-section-enabled"
+                enabled={editingService.pageLayout.offeringsEnabled}
+                onChange={(enabled) => updatePageLayout({ offeringsEnabled: enabled })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm admin-text-secondary mb-2">Section title</label>
+              <Input
+                value={editingService.pageLayout.offeringsTitle}
+                onChange={(e) => updatePageLayout({ offeringsTitle: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder="Services We Offer"
+              />
+            </div>
+            <p className="text-sm admin-text-muted mb-3">Add offerings as tags. Press Enter to add each item.</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {editingService.offerings.map((offering, index) => (
                 <span
@@ -962,146 +1072,53 @@ export function ServicesPageManager() {
             />
           </div>
 
-          {/* Benefits */}
+          {/* Sections 4–7: Custom content */}
+          <ServiceSectionsEditor
+            sections={editingService.sections ?? createEmptySections()}
+            onChange={(sections) => updateField("sections", sections)}
+            hints={PARENT_SERVICE_SECTION_HINTS}
+            sectionNumberStart={4}
+          />
+
+          {/* FAQ */}
           <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Benefits Section</h2>
-            <div className="space-y-4">
+            <div className="flex justify-between items-center mb-4 gap-4">
+              <h2 className="text-lg font-semibold admin-text-primary">FAQ</h2>
+              <div className="flex items-center gap-3">
+                <SectionEnableToggle
+                  id="faq-section-enabled"
+                  enabled={editingService.pageLayout.faqEnabled}
+                  onChange={(enabled) => updatePageLayout({ faqEnabled: enabled })}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => updateField("faqs", [...editingService.faqs, { question: "", answer: "" }])}
+                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add FAQ
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Section title</label>
                 <Input
-                  value={editingService.benefits.title}
-                  onChange={(e) => updateField("benefits", { ...editingService.benefits, title: e.target.value })}
+                  value={editingService.pageLayout.faqTitle}
+                  onChange={(e) => updatePageLayout({ faqTitle: e.target.value })}
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="Frequently Asked Questions"
                 />
               </div>
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Description</label>
-                <RichTextEditor
-                  value={editingService.benefits.description ?? ""}
-                  onChange={(html) => updateField("benefits", { ...editingService.benefits, description: html })}
-                  placeholder="Benefits description (headings and lists supported)"
-                  minHeight="120px"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Key Features</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Title</label>
+                <label className="block text-sm admin-text-secondary mb-2">Section subtitle</label>
                 <Input
-                  value={editingService.features.title}
-                  onChange={(e) => updateField("features", { ...editingService.features, title: e.target.value })}
+                  value={editingService.pageLayout.faqSubtitle}
+                  onChange={(e) => updatePageLayout({ faqSubtitle: e.target.value })}
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="Optional subtitle"
                 />
               </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Feature Points (comma separated)</label>
-                <Textarea
-                  value={editingService.features.points.join(", ")}
-                  onChange={(e) =>
-                    updateField("features", {
-                      ...editingService.features,
-                      points: e.target.value
-                        .split(",")
-                        .map((p) => p.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  rows={2}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Process */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Process Steps</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  updateField("process", [...editingService.process, { icon: "", title: "", description: "" }])
-                }
-                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-              >
-                <Plus className="w-4 h-4 mr-1" /> Add Step
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {editingService.process.map((step, index) => (
-                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm admin-text-secondary">Step {index + 1}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        updateField(
-                          "process",
-                          editingService.process.filter((_, i) => i !== index),
-                        )
-                      }
-                      className="text-red-400 hover:text-red-300 h-6 px-2"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      value={step.title}
-                      onChange={(e) => {
-                        const newProcess = [...editingService.process]
-                        newProcess[index].title = e.target.value
-                        updateField("process", newProcess)
-                      }}
-                      placeholder="Step title"
-                      className="admin-card admin-border-light admin-text-primary"
-                    />
-                    <Input
-                      value={step.icon}
-                      onChange={(e) => {
-                        const newProcess = [...editingService.process]
-                        newProcess[index].icon = e.target.value
-                        updateField("process", newProcess)
-                      }}
-                      placeholder="Icon name"
-                      className="admin-card admin-border-light admin-text-primary"
-                    />
-                  </div>
-                  <Textarea
-                    value={step.description}
-                    onChange={(e) => {
-                      const newProcess = [...editingService.process]
-                      newProcess[index].description = e.target.value
-                      updateField("process", newProcess)
-                    }}
-                    placeholder="Step description"
-                    className="admin-card admin-border-light admin-text-primary mt-2"
-                    rows={2}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FAQs */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">FAQs</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => updateField("faqs", [...editingService.faqs, { question: "", answer: "" }])}
-                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-              >
-                <Plus className="w-4 h-4 mr-1" /> Add FAQ
-              </Button>
             </div>
             <div className="space-y-4">
               {editingService.faqs.map((faq, index) => (

@@ -69,15 +69,16 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero — min 650px, red-bordered pills & stats */}
-      <section className="relative min-h-[650px] flex flex-col justify-center pt-24 pb-16">
+      {/* Hero — min 600px, red-bordered pills & stats */}
+      <section className="relative min-h-[600px] flex flex-col justify-center pt-24 pb-16">
         {heroBg && (
           <div className="absolute inset-0">
             <Image src={heroBg} alt="" fill className="object-cover" priority sizes="100vw" />
-            <div className="absolute inset-0 bg-black/45 dark:bg-black/55" />
+            <div className="hero-overlay" aria-hidden="true" />
           </div>
         )}
         {!heroBg && <div className="absolute inset-0 bg-muted dark:bg-zinc-950" />}
+        {!heroBg && <div className="hero-overlay" aria-hidden="true" />}
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 w-full text-center">
           {work.tags && work.tags.length > 0 && (
@@ -86,7 +87,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
                 <span
                   key={index}
                   className={`px-4 py-1.5 rounded-full text-[10px] md:text-xs font-medium uppercase tracking-wide border border-[#E63946] bg-transparent ${
-                    heroOnImage ? "text-white" : "text-foreground"
+                    heroOnImage ? "text-white light:text-foreground" : "text-foreground"
                   }`}
                 >
                   {tag}
@@ -97,7 +98,7 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
 
           <h1
             className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-10 tracking-tight ${
-              heroOnImage ? "text-white" : "text-foreground"
+              heroOnImage ? "text-white light:text-foreground" : "text-foreground"
             }`}
           >
             {work.title}
@@ -116,14 +117,14 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
                   <div className="text-center">
                     <p
                       className={`text-xs uppercase tracking-wider mb-1 ${
-                        heroOnImage ? "text-white/70" : "text-muted-foreground"
+                        heroOnImage ? "text-white/70 light:text-muted-foreground" : "text-muted-foreground"
                       }`}
                     >
                       Industry
                     </p>
                     <p
                       className={`text-sm md:text-base font-medium ${
-                        heroOnImage ? "text-white" : "text-foreground"
+                        heroOnImage ? "text-white light:text-foreground" : "text-foreground"
                       }`}
                     >
                       {work.industry}
@@ -134,14 +135,14 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
                   <div className="text-center">
                     <p
                       className={`text-xs uppercase tracking-wider mb-1 ${
-                        heroOnImage ? "text-white/70" : "text-muted-foreground"
+                        heroOnImage ? "text-white/70 light:text-muted-foreground" : "text-muted-foreground"
                       }`}
                     >
                       Role
                     </p>
                     <p
                       className={`text-sm md:text-base font-medium ${
-                        heroOnImage ? "text-white" : "text-foreground"
+                        heroOnImage ? "text-white light:text-foreground" : "text-foreground"
                       }`}
                     >
                       {work.role}
@@ -152,14 +153,14 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
                   <div className="text-center">
                     <p
                       className={`text-xs uppercase tracking-wider mb-1 ${
-                        heroOnImage ? "text-white/70" : "text-muted-foreground"
+                        heroOnImage ? "text-white/70 light:text-muted-foreground" : "text-muted-foreground"
                       }`}
                     >
                       Technology
                     </p>
                     <p
                       className={`text-sm md:text-base font-medium ${
-                        heroOnImage ? "text-white" : "text-foreground"
+                        heroOnImage ? "text-white light:text-foreground" : "text-foreground"
                       }`}
                     >
                       {work.technology}
@@ -170,14 +171,14 @@ export default async function WorkDetailPage(props: { params: Promise<{ slug: st
                   <div className="text-center">
                     <p
                       className={`text-xs uppercase tracking-wider mb-1 ${
-                        heroOnImage ? "text-white/70" : "text-muted-foreground"
+                        heroOnImage ? "text-white/70 light:text-muted-foreground" : "text-muted-foreground"
                       }`}
                     >
                       Year
                     </p>
                     <p
                       className={`text-sm md:text-base font-medium ${
-                        heroOnImage ? "text-white" : "text-foreground"
+                        heroOnImage ? "text-white light:text-foreground" : "text-foreground"
                       }`}
                     >
                       {work.year}

@@ -72,24 +72,24 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
       <Header />
 
       {/* Hero Section - white text for visibility on all backgrounds */}
-      <section className="pt-24 pb-16 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-800/50 to-[#0a0a0a]">
+      <section className="pt-24 pb-16 relative min-h-[600px] flex flex-col justify-center overflow-hidden">
+        <div className="absolute inset-0">
           <Image
             src={caseStudy.image || "/placeholder.svg"}
             alt={caseStudy.title}
             fill
-            className="object-cover opacity-20"
+            className="object-cover"
           />
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 pt-16">
+        <div className="hero-overlay" aria-hidden="true" />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-16">
           {/* Tags */}
           {caseStudy.tags && caseStudy.tags.length > 0 && (
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               {caseStudy.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="px-4 py-1.5 bg-white/10 text-white rounded-full text-xs border border-white/40"
-                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+                  className="px-4 py-1.5 bg-white/10 light:bg-muted text-white light:text-foreground rounded-full text-xs border border-white/40 light:border-border"
                 >
                   {tag}
                 </span>
@@ -97,16 +97,10 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
             </div>
           )}
 
-          <h1
-            className="text-4xl md:text-5xl font-bold text-white text-center mb-6"
-            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6)" }}
-          >
+          <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 page-hero-heading">
             {caseStudy.title}
           </h1>
-          <p
-            className="text-xl text-white text-center max-w-3xl mx-auto mb-12"
-            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
-          >
+          <p className="text-xl text-center max-w-3xl mx-auto mb-12 page-hero-description">
             {caseStudy.description}
           </p>
 

@@ -16,8 +16,9 @@ export default function DigitalMarketingRequirementFormPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative flex items-center justify-center pt-32 pb-16 px-4 overflow-hidden min-h-[320px]">
+      <section className="relative flex items-center justify-center pt-32 pb-16 px-4 overflow-hidden min-h-[600px]">
         <div className="absolute inset-0 bg-muted/30" />
+        <div className="hero-overlay" aria-hidden="true" />
         <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold leading-tight text-foreground">
             Digital Marketing <span className="text-[#E63946]">Requirement Form</span>

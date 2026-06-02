@@ -4,7 +4,6 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { clientPromise, ObjectId } from "@/lib/mongodb"
 import { sanitizeHtml } from "@/lib/sanitize-html"
-import { Breadcrumbs } from "@/components/breadcrumbs"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -37,16 +36,6 @@ export default async function InsightDetailPage(props: { params: Promise<{ slug:
   return (
     <main className="min-h-screen bg-background">
       <Header />
-
-      <section className="px-4 py-2 max-w-6xl mx-auto pt-20">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Insights", href: "/insights" },
-            { label: insight.title || "Article" },
-          ]}
-        />
-      </section>
 
       <article className="max-w-4xl mx-auto px-4 py-12">
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-8">

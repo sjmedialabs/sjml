@@ -58,6 +58,7 @@ export async function PUT(
       bannerImage: data.bannerImage,
       shortDescription: data.shortDescription,
       fullDescription: data.fullDescription,
+      sections: data.sections,
       portfolioUrl: data.portfolioUrl,
       brochureUrl: data.brochureUrl,
       displayOrder: data.displayOrder,
@@ -70,9 +71,13 @@ export async function PUT(
     const existing = await db.collection(COLLECTION).findOne(filter)
     if (!existing) return NextResponse.json({ error: "Sub-service not found" }, { status: 404 })
     await db.collection(COLLECTION).updateOne(filter, { $set: update })
-    const parentSlug = data.parentSlug ?? existing.parentSlug
+    const parentSlug = (data.parentSlug ?? existing.parentSlug) as string
+    const subSlug = (data.slug ?? existing.slug) as string
     revalidatePath("/services")
-    if (parentSlug) revalidatePath(`/services/${parentSlug}`)
+    if (parentSlug) {
+      revalidatePath(`/services/${parentSlug}`)
+      if (subSlug) revalidatePath(`/services/${parentSlug}/${subSlug}`)
+    }
     return NextResponse.json({ success: true, ...update })
   } catch (error) {
     console.error("Update sub-service error:", error)
