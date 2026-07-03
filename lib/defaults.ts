@@ -169,6 +169,7 @@ export const defaultHomeContent = {
   trustedByBackgroundImage: "",
   playbookBackgroundImage: "",
   footer: {
+    logo: "",
     address: "Realtor Office Building 5F, 123 Anywhere St., Any City, 12345 Any State",
     phone: "123-456-7890",
     email: "support@sjmedialabs.com",
@@ -184,6 +185,7 @@ export const defaultHomeContent = {
     ],
     serviceLinks: [
       { name: "Branding", href: "/services/branding" },
+      { name: "Advertising", href: "/services/advertising" },
       { name: "Digital Marketing", href: "/services/digital-marketing" },
       { name: "Web & Experience", href: "/services/web-experience" },
     ],
@@ -633,17 +635,15 @@ export const defaultHeaderContent = {
   logo: "/logo.svg",
   logoText: "SJ MEDIA LABS",
   navItems: [
-    { id: "1", label: "About", href: "/about" },
-    { id: "2", label: "Work", href: "/work" },
-    { id: "3", label: "Services", href: "/services" },
-    { id: "4", label: "Case Studies", href: "/case-studies" },
-    { id: "5", label: "Insights", href: "/insights" },
-    { id: "6", label: "Clients", href: "/clients" },
-    { id: "7", label: "Testimonials", href: "/testimonials" },
-    { id: "8", label: "Careers", href: "/careers" },
-    { id: "9", label: "Contact", href: "/contact" },
+    { id: "0", label: "HOME", href: "/" },
+    { id: "1", label: "ABOUT US", href: "/about" },
+    { id: "2", label: "SERVICES", href: "/services" },
+    { id: "3", label: "WORK", href: "/work" },
+    { id: "4", label: "INDUSTRIES", href: "/industries" },
+    { id: "5", label: "INSIGHTS", href: "/insights" },
+    { id: "6", label: "CONTACT US", href: "/contact" },
   ],
-  ctaButton: { text: "Start a project", href: "/contact" },
+  ctaButton: { text: "START A PROJECT", href: "/contact" },
   showTopBar: false,
   topBarText: "",
 }
@@ -659,6 +659,9 @@ export const defaultSettingsContent = {
   email: "support@sjmedialabs.com",
   copyright: "© 2025 SJ Media Labs. All rights reserved.",
   socialMedia: { facebook: "", twitter: "", instagram: "", linkedin: "", youtube: "" },
+  headingFontSize: 32,
+  subtitleFontSize: 20,
+  paragraphFontSize: 16,
 }
 
 export const defaultSeoContent = {

@@ -4,10 +4,15 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { normalizeSiteTypography } from "@/lib/site-typography"
+import { FontSizePill, TypographyPillRow } from "./admin-compact-fields"
 
 interface SettingsData {
   contactEmail: string
   contactPhone: string
+  headingFontSize: number
+  subtitleFontSize: number
+  paragraphFontSize: number
   socialMedia: {
     facebook: string
     twitter: string
@@ -24,6 +29,9 @@ interface SettingsData {
 const defaultSettings: SettingsData = {
   contactEmail: "info@sjmedialabs.com",
   contactPhone: "+91 1234567890",
+  headingFontSize: 32,
+  subtitleFontSize: 20,
+  paragraphFontSize: 16,
   socialMedia: {
     facebook: "",
     twitter: "",
@@ -52,7 +60,8 @@ export function SettingsManager() {
       const res = await fetch("/api/content/settings")
       if (res.ok) {
         const data = await res.json()
-        setSettings({ ...defaultSettings, ...data })
+        const typography = normalizeSiteTypography(data)
+        setSettings({ ...defaultSettings, ...data, ...typography })
       }
     } catch (error) {
       console.error("Failed to fetch settings:", error)
@@ -95,7 +104,7 @@ export function SettingsManager() {
       <div className="p-8">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E63946] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="admin-text-secondary">Loading settings...</p>
           </div>
         </div>
@@ -126,6 +135,37 @@ export function SettingsManager() {
       )}
 
       <div className="space-y-8 max-w-3xl">
+        {/* Typography */}
+        <div className="admin-card p-4">
+          <h2 className="text-sm font-semibold admin-text-primary mb-2">Typography</h2>
+          <p className="text-xs admin-text-secondary mb-3">
+            Site-wide title, subtitle, and paragraph sizes. Homepage hero title is on the Homepage tab.
+          </p>
+          <TypographyPillRow>
+            <FontSizePill
+              label="Title"
+              value={settings.headingFontSize}
+              onChange={(v) => setSettings({ ...settings, headingFontSize: v })}
+              min={16}
+              max={72}
+            />
+            <FontSizePill
+              label="Subtitle"
+              value={settings.subtitleFontSize}
+              onChange={(v) => setSettings({ ...settings, subtitleFontSize: v })}
+              min={12}
+              max={48}
+            />
+            <FontSizePill
+              label="Paragraph"
+              value={settings.paragraphFontSize}
+              onChange={(v) => setSettings({ ...settings, paragraphFontSize: v })}
+              min={12}
+              max={24}
+            />
+          </TypographyPillRow>
+        </div>
+
         {/* Contact Info */}
         <div className="admin-card p-6">
           <h2 className="text-lg font-semibold admin-text-primary mb-4">Contact Information</h2>
@@ -234,7 +274,7 @@ export function SettingsManager() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-[#E63946] hover:bg-[#d62839] text-white px-8"
+            className="bg-primary hover:bg-primary/90 text-white px-8"
           >
             {saving ? "Saving..." : "Save Settings"}
           </Button>

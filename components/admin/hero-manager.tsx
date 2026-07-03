@@ -61,7 +61,7 @@ export function HeroManager() {
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Hero Section</h1>
           <p className="admin-text-secondary">Manage the hero section content on your homepage.</p>
         </div>
-        <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
+        <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
           <Save className="w-4 h-4 mr-2" />
           Save Changes
         </Button>
@@ -125,7 +125,7 @@ export function HeroManager() {
                 className="admin-bg-secondary admin-border-light admin-text-primary"
                 onKeyPress={(e) => e.key === "Enter" && addRotatingWord()}
               />
-              <Button onClick={addRotatingWord} className="bg-[#E63946] hover:bg-[#d32f3d]">
+              <Button onClick={addRotatingWord}>
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
@@ -136,7 +136,7 @@ export function HeroManager() {
                   className="flex items-center justify-between admin-bg-secondary border admin-border-light rounded-lg px-4 py-3"
                 >
                   <span className="admin-text-primary">{word}</span>
-                  <button onClick={() => removeRotatingWord(index)} className="admin-text-secondary hover:text-[#E63946]">
+                  <button onClick={() => removeRotatingWord(index)} className="admin-text-secondary hover:text-primary">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </li>

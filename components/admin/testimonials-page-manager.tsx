@@ -127,7 +127,7 @@ export function TestimonialsPageManager() {
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -136,7 +136,7 @@ export function TestimonialsPageManager() {
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <ImageUpload
@@ -153,7 +153,7 @@ export function TestimonialsPageManager() {
           <h2 className="text-lg font-semibold admin-text-primary">Testimonials ({data.testimonials.length})</h2>
           <button
             onClick={addTestimonial}
-            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
           >
             + Add Testimonial
           </button>
@@ -178,7 +178,7 @@ export function TestimonialsPageManager() {
                     value={testimonial.quote}
                     onChange={(e) => updateTestimonial(testimonial.id, { quote: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-3">
@@ -188,7 +188,7 @@ export function TestimonialsPageManager() {
                       type="text"
                       value={testimonial.author}
                       onChange={(e) => updateTestimonial(testimonial.id, { author: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -197,7 +197,7 @@ export function TestimonialsPageManager() {
                       type="text"
                       value={testimonial.role}
                       onChange={(e) => updateTestimonial(testimonial.id, { role: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -206,7 +206,7 @@ export function TestimonialsPageManager() {
                       type="text"
                       value={testimonial.company}
                       onChange={(e) => updateTestimonial(testimonial.id, { company: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -219,7 +219,7 @@ export function TestimonialsPageManager() {
                       onChange={(e) =>
                         updateTestimonial(testimonial.id, { rating: Number.parseInt(e.target.value) || 5 })
                       }
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export function TestimonialsPageManager() {
                     type="checkbox"
                     checked={testimonial.featured}
                     onChange={(e) => updateTestimonial(testimonial.id, { featured: e.target.checked })}
-                    className="w-3 h-3 accent-[#E63946]"
+                    className="w-3 h-3 accent-primary"
                   />
                   Featured (show on homepage)
                 </label>
@@ -253,7 +253,7 @@ export function TestimonialsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

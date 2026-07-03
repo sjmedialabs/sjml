@@ -49,7 +49,7 @@ export function InsightsSection({ data, backgroundImage, title, description }: I
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
+      <div className="relative z-10 site-container">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] mb-4">{title || "Latest Insights"}</h2>

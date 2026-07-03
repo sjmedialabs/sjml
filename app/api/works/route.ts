@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
+import { sortByDisplayOrder } from "@/lib/service-order"
 
 export const dynamic = "force-dynamic"
 
@@ -19,11 +21,13 @@ export async function GET(request: NextRequest) {
       const filter: any = { isActive: true }
       if (featured) filter.isFeatured = true
 
-      const works = await db.collection("works").find(filter).sort({ createdAt: -1 }).toArray()
-      // Convert MongoDB _id to string for JSON serialization
-      const serializedWorks = works.map(work => ({
+      const works = await db.collection("works").find(filter).toArray()
+      const sorted = sortByDisplayOrder(works, (a, b) =>
+        String(b.createdAt ?? "").localeCompare(String(a.createdAt ?? "")),
+      )
+      const serializedWorks = sorted.map((work) => ({
         ...work,
-        _id: work._id.toString()
+        _id: work._id.toString(),
       }))
       return NextResponse.json(serializedWorks)
     }
@@ -79,6 +83,8 @@ export async function POST(request: NextRequest) {
     }
 
     await db.collection("works").insertOne(work)
+    revalidatePath("/work")
+    if (work.slug) revalidatePath(`/work/${work.slug}`)
     return NextResponse.json(work, { status: 201 })
   } catch (error) {
     console.error("Create work error:", error)

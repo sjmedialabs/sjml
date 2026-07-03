@@ -1,4 +1,4 @@
-import Image from "next/image"
+import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
 
 export interface PageHeroProps {
   title: string
@@ -7,11 +7,11 @@ export interface PageHeroProps {
   image?: string
 }
 
-const HERO_MIN_HEIGHT = "min-h-[600px]"
-const TITLE_BASE_CLASS = "text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-center page-hero-heading"
-const DESCRIPTION_CLASS = "text-xl max-w-3xl mx-auto text-center mt-6 page-hero-description"
+const TITLE_BASE_CLASS = "site-title font-bold leading-tight page-hero-heading"
+const DESCRIPTION_CLASS =
+  "site-paragraph max-w-3xl text-white/85 leading-relaxed mt-3 page-hero-description typography-exempt"
 
-/** Renders title in white; use "|" in title to split: part before | is white, part after | is red. */
+/** Renders title in white; use "|" in title to split: part before | is white, part after | is gold. */
 function HeroTitle({ title }: { title: string }) {
   if (!title) return null
   const pipeIndex = title.indexOf("|")
@@ -19,42 +19,30 @@ function HeroTitle({ title }: { title: string }) {
     return <h1 className={TITLE_BASE_CLASS}>{title}</h1>
   }
   const beforePart = title.slice(0, pipeIndex).trim()
-  const redPart = title.slice(pipeIndex + 1).trim()
+  const highlightPart = title.slice(pipeIndex + 1).trim()
   return (
     <h1 className={TITLE_BASE_CLASS}>
       <span>{beforePart}</span>
-      {redPart && <span style={{ color: "#E63946" }}> {redPart}</span>}
+      {highlightPart && <span className="text-home-primary"> {highlightPart}</span>}
     </h1>
   )
 }
 
 /**
- * Shared hero section for all inner pages (About, Work, Services, etc.).
- * Title uses black and red combination (use "|" in admin to split).
+ * Shared hero section for legacy inner pages (Careers, Clients, Testimonials, etc.).
  */
 export function PageHero({ title, description, image }: PageHeroProps) {
   return (
-    <section
-      className={`relative flex items-center justify-center pt-32 pb-20 px-4 overflow-hidden ${HERO_MIN_HEIGHT}`}
-    >
-      {image && (
-        <div className="absolute inset-0">
-          <Image
-            src={image}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
+    <section className="about-hero bg-home-secondary">
+      <InnerPageHeroBackground image={image} overlayClassName="about-hero-overlay" />
+      {!image && <div className="absolute inset-0 bg-home-secondary z-0" aria-hidden="true" />}
+      <div className="site-container about-hero-inner">
+        <div className="about-hero-grid">
+          <div className="about-hero-content w-full max-w-5xl">
+            <HeroTitle title={title} />
+            {description && <p className={DESCRIPTION_CLASS}>{description}</p>}
+          </div>
         </div>
-      )}
-      {!image && <div className="absolute inset-0 bg-muted/30" />}
-      <div className="hero-overlay" aria-hidden="true" />
-
-      <div className="relative z-10 w-full max-w-5xl mx-auto">
-        <HeroTitle title={title} />
-        {description && <p className={DESCRIPTION_CLASS}>{description}</p>}
       </div>
     </section>
   )

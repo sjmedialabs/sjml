@@ -40,8 +40,8 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
       <Header />
 
       {/* Back Link */}
-      <div className="pt-24 px-4">
-        <div className="max-w-6xl mx-auto">
+      <div className="pt-24">
+        <div className="site-container">
           <Link
             href="/careers"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -53,8 +53,8 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
       </div>
 
       {/* Job Header */}
-      <section className="pt-8 pb-12 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="pt-8 pb-12">
+        <div className="site-container">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{job.title}</h1>
           <div className="flex flex-wrap gap-4">
             <span className="flex items-center gap-2 text-muted-foreground">
@@ -80,8 +80,8 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
       </section>
 
       {/* Content */}
-      <section className="pb-20 px-4">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-12">
+      <section className="pb-20">
+        <div className="site-container grid lg:grid-cols-3 gap-12">
           {/* Job Details */}
           <div className="lg:col-span-2 space-y-8">
             <div>

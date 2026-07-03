@@ -37,7 +37,7 @@ export default async function TestimonialsPage() {
     console.error("Failed to fetch testimonials:", error)
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center px-4">
+        <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
           <p className="text-muted-foreground">Testimonials page content has not been set up yet. Please contact the administrator.</p>
         </div>
@@ -50,14 +50,14 @@ export default async function TestimonialsPage() {
   const heroDescription = hero.description || hero.subtitle || ""
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
       <PageHero title={hero.title} description={heroDescription} image={hero.image} />
 
       {/* Testimonials Grid */}
-      <section className="py-8 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-8">
+        <div className="site-container">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
               <div key={testimonial.id} className="bg-card border border-border rounded-2xl p-8">
@@ -96,7 +96,7 @@ export default async function TestimonialsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto bg-card border border-border rounded-2xl p-12 text-center">
           <h2 className="text-3xl font-bold text-foreground mb-4">{cta.title}</h2>
           <p className="text-muted-foreground mb-8">{cta.description}</p>

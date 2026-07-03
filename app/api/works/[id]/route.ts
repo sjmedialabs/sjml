@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -61,6 +62,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Work not found" }, { status: 404 })
     }
 
+    revalidatePath("/work")
+    if (updateData.slug) revalidatePath(`/work/${updateData.slug}`)
+
     return NextResponse.json({ ...updateData, id })
   } catch (error) {
     console.error("Update work error:", error)
@@ -88,6 +92,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Work not found" }, { status: 404 })
     }
+
+    revalidatePath("/work")
 
     return NextResponse.json({ success: true })
   } catch (error) {

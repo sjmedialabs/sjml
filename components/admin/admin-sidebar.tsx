@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useTheme } from "@/hooks/use-theme"
 
 interface AdminSidebarProps {
   activeSection: string
@@ -20,6 +19,7 @@ const menuCategories = [
       { id: "about", label: "About Page", icon: "Users" },
       { id: "work", label: "Work Page", icon: "FolderOpen" },
       { id: "services", label: "Services Page", icon: "Layers" },
+      { id: "industries", label: "Industries Page", icon: "Building" },
       { id: "case-studies", label: "Case Studies", icon: "Briefcase" },
       { id: "insights", label: "Insights", icon: "Lightbulb" },
       { id: "clients", label: "Clients", icon: "Building" },
@@ -374,7 +374,6 @@ const icons: Record<string, React.ReactNode> = {
 
 export default function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarProps) {
   const router = useRouter()
-  const { theme, toggleTheme } = useTheme()
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken")
@@ -386,7 +385,7 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
       {/* Logo */}
       <div className="admin-logo-section flex-shrink-0 p-6 border-b">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#E63946] rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
             <span className="admin-text-primary font-bold text-sm">SJ</span>
           </div>
           <div className="flex flex-col">
@@ -422,16 +421,8 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
         ))}
       </nav>
 
-      {/* Theme Toggle, View Site & Logout */}
+      {/* View Site & Logout */}
       <div className="admin-footer flex-shrink-0 p-4 border-t space-y-2">
-        <button
-          onClick={toggleTheme}
-          className="admin-action-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
-          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-        >
-          {theme === "dark" ? icons.Sun : icons.Moon}
-          {theme === "dark" ? "Light Mode" : "Dark Mode"}
-        </button>
         <a
           href="/"
           target="_blank"

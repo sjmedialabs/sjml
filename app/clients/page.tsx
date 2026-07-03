@@ -20,7 +20,7 @@ export default async function ClientsPage() {
     return (
       <main className="min-h-screen bg-background">
         <Header />
-        <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h1>
           <p className="text-muted-foreground">Page content has not been set up yet.</p>
         </div>
@@ -32,7 +32,7 @@ export default async function ClientsPage() {
   const heroDescription = heroSubtitle || ""
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
       <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
@@ -41,8 +41,8 @@ export default async function ClientsPage() {
 
       {/* Stats */}
       {stats.length > 0 && (
-        <section className="py-16 px-4 bg-card">
-          <div className="max-w-6xl mx-auto">
+        <section className="py-16 bg-card">
+          <div className="site-container">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {stats.map((stat, index) => (
                 <div key={index}>
@@ -57,7 +57,7 @@ export default async function ClientsPage() {
 
       {/* CTA */}
       {cta && (
-        <section className="py-16 px-4">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto bg-gradient-to-r from-[#E63946] to-[#d62839] rounded-2xl p-12 text-center">
             <h2 className="text-3xl font-bold text-foreground mb-4">{cta.title}</h2>
             <p className="text-foreground/80 mb-8">{cta.description}</p>

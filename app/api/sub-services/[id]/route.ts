@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { getDisplayOrder } from "@/lib/service-order"
 
 export const dynamic = "force-dynamic"
 const COLLECTION = "sub-services"
@@ -58,13 +59,16 @@ export async function PUT(
       bannerImage: data.bannerImage,
       shortDescription: data.shortDescription,
       fullDescription: data.fullDescription,
+      detailTemplate: data.detailTemplate,
       sections: data.sections,
       pageLayout: data.pageLayout,
       portfolioUrl: data.portfolioUrl,
       brochureUrl: data.brochureUrl,
-      displayOrder: data.displayOrder,
       isActive: data.isActive,
       updatedAt: new Date(),
+    }
+    if (data.displayOrder !== undefined) {
+      update.displayOrder = getDisplayOrder(data.displayOrder)
     }
     Object.keys(update).forEach((k) => update[k] === undefined && delete update[k])
 

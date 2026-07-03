@@ -119,7 +119,7 @@ export function SeoManager() {
       <div className="p-8">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E63946] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="admin-text-secondary">Loading SEO settings...</p>
           </div>
         </div>
@@ -285,7 +285,7 @@ export function SeoManager() {
             {data.pages.map((page, index) => (
               <div key={page.page} className="admin-card p-6">
                 <h3 className="text-lg font-semibold admin-text-primary mb-4 flex items-center gap-2">
-                  <span className="text-[#E63946]">●</span> {page.page} Page
+                  <span className="text-primary">●</span> {page.page} Page
                 </h3>
                 
                 <div className="space-y-4">
@@ -442,12 +442,12 @@ export function SeoManager() {
       {/* SAVE BUTTON */}
       <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#333]">
         <div className="text-sm admin-text-secondary">
-          💡 Remember to clear cache after saving: <code className="text-[#E63946] bg-black/30 px-2 py-1 rounded">rm -rf .next/cache && pm2 restart sjml-app</code>
+          💡 Remember to clear cache after saving: <code className="text-primary bg-black/30 px-2 py-1 rounded">rm -rf .next/cache && pm2 restart sjml-app</code>
         </div>
         <Button
           onClick={saveData}
           disabled={saving}
-          className="bg-[#E63946] hover:bg-[#d62839] text-white px-8 py-3 text-base"
+          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-base"
         >
           {saving ? "Saving..." : "💾 Save All SEO Settings"}
         </Button>

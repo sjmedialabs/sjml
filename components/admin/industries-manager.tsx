@@ -66,7 +66,7 @@ export function IndustriesManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Industry
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -78,7 +78,7 @@ export function IndustriesManager() {
           <Card key={industry.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary text-lg">{industry.title || "New Industry"}</CardTitle>
-              <button onClick={() => removeIndustry(industry.id)} className="admin-text-secondary hover:text-[#E63946]">
+              <button onClick={() => removeIndustry(industry.id)} className="admin-text-secondary hover:text-primary">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>

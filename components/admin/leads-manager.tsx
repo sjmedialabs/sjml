@@ -280,7 +280,7 @@ export function LeadsManager() {
           <Button
             size="sm"
             onClick={() => setShowAddModal(true)}
-            className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary"
+            className="bg-primary hover:bg-primary/90 admin-text-primary"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Lead
           </Button>
@@ -326,7 +326,7 @@ export function LeadsManager() {
         <h4 className="text-blue-400 font-medium mb-2">Meta & Google Ads Integration</h4>
         <p className="admin-text-secondary text-sm">
           To automatically receive leads from ad campaigns, configure webhooks to send data to:{" "}
-          <code className="admin-bg-secondary px-2 py-1 rounded text-[#E63946]">/api/leads/webhook</code>
+          <code className="admin-bg-secondary px-2 py-1 rounded text-primary">/api/leads/webhook</code>
         </p>
       </div>
 
@@ -350,7 +350,7 @@ export function LeadsManager() {
                 setPagination((p) => ({ ...p, page: 1 }))
               }}
               className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
-                filter === status ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
+                filter === status ? "bg-primary text-primary-foreground" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
               }`}
             >
               {status}
@@ -397,7 +397,7 @@ export function LeadsManager() {
             {loading ? (
               <tr>
                 <td colSpan={7} className="p-8 text-center">
-                  <div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" />
+                  <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                 </td>
               </tr>
             ) : filteredLeads.length === 0 ? (
@@ -414,7 +414,7 @@ export function LeadsManager() {
                     {lead.company && <div className="admin-text-muted text-sm">{lead.company}</div>}
                   </td>
                   <td className="p-4">
-                    <a href={`mailto:${lead.email}`} className="admin-text-secondary hover:text-[#E63946]">
+                    <a href={`mailto:${lead.email}`} className="admin-text-secondary hover:text-primary">
                       {lead.email}
                     </a>
                   </td>
@@ -517,13 +517,13 @@ export function LeadsManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="text-xs admin-text-muted mb-1">Email</div>
-                  <a href={`mailto:${selectedLead.email}`} className="admin-text-primary hover:text-[#E63946]">
+                  <a href={`mailto:${selectedLead.email}`} className="admin-text-primary hover:text-primary">
                     {selectedLead.email}
                   </a>
                 </div>
                 <div className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="text-xs admin-text-muted mb-1">Phone</div>
-                  <a href={`tel:${selectedLead.phone}`} className="admin-text-primary hover:text-[#E63946]">
+                  <a href={`tel:${selectedLead.phone}`} className="admin-text-primary hover:text-primary">
                     {selectedLead.phone || "Not provided"}
                   </a>
                 </div>
@@ -612,7 +612,7 @@ export function LeadsManager() {
                 >
                   Delete Lead
                 </Button>
-                <Button onClick={() => setSelectedLead(null)} className="bg-[#E63946] hover:bg-[#d32f3d]">
+                <Button onClick={() => setSelectedLead(null)}>
                   Close
                 </Button>
               </div>
@@ -700,7 +700,7 @@ export function LeadsManager() {
               <Button
                 onClick={addLead}
                 disabled={!newLead.name || !newLead.email}
-                className="bg-[#E63946] hover:bg-[#d32f3d]"
+               
               >
                 Add Lead
               </Button>

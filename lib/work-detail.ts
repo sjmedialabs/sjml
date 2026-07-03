@@ -10,11 +10,8 @@ export function validWorkImages(urls: string[] | undefined | null): string[] {
   )
 }
 
-export interface WorkSection4 {
-  caption?: string
-  rectangleImage?: string
-  squareImage1?: string
-  squareImage2?: string
+export function isValidWorkImage(url: string | undefined): boolean {
+  return !!url && url.trim() !== "" && !url.includes("placeholder.svg")
 }
 
 export interface WorkDetailData {
@@ -23,16 +20,32 @@ export interface WorkDetailData {
   title: string
   description?: string
   image: string
+  cardSubtitle?: string
+  categoryTags?: string
+  categories?: string[]
+  displayOrder?: number
+  category?: string
+  client?: string
   industry?: string
   role?: string
   technology?: string
   year?: string
   tags?: string[]
+  isActive?: boolean
+  isFeatured?: boolean
+  detailTemplate?: import("@/lib/work-detail-template").WorkDetailTemplate
+  sections?: import("@/lib/work-sections").WorkDetailSections
+  /** @deprecated Legacy fields — migrated via normalizeWorkSections */
   overview?: { title: string; description: string; points: string[] }
   logoVariations?: string[]
   mobileCarouselImages?: string[]
   mobileCarouselCaption?: string
-  section4?: WorkSection4
+  section4?: {
+    caption?: string
+    rectangleImage?: string
+    squareImage1?: string
+    squareImage2?: string
+  }
   process?: Array<{ step: string; title: string; description: string }>
   gallery?: string[]
 }

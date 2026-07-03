@@ -148,7 +148,7 @@ export function CareersPageManager() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
-              activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
+              activeTab === tab ? "bg-primary text-primary-foreground" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab}
@@ -166,7 +166,7 @@ export function CareersPageManager() {
                 type="text"
                 value={data.heroTitle}
                 onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
             <div>
@@ -175,7 +175,7 @@ export function CareersPageManager() {
                 value={data.heroSubtitle}
                 onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
             <ImageUpload
@@ -196,7 +196,7 @@ export function CareersPageManager() {
             </div>
             <button
               onClick={addJob}
-              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839]"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90"
             >
               + Add Job
             </button>
@@ -298,7 +298,7 @@ export function CareersPageManager() {
                       type="text"
                       value={editingJob.title}
                       onChange={(e) => updateJob({ ...editingJob, title: e.target.value })}
-                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -307,7 +307,7 @@ export function CareersPageManager() {
                       type="text"
                       value={editingJob.department}
                       onChange={(e) => updateJob({ ...editingJob, department: e.target.value })}
-                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export function CareersPageManager() {
                       type="text"
                       value={editingJob.location}
                       onChange={(e) => updateJob({ ...editingJob, location: e.target.value })}
-                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -326,7 +326,7 @@ export function CareersPageManager() {
                     <select
                       value={editingJob.type}
                       onChange={(e) => updateJob({ ...editingJob, type: e.target.value })}
-                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                     >
                       <option value="Full-time">Full-time</option>
                       <option value="Part-time">Part-time</option>
@@ -341,7 +341,7 @@ export function CareersPageManager() {
                       value={editingJob.salary}
                       onChange={(e) => updateJob({ ...editingJob, salary: e.target.value })}
                       placeholder="e.g. $80k - $120k"
-                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export function CareersPageManager() {
                     value={editingJob.description}
                     onChange={(e) => updateJob({ ...editingJob, description: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                   />
                 </div>
                 <div>
@@ -368,7 +368,7 @@ export function CareersPageManager() {
                       })
                     }
                     rows={2}
-                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                   />
                 </div>
                 <label className="flex items-center gap-2 text-sm admin-text-secondary">
@@ -376,7 +376,7 @@ export function CareersPageManager() {
                     type="checkbox"
                     checked={editingJob.published}
                     onChange={(e) => updateJob({ ...editingJob, published: e.target.checked })}
-                    className="w-4 h-4 accent-[#E63946]"
+                    className="w-4 h-4 accent-primary"
                   />
                   Published (visible on website)
                 </label>
@@ -396,7 +396,7 @@ export function CareersPageManager() {
                 type="text"
                 value={data.culture.title}
                 onChange={(e) => setData({ ...data, culture: { ...data.culture, title: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
               />
             </div>
             <div>
@@ -405,7 +405,7 @@ export function CareersPageManager() {
                 value={data.culture.description}
                 onChange={(e) => setData({ ...data, culture: { ...data.culture, description: e.target.value } })}
                 rows={4}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -420,7 +420,7 @@ export function CareersPageManager() {
               onClick={() =>
                 setData({ ...data, benefits: [...data.benefits, { icon: "Star", title: "", description: "" }] })
               }
-              className="px-3 py-1.5 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
+              className="px-3 py-1.5 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
             >
               + Add Benefit
             </button>
@@ -489,7 +489,7 @@ export function CareersPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

@@ -20,7 +20,7 @@ export default async function CareersPage() {
     return (
       <main className="min-h-screen bg-background">
         <Header />
-        <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h1>
           <p className="text-muted-foreground">Page content has not been set up yet.</p>
         </div>
@@ -37,14 +37,14 @@ export default async function CareersPage() {
   const heroImage = hero?.image || ""
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
       <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
 
       {/* Culture Section */}
-      <section className="py-16 px-4 bg-background">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <section className="py-16 bg-background">
+        <div className="site-container grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-6">{data.culture.title}</h2>
             <p className="text-muted-foreground leading-relaxed">{data.culture.description}</p>
@@ -59,8 +59,8 @@ export default async function CareersPage() {
 
       {/* Benefits */}
       {data.benefits && data.benefits.length > 0 && (
-        <section className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
+        <section className="py-16">
+          <div className="site-container">
             <h2 className="text-3xl font-bold text-foreground text-center mb-12">
               Benefits & <span className="text-[#E63946]">Perks</span>
             </h2>
@@ -80,8 +80,8 @@ export default async function CareersPage() {
       )}
 
       {/* Open Positions */}
-      <section className="py-16 px-4 bg-background">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 bg-background">
+        <div className="site-container">
           <h2 className="text-3xl font-bold text-foreground text-center mb-4">
             Open <span className="text-[#E63946]">Positions</span>
           </h2>
@@ -143,7 +143,7 @@ export default async function CareersPage() {
 
       {/* CTA */}
       {(data as any).cta && (
-        <section className="py-16 px-4">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-foreground mb-4">{(data as any).cta.title}</h2>
             <p className="text-muted-foreground mb-8">{(data as any).cta.description}</p>

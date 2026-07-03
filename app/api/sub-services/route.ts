@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { getDisplayOrder, sortByDisplayOrder } from "@/lib/service-order"
+import { createDefaultServiceDetailTemplate } from "@/lib/service-detail-template"
 
 export const dynamic = "force-dynamic"
 const COLLECTION = "sub-services"
@@ -27,12 +29,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (parentSlug) {
-      const list = await db
-        .collection(COLLECTION)
-        .find({ parentSlug, isActive: true })
-        .sort({ displayOrder: 1, createdAt: -1 })
-        .toArray()
-      return NextResponse.json(list.map(serialize))
+      const list = await db.collection(COLLECTION).find({ parentSlug, isActive: true }).toArray()
+      const sorted = sortByDisplayOrder(list)
+      return NextResponse.json(sorted.map(serialize))
     }
 
     const nav = searchParams.get("nav") === "true"
@@ -52,13 +51,9 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
     const filter = parent ? { parentSlug: parent } : {}
     const total = await db.collection(COLLECTION).countDocuments(filter)
-    const list = await db
-      .collection(COLLECTION)
-      .find(filter)
-      .sort({ parentSlug: 1, displayOrder: 1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray()
+    const allItems = await db.collection(COLLECTION).find(filter).toArray()
+    const sorted = sortByDisplayOrder(allItems, (a, b) => String(a.parentSlug).localeCompare(String(b.parentSlug)))
+    const list = sorted.slice(skip, skip + limit)
 
     return NextResponse.json({
       subServices: list.map(serialize),
@@ -85,6 +80,7 @@ export async function POST(request: NextRequest) {
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
+    const parentTitle = data.parentTitle ?? data.parentSlug ?? ""
     const doc = {
       parentSlug: data.parentSlug ?? "",
       slug: data.slug ?? "",
@@ -92,11 +88,14 @@ export async function POST(request: NextRequest) {
       bannerImage: data.bannerImage ?? "",
       shortDescription: data.shortDescription ?? "",
       fullDescription: data.fullDescription ?? "",
+      detailTemplate:
+        data.detailTemplate ??
+        createDefaultServiceDetailTemplate(data.name ?? "", parentTitle.toUpperCase()),
       sections: Array.isArray(data.sections) ? data.sections : [],
       pageLayout: data.pageLayout ?? {},
       portfolioUrl: data.portfolioUrl ?? "",
       brochureUrl: data.brochureUrl ?? "",
-      displayOrder: typeof data.displayOrder === "number" ? data.displayOrder : 0,
+      displayOrder: getDisplayOrder(data.displayOrder),
       isActive: data.isActive !== false,
       createdAt: new Date(),
       updatedAt: new Date(),

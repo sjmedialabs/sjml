@@ -2,168 +2,39 @@
 
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
+import { VideoUpload } from "./video-upload"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { SectionEnableToggle } from "./section-enable-toggle"
+import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react"
+import {
+  createDefaultHero,
+  createDefaultStats,
+  createDefaultServicesSection,
+  normalizeHomeContent,
+  type HomeHero,
+  type HomeStat,
+  type HomeServicesSection,
+  type HeroSlide,
+  type HomeServiceCard,
+} from "@/lib/home-content"
+import { STAT_ICON_PRESETS, isStatIconPreset } from "@/components/stats-icons"
 
-interface HeroData {
-  title: string
-  description: string
-  primaryButtonText: string
-  primaryButtonUrl: string
-  secondaryButtonText: string
-  secondaryButtonUrl: string
-  rotatingWords: string[]
-  backgroundImage?: string
-}
-
-interface StatItem {
-  id: string
-  value: string
-  label: string
-}
-
-interface CaseStudyItem {
-  id: string
-  title: string
-  description: string
-  image: string
-  tags: string[]
-  stat1Label: string
-  stat1Value: string
-  stat2Label: string
-  stat2Value: string
-}
-
-interface ServiceItem {
-  id: string
-  title: string
-  description: string
-  icon: string
-  image: string
-  link: string
-}
-
-interface IndustryItem {
-  id: string
-  title: string
-  description: string
-  image: string
-}
-
-interface PlaybookData {
-  title: string
-  description: string
-  buttonText: string
-  buttonUrl: string
-  image: string
-  pdfUrl?: string
-}
-
-interface PartnerItem {
-  id: string
-  name: string
-  logo: string
-}
-
-interface TestimonialItem {
-  id: string
-  quote: string
-  author: string
-  company: string
-  image: string
-  rating: number
-}
-
-interface InsightItem {
-  id: string
-  title: string
-  description: string
-  image: string
-  date: string
-  category: string
-  readTime: string
-}
-
-interface SectionMeta {
-  title: string
-  description: string
-  backgroundImage: string
-}
-
-interface HomeContent {
-  hero: HeroData
-  stats: StatItem[]
-  caseStudies: CaseStudyItem[]
-  services: ServiceItem[]
-  industries: IndustryItem[]
-  playbook: PlaybookData
-  partners: PartnerItem[]
-  testimonials?: TestimonialItem[]
-  insights?: InsightItem[]
-  statsBackgroundImage?: string
-  servicesBackgroundImage?: string
-  industriesBackgroundImage?: string
-  caseStudiesBackgroundImage?: string
-  testimonialsBackgroundImage?: string
-  insightsBackgroundImage?: string
-  trustedByBackgroundImage?: string
-  playbookBackgroundImage?: string
-  statsSection?: SectionMeta
-  caseStudiesSection?: SectionMeta
-  servicesSection?: SectionMeta
-  industriesSection?: SectionMeta
-  testimonialsSection?: SectionMeta
-  insightsSection?: SectionMeta
-  playbookSection?: SectionMeta
-  trustedBySection?: SectionMeta
-}
+const ICON_OPTIONS = [
+  { value: "users", label: "Users / Clients" },
+  { value: "layers", label: "Layers / Projects" },
+  { value: "trophy", label: "Trophy / Experience" },
+  { value: "globe", label: "Globe / Global" },
+]
 
 export function HomePageManager() {
-  const [activeTab, setActiveTab] = useState("hero")
-  const [heroData, setHeroData] = useState<HeroData>({
-    title: "",
-    description: "",
-    primaryButtonText: "",
-    primaryButtonUrl: "",
-    secondaryButtonText: "",
-    secondaryButtonUrl: "",
-    rotatingWords: [],
-  })
-  const [statsData, setStatsData] = useState<StatItem[]>([])
-  const [caseStudiesData, setCaseStudiesData] = useState<CaseStudyItem[]>([])
-  const [servicesData, setServicesData] = useState<ServiceItem[]>([])
-  const [industriesData, setIndustriesData] = useState<IndustryItem[]>([])
-  const [playbookData, setPlaybookData] = useState<PlaybookData>({
-    title: "",
-    description: "",
-    buttonText: "",
-    buttonUrl: "",
-    image: "",
-  })
-  const [partnersData, setPartnersData] = useState<PartnerItem[]>([])
-  const [testimonialsData, setTestimonialsData] = useState<TestimonialItem[]>([])
-  const [insightsData, setInsightsData] = useState<InsightItem[]>([])
-
-  const [statsBackgroundImage, setStatsBackgroundImage] = useState("")
-  const [servicesBackgroundImage, setServicesBackgroundImage] = useState("")
-  const [industriesBackgroundImage, setIndustriesBackgroundImage] = useState("")
-  const [caseStudiesBackgroundImage, setCaseStudiesBackgroundImage] = useState("")
-  const [testimonialsBackgroundImage, setTestimonialsBackgroundImage] = useState("")
-  const [insightsBackgroundImage, setInsightsBackgroundImage] = useState("")
-  const [trustedByBackgroundImage, setTrustedByBackgroundImage] = useState("")
-  const [playbookBackgroundImage, setPlaybookBackgroundImage] = useState("")
-
-  const defaultSection = (): SectionMeta => ({ title: "", description: "", backgroundImage: "" })
-  const [statsSection, setStatsSection] = useState<SectionMeta>(defaultSection)
-  const [caseStudiesSection, setCaseStudiesSection] = useState<SectionMeta>(defaultSection)
-  const [servicesSection, setServicesSection] = useState<SectionMeta>(defaultSection)
-  const [industriesSection, setIndustriesSection] = useState<SectionMeta>(defaultSection)
-  const [testimonialsSection, setTestimonialsSection] = useState<SectionMeta>(defaultSection)
-  const [insightsSection, setInsightsSection] = useState<SectionMeta>(defaultSection)
-  const [playbookSection, setPlaybookSection] = useState<SectionMeta>(defaultSection)
-  const [trustedBySection, setTrustedBySection] = useState<SectionMeta>(defaultSection)
-
+  const [activeTab, setActiveTab] = useState<"hero" | "stats" | "services">("hero")
+  const [hero, setHero] = useState<HomeHero>(createDefaultHero())
+  const [stats, setStats] = useState<HomeStat[]>(createDefaultStats())
+  const [servicesSection, setServicesSection] = useState<HomeServicesSection>(createDefaultServicesSection())
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
-  const [rotatingWordsInput, setRotatingWordsInput] = useState("")
 
   useEffect(() => {
     fetchContent()
@@ -171,41 +42,15 @@ export function HomePageManager() {
 
   const fetchContent = async () => {
     try {
-      const response = await fetch("/api/content/home")
-      if (response.ok) {
-        const data: HomeContent = await response.json()
-        if (data.hero) {
-          setHeroData(data.hero)
-          setRotatingWordsInput(data.hero.rotatingWords?.join(", ") || "")
-        }
-        if (data.stats) setStatsData(data.stats)
-        if (data.caseStudies) setCaseStudiesData(data.caseStudies)
-        if (data.services) setServicesData(data.services)
-        if (data.industries) setIndustriesData(data.industries)
-        if (data.playbook) setPlaybookData(data.playbook)
-        if (data.partners) setPartnersData(data.partners)
-        if (data.testimonials) setTestimonialsData(data.testimonials)
-        if (data.insights) setInsightsData(data.insights)
-        if (data.statsBackgroundImage) setStatsBackgroundImage(data.statsBackgroundImage)
-        if (data.servicesBackgroundImage) setServicesBackgroundImage(data.servicesBackgroundImage)
-        if (data.industriesBackgroundImage) setIndustriesBackgroundImage(data.industriesBackgroundImage)
-        if (data.caseStudiesBackgroundImage) setCaseStudiesBackgroundImage(data.caseStudiesBackgroundImage)
-        if (data.testimonialsBackgroundImage) setTestimonialsBackgroundImage(data.testimonialsBackgroundImage)
-        if (data.insightsBackgroundImage) setInsightsBackgroundImage(data.insightsBackgroundImage)
-        if (data.trustedByBackgroundImage) setTrustedByBackgroundImage(data.trustedByBackgroundImage)
-        if (data.playbookBackgroundImage) setPlaybookBackgroundImage(data.playbookBackgroundImage)
-        const withBg = (s?: SectionMeta, flat?: string) => ({ title: s?.title ?? "", description: s?.description ?? "", backgroundImage: s?.backgroundImage ?? flat ?? "" })
-        if (data.statsSection || data.statsBackgroundImage) setStatsSection(withBg(data.statsSection, data.statsBackgroundImage))
-        if (data.caseStudiesSection || data.caseStudiesBackgroundImage) setCaseStudiesSection(withBg(data.caseStudiesSection, data.caseStudiesBackgroundImage))
-        if (data.servicesSection || data.servicesBackgroundImage) setServicesSection(withBg(data.servicesSection, data.servicesBackgroundImage))
-        if (data.industriesSection || data.industriesBackgroundImage) setIndustriesSection(withBg(data.industriesSection, data.industriesBackgroundImage))
-        if (data.testimonialsSection || data.testimonialsBackgroundImage) setTestimonialsSection(withBg(data.testimonialsSection, data.testimonialsBackgroundImage))
-        if (data.insightsSection || data.insightsBackgroundImage) setInsightsSection(withBg(data.insightsSection, data.insightsBackgroundImage))
-        if (data.playbookSection || data.playbookBackgroundImage) setPlaybookSection(withBg(data.playbookSection, data.playbookBackgroundImage))
-        if (data.trustedBySection || data.trustedByBackgroundImage) setTrustedBySection(withBg(data.trustedBySection, data.trustedByBackgroundImage))
-      }
-    } catch (error) {
-      console.error("Error fetching content:", error)
+      const res = await fetch("/api/content/home")
+      if (!res.ok) return
+      const raw = await res.json()
+      const normalized = normalizeHomeContent(raw, { forAdmin: true })
+      setHero(normalized.hero)
+      setStats(normalized.stats)
+      setServicesSection(normalized.servicesSection)
+    } catch (e) {
+      console.error("Failed to fetch home content", e)
     }
   }
 
@@ -213,233 +58,110 @@ export function HomePageManager() {
     setSaving(true)
     setMessage("")
     try {
-      // Parse the rotating words input before saving
-      const rotatingWords = rotatingWordsInput.split(",").map((w) => w.trim()).filter(w => w.length > 0)
-      const updatedHeroData = { ...heroData, rotatingWords }
-      
       const token = localStorage.getItem("adminToken")
-      const response = await fetch("/api/content/home", {
+      const res = await fetch("/api/content/home", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          hero: updatedHeroData,
-          stats: statsData,
-          caseStudies: caseStudiesData,
-          services: servicesData,
-          industries: industriesData,
-          playbook: playbookData,
-          partners: [], // Trusted by section uses clients from Pages → Clients
-          testimonials: testimonialsData,
-          insights: insightsData,
-          statsBackgroundImage,
-          servicesBackgroundImage,
-          industriesBackgroundImage,
-          caseStudiesBackgroundImage,
-          testimonialsBackgroundImage,
-          insightsBackgroundImage,
-          trustedByBackgroundImage,
-          playbookBackgroundImage,
-          statsSection,
-          caseStudiesSection,
-          servicesSection,
-          industriesSection,
-          testimonialsSection,
-          insightsSection,
-          playbookSection,
-          trustedBySection,
+          hero,
+          stats,
+          homeServicesSection: servicesSection,
         }),
       })
-      if (response.ok) {
-        setMessage("Content saved successfully!")
-      } else {
-        setMessage("Error saving content")
-      }
-    } catch (error) {
-      setMessage("Error saving content")
+      setMessage(res.ok ? "Homepage saved successfully!" : "Error saving homepage")
+    } catch {
+      setMessage("Error saving homepage")
     }
     setSaving(false)
   }
 
+  const updateSlide = (index: number, patch: Partial<HeroSlide>) => {
+    const slides = [...hero.slides]
+    slides[index] = { ...slides[index], ...patch }
+    setHero({ ...hero, slides })
+  }
+
+  const moveSlide = (index: number, dir: -1 | 1) => {
+    const slides = [...hero.slides]
+    const target = index + dir
+    if (target < 0 || target >= slides.length) return
+    ;[slides[index], slides[target]] = [slides[target], slides[index]]
+    setHero({
+      ...hero,
+      slides: slides.map((s, i) => ({ ...s, sortOrder: i })),
+    })
+  }
+
+  const addSlide = () => {
+    setHero({
+      ...hero,
+      slides: [
+        ...hero.slides,
+        {
+          id: Date.now().toString(),
+          enabled: true,
+          sortOrder: hero.slides.length,
+          overTitle: "",
+          headline: "",
+          headlineLine2: "",
+          highlightText: "",
+          description: "",
+          primaryButtonText: "OUR SERVICES",
+          primaryButtonUrl: "/services",
+          secondaryButtonText: "VIEW OUR WORK",
+          secondaryButtonUrl: "/work",
+          backgroundImage: "",
+          backgroundVideo: "",
+        },
+      ],
+    })
+  }
+
   const tabs = [
-    { id: "hero", label: "Hero Section" },
-    { id: "stats", label: "Statistics" },
-    { id: "case-studies", label: "Case Studies" },
-    { id: "services", label: "Our Services" },
-    { id: "industries", label: "Industries We Serve" },
-    { id: "testimonials", label: "What Our Clients Say" },
-    { id: "insights", label: "Latest Insights" },
-    { id: "playbook", label: "Get Our Brand Strategy Playbook" },
-    { id: "partners", label: "Trusted by Industry Leaders" },
+    { id: "hero" as const, label: "Hero Section" },
+    { id: "stats" as const, label: "Statistics Bar" },
+    { id: "services" as const, label: "What We Do" },
   ]
 
-  const addStat = () => {
-    const newStat: StatItem = {
-      id: Date.now().toString(),
-      value: "0",
-      label: "New Stat",
-    }
-    setStatsData([...statsData, newStat])
-  }
-
-  const updateStat = (id: string, field: keyof StatItem, value: string) => {
-    setStatsData(statsData.map((stat) => (stat.id === id ? { ...stat, [field]: value } : stat)))
-  }
-
-  const removeStat = (id: string) => {
-    setStatsData(statsData.filter((stat) => stat.id !== id))
-  }
-
-  const addCaseStudy = () => {
-    const newCaseStudy: CaseStudyItem = {
-      id: Date.now().toString(),
-      title: "New Case Study",
-      description: "Description here",
-      image: "",
-      tags: ["Tag"],
-      stat1Label: "Metric 1",
-      stat1Value: "0%",
-      stat2Label: "Metric 2",
-      stat2Value: "0%",
-    }
-    setCaseStudiesData([...caseStudiesData, newCaseStudy])
-  }
-
-  const updateCaseStudy = (id: string, field: keyof CaseStudyItem, value: string | string[]) => {
-    setCaseStudiesData(caseStudiesData.map((cs) => (cs.id === id ? { ...cs, [field]: value } : cs)))
-  }
-
-  const removeCaseStudy = (id: string) => {
-    setCaseStudiesData(caseStudiesData.filter((cs) => cs.id !== id))
-  }
-
-  const addService = () => {
-    const newService: ServiceItem = {
-      id: Date.now().toString(),
-      title: "New Service",
-      description: "Service description",
-      icon: "",
-      image: "",
-      link: "#",
-    }
-    setServicesData([...servicesData, newService])
-  }
-
-  const updateService = (id: string, field: keyof ServiceItem, value: string) => {
-    setServicesData(servicesData.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
-  }
-
-  const removeService = (id: string) => {
-    setServicesData(servicesData.filter((s) => s.id !== id))
-  }
-
-  const addIndustry = () => {
-    const newIndustry: IndustryItem = {
-      id: Date.now().toString(),
-      title: "New Industry",
-      description: "Industry description",
-      image: "",
-    }
-    setIndustriesData([...industriesData, newIndustry])
-  }
-
-  const updateIndustry = (id: string, field: keyof IndustryItem, value: string) => {
-    setIndustriesData(industriesData.map((i) => (i.id === id ? { ...i, [field]: value } : i)))
-  }
-
-  const removeIndustry = (id: string) => {
-    setIndustriesData(industriesData.filter((i) => i.id !== id))
-  }
-
-  const addPartner = () => {
-    const newPartner: PartnerItem = {
-      id: Date.now().toString(),
-      name: "New Partner",
-      logo: "",
-    }
-    setPartnersData([...partnersData, newPartner])
-  }
-
-  const updatePartner = (id: string, field: keyof PartnerItem, value: string) => {
-    setPartnersData(partnersData.map((p) => (p.id === id ? { ...p, [field]: value } : p)))
-  }
-
-  const removePartner = (id: string) => {
-    setPartnersData(partnersData.filter((p) => p.id !== id))
-  }
-
-  const addTestimonial = () => {
-    const newTestimonial: TestimonialItem = {
-      id: Date.now().toString(),
-      quote: "New testimonial quote",
-      author: "Client Name",
-      company: "Company Name",
-      image: "",
-      rating: 5,
-    }
-    setTestimonialsData([...testimonialsData, newTestimonial])
-  }
-
-  const updateTestimonial = (id: string, field: keyof TestimonialItem, value: string | number) => {
-    setTestimonialsData(testimonialsData.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
-
-  const removeTestimonial = (id: string) => {
-    setTestimonialsData(testimonialsData.filter((item) => item.id !== id))
-  }
-
-  const addInsight = () => {
-    const newInsight: InsightItem = {
-      id: Date.now().toString(),
-      title: "New Insight",
-      description: "Insight description",
-      image: "",
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
-      category: "Branding",
-      readTime: "5 min read",
-    }
-    setInsightsData([...insightsData, newInsight])
-  }
-
-  const updateInsight = (id: string, field: keyof InsightItem, value: string) => {
-    setInsightsData(insightsData.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
-
-  const removeInsight = (id: string) => {
-    setInsightsData(insightsData.filter((item) => item.id !== id))
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold admin-text-primary">Home Page Content</h2>
-        <button
-          onClick={saveContent}
-          disabled={saving}
-          className="px-6 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80 disabled:opacity-50"
-        >
-          {saving ? "Saving..." : "Save All Changes"}
-        </button>
+    <div>
+      <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold admin-text-primary mb-2">Homepage</h1>
+          <p className="admin-text-secondary">
+            Manage the homepage hero, statistics bar, and services section (reference layout).
+          </p>
+        </div>
+        <Button onClick={saveContent} disabled={saving}>
+          {saving ? "Saving…" : "Save Homepage"}
+        </Button>
       </div>
 
       {message && (
         <div
-          className={`p-4 rounded-lg ${message.includes("success") ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+          className={`mb-4 p-4 rounded-lg border ${
+            message.includes("success")
+              ? "bg-green-500/20 border-green-500/50 text-green-400"
+              : "bg-red-500/20 border-red-500/50 text-red-400"
+          }`}
         >
           {message}
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b admin-border pb-4">
+      <div className="flex flex-wrap gap-2 mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === tab.id ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              activeTab === tab.id
+                ? "bg-primary text-primary-foreground"
+                : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
             }`}
           >
             {tab.label}
@@ -447,541 +169,574 @@ export function HomePageManager() {
         ))}
       </div>
 
-      {/* Hero Section */}
       {activeTab === "hero" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Hero Section</h3>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Background Image</label>
-            <ImageUpload
-              value={heroData.backgroundImage || ""}
-              onChange={(url) => setHeroData({ ...heroData, backgroundImage: url })}
-              label="Upload Background"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
-            <input
-              type="text"
-              value={heroData.title}
-              onChange={(e) => setHeroData({ ...heroData, title: e.target.value })}
-              className="w-full px-4 py-2 admin-input rounded-lg "
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
-            <textarea
-              value={heroData.description}
-              onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 admin-input rounded-lg "
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Rotating Words (comma separated)</label>
-            <input
-              type="text"
-              value={rotatingWordsInput}
-              onChange={(e) => setRotatingWordsInput(e.target.value)}
-              placeholder="Success Story, Digital Experience, Market Leader"
-              className="w-full px-4 py-2 admin-input rounded-lg "
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Primary Button Text</label>
-              <input
-                type="text"
-                value={heroData.primaryButtonText}
-                onChange={(e) => setHeroData({ ...heroData, primaryButtonText: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
+        <div className="space-y-6">
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-semibold admin-text-primary">Hero settings</h2>
+              <SectionEnableToggle
+                id="hero-enabled"
+                enabled={hero.enabled}
+                onChange={(enabled) => setHero({ ...hero, enabled })}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Primary Button URL</label>
+            <label className="flex items-center gap-2 text-sm admin-text-primary">
               <input
-                type="text"
-                value={heroData.primaryButtonUrl}
-                onChange={(e) => setHeroData({ ...heroData, primaryButtonUrl: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
+                type="checkbox"
+                checked={hero.showScrollIndicator}
+                onChange={(e) => setHero({ ...hero, showScrollIndicator: e.target.checked })}
               />
+              Show scroll indicator
+            </label>
+            <Input
+              value={hero.scrollIndicatorText}
+              onChange={(e) => setHero({ ...hero, scrollIndicatorText: e.target.value })}
+              placeholder="SCROLL DOWN"
+              className="admin-bg-tertiary admin-border-light admin-text-primary max-w-xs"
+            />
+            <div className="grid sm:grid-cols-2 gap-4 max-w-md">
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Hero title font size (px)</label>
+                <Input
+                  type="number"
+                  min={20}
+                  max={80}
+                  value={hero.titleFontSize ?? 42}
+                  onChange={(e) =>
+                    setHero({ ...hero, titleFontSize: Math.max(20, Math.min(80, Number(e.target.value) || 42)) })
+                  }
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Carousel max height (px)</label>
+                <Input
+                  type="number"
+                  min={300}
+                  max={800}
+                  value={hero.maxHeight ?? 500}
+                  onChange={(e) =>
+                    setHero({ ...hero, maxHeight: Math.max(300, Math.min(800, Number(e.target.value) || 500)) })
+                  }
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex justify-between items-center gap-4 flex-wrap">
             <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Secondary Button Text</label>
-              <input
-                type="text"
-                value={heroData.secondaryButtonText}
-                onChange={(e) => setHeroData({ ...heroData, secondaryButtonText: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
-              />
+              <h2 className="text-lg font-semibold admin-text-primary">Slides</h2>
+              <p className="text-sm admin-text-secondary">{hero.slides.length} slide{hero.slides.length !== 1 ? "s" : ""}</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Secondary Button URL</label>
-              <input
-                type="text"
-                value={heroData.secondaryButtonUrl}
-                onChange={(e) => setHeroData({ ...heroData, secondaryButtonUrl: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Stats Section - Added background image upload */}
-      {activeTab === "stats" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Statistics</h3>
-            <button onClick={addStat} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
-              Add Stat
-            </button>
+            <Button type="button" onClick={addSlide}>
+              <Plus className="w-4 h-4 mr-1" /> Add slide
+            </Button>
           </div>
 
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header (optional)</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={statsSection.title} onChange={(e) => setStatsSection({ ...statsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="e.g. By the numbers" />
+          {hero.slides.length === 0 && (
+            <div className="admin-card border admin-border rounded-xl p-8 text-center">
+              <p className="admin-text-secondary mb-4">No slides yet. Add your first hero slide to get started.</p>
+              <Button type="button" onClick={addSlide}>
+                <Plus className="w-4 h-4 mr-1" /> Add slide
+              </Button>
             </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={statsSection.description} onChange={(e) => setStatsSection({ ...statsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Optional subtitle" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={statsSection.backgroundImage} onChange={(url) => setStatsSection({ ...statsSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
+          )}
 
-          {statsData.map((stat) => (
-            <div key={stat.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light">
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Value</label>
-                  <input
-                    type="text"
-                    value={stat.value}
-                    onChange={(e) => updateStat(stat.id, "value", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Label</label>
-                  <input
-                    type="text"
-                    value={stat.label}
-                    onChange={(e) => updateStat(stat.id, "label", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
+          {hero.slides.map((slide, index) => (
+            <div key={slide.id} className="admin-card border admin-border rounded-xl p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold admin-text-primary">Slide {index + 1}</h3>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" disabled={index === 0} onClick={() => moveSlide(index, -1)}>
+                    <ChevronUp className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={index === hero.slides.length - 1}
+                    onClick={() => moveSlide(index, 1)}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-400"
+                    onClick={() =>
+                      setHero({ ...hero, slides: hero.slides.filter((_, i) => i !== index) })
+                    }
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-              <button onClick={() => removeStat(stat.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Case Studies Section - section header + background only; items from Case Studies page/collection */}
-      {activeTab === "case-studies" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Case Studies</h3>
-          <p className="admin-text-secondary text-sm">Section title, description and background. Case study items are managed on the Case Studies page.</p>
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={caseStudiesSection.title} onChange={(e) => setCaseStudiesSection({ ...caseStudiesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Case Studies" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={caseStudiesSection.description} onChange={(e) => setCaseStudiesSection({ ...caseStudiesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Explore our portfolio of successful brand transformations." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={caseStudiesSection.backgroundImage} onChange={(url) => setCaseStudiesSection({ ...caseStudiesSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Our Services Section - section header + background only; items from Services collection */}
-      {activeTab === "services" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Our Services</h3>
-          <p className="admin-text-secondary text-sm">Section title, description and background. Service items are managed on the Services page.</p>
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={servicesSection.title} onChange={(e) => setServicesSection({ ...servicesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Our Services" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={servicesSection.description} onChange={(e) => setServicesSection({ ...servicesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Comprehensive solutions to elevate your brand." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={servicesSection.backgroundImage} onChange={(url) => setServicesSection({ ...servicesSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Industries Section */}
-      {activeTab === "industries" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Industries We Serve</h3>
-            <button
-              onClick={addIndustry}
-              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
-            >
-              Add Industry
-            </button>
-          </div>
-
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={industriesSection.title} onChange={(e) => setIndustriesSection({ ...industriesSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Industries We Serve" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={industriesSection.description} onChange={(e) => setIndustriesSection({ ...industriesSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Deep industry expertise delivering tailored solutions." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={industriesSection.backgroundImage} onChange={(url) => setIndustriesSection({ ...industriesSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-
-          {industriesData.map((industry) => (
-            <div key={industry.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
+              <label className="flex items-center gap-2 text-sm admin-text-primary">
                 <input
-                  type="text"
-                  value={industry.title}
-                  onChange={(e) => updateIndustry(industry.id, "title", e.target.value)}
-                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
+                  type="checkbox"
+                  checked={slide.enabled}
+                  onChange={(e) => updateSlide(index, { enabled: e.target.checked })}
+                />
+                Enabled
+              </label>
+              <Input
+                placeholder="Over-title (e.g. WE BUILD BRANDS THAT)"
+                value={slide.overTitle}
+                onChange={(e) => updateSlide(index, { overTitle: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <div className="grid md:grid-cols-3 gap-4">
+                <Input
+                  placeholder="Title line 1 (e.g. INSPIRE.)"
+                  value={slide.headline}
+                  onChange={(e) => updateSlide(index, { headline: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Title line 2 (e.g. CONNECT.)"
+                  value={slide.headlineLine2 ?? ""}
+                  onChange={(e) => updateSlide(index, { headlineLine2: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Title line 3 / highlight (e.g. PERFORM.)"
+                  value={slide.highlightText}
+                  onChange={(e) => updateSlide(index, { highlightText: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
+              <Textarea
+                value={slide.description}
+                onChange={(e) => updateSlide(index, { description: e.target.value })}
+                rows={3}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input
+                  placeholder="Primary button text"
+                  value={slide.primaryButtonText}
+                  onChange={(e) => updateSlide(index, { primaryButtonText: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Primary button URL"
+                  value={slide.primaryButtonUrl}
+                  onChange={(e) => updateSlide(index, { primaryButtonUrl: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Secondary button text"
+                  value={slide.secondaryButtonText}
+                  onChange={(e) => updateSlide(index, { secondaryButtonText: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Secondary button URL"
+                  value={slide.secondaryButtonUrl}
+                  onChange={(e) => updateSlide(index, { secondaryButtonUrl: e.target.value })}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+              </div>
+              <ImageUpload
+                label="Background image"
+                value={slide.backgroundImage ?? ""}
+                onChange={(url) => updateSlide(index, { backgroundImage: url })}
+              />
+              <VideoUpload
+                label="Background video (optional — takes priority over image)"
+                value={slide.backgroundVideo ?? ""}
+                onChange={(url) => updateSlide(index, { backgroundVideo: url })}
+              />
               <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
-                <textarea
-                  value={industry.description}
-                  onChange={(e) => updateIndustry(industry.id, "description", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
+                <label className="block text-sm admin-text-secondary mb-2">Or paste video URL</label>
+                <Input
+                  value={slide.backgroundVideo ?? ""}
+                  onChange={(e) => updateSlide(index, { backgroundVideo: e.target.value })}
+                  placeholder="https://..."
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Image</label>
-                <ImageUpload
-                  value={industry.image}
-                  onChange={(url) => updateIndustry(industry.id, "image", url)}
-                  label="Upload Image"
-                />
-              </div>
-              <button onClick={() => removeIndustry(industry.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Testimonials Section */}
-      {activeTab === "testimonials" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">What Our Clients Say</h3>
-            <button
-              onClick={addTestimonial}
-              className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80"
+      {activeTab === "stats" && (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setStats([
+                  ...stats,
+                  {
+                    id: Date.now().toString(),
+                    value: "",
+                    label: "",
+                    icon: "users",
+                    enabled: true,
+                    sortOrder: stats.length,
+                  },
+                ])
+              }
+              className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
             >
-              Add Testimonial
-            </button>
+              <Plus className="w-4 h-4 mr-1" /> Add statistic
+            </Button>
           </div>
-
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={testimonialsSection.title} onChange={(e) => setTestimonialsSection({ ...testimonialsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="What Our Clients Say" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={testimonialsSection.description} onChange={(e) => setTestimonialsSection({ ...testimonialsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Hear from the brands we've helped transform." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={testimonialsSection.backgroundImage} onChange={(url) => setTestimonialsSection({ ...testimonialsSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-
-          {testimonialsData.map((testimonial) => (
-            <div key={testimonial.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Author</label>
-                  <input
-                    type="text"
-                    value={testimonial.author}
-                    onChange={(e) => updateTestimonial(testimonial.id, "author", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Company</label>
-                  <input
-                    type="text"
-                    value={testimonial.company}
-                    onChange={(e) => updateTestimonial(testimonial.id, "company", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
+          {stats.map((stat, index) => (
+            <div key={stat.id} className="admin-card border admin-border rounded-xl p-6 space-y-3">
+              <div className="flex justify-between">
+                <span className="admin-text-secondary text-sm">Stat {index + 1}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-400"
+                  onClick={() => setStats(stats.filter((_, i) => i !== index))}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Quote</label>
-                <textarea
-                  value={testimonial.quote}
-                  onChange={(e) => updateTestimonial(testimonial.id, "quote", e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
+              <label className="flex items-center gap-2 text-sm admin-text-primary">
+                <input
+                  type="checkbox"
+                  checked={stat.enabled}
+                  onChange={(e) => {
+                    const next = [...stats]
+                    next[index] = { ...stat, enabled: e.target.checked }
+                    setStats(next)
+                  }}
+                />
+                Enabled
+              </label>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input
+                  placeholder="Value (e.g. 500+)"
+                  value={stat.value}
+                  onChange={(e) => {
+                    const next = [...stats]
+                    next[index] = { ...stat, value: e.target.value }
+                    setStats(next)
+                  }}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+                <Input
+                  placeholder="Label (e.g. HAPPY CLIENTS)"
+                  value={stat.label}
+                  onChange={(e) => {
+                    const next = [...stats]
+                    next[index] = { ...stat, label: e.target.value }
+                    setStats(next)
+                  }}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Profile Image</label>
-                  <ImageUpload
-                    value={testimonial.image}
-                    onChange={(url) => updateTestimonial(testimonial.id, "image", url)}
-                    label="Upload Image"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Rating (1-5)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={testimonial.rating}
-                    onChange={(e) => updateTestimonial(testimonial.id, "rating", Number.parseInt(e.target.value))}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Icon preset</label>
+                <div className="flex items-center gap-3">
+                  <div className="text-[var(--home-primary,#fcc50e)] shrink-0">
+                    {isStatIconPreset(stat.icon) ? (
+                      (() => {
+                        const PreviewIcon = STAT_ICON_PRESETS[stat.icon]
+                        return <PreviewIcon />
+                      })()
+                    ) : (
+                      <STAT_ICON_PRESETS.users />
+                    )}
+                  </div>
+                  <select
+                    value={isStatIconPreset(stat.icon) ? stat.icon : "users"}
+                    onChange={(e) => {
+                      const next = [...stats]
+                      next[index] = { ...stat, icon: e.target.value }
+                      setStats(next)
+                    }}
+                    className="flex-1 admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
+                  >
+                    {ICON_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <button
-                onClick={() => removeTestimonial(testimonial.id)}
-                className="text-red-400 hover:text-red-300 text-sm"
-              >
-                Remove
-              </button>
+              <ImageUpload
+                label="Custom icon image (overrides preset)"
+                value={stat.icon.startsWith("/") || stat.icon.startsWith("http") ? stat.icon : ""}
+                onChange={(url) => {
+                  const next = [...stats]
+                  next[index] = { ...stat, icon: url }
+                  setStats(next)
+                }}
+              />
             </div>
           ))}
         </div>
       )}
 
-      {activeTab === "insights" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold admin-text-primary">Latest Insights</h3>
-            <button onClick={addInsight} className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#E63946]/80">
-              Add Insight
-            </button>
-          </div>
-
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={insightsSection.title} onChange={(e) => setInsightsSection({ ...insightsSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Latest Insights" />
+      {activeTab === "services" && (
+        <div className="space-y-6">
+          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold admin-text-primary">Section settings</h2>
+              <SectionEnableToggle
+                id="services-section-enabled"
+                enabled={servicesSection.enabled}
+                onChange={(enabled) => setServicesSection({ ...servicesSection, enabled })}
+              />
             </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={insightsSection.description} onChange={(e) => setInsightsSection({ ...insightsSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Expert perspectives on branding and digital transformation." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={insightsSection.backgroundImage} onChange={(url) => setInsightsSection({ ...insightsSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-
-          {insightsData.map((insight) => (
-            <div key={insight.id} className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={insight.title}
-                    onChange={(e) => updateInsight(insight.id, "title", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Category</label>
-                  <input
-                    type="text"
-                    value={insight.category}
-                    onChange={(e) => updateInsight(insight.id, "category", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
-                <textarea
-                  value={insight.description}
-                  onChange={(e) => updateInsight(insight.id, "description", e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Date</label>
-                  <input
-                    type="text"
-                    value={insight.date}
-                    onChange={(e) => updateInsight(insight.id, "date", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Read Time</label>
-                  <input
-                    type="text"
-                    value={insight.readTime}
-                    onChange={(e) => updateInsight(insight.id, "readTime", e.target.value)}
-                    className="w-full px-4 py-2 admin-card border admin-border-light rounded-lg admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium admin-text-secondary mb-2">Image</label>
-                  <ImageUpload
-                    value={insight.image}
-                    onChange={(url) => updateInsight(insight.id, "image", url)}
-                    label="Upload Image"
-                  />
-                </div>
-              </div>
-              <button onClick={() => removeInsight(insight.id)} className="text-red-400 hover:text-red-300 text-sm">
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Playbook Section */}
-      {activeTab === "playbook" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Get Our Brand Strategy Playbook</h3>
-
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header (shown above the CTA)</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={playbookSection.title} onChange={(e) => setPlaybookSection({ ...playbookSection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="e.g. Get Our Brand Strategy Playbook" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={playbookSection.description} onChange={(e) => setPlaybookSection({ ...playbookSection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Optional section subtitle" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={playbookSection.backgroundImage} onChange={(url) => setPlaybookSection({ ...playbookSection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">CTA Title</label>
-            <input
-              type="text"
-              value={playbookData.title}
-              onChange={(e) => setPlaybookData({ ...playbookData, title: e.target.value })}
-              className="w-full px-4 py-2 admin-input rounded-lg "
+            <Input
+              placeholder="Label (WHAT WE DO)"
+              value={servicesSection.label}
+              onChange={(e) => setServicesSection({ ...servicesSection, label: e.target.value })}
+              className="admin-bg-tertiary admin-border-light admin-text-primary"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">Description</label>
-            <textarea
-              value={playbookData.description}
-              onChange={(e) => setPlaybookData({ ...playbookData, description: e.target.value })}
+            <Input
+              placeholder="Title"
+              value={servicesSection.title}
+              onChange={(e) => setServicesSection({ ...servicesSection, title: e.target.value })}
+              className="admin-bg-tertiary admin-border-light admin-text-primary"
+            />
+            <Textarea
+              value={servicesSection.description}
+              onChange={(e) => setServicesSection({ ...servicesSection, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 admin-input rounded-lg "
+              className="admin-bg-tertiary admin-border-light admin-text-primary"
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Button Text</label>
-              <input
-                type="text"
-                value={playbookData.buttonText}
-                onChange={(e) => setPlaybookData({ ...playbookData, buttonText: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
+            <div className="border-t admin-border pt-4 mt-2">
+              <h3 className="text-sm font-semibold admin-text-primary mb-3">Typography & card size</h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Label font size (px)</label>
+                  <Input
+                    type="number"
+                    min={8}
+                    max={18}
+                    value={servicesSection.labelFontSize ?? 11}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        labelFontSize: Math.min(18, Math.max(8, Number(e.target.value) || 11)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Section title font size (px)</label>
+                  <Input
+                    type="number"
+                    min={24}
+                    max={56}
+                    value={servicesSection.sectionTitleFontSize ?? 38}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        sectionTitleFontSize: Math.min(56, Math.max(24, Number(e.target.value) || 38)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Description font size (px)</label>
+                  <Input
+                    type="number"
+                    min={11}
+                    max={22}
+                    value={servicesSection.sectionDescriptionFontSize ?? 15}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        sectionDescriptionFontSize: Math.min(22, Math.max(11, Number(e.target.value) || 15)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Card width (px)</label>
+                  <Input
+                    type="number"
+                    min={150}
+                    max={320}
+                    value={servicesSection.cardWidth ?? 190}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        cardWidth: Math.min(320, Math.max(150, Number(e.target.value) || 190)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Card height (px)</label>
+                  <Input
+                    type="number"
+                    min={160}
+                    max={360}
+                    value={servicesSection.cardHeight ?? 220}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        cardHeight: Math.min(360, Math.max(160, Number(e.target.value) || 220)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Card title font size (px)</label>
+                  <Input
+                    type="number"
+                    min={10}
+                    max={24}
+                    value={servicesSection.cardTitleFontSize ?? 13}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        cardTitleFontSize: Math.min(24, Math.max(10, Number(e.target.value) || 13)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Card description font size (px)</label>
+                  <Input
+                    type="number"
+                    min={9}
+                    max={18}
+                    value={servicesSection.cardDescriptionFontSize ?? 11}
+                    onChange={(e) =>
+                      setServicesSection({
+                        ...servicesSection,
+                        cardDescriptionFontSize: Math.min(18, Math.max(9, Number(e.target.value) || 11)),
+                      })
+                    }
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                placeholder="Explore link text"
+                value={servicesSection.exploreLinkText}
+                onChange={(e) => setServicesSection({ ...servicesSection, exploreLinkText: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <Input
+                placeholder="Explore link URL"
+                value={servicesSection.exploreLinkUrl}
+                onChange={(e) => setServicesSection({ ...servicesSection, exploreLinkUrl: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Button URL</label>
-              <input
-                type="text"
-                value={playbookData.buttonUrl}
-                onChange={(e) => setPlaybookData({ ...playbookData, buttonUrl: e.target.value })}
-                className="w-full px-4 py-2 admin-input rounded-lg "
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setServicesSection({
+                  ...servicesSection,
+                  items: [
+                    ...servicesSection.items,
+                    {
+                      id: Date.now().toString(),
+                      title: "",
+                      description: "",
+                      icon: "",
+                      link: "/services",
+                      enabled: true,
+                      sortOrder: servicesSection.items.length,
+                    },
+                  ],
+                })
+              }
+              className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
+            >
+              <Plus className="w-4 h-4 mr-1" /> Add service card
+            </Button>
+          </div>
+
+          {servicesSection.items.map((item, index) => (
+            <div key={item.id} className="admin-card border admin-border rounded-xl p-6 space-y-3">
+              <div className="flex justify-between">
+                <span className="admin-text-secondary text-sm">Card {index + 1}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-400"
+                  onClick={() =>
+                    setServicesSection({
+                      ...servicesSection,
+                      items: servicesSection.items.filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              <label className="flex items-center gap-2 text-sm admin-text-primary">
+                <input
+                  type="checkbox"
+                  checked={item.enabled}
+                  onChange={(e) => {
+                    const items = [...servicesSection.items]
+                    items[index] = { ...item, enabled: e.target.checked }
+                    setServicesSection({ ...servicesSection, items })
+                  }}
+                />
+                Enabled
+              </label>
+              <Input
+                placeholder="Title"
+                value={item.title}
+                onChange={(e) => {
+                  const items = [...servicesSection.items]
+                  items[index] = { ...item, title: e.target.value }
+                  setServicesSection({ ...servicesSection, items })
+                }}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <Textarea
+                placeholder="Description"
+                value={item.description}
+                onChange={(e) => {
+                  const items = [...servicesSection.items]
+                  items[index] = { ...item, description: e.target.value }
+                  setServicesSection({ ...servicesSection, items })
+                }}
+                rows={2}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <Input
+                placeholder="Link URL"
+                value={item.link}
+                onChange={(e) => {
+                  const items = [...servicesSection.items]
+                  items[index] = { ...item, link: e.target.value }
+                  setServicesSection({ ...servicesSection, items })
+                }}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+              />
+              <ImageUpload
+                label="Icon"
+                value={item.icon}
+                onChange={(url) => {
+                  const items = [...servicesSection.items]
+                  items[index] = { ...item, icon: url }
+                  setServicesSection({ ...servicesSection, items })
+                }}
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium admin-text-secondary mb-2">PDF Download URL</label>
-            <ImageUpload
-              value={playbookData.pdfUrl || ""}
-              onChange={(url) => setPlaybookData({ ...playbookData, pdfUrl: url })}
-              label="Upload PDF"
-            />
-            <p className="text-xs text-gray-500 mt-1">Upload the playbook PDF file that users will download after OTP verification</p>
-          </div>
-        </div>
-      )}
-
-      {/* Trusted by Section – uses same clients as Clients page; no separate upload */}
-      {activeTab === "partners" && (
-        <div className="space-y-6 admin-card p-6 rounded-xl border admin-border">
-          <h3 className="text-xl font-semibold admin-text-primary">Trusted by Industry Leaders</h3>
-          <p className="text-sm admin-text-muted">
-            This section shows the same clients as the <strong>Clients</strong> page. Manage client logos and names under <strong>Pages → Clients</strong>. No need to upload here.
-          </p>
-
-          <div className="p-4 admin-bg-tertiary rounded-lg border admin-border-light space-y-4">
-            <h4 className="admin-text-primary font-medium">Section header</h4>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Title</label>
-              <input type="text" value={trustedBySection.title} onChange={(e) => setTrustedBySection({ ...trustedBySection, title: e.target.value })} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Trusted by Industry Leaders" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Description</label>
-              <textarea value={trustedBySection.description} onChange={(e) => setTrustedBySection({ ...trustedBySection, description: e.target.value })} rows={2} className="w-full px-4 py-2 admin-input rounded-lg" placeholder="Partnering with forward-thinking brands worldwide" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium admin-text-secondary mb-2">Section Background Image</label>
-              <ImageUpload value={trustedBySection.backgroundImage} onChange={(url) => setTrustedBySection({ ...trustedBySection, backgroundImage: url })} label="Upload Background" />
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>

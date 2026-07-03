@@ -132,7 +132,7 @@ export function ClientsPageManager() {
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -141,7 +141,7 @@ export function ClientsPageManager() {
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <ImageUpload
@@ -158,7 +158,7 @@ export function ClientsPageManager() {
           <h2 className="text-lg font-semibold admin-text-primary">Clients ({data.clients.length})</h2>
           <button
             onClick={addClient}
-            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
           >
             + Add Client
           </button>
@@ -180,7 +180,7 @@ export function ClientsPageManager() {
                     type="text"
                     value={client.name}
                     onChange={(e) => updateClient(client.id, { name: e.target.value })}
-                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                   />
                 </div>
                 <ImageUpload
@@ -195,7 +195,7 @@ export function ClientsPageManager() {
                       type="text"
                       value={client.industry}
                       onChange={(e) => updateClient(client.id, { industry: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
@@ -204,7 +204,7 @@ export function ClientsPageManager() {
                       type="text"
                       value={client.website}
                       onChange={(e) => updateClient(client.id, { website: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-[#E63946]"
+                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -213,7 +213,7 @@ export function ClientsPageManager() {
                     type="checkbox"
                     checked={client.featured}
                     onChange={(e) => updateClient(client.id, { featured: e.target.checked })}
-                    className="w-3 h-3 accent-[#E63946]"
+                    className="w-3 h-3 accent-primary"
                   />
                   Featured (show on homepage)
                 </label>
@@ -231,7 +231,7 @@ export function ClientsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

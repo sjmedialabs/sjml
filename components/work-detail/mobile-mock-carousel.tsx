@@ -98,7 +98,7 @@ function InstagramPhoneScreen({
       </div>
 
       {/* Bottom nav */}
-      <div className="flex items-center justify-around px-4 py-3 border-t border-zinc-200 shrink-0 pb-6">
+      <div className="flex items-center justify-around py-3 border-t border-zinc-200 shrink-0 pb-6">
         <div className="w-6 h-6 rounded-sm bg-black/10" />
         <div className="w-6 h-6 rounded-full border border-black/30" />
         <div className="w-6 h-6 rounded-sm bg-black/10" />
@@ -148,8 +148,8 @@ export function MobileMockCarousel({ images, caption }: MobileMockCarouselProps)
   const rightFar = showSides ? images[wrapIndex(displayIndex + 2, len)] : null
 
   return (
-    <section className="relative bg-muted dark:bg-zinc-950 py-16 md:py-24 px-4 overflow-hidden">
-      <div className="max-w-7xl mx-auto relative">
+    <section className="relative bg-muted dark:bg-zinc-950 py-16 md:py-24 overflow-hidden">
+      <div className="site-container relative">
         <div className="flex flex-col items-center">
           <div className="flex items-center justify-center gap-4 md:gap-6 lg:gap-8 w-full">
             {/* Left squares */}

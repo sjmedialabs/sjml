@@ -6,19 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, Star } from "lucide-react"
-
-interface WorkPageHero {
-  title: string
-  description: string
-  image: string
-}
-
-interface WorkSection4 {
-  caption?: string
-  rectangleImage?: string
-  squareImage1?: string
-  squareImage2?: string
-}
+import { WorkDetailTemplateEditor } from "./work-detail-template-editor"
+import { WorkPageContentManager } from "./work-page-content-manager"
+import {
+  createDefaultWorkDetailTemplate,
+  normalizeWorkDetailTemplate,
+  type WorkDetailTemplate,
+} from "@/lib/work-detail-template"
 
 interface WorkItem {
   id: string
@@ -26,6 +20,10 @@ interface WorkItem {
   title: string
   description: string
   image: string
+  cardSubtitle: string
+  categoryTags: string
+  categories: string[]
+  displayOrder: number
   category: string
   client: string
   industry: string
@@ -33,14 +31,7 @@ interface WorkItem {
   technology: string
   year: string
   tags: string[]
-  overview: { title: string; description: string; points: string[] }
-  logoVariations: string[]
-  mobileCarouselImages: string[]
-  mobileCarouselCaption?: string
-  section4: WorkSection4
-  gallery: string[]
-  process: Array<{ step: string; title: string; description: string }>
-  showcase: string[]
+  detailTemplate: WorkDetailTemplate
   isActive: boolean
   isFeatured: boolean
 }
@@ -57,6 +48,10 @@ const emptyWork: Omit<WorkItem, "id"> = {
   title: "",
   description: "",
   image: "/placeholder.svg?height=400&width=600",
+  cardSubtitle: "",
+  categoryTags: "BRANDING",
+  categories: ["branding"],
+  displayOrder: 999,
   category: "Branding",
   client: "",
   industry: "",
@@ -64,14 +59,7 @@ const emptyWork: Omit<WorkItem, "id"> = {
   technology: "",
   year: new Date().getFullYear().toString(),
   tags: [],
-  overview: { title: "Brand overview", description: "", points: [] },
-  logoVariations: ["", "", ""],
-  mobileCarouselImages: [],
-  mobileCarouselCaption: "",
-  section4: { caption: "", rectangleImage: "", squareImage1: "", squareImage2: "" },
-  gallery: [],
-  process: [],
-  showcase: [],
+  detailTemplate: createDefaultWorkDetailTemplate(),
   isActive: true,
   isFeatured: false,
 }
@@ -83,79 +71,51 @@ export function WorkPageManager() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [view, setView] = useState<"list" | "edit" | "hero">("list")
+  const [view, setView] = useState<"list" | "edit" | "pageContent">("list")
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
   const [isNew, setIsNew] = useState(false)
-  const [pageContent, setPageContent] = useState<{ hero?: WorkPageHero; portfolio?: any } | null>(null)
-  const [heroData, setHeroData] = useState<WorkPageHero>({
-    title: "Elevate Beyond the Ordinary.",
-    description: "We're a creative agency dedicated to design that moves brands from good to unforgettable.",
-    image: "",
-  })
-  const [heroSaving, setHeroSaving] = useState(false)
+  const [seeding, setSeeding] = useState(false)
 
   useEffect(() => {
     fetchWorks()
   }, [pagination.page])
 
-  useEffect(() => {
-    if (view === "hero") fetchWorkPageContent()
-  }, [view])
-
-  const fetchWorkPageContent = async () => {
+  const seedDefaults = async () => {
+    if (!confirm("Seed default portfolio works from mockup? Existing slugs will be skipped.")) return
+    setSeeding(true)
     try {
-      const res = await fetch("/api/content/work")
-      if (res.ok) {
-        const data = await res.json()
-        setPageContent(data)
-        const hero = data?.hero || {}
-        setHeroData({
-          title: hero.title || "Elevate Beyond the Ordinary.",
-          description: hero.description || hero.subtitle || "",
-          image: hero.image || "",
-        })
-      }
-    } catch {
-      console.error("Failed to fetch work page content")
-    }
-  }
-
-  const saveHero = async () => {
-    setHeroSaving(true)
-    try {
-      let content = pageContent
-      if (!content) {
-        const r = await fetch("/api/content/work")
-        if (r.ok) content = await r.json()
-      }
       const token = localStorage.getItem("adminToken")
-      const res = await fetch("/api/content/work", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          pageKey: "work",
-          ...content,
-          hero: {
-            ...content?.hero,
-            title: heroData.title,
-            description: heroData.description,
-            image: heroData.image,
-          },
-        }),
+      const res = await fetch("/api/works/seed-defaults", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
-        setMessage("Hero saved successfully!")
-        setTimeout(() => setMessage(""), 3000)
+        const data = await res.json()
+        setMessage(`Seeded ${data.inserted} works (${data.skipped} skipped)`)
+        setTimeout(() => setMessage(""), 4000)
+        fetchWorks()
       } else {
-        setMessage("Failed to save hero")
+        setMessage("Failed to seed works")
       }
     } catch {
-      setMessage("Failed to save hero")
+      setMessage("Failed to seed works")
     }
-    setHeroSaving(false)
+    setSeeding(false)
+  }
+
+  const normalizeWorkItem = (work: WorkItem & Record<string, unknown>): WorkItem => {
+    const title = work.title || ""
+    const detailTemplate = work.detailTemplate
+      ? { ...createDefaultWorkDetailTemplate(title), ...work.detailTemplate }
+      : normalizeWorkDetailTemplate(work as Record<string, unknown>, title)
+    return {
+      ...work,
+      cardSubtitle: work.cardSubtitle ?? work.role ?? "",
+      categoryTags: work.categoryTags ?? work.category?.toUpperCase() ?? "",
+      categories: work.categories?.length ? work.categories : (work.tags as string[]) ?? [],
+      displayOrder: work.displayOrder ?? 999,
+      detailTemplate,
+    }
   }
 
   const fetchWorks = async () => {
@@ -231,23 +191,7 @@ export function WorkPageManager() {
   }
 
   const editWork = (work: WorkItem) => {
-    const logos = [...(work.logoVariations || [])]
-    while (logos.length < 3) logos.push("")
-    setEditingWork({
-      ...work,
-      logoVariations: logos.slice(0, 3),
-      mobileCarouselImages: work.mobileCarouselImages || work.gallery || [],
-      mobileCarouselCaption: work.mobileCarouselCaption || "",
-      section4: {
-        caption: "",
-        rectangleImage: "",
-        squareImage1: "",
-        squareImage2: "",
-        ...work.section4,
-      },
-      overview: work.overview || emptyWork.overview,
-      process: work.process || [],
-    })
+    setEditingWork(normalizeWorkItem(work as WorkItem & Record<string, unknown>))
     setIsNew(false)
     setView("edit")
   }
@@ -264,52 +208,15 @@ export function WorkPageManager() {
       w.category?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  // Hero View
-  if (view === "hero") {
+  if (view === "pageContent") {
     return (
       <div>
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold admin-text-primary mb-2">Work Page Hero</h1>
-            <p className="admin-text-secondary">Edit the hero section (title, description, image) shown on the Work page.</p>
-          </div>
+        <div className="mb-6">
           <Button variant="outline" onClick={() => setView("list")} className="admin-border">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to list
           </Button>
         </div>
-        {message && (
-          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-        )}
-        <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
-          <div>
-            <label className="block text-sm admin-text-secondary mb-2">Title</label>
-            <Input
-              value={heroData.title}
-              onChange={(e) => setHeroData({ ...heroData, title: e.target.value })}
-              className="admin-input"
-              placeholder="Elevate Beyond the Ordinary."
-            />
-          </div>
-          <div>
-            <label className="block text-sm admin-text-secondary mb-2">Description</label>
-            <Textarea
-              value={heroData.description}
-              onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
-              rows={4}
-              className="admin-input"
-              placeholder="We're a creative agency dedicated to design..."
-            />
-          </div>
-          <ImageUpload
-            label="Hero Background Image"
-            value={heroData.image}
-            onChange={(url) => setHeroData({ ...heroData, image: url })}
-          />
-          <Button onClick={saveHero} disabled={heroSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">
-            {heroSaving ? "Saving..." : "Save Hero"}
-          </Button>
-        </div>
+        <WorkPageContentManager />
       </div>
     )
   }
@@ -323,11 +230,14 @@ export function WorkPageManager() {
             <h1 className="text-2xl font-bold admin-text-primary mb-2">Portfolio / Works Management</h1>
             <p className="admin-text-secondary">Create and manage your portfolio projects. Each work has its own detail page.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setView("hero")} className="admin-border">
-              Edit Page Hero
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => setView("pageContent")} className="admin-border">
+              Edit Page Content
             </Button>
-            <Button onClick={addNewWork} className="bg-[#E63946] hover:bg-[#d32f3d]">
+            <Button variant="outline" onClick={seedDefaults} disabled={seeding} className="admin-border">
+              {seeding ? "Seeding..." : "Seed Defaults"}
+            </Button>
+            <Button onClick={addNewWork}>
               <Plus className="w-4 h-4 mr-2" /> Add Work
             </Button>
           </div>
@@ -364,7 +274,7 @@ export function WorkPageManager() {
               {loading ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center">
-                    <div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" />
+                    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                   </td>
                 </tr>
               ) : filteredWorks.length === 0 ? (
@@ -525,7 +435,51 @@ export function WorkPageManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Category</label>
+                <label className="block text-sm admin-text-secondary mb-2">Card subtitle</label>
+                <Input
+                  value={editingWork.cardSubtitle}
+                  onChange={(e) => updateField("cardSubtitle", e.target.value)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="Brand Identity, Packaging Design"
+                />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Category tags</label>
+                <Input
+                  value={editingWork.categoryTags}
+                  onChange={(e) => updateField("categoryTags", e.target.value)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="BRANDING, PACKAGING"
+                />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Filter categories (comma)</label>
+                <Input
+                  value={editingWork.categories.join(", ")}
+                  onChange={(e) =>
+                    updateField(
+                      "categories",
+                      e.target.value
+                        .split(",")
+                        .map((t) => t.trim().toLowerCase())
+                        .filter(Boolean),
+                    )
+                  }
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="branding, packaging"
+                />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Display order</label>
+                <Input
+                  type="number"
+                  value={editingWork.displayOrder}
+                  onChange={(e) => updateField("displayOrder", Number.parseInt(e.target.value) || 999)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Category (legacy)</label>
                 <Input
                   value={editingWork.category}
                   onChange={(e) => updateField("category", e.target.value)}
@@ -622,234 +576,23 @@ export function WorkPageManager() {
             </div>
           </div>
 
-          {/* Hero background */}
           <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Detail Page Hero</h2>
-            <p className="text-sm admin-text-muted mb-4">Background for the project detail hero (min 650px). Upload a wide image.</p>
-            <ImageUpload label="Hero Background Image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
+            <h2 className="text-lg font-semibold admin-text-primary mb-2">Listing thumbnail</h2>
+            <p className="text-sm admin-text-muted mb-4">Used on the Work listing page grid.</p>
+            <ImageUpload label="Thumbnail / card image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
           </div>
 
-          {/* Brand overview */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Brand Overview</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
-                <Input
-                  value={editingWork.overview.title}
-                  onChange={(e) => updateField("overview", { ...editingWork.overview, title: e.target.value })}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Brand overview"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Description</label>
-                <Textarea
-                  value={editingWork.overview.description}
-                  onChange={(e) => updateField("overview", { ...editingWork.overview, description: e.target.value })}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Key Points (one per line)</label>
-                <Textarea
-                  value={editingWork.overview.points.join("\n")}
-                  onChange={(e) =>
-                    updateField("overview", {
-                      ...editingWork.overview,
-                      points: e.target.value
-                        .split("\n")
-                        .map((p) => p.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  rows={4}
-                  placeholder="Branding and identity&#10;Websites and digital platforms"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Circular Images (up to 3, square uploads)</label>
-                <p className="text-xs admin-text-muted mb-3">Shown as circles on the site. Leave empty to hide.</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[0, 1, 2].map((i) => (
-                    <ImageUpload
-                      key={i}
-                      label={`Circle ${i + 1}`}
-                      value={editingWork.logoVariations[i] || ""}
-                      onChange={(url) => {
-                        const next = [...editingWork.logoVariations]
-                        while (next.length < 3) next.push("")
-                        next[i] = url
-                        updateField("logoVariations", next)
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3 — mobile carousel */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h2 className="text-lg font-semibold admin-text-primary">Section 3 — Mobile Mock Carousel</h2>
-                <p className="text-sm admin-text-muted mt-1">Images slide inside the phone mock on the detail page.</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => updateField("mobileCarouselImages", [...editingWork.mobileCarouselImages, ""])}
-                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-              >
-                <Plus className="w-4 h-4 mr-1" /> Add Slide
-              </Button>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm admin-text-secondary mb-2">Caption (optional, bottom-left on section)</label>
-              <Textarea
-                value={editingWork.mobileCarouselCaption || ""}
-                onChange={(e) => updateField("mobileCarouselCaption", e.target.value)}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                rows={2}
-              />
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {editingWork.mobileCarouselImages.map((img, index) => (
-                <div key={index} className="relative">
-                  <ImageUpload
-                    label={`Slide ${index + 1}`}
-                    value={img}
-                    onChange={(url) => {
-                      const next = [...editingWork.mobileCarouselImages]
-                      next[index] = url
-                      updateField("mobileCarouselImages", next)
-                    }}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateField(
-                        "mobileCarouselImages",
-                        editingWork.mobileCarouselImages.filter((_, i) => i !== index),
-                      )
-                    }
-                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 4 */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Section 4 — Images &amp; Process</h2>
-            <p className="text-sm admin-text-muted mb-4">One wide rectangle and two square images. Process steps appear as three columns above the images.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <ImageUpload
-                label="Rectangle (wide)"
-                value={editingWork.section4.rectangleImage || ""}
-                onChange={(url) => updateField("section4", { ...editingWork.section4, rectangleImage: url })}
-              />
-              <ImageUpload
-                label="Square 1"
-                value={editingWork.section4.squareImage1 || ""}
-                onChange={(url) => updateField("section4", { ...editingWork.section4, squareImage1: url })}
-              />
-              <ImageUpload
-                label="Square 2"
-                value={editingWork.section4.squareImage2 || ""}
-                onChange={(url) => updateField("section4", { ...editingWork.section4, squareImage2: url })}
-              />
-            </div>
-          </div>
-
-          {/* Process (Section 4 content) */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Section 4 — Process Steps (3 columns)</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  updateField("process", [
-                    ...editingWork.process,
-                    { step: String(editingWork.process.length + 1).padStart(2, "0"), title: "", description: "" },
-                  ])
-                }
-                className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-              >
-                <Plus className="w-4 h-4 mr-1" /> Add Step
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {editingWork.process.map((step, index) => (
-                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm admin-text-secondary">Step {index + 1}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        updateField(
-                          "process",
-                          editingWork.process.filter((_, i) => i !== index),
-                        )
-                      }
-                      className="text-red-400 hover:text-red-300 h-6 px-2"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      value={step.step}
-                      onChange={(e) => {
-                        const newProcess = [...editingWork.process]
-                        newProcess[index].step = e.target.value
-                        updateField("process", newProcess)
-                      }}
-                      placeholder="01"
-                      className="admin-card admin-border-light admin-text-primary"
-                    />
-                    <Input
-                      value={step.title}
-                      onChange={(e) => {
-                        const newProcess = [...editingWork.process]
-                        newProcess[index].title = e.target.value
-                        updateField("process", newProcess)
-                      }}
-                      placeholder="Step title"
-                      className="admin-card admin-border-light admin-text-primary"
-                    />
-                  </div>
-                  <Textarea
-                    value={step.description}
-                    onChange={(e) => {
-                      const newProcess = [...editingWork.process]
-                      newProcess[index].description = e.target.value
-                      updateField("process", newProcess)
-                    }}
-                    placeholder="Step description"
-                    className="admin-card admin-border-light admin-text-primary mt-2"
-                    rows={2}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <WorkDetailTemplateEditor
+            template={editingWork.detailTemplate}
+            onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
+          />
 
           {/* Save Button */}
           <div className="flex gap-4">
             <Button
               onClick={saveWork}
               disabled={saving || !editingWork.title || !editingWork.slug}
-              className="bg-[#E63946] hover:bg-[#d32f3d]"
+             
             >
               {saving ? "Saving..." : isNew ? "Create Work" : "Save Changes"}
             </Button>

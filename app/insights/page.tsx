@@ -1,64 +1,61 @@
+import { generateSeoMetadata } from "@/lib/seo"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
-import InsightsClient from "./insights-client"
+import { sortByDisplayOrder } from "@/lib/service-order"
+import {
+  createDefaultInsightsPageContent,
+  normalizeInsightsPageContent,
+} from "@/lib/insights-page-content"
+import { normalizeInsightGridItem, getDefaultInsightGridItems, type InsightGridItem } from "@/lib/insight-grid-item"
+import { InsightsHeroSection } from "@/components/insights/insights-hero-section"
+import { InsightsGridSection } from "@/components/insights/insights-grid-section"
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0 // Enable ISR: Revalidate every hour
+export async function generateMetadata() {
+  return await generateSeoMetadata("Insights")
+}
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export default async function InsightsPage() {
-  let posts: any[] = []
-  let categories: string[] = ["All"]
-  let content: any = null
+  let pageContent = createDefaultInsightsPageContent()
+  let posts: InsightGridItem[] = []
 
   try {
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
-    // Fetch content and insights in parallel
-    const [pageContent, insightsData] = await Promise.all([
+    const [rawContent, insightsData] = await Promise.all([
       getPageContent("insights"),
-      db.collection("insights").find({ published: true }).sort({ date: -1 }).toArray(),
+      db.collection("insights").find({ published: { $ne: false } }).toArray(),
     ])
 
-    content = pageContent
-    if (!content) {
-      throw new Error("Insights page content not found")
+    if (rawContent) {
+      pageContent = normalizeInsightsPageContent(rawContent as unknown as Record<string, unknown>)
     }
 
-    // Serialize MongoDB _id and extract categories
-    const categoriesSet = new Set<string>()
-    posts = insightsData.map((insight) => {
-      if (insight.category) categoriesSet.add(insight.category)
-      const id = insight._id.toString()
-      return {
-        ...insight,
-        _id: id,
-        id,
-        slug: insight.slug || id,
-      }
-    })
-    
-    categories = ["All", ...Array.from(categoriesSet)]
+    const mapped = sortByDisplayOrder(
+      insightsData.map((doc) => normalizeInsightGridItem(doc as Record<string, unknown>)),
+    )
+    posts = mapped.length > 0 ? mapped : getDefaultInsightGridItems()
   } catch (error) {
     console.error("Failed to fetch insights:", error)
-    return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center px-4">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
-          <p className="text-muted-foreground">Insights page content has not been set up yet. Please contact the administrator.</p>
-        </div>
-      </main>
-    )
+    posts = getDefaultInsightGridItems()
   }
 
-  const hero = content.hero
-  const newsletter = content.newsletter
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
-      <InsightsClient posts={posts} categories={categories} hero={hero} newsletter={newsletter} />
+      <InsightsHeroSection data={pageContent.hero} typography={pageContent.typography} />
+      <InsightsGridSection
+        posts={posts}
+        filterCategories={pageContent.filterCategories}
+        searchPlaceholder={pageContent.searchPlaceholder}
+        loadMore={pageContent.loadMore}
+        typography={pageContent.typography}
+      />
       <Footer />
     </main>
   )

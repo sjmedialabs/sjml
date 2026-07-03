@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
+import { normalizeHeaderContent } from "@/lib/header-content"
 
 interface NavItem {
   id: string
@@ -23,17 +24,15 @@ const defaultData: HeaderData = {
   logo: "/logo.svg",
   logoText: "SJ MEDIA LABS",
   navItems: [
-    { id: "1", label: "About", href: "/about" },
-    { id: "2", label: "Work", href: "/work" },
-    { id: "3", label: "Services", href: "/services" },
-    { id: "4", label: "Case Studies", href: "/case-studies" },
-    { id: "5", label: "Insights", href: "/insights" },
-    { id: "6", label: "Clients", href: "/clients" },
-    { id: "7", label: "Testimonials", href: "/testimonials" },
-    { id: "8", label: "Careers", href: "/careers" },
-    { id: "9", label: "Contact", href: "/contact" },
+    { id: "0", label: "HOME", href: "/" },
+    { id: "1", label: "ABOUT US", href: "/about" },
+    { id: "2", label: "SERVICES", href: "/services" },
+    { id: "3", label: "WORK", href: "/work" },
+    { id: "4", label: "INDUSTRIES", href: "/industries" },
+    { id: "5", label: "INSIGHTS", href: "/insights" },
+    { id: "6", label: "CONTACT US", href: "/contact" },
   ],
-  ctaButton: { text: "Start a project", href: "/contact" },
+  ctaButton: { text: "START A PROJECT", href: "/contact" },
   showTopBar: false,
   topBarText: "",
 }
@@ -52,7 +51,7 @@ export function HeaderManager() {
       const res = await fetch("/api/content/header")
       if (res.ok) {
         const fetchedData = await res.json()
-        setData({ ...defaultData, ...fetchedData })
+        setData(normalizeHeaderContent(fetchedData))
       }
     } catch (error) {
       console.error("Failed to fetch header data")
@@ -121,7 +120,7 @@ export function HeaderManager() {
               type="text"
               value={data.logoText}
               onChange={(e) => setData({ ...data, logoText: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
             />
           </div>
         </div>
@@ -136,7 +135,7 @@ export function HeaderManager() {
               type="checkbox"
               checked={data.showTopBar}
               onChange={(e) => setData({ ...data, showTopBar: e.target.checked })}
-              className="w-4 h-4 accent-[#E63946]"
+              className="w-4 h-4 accent-primary"
             />
             Show announcement bar
           </label>
@@ -148,7 +147,7 @@ export function HeaderManager() {
                 value={data.topBarText}
                 onChange={(e) => setData({ ...data, topBarText: e.target.value })}
                 placeholder="e.g. 🎉 New service launched! Check it out →"
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
               />
             </div>
           )}
@@ -161,7 +160,7 @@ export function HeaderManager() {
           <h2 className="text-lg font-semibold admin-text-primary">Navigation Links</h2>
           <button
             onClick={addNavItem}
-            className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
           >
             + Add Link
           </button>
@@ -202,7 +201,7 @@ export function HeaderManager() {
               type="text"
               value={data.ctaButton.text}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, text: e.target.value } })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -211,7 +210,7 @@ export function HeaderManager() {
               type="text"
               value={data.ctaButton.href}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, href: e.target.value } })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
             />
           </div>
         </div>
@@ -220,7 +219,7 @@ export function HeaderManager() {
       <button
         onClick={saveData}
         disabled={saving}
-        className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+        className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
       >
         {saving ? "Saving..." : "Save Header Settings"}
       </button>

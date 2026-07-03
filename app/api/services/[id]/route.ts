@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
+import { getDisplayOrder } from "@/lib/service-order"
 
 export const dynamic = "force-dynamic"
 
@@ -50,9 +51,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
-    const updateData = {
+    const updateData: Record<string, unknown> = {
       ...data,
       updatedAt: new Date().toISOString(),
+    }
+    if (data.displayOrder !== undefined) {
+      updateData.displayOrder = getDisplayOrder(data.displayOrder)
     }
     delete updateData._id
 

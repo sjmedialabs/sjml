@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
+import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
 import { notFound } from "next/navigation"
 import { clientPromise } from "@/lib/mongodb"
 
@@ -68,62 +69,54 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section - white text for visibility on all backgrounds */}
-      <section className="pt-24 pb-16 relative min-h-[600px] flex flex-col justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src={caseStudy.image || "/placeholder.svg"}
-            alt={caseStudy.title}
-            fill
-            className="object-cover"
-          />
+      <section className="about-hero bg-home-secondary">
+        <InnerPageHeroBackground image={caseStudy.image || "/placeholder.svg"} overlayClassName="about-hero-overlay" />
+        <div className="site-container about-hero-inner">
+          <div className="about-hero-grid">
+            <div className="about-hero-content w-full max-w-4xl">
+              {caseStudy.tags && caseStudy.tags.length > 0 && (
+                <div className="flex flex-wrap justify-start gap-2 mb-3">
+                  {caseStudy.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-white/10 text-white rounded-full text-xs border border-white/30"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <h1 className="text-2xl md:text-3xl font-bold page-hero-heading mb-2">{caseStudy.title}</h1>
+              <p className="text-sm md:text-base page-hero-description line-clamp-2">{caseStudy.description}</p>
+            </div>
+          </div>
         </div>
-        <div className="hero-overlay" aria-hidden="true" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-16">
-          {/* Tags */}
-          {caseStudy.tags && caseStudy.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              {caseStudy.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-4 py-1.5 bg-white/10 light:bg-muted text-white light:text-foreground rounded-full text-xs border border-white/40 light:border-border"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+      </section>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 page-hero-heading">
-            {caseStudy.title}
-          </h1>
-          <p className="text-xl text-center max-w-3xl mx-auto mb-12 page-hero-description">
-            {caseStudy.description}
-          </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+      <section className="bg-home-secondary border-t border-white/10">
+        <div className="site-container py-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
             <div className="text-center">
-              <p className="text-[#E63946] text-3xl font-bold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat1Value}</p>
-              <p className="text-white/90 text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat1Label}</p>
+              <p className="text-home-primary text-2xl font-bold mb-0.5">{caseStudy.stat1Value}</p>
+              <p className="text-white/80 text-sm">{caseStudy.stat1Label}</p>
             </div>
             <div className="text-center">
-              <p className="text-[#E63946] text-3xl font-bold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat2Value}</p>
-              <p className="text-white/90 text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.stat2Label}</p>
+              <p className="text-home-primary text-2xl font-bold mb-0.5">{caseStudy.stat2Value}</p>
+              <p className="text-white/80 text-sm">{caseStudy.stat2Label}</p>
             </div>
             {caseStudy.industry && (
               <div className="text-center">
-                <p className="text-white/90 text-sm font-semibold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Industry</p>
-                <p className="text-white text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.industry}</p>
+                <p className="text-white/80 text-sm font-semibold mb-0.5">Industry</p>
+                <p className="text-white text-sm">{caseStudy.industry}</p>
               </div>
             )}
             {caseStudy.year && (
               <div className="text-center">
-                <p className="text-white/90 text-sm font-semibold mb-1" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>Year</p>
-                <p className="text-white text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>{caseStudy.year}</p>
+                <p className="text-white/80 text-sm font-semibold mb-0.5">Year</p>
+                <p className="text-white text-sm">{caseStudy.year}</p>
               </div>
             )}
           </div>
@@ -131,7 +124,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
       </section>
 
       {/* Main Image */}
-      <section className="py-8 px-4">
+      <section className="py-8">
         <div className="max-w-5xl mx-auto">
           <div className="rounded-2xl overflow-hidden border border-border">
             <Image
@@ -147,7 +140,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Challenge Section */}
       {caseStudy.challenge && (
-        <section className="py-16 px-4">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-foreground mb-6">
               The <span className="text-[#E63946]">Challenge</span>
@@ -159,7 +152,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Solution Section */}
       {caseStudy.solution && (
-        <section className="py-16 px-4 bg-card">
+        <section className="py-16 bg-card">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-foreground mb-6">
               Our <span className="text-[#E63946]">Solution</span>
@@ -171,8 +164,8 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Gallery */}
       {caseStudy.gallery && caseStudy.gallery.length > 0 && (
-        <section className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
+        <section className="py-16">
+          <div className="site-container">
             <div className="grid md:grid-cols-2 gap-6">
               {caseStudy.gallery.map((img, index) => (
                 <div key={index} className="rounded-2xl overflow-hidden border border-border">
@@ -192,7 +185,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Results Section */}
       {caseStudy.results && caseStudy.results.length > 0 && (
-        <section className="py-16 px-4">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-foreground mb-8">
               The <span className="text-[#E63946]">Results</span>
@@ -213,7 +206,7 @@ export default async function CaseStudyDetailPage(props: { params: Promise<{ slu
 
       {/* Testimonial */}
       {caseStudy.testimonial && (
-        <section className="py-16 px-4 bg-card">
+        <section className="py-16 bg-card">
           <div className="max-w-4xl mx-auto">
             <div className="border-l-4 border-[#E63946] pl-8">
               <p className="text-foreground text-xl italic mb-6">&quot;{caseStudy.testimonial.quote}&quot;</p>

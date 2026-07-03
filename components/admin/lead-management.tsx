@@ -199,7 +199,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "new":
-        return "bg-[#E63946]/20 text-[#E63946]"
+        return "bg-primary/20 text-primary"
       case "contacted":
         return "bg-blue-500/20 text-blue-400"
       case "qualified":
@@ -240,7 +240,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
         </div>
         <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
           <p className="admin-text-secondary text-sm">New</p>
-          <p className="text-2xl font-bold text-[#E63946]">{leads.filter((l) => l.status === "new").length}</p>
+          <p className="text-2xl font-bold text-primary">{leads.filter((l) => l.status === "new").length}</p>
         </div>
         <div className="admin-bg-secondary border admin-border-light rounded-lg p-4">
           <p className="admin-text-secondary text-sm">Contacted</p>
@@ -319,7 +319,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
           <Button
             size="sm"
             onClick={() => setShowAddManual(true)}
-            className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary"
+            className="bg-primary hover:bg-primary/90 admin-text-primary"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Lead
@@ -333,7 +333,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
         <p className="admin-text-secondary text-sm">
           To fetch leads from Meta Ads and Google Ads campaigns, you need to set up webhook integrations. Configure your
           ad platforms to send lead data to:{" "}
-          <code className="admin-bg-secondary px-2 py-1 rounded text-[#E63946]">/api/leads/webhook</code>
+          <code className="admin-bg-secondary px-2 py-1 rounded text-primary">/api/leads/webhook</code>
         </p>
         <p className="admin-text-secondary text-sm mt-2">
           For now, you can manually add leads from ad campaigns using the "Add Lead" button and selecting the
@@ -568,7 +568,7 @@ export function LeadManagement({ token }: LeadManagementProps) {
             <Button
               onClick={addManualLead}
               disabled={!manualLead.name || !manualLead.email}
-              className="w-full bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary"
+              className="w-full bg-primary hover:bg-primary/90 admin-text-primary"
             >
               Add Lead
             </Button>

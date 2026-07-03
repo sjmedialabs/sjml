@@ -184,7 +184,7 @@ export function ImageUpload({
           onDrop={handleDrop}
           className={`
             flex-1 relative border-2 border-dashed rounded-lg cursor-pointer transition-colors
-            ${dragActive ? "border-[#E63946] bg-[#E63946]/10" : "admin-border-light hover:border-[#555]"}
+            ${dragActive ? "border-primary bg-primary/10" : "admin-border-light hover:border-[#555]"}
             ${uploading ? "pointer-events-none opacity-60" : ""}
           `}
         >
@@ -193,7 +193,7 @@ export function ImageUpload({
           <div className="p-4 text-center">
             {uploading ? (
               <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-[#E63946] border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 <span className="admin-text-secondary text-sm">Uploading...</span>
               </div>
             ) : (
@@ -208,7 +208,7 @@ export function ImageUpload({
                 </svg>
                 <div className="text-left">
                   <p className="admin-text-secondary text-sm">
-                    <span className="text-[#E63946]">{value ? "Change image" : "Click to upload"}</span> or drag and
+                    <span className="text-primary">{value ? "Change image" : "Click to upload"}</span> or drag and
                     drop
                   </p>
                   <p className="text-[#555] text-xs">

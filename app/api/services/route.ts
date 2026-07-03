@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
+import { getDisplayOrder, sortByDisplayOrder } from "@/lib/service-order"
 
 export const dynamic = "force-dynamic"
 
@@ -16,24 +17,29 @@ export async function GET(request: NextRequest) {
     const db = client.db("sjmedialabs")
 
     if (all) {
-      // Return all active parent services for frontend, sorted by displayOrder then createdAt
-      const services = await db
-        .collection("services")
-        .find({ isActive: true })
-        .sort({ displayOrder: 1, createdAt: -1 })
-        .toArray()
-      // Convert MongoDB _id to string for JSON serialization
-      const serializedServices = services.map(service => ({
+      const services = await db.collection("services").find({ isActive: true }).toArray()
+      const sorted = sortByDisplayOrder(services, (a, b) => {
+        const aCreated = a.createdAt ? new Date(a.createdAt as string).getTime() : 0
+        const bCreated = b.createdAt ? new Date(b.createdAt as string).getTime() : 0
+        return bCreated - aCreated
+      })
+      const serializedServices = sorted.map((service) => ({
         ...service,
-        _id: service._id.toString()
+        _id: service._id.toString(),
       }))
       return NextResponse.json(serializedServices)
     }
 
-    // Paginated results for admin
+    // Paginated results for admin — sort by display order
     const skip = (page - 1) * limit
     const total = await db.collection("services").countDocuments()
-    const services = await db.collection("services").find().sort({ createdAt: -1 }).skip(skip).limit(limit).toArray()
+    const allServices = await db.collection("services").find().toArray()
+    const sorted = sortByDisplayOrder(allServices, (a, b) => {
+      const aCreated = a.createdAt ? new Date(a.createdAt as string).getTime() : 0
+      const bCreated = b.createdAt ? new Date(b.createdAt as string).getTime() : 0
+      return bCreated - aCreated
+    })
+    const services = sorted.slice(skip, skip + limit)
 
     // Convert MongoDB _id to string for JSON serialization
     const serializedServices = services.map(service => ({
@@ -75,6 +81,7 @@ export async function POST(request: NextRequest) {
       ...data,
       id: Date.now().toString(),
       heroImage: data.heroImage ?? "",
+      displayOrder: getDisplayOrder(data.displayOrder),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,

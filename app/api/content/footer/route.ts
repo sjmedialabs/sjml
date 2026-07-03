@@ -2,19 +2,18 @@ import { type NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getHomeContent, updateHomeContent } from "@/lib/models/content"
+import { normalizeFooterContent } from "@/lib/footer-content"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
     const content = await getHomeContent()
-    if (!content?.footer) {
-      return NextResponse.json({ error: "Content not found" }, { status: 404 })
-    }
-    return NextResponse.json(content.footer)
+    const footer = normalizeFooterContent(content?.footer)
+    return NextResponse.json(footer)
   } catch (error) {
     console.error("Get footer error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json(normalizeFooterContent(null))
   }
 }
 

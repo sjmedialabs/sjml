@@ -103,7 +103,7 @@ export function ServicesManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     )
   }
@@ -124,7 +124,7 @@ export function ServicesManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Service
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -136,7 +136,7 @@ export function ServicesManager() {
           <Card key={service.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary text-lg">{service.title || "New Service"}</CardTitle>
-              <button onClick={() => removeService(service.id)} className="admin-text-secondary hover:text-[#E63946]">
+              <button onClick={() => removeService(service.id)} className="admin-text-secondary hover:text-primary">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>

@@ -23,6 +23,21 @@ import {
   type SubServicePageLayout,
 } from "@/lib/service-sections"
 import { SectionEnableToggle } from "./section-enable-toggle"
+import {
+  createDefaultServicesPageContent,
+  normalizeServicesPageContent,
+  type NormalizedServicesPageContent,
+} from "@/lib/services-page-content"
+import {
+  createDefaultServiceDetailTemplate,
+  normalizeServiceDetailTemplate,
+  type ServiceDetailTemplate,
+} from "@/lib/service-detail-template"
+import { ServicesOverviewEditor } from "./services-overview-editor"
+import { ServiceDetailTemplateEditor } from "./service-detail-template-editor"
+import { CompactSelect } from "./admin-compact-fields"
+import { SERVICE_ICON_OPTIONS, ServiceCardIconDisplay } from "@/components/services/service-card-icons"
+import { sortByDisplayOrder } from "@/lib/service-order"
 
 interface ServiceItem {
   id: string
@@ -45,6 +60,7 @@ interface ServiceItem {
   brochureUrl?: string
   sections: ServiceContentSection[]
   pageLayout: ServicePageLayout
+  detailTemplate: ServiceDetailTemplate
 }
 
 interface Pagination {
@@ -58,8 +74,8 @@ const emptyService: Omit<ServiceItem, "id"> = {
   slug: "",
   title: "",
   description: "",
-  icon: "",
-  linkText: "Explore Service",
+  icon: "branding",
+  linkText: "EXPLORE SERVICES",
   fullDescription: "",
   heroImage: "",
   image: "",
@@ -74,6 +90,7 @@ const emptyService: Omit<ServiceItem, "id"> = {
   brochureUrl: "",
   sections: createEmptySections(),
   pageLayout: createDefaultPageLayout(),
+  detailTemplate: createDefaultServiceDetailTemplate(),
 }
 
 interface PageContent {
@@ -105,6 +122,7 @@ interface SubServiceItem {
   isActive: boolean
   sections: ServiceContentSection[]
   pageLayout: SubServicePageLayout
+  detailTemplate: ServiceDetailTemplate
 }
 
 export function ServicesPageManager() {
@@ -119,10 +137,7 @@ export function ServicesPageManager() {
   const [view, setView] = useState<"list" | "edit">("list")
   const [editingService, setEditingService] = useState<ServiceItem | null>(null)
   const [isNew, setIsNew] = useState(false)
-  const [pageContent, setPageContent] = useState<PageContent>({
-    hero: { title: "", description: "", highlightedWords: [], backgroundImage: "", watermark: "SERVICES" } as PageContent["hero"],
-    section: { title: "", subtitle: "", description: "" }
-  })
+  const [pageContent, setPageContent] = useState<NormalizedServicesPageContent>(createDefaultServicesPageContent())
   const [pageContentSaving, setPageContentSaving] = useState(false)
   const [subServices, setSubServices] = useState<SubServiceItem[]>([])
   const [subPagination, setSubPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
@@ -223,6 +238,7 @@ export function ServicesPageManager() {
       isActive: true,
       sections: createEmptySections(),
       pageLayout: createDefaultSubServicePageLayout(),
+      detailTemplate: createDefaultServiceDetailTemplate(),
     })
     setSubIsNew(true)
     setSubView("edit")
@@ -230,10 +246,16 @@ export function ServicesPageManager() {
 
   const editSubService = (sub: SubServiceItem) => {
     setActiveTab("sub-services")
+    const parentTitle = getParentServiceTitle(sub.parentSlug)
     setEditingSub({
       ...sub,
       sections: normalizeSubServiceSections(sub as unknown as Record<string, unknown>),
       pageLayout: normalizeSubServicePageLayout(sub as unknown as Record<string, unknown>),
+      detailTemplate: normalizeServiceDetailTemplate(
+        sub as unknown as Record<string, unknown>,
+        sub.name,
+        parentTitle,
+      ),
     })
     setSubIsNew(false)
     setSubView("edit")
@@ -241,34 +263,41 @@ export function ServicesPageManager() {
 
   const fetchPageContent = async () => {
     try {
-      const res = await fetch('/api/content/services')
+      const res = await fetch("/api/content/services")
       if (res.ok) {
         const data = await res.json()
-        if (data.hero) setPageContent(data)
+        setPageContent(normalizeServicesPageContent(data))
       }
     } catch (error) {
-      console.error('Failed to fetch page content')
+      console.error("Failed to fetch page content")
     }
   }
 
   const savePageContent = async () => {
     setPageContentSaving(true)
     try {
-      const token = localStorage.getItem('adminToken')
-      const res = await fetch('/api/content/services', {
-        method: 'PUT',
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch("/api/content/services", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          pageKey: 'services',
-          ...pageContent,
+          pageKey: "services",
+          servicesPage: pageContent,
           hero: {
-            ...pageContent.hero,
-            image: pageContent.hero.backgroundImage ?? (pageContent.hero as any).image ?? ''
-          }
-        })
+            title: `${pageContent.hero.titleLine1} ${pageContent.hero.titleHighlight}`,
+            description: pageContent.hero.description,
+            image: pageContent.hero.image,
+            backgroundImage: pageContent.hero.image,
+            label: pageContent.hero.label,
+            titleLine1: pageContent.hero.titleLine1,
+            titleHighlight: pageContent.hero.titleHighlight,
+          },
+          cta: pageContent.cta,
+          typography: pageContent.typography,
+        }),
       })
       if (res.ok) {
         setMessage('Page content saved successfully!')
@@ -362,11 +391,37 @@ export function ServicesPageManager() {
     setView("edit")
   }
 
+  const seedDefaultServices = async () => {
+    if (!confirm("Load the 8 default services from the mockup? Existing slugs will be skipped.")) return
+    try {
+      const token = localStorage.getItem("adminToken")
+      const res = await fetch("/api/services/seed-defaults", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setMessage(`Loaded ${data.inserted} services (${data.skipped} skipped — already exist).`)
+        setTimeout(() => setMessage(""), 4000)
+        fetchServices()
+      } else {
+        setMessage("Failed to load default services")
+      }
+    } catch {
+      setMessage("Failed to load default services")
+    }
+  }
+
   const editService = (service: ServiceItem) => {
     setEditingService({
       ...service,
       sections: normalizeServiceSections(service as unknown as Record<string, unknown>),
       pageLayout: normalizeServicePageLayout(service as unknown as Record<string, unknown>),
+      detailTemplate: normalizeServiceDetailTemplate(
+        service as unknown as Record<string, unknown>,
+        service.title,
+        service.title,
+      ),
     })
     setIsNew(false)
     setView("edit")
@@ -393,10 +448,13 @@ export function ServicesPageManager() {
     })
   }
 
-  const filteredServices = services.filter(
-    (s) =>
-      s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredServices = sortByDisplayOrder(
+    services.filter(
+      (s) =>
+        s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
+    (a, b) => a.title.localeCompare(b.title),
   )
 
   const cancelSubServiceEdit = () => {
@@ -462,11 +520,9 @@ export function ServicesPageManager() {
             <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
             <Textarea value={editingSub.shortDescription} onChange={(e) => setEditingSub({ ...editingSub, shortDescription: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" rows={2} />
           </div>
-          <ServiceSectionsEditor
-            sections={editingSub.sections ?? createEmptySections()}
-            onChange={(sections) => setEditingSub({ ...editingSub, sections })}
-            hints={SUB_SERVICE_SECTION_HINTS}
-            sectionNumberStart={1}
+          <ServiceDetailTemplateEditor
+            template={editingSub.detailTemplate}
+            onChange={(detailTemplate) => setEditingSub({ ...editingSub, detailTemplate })}
           />
 
           {/* Section 5: Gallery images */}
@@ -637,7 +693,7 @@ export function ServicesPageManager() {
                   } catch (_) {}
                   e.target.value = ""
                 }} />
-                {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View</a>}
+                {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">View</a>}
               </div>
             </div>
           </div>
@@ -646,7 +702,7 @@ export function ServicesPageManager() {
             <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
           </div>
           <div className="flex gap-4">
-            <Button onClick={saveSubService} disabled={subSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">{subSaving ? "Saving…" : subIsNew ? "Create Sub-Service" : "Save Sub-Service"}</Button>
+            <Button onClick={saveSubService} disabled={subSaving}>{subSaving ? "Saving…" : subIsNew ? "Create Sub-Service" : "Save Sub-Service"}</Button>
             <Button variant="outline" onClick={cancelSubServiceEdit} className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent">Cancel</Button>
           </div>
         </div>
@@ -664,17 +720,22 @@ export function ServicesPageManager() {
             <p className="admin-text-secondary">Manage services page content and individual services</p>
           </div>
           {activeTab === "services" && (
-            <Button onClick={addNewService} className="bg-[#E63946] hover:bg-[#d32f3d]">
-              <Plus className="w-4 h-4 mr-2" /> Add Service
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={seedDefaultServices}>
+                Load Default Services
+              </Button>
+              <Button onClick={addNewService}>
+                <Plus className="w-4 h-4 mr-2" /> Add Service
+              </Button>
+            </div>
           )}
           {activeTab === "sub-services" && (
-            <Button onClick={addNewSubService} className="bg-[#E63946] hover:bg-[#d32f3d]">
+            <Button onClick={addNewSubService}>
               <Plus className="w-4 h-4 mr-2" /> Add Sub-Service
             </Button>
           )}
           {activeTab === "page-content" && (
-            <Button onClick={savePageContent} disabled={pageContentSaving} className="bg-[#E63946] hover:bg-[#d32f3d]">
+            <Button onClick={savePageContent} disabled={pageContentSaving}>
               {pageContentSaving ? 'Saving...' : 'Save Page Content'}
             </Button>
           )}
@@ -688,19 +749,19 @@ export function ServicesPageManager() {
         <div className="flex gap-2 border-b admin-border pb-4 mb-6">
           <button
             onClick={() => setActiveTab('page-content')}
-            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-primary text-primary-foreground' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Page Content
           </button>
           <button
             onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'services' ? 'bg-primary text-primary-foreground' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Services List
           </button>
           <button
             onClick={() => setActiveTab('sub-services')}
-            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'sub-services' ? 'bg-[#E63946] admin-text-primary' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
+            className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'sub-services' ? 'bg-primary text-primary-foreground' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
           >
             Sub-Services
           </button>
@@ -708,80 +769,7 @@ export function ServicesPageManager() {
 
         {/* Page Content Tab */}
         {activeTab === 'page-content' && (
-          <div className="space-y-6">
-            <div className="admin-card border admin-border rounded-xl p-6">
-              <h3 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Background Image</label>
-                  <ImageUpload
-                    value={pageContent.hero.backgroundImage}
-                    onChange={(url) => setPageContent({...pageContent, hero: {...pageContent.hero, backgroundImage: url}})}
-                    label="Upload Background"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Hero Title</label>
-                  <Input
-                    value={pageContent.hero.title}
-                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, title: e.target.value}})}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                    placeholder="Redefining Digital Success..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Hero Description</label>
-                  <Textarea
-                    value={(pageContent.hero as any).description ?? ""}
-                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, description: e.target.value}})}
-                    rows={3}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                    placeholder="Comprehensive solutions to elevate your brand..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Watermark Text</label>
-                  <Input
-                    value={pageContent.hero.watermark}
-                    onChange={(e) => setPageContent({...pageContent, hero: {...pageContent.hero, watermark: e.target.value}})}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                    placeholder="SERVICES"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-card border admin-border rounded-xl p-6">
-              <h3 className="text-lg font-semibold admin-text-primary mb-4">Section Content</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
-                  <Input
-                    value={pageContent.section.title}
-                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, title: e.target.value}})}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Section Subtitle</label>
-                  <Input
-                    value={pageContent.section.subtitle}
-                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, subtitle: e.target.value}})}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Section Description</label>
-                  <Textarea
-                    value={pageContent.section.description}
-                    onChange={(e) => setPageContent({...pageContent, section: {...pageContent.section, description: e.target.value}})}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <ServicesOverviewEditor content={pageContent} onChange={setPageContent} />
         )}
 
         {/* Services List Tab */}
@@ -803,6 +791,7 @@ export function ServicesPageManager() {
           <table className="w-full">
             <thead>
               <tr className="border-b admin-border">
+                <th className="text-left p-4 admin-text-secondary font-medium w-16">Order</th>
                 <th className="text-left p-4 admin-text-secondary font-medium">Service</th>
                 <th className="text-left p-4 admin-text-secondary font-medium">Slug</th>
                 <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
@@ -812,32 +801,37 @@ export function ServicesPageManager() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center">
-                    <div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" />
+                  <td colSpan={5} className="p-8 text-center">
+                    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                   </td>
                 </tr>
               ) : filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center admin-text-muted">
+                  <td colSpan={5} className="p-8 text-center admin-text-muted">
                     No services found
                   </td>
                 </tr>
               ) : (
                 filteredServices.map((service) => (
                   <tr key={service.id} className="border-b admin-border hover:admin-bg-secondary">
+                    <td className="p-4 admin-text-secondary tabular-nums">{service.displayOrder ?? "—"}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 admin-bg-secondary rounded-lg flex items-center justify-center overflow-hidden">
-                          {service.icon && (service.icon.startsWith('/') || service.icon.startsWith('http')) ? (
-                            <Image
-                              src={service.icon}
-                              alt={service.title}
-                              width={24}
-                              height={24}
-                              className="object-contain"
-                            />
+                        <div className="w-10 h-10 admin-bg-secondary rounded-lg flex items-center justify-center overflow-hidden p-1.5">
+                          {service.icon ? (
+                            service.icon.startsWith("/") || service.icon.startsWith("http") ? (
+                              <Image
+                                src={service.icon}
+                                alt={service.title}
+                                width={24}
+                                height={24}
+                                className="object-contain"
+                              />
+                            ) : (
+                              <ServiceCardIconDisplay icon={service.icon} index={0} />
+                            )
                           ) : (
-                            <span className="text-[#E63946] text-xs">?</span>
+                            <span className="text-primary text-xs">?</span>
                           )}
                         </div>
                         <div>
@@ -946,7 +940,7 @@ export function ServicesPageManager() {
                 </thead>
                 <tbody>
                   {subLoading ? (
-                    <tr><td colSpan={6} className="p-8 text-center"><div className="w-6 h-6 border-2 border-[#E63946]/30 border-t-[#E63946] rounded-full animate-spin mx-auto" /></td></tr>
+                    <tr><td colSpan={6} className="p-8 text-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" /></td></tr>
                   ) : subServices.length === 0 ? (
                     <tr><td colSpan={6} className="p-8 text-center admin-text-muted">No sub-services found</td></tr>
                   ) : (
@@ -1039,11 +1033,34 @@ export function ServicesPageManager() {
                   placeholder="service-slug"
                 />
               </div>
-              <div className="col-span-2">
-                <label className="block text-sm admin-text-secondary mb-2">Service Icon</label>
+              <div>
+                <CompactSelect
+                  label="Icon preset"
+                  value={
+                    editingService.icon.startsWith("/") || editingService.icon.startsWith("http")
+                      ? ""
+                      : editingService.icon || "branding"
+                  }
+                  onChange={(v) => updateField("icon", v)}
+                  options={[{ value: "", label: "Custom image below" }, ...SERVICE_ICON_OPTIONS]}
+                />
+                {editingService.icon &&
+                  !editingService.icon.startsWith("/") &&
+                  !editingService.icon.startsWith("http") && (
+                    <div className="mt-2 w-10 h-10 p-1.5 admin-bg-secondary rounded-lg">
+                      <ServiceCardIconDisplay icon={editingService.icon} index={0} />
+                    </div>
+                  )}
+              </div>
+              <div>
+                <label className="block text-sm admin-text-secondary mb-2">Custom icon image (optional)</label>
                 <ImageUpload
-                  value={editingService.icon}
-                  onChange={(url) => updateField("icon", url)}
+                  value={
+                    editingService.icon.startsWith("/") || editingService.icon.startsWith("http")
+                      ? editingService.icon
+                      : ""
+                  }
+                  onChange={(url) => updateField("icon", url || editingService.icon || "branding")}
                   maxSizeMB={1}
                   maxWidth={512}
                   maxHeight={512}
@@ -1111,7 +1128,7 @@ export function ServicesPageManager() {
                     }}
                   />
                   {editingService.brochureUrl && (
-                    <a href={editingService.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#E63946] hover:underline">View current</a>
+                    <a href={editingService.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">View current</a>
                   )}
                 </div>
                 <p className="text-xs admin-text-muted mt-1">Shows &quot;Download Brochure&quot; when set</p>
@@ -1131,168 +1148,17 @@ export function ServicesPageManager() {
             </div>
           </div>
 
-          {/* Section 1: Hero */}
-          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Section 1: Hero</h2>
-              <SectionEnableToggle
-                id="hero-section-enabled"
-                enabled={editingService.pageLayout.heroEnabled}
-                onChange={(enabled) => updatePageLayout({ heroEnabled: enabled })}
-              />
-            </div>
-            <p className="text-sm admin-text-muted">
-              Uses the service title, icon, and portfolio/brochure links from Basic Information.
-            </p>
-            <ImageUpload
-              label="Hero background image"
-              value={editingService.heroImage ?? ""}
-              onChange={(url) => updateField("heroImage", url)}
-            />
-          </div>
-
-          {/* Section 2: Image */}
-          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Section 2: Image</h2>
-              <SectionEnableToggle
-                id="image-section-enabled"
-                enabled={editingService.pageLayout.imageEnabled}
-                onChange={(enabled) => updatePageLayout({ imageEnabled: enabled })}
-              />
-            </div>
-            <ImageUpload
-              label="Content image"
-              value={editingService.image}
-              onChange={(url) => updateField("image", url)}
-            />
-          </div>
-
-          {/* Section 3: Services We Offer */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Section 3: Services We Offer</h2>
-              <SectionEnableToggle
-                id="offerings-section-enabled"
-                enabled={editingService.pageLayout.offeringsEnabled}
-                onChange={(enabled) => updatePageLayout({ offeringsEnabled: enabled })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm admin-text-secondary mb-2">Section title</label>
-              <Input
-                value={editingService.pageLayout.offeringsTitle}
-                onChange={(e) => updatePageLayout({ offeringsTitle: e.target.value })}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                placeholder="Services We Offer"
-              />
-            </div>
-            <p className="text-sm admin-text-muted">
-              Sub-services are managed in the <strong className="admin-text-primary">Sub-Services</strong> tab. Active
-              sub-services linked to this parent service appear here automatically on the website and link to their
-              detail pages.
-            </p>
-          </div>
-
-          {/* Sections 4–7: Custom content */}
-          <ServiceSectionsEditor
-            sections={editingService.sections ?? createEmptySections()}
-            onChange={(sections) => updateField("sections", sections)}
-            hints={PARENT_SERVICE_SECTION_HINTS}
-            sectionNumberStart={4}
+          <ServiceDetailTemplateEditor
+            template={editingService.detailTemplate}
+            onChange={(detailTemplate) => setEditingService({ ...editingService, detailTemplate })}
           />
-
-          {/* FAQ */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4 gap-4">
-              <h2 className="text-lg font-semibold admin-text-primary">FAQ</h2>
-              <div className="flex items-center gap-3">
-                <SectionEnableToggle
-                  id="faq-section-enabled"
-                  enabled={editingService.pageLayout.faqEnabled}
-                  onChange={(enabled) => updatePageLayout({ faqEnabled: enabled })}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => updateField("faqs", [...editingService.faqs, { question: "", answer: "" }])}
-                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add FAQ
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Section title</label>
-                <Input
-                  value={editingService.pageLayout.faqTitle}
-                  onChange={(e) => updatePageLayout({ faqTitle: e.target.value })}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Frequently Asked Questions"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Section subtitle</label>
-                <Input
-                  value={editingService.pageLayout.faqSubtitle}
-                  onChange={(e) => updatePageLayout({ faqSubtitle: e.target.value })}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Optional subtitle"
-                />
-              </div>
-            </div>
-            <div className="space-y-4">
-              {editingService.faqs.map((faq, index) => (
-                <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm admin-text-secondary">FAQ {index + 1}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        updateField(
-                          "faqs",
-                          editingService.faqs.filter((_, i) => i !== index),
-                        )
-                      }
-                      className="text-red-400 hover:text-red-300 h-6 px-2"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <Input
-                    value={faq.question}
-                    onChange={(e) => {
-                      const newFaqs = [...editingService.faqs]
-                      newFaqs[index].question = e.target.value
-                      updateField("faqs", newFaqs)
-                    }}
-                    placeholder="Question"
-                    className="admin-card admin-border-light admin-text-primary mb-2"
-                  />
-                  <Textarea
-                    value={faq.answer}
-                    onChange={(e) => {
-                      const newFaqs = [...editingService.faqs]
-                      newFaqs[index].answer = e.target.value
-                      updateField("faqs", newFaqs)
-                    }}
-                    placeholder="Answer"
-                    className="admin-card admin-border-light admin-text-primary"
-                    rows={2}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Save Button */}
           <div className="flex gap-4">
             <Button
               onClick={saveService}
               disabled={saving || !editingService.title || !editingService.slug}
-              className="bg-[#E63946] hover:bg-[#d32f3d]"
+             
             >
               {saving ? "Saving..." : isNew ? "Create Service" : "Save Changes"}
             </Button>

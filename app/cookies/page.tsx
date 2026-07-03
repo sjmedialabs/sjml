@@ -6,8 +6,9 @@ export default function CookiesPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-background pt-32 pb-16 px-4">
-        <div className="max-w-4xl mx-auto">
+      <main className="min-h-screen bg-background pt-32 pb-16">
+        <div className="site-container">
+          <div className="max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Cookie Policy</h1>
           <p className="text-muted-foreground mb-8">Last updated: {new Date().toLocaleDateString()}</p>
           
@@ -28,6 +29,7 @@ export default function CookiesPage() {
                 Return to Homepage
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </main>

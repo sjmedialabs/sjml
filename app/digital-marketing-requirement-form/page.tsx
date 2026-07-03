@@ -12,27 +12,30 @@ export const metadata: Metadata = {
 
 export default function DigitalMarketingRequirementFormPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
-      {/* Hero */}
-      <section className="relative flex items-center justify-center pt-32 pb-16 px-4 overflow-hidden min-h-[600px]">
-        <div className="absolute inset-0 bg-muted/30" />
-        <div className="hero-overlay" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight text-foreground">
-            Digital Marketing <span className="text-[#E63946]">Requirement Form</span>
-          </h1>
-          <p className="text-lg max-w-2xl mx-auto text-muted-foreground mt-4">
-            Please complete this form to help us understand your product, business goals, and marketing requirements.
-          </p>
+      <section className="about-hero bg-home-secondary">
+        <div className="absolute inset-0 bg-home-secondary z-0" aria-hidden="true" />
+        <div className="site-container about-hero-inner">
+          <div className="about-hero-grid">
+            <div className="about-hero-content w-full max-w-4xl mx-auto text-center">
+              <h1 className="text-2xl md:text-3xl font-bold leading-tight text-white">
+                Digital Marketing <span className="text-home-primary">Requirement Form</span>
+              </h1>
+              <p className="text-sm md:text-base text-white/85 leading-relaxed mt-3 max-w-2xl mx-auto">
+                Please complete this form to help us understand your product, business goals, and marketing requirements.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Form */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <DigitalMarketingForm />
+      <section className="py-12">
+        <div className="site-container">
+          <div className="max-w-4xl">
+            <DigitalMarketingForm />
+          </div>
         </div>
       </section>
 

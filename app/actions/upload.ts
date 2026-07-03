@@ -6,17 +6,27 @@ import { uploadToGridFS } from "@/lib/gridfs"
  * Server Action for image upload. Uses serverActions.bodySizeLimit from next.config (e.g. 10mb).
  * Use this from admin ImageUpload instead of POST /api/upload to avoid 1MB Route Handler limit.
  */
-export async function uploadImageAction(formData: FormData): Promise<{ url?: string; error?: string }> {
+export async function uploadMediaAction(
+  formData: FormData,
+  allowedPrefix: "image/" | "video/",
+): Promise<{ url?: string; error?: string }> {
   try {
     const file = formData.get("file") as File | null
     if (!file || !(file instanceof File)) {
       return { error: "No file provided" }
     }
-    if (!file.type.startsWith("image/")) {
-      return { error: "File must be an image (PNG, JPG, GIF, WebP)" }
+    if (!file.type.startsWith(allowedPrefix)) {
+      return {
+        error:
+          allowedPrefix === "image/"
+            ? "File must be an image (PNG, JPG, GIF, WebP)"
+            : "File must be a video (MP4, WebM, etc.)",
+      }
     }
-    if (file.size > 10 * 1024 * 1024) {
-      return { error: "File must be less than 10MB" }
+
+    const maxBytes = allowedPrefix === "image/" ? 10 * 1024 * 1024 : 10 * 1024 * 1024
+    if (file.size > maxBytes) {
+      return { error: `File must be less than ${maxBytes / (1024 * 1024)}MB` }
     }
 
     const bytes = await file.arrayBuffer()
@@ -32,4 +42,12 @@ export async function uploadImageAction(formData: FormData): Promise<{ url?: str
     console.error("Upload action error:", err)
     return { error: message }
   }
+}
+
+export async function uploadImageAction(formData: FormData): Promise<{ url?: string; error?: string }> {
+  return uploadMediaAction(formData, "image/")
+}
+
+export async function uploadVideoAction(formData: FormData): Promise<{ url?: string; error?: string }> {
+  return uploadMediaAction(formData, "video/")
 }

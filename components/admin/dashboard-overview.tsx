@@ -129,7 +129,7 @@ export function DashboardOverview() {
             {error.includes("authenticated") || error.includes("Session expired") ? (
               <button
                 onClick={() => window.location.href = "/admin/login"}
-                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/90 transition-colors"
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Go to Login
               </button>
@@ -140,7 +140,7 @@ export function DashboardOverview() {
                   setError(null)
                   fetchDashboardStats()
                 }}
-                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#E63946]/90 transition-colors"
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Retry
               </button>
@@ -178,7 +178,7 @@ export function DashboardOverview() {
             <Card key={key} className="admin-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium admin-text-secondary">{label}</CardTitle>
-                <Icon className="w-4 h-4 text-[#E63946]" />
+                <Icon className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold admin-text-primary">{stat.value}</div>

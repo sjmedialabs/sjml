@@ -158,7 +158,7 @@ export function CaseStudiesPageManager() {
               type="text"
               value={data.heroTitle}
               onChange={(e) => setData({ ...data, heroTitle: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -167,7 +167,7 @@ export function CaseStudiesPageManager() {
               value={data.heroSubtitle}
               onChange={(e) => setData({ ...data, heroSubtitle: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <ImageUpload
@@ -185,7 +185,7 @@ export function CaseStudiesPageManager() {
         </div>
         <button
           onClick={addCaseStudy}
-          className="px-4 py-2 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839]"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90"
         >
           + Add Case Study
         </button>
@@ -301,7 +301,7 @@ export function CaseStudiesPageManager() {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1.5 rounded text-sm capitalize ${
-                      activeTab === tab ? "bg-[#E63946] text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      activeTab === tab ? "bg-primary text-primary-foreground" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                   >
                     {tab}
@@ -319,7 +319,7 @@ export function CaseStudiesPageManager() {
                           type="text"
                           value={editingStudy.title}
                           onChange={(e) => { updateCaseStudy({ ...editingStudy, title: e.target.value }); setModalError("") }}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946] focus:ring-1 focus:ring-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                           placeholder="Required"
                         />
                       </div>
@@ -329,7 +329,7 @@ export function CaseStudiesPageManager() {
                           type="text"
                           value={editingStudy.client}
                           onChange={(e) => updateCaseStudy({ ...editingStudy, client: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                         />
                       </div>
                     </div>
@@ -339,7 +339,7 @@ export function CaseStudiesPageManager() {
                         type="text"
                         value={editingStudy.industry}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
@@ -356,7 +356,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <ImageUpload
@@ -369,7 +369,7 @@ export function CaseStudiesPageManager() {
                         type="checkbox"
                         checked={editingStudy.featured}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, featured: e.target.checked })}
-                        className="w-4 h-4 accent-[#E63946]"
+                        className="w-4 h-4 accent-primary"
                       />
                       Featured Case Study
                     </label>
@@ -384,7 +384,7 @@ export function CaseStudiesPageManager() {
                         value={editingStudy.description}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, description: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
@@ -393,7 +393,7 @@ export function CaseStudiesPageManager() {
                         value={editingStudy.challenge}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, challenge: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
@@ -402,7 +402,7 @@ export function CaseStudiesPageManager() {
                         value={editingStudy.solution}
                         onChange={(e) => updateCaseStudy({ ...editingStudy, solution: e.target.value })}
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
@@ -419,7 +419,7 @@ export function CaseStudiesPageManager() {
                               .filter(Boolean),
                           })
                         }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                   </>
@@ -439,7 +439,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Label"
-                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-[#E63946]"
+                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
                           />
                           <input
                             type="text"
@@ -450,7 +450,7 @@ export function CaseStudiesPageManager() {
                               updateCaseStudy({ ...editingStudy, stats: newStats })
                             }}
                             placeholder="Value"
-                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-[#E63946]"
+                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
                           />
                         </div>
                       ))}
@@ -458,7 +458,7 @@ export function CaseStudiesPageManager() {
                         onClick={() =>
                           updateCaseStudy({ ...editingStudy, stats: [...editingStudy.stats, { label: "", value: "" }] })
                         }
-                        className="text-[#E63946] text-sm hover:underline"
+                        className="text-primary text-sm hover:underline"
                       >
                         + Add Stat
                       </button>
@@ -479,7 +479,7 @@ export function CaseStudiesPageManager() {
                           })
                         }
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -494,7 +494,7 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, author: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                         />
                       </div>
                       <div>
@@ -508,7 +508,7 @@ export function CaseStudiesPageManager() {
                               testimonial: { ...editingStudy.testimonial, role: e.target.value },
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-[#E63946]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                         />
                       </div>
                     </div>
@@ -533,7 +533,7 @@ export function CaseStudiesPageManager() {
                   setModalError("")
                   setEditingStudy(null)
                 }}
-                className="px-4 py-2 bg-[#E63946] text-white rounded-lg hover:bg-[#d62839]"
+                className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90"
               >
                 Save
               </button>
@@ -546,7 +546,7 @@ export function CaseStudiesPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
-          className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
+          className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

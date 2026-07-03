@@ -22,6 +22,7 @@ const CaseStudiesPageManager = dynamic(() => import("@/components/admin/case-stu
 const InsightsPageManager = dynamic(() => import("@/components/admin/insights-page-manager").then(mod => mod.InsightsPageManager), { loading: LoadingManager })
 const ClientsPageManager = dynamic(() => import("@/components/admin/clients-page-manager").then(mod => mod.ClientsPageManager), { loading: LoadingManager })
 const TestimonialsPageManager = dynamic(() => import("@/components/admin/testimonials-page-manager").then(mod => mod.TestimonialsPageManager), { loading: LoadingManager })
+const IndustriesPageManager = dynamic(() => import("@/components/admin/industries-page-manager").then(mod => mod.IndustriesPageManager), { loading: LoadingManager })
 const CareersPageManager = dynamic(() => import("@/components/admin/careers-page-manager").then(mod => mod.CareersPageManager), { loading: LoadingManager })
 const ContactPageManager = dynamic(() => import("@/components/admin/contact-page-manager").then(mod => mod.ContactPageManager), { loading: LoadingManager })
 const LeadsManager = dynamic(() => import("@/components/admin/leads-manager").then(mod => mod.LeadsManager), { loading: LoadingManager })
@@ -63,6 +64,8 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
         return <WorkPageManager />
       case "services":
         return <ServicesPageManager />
+      case "industries":
+        return <IndustriesPageManager />
       case "case-studies":
         return <CaseStudiesPageManager />
       case "insights":

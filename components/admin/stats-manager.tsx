@@ -66,7 +66,7 @@ export function StatsManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Stat
           </Button>
-          <Button onClick={handleSave} className="bg-[#E63946] hover:bg-[#d32f3d] admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -81,7 +81,7 @@ export function StatsManager() {
                 <GripVertical className="w-4 h-4 admin-text-muted cursor-grab" />
                 <CardTitle className="admin-text-primary text-lg">Statistic</CardTitle>
               </div>
-              <button onClick={() => removeStat(stat.id)} className="admin-text-secondary hover:text-[#E63946]">
+              <button onClick={() => removeStat(stat.id)} className="admin-text-secondary hover:text-primary">
                 <Trash2 className="w-4 h-4" />
               </button>
             </CardHeader>

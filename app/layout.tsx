@@ -4,6 +4,8 @@ import { Inter, Geist_Mono, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { generateSeoMetadata } from "@/lib/seo"
 import { ThemeProvider } from "@/hooks/use-theme"
+import { getSiteTypography } from "@/lib/get-site-typography"
+import { siteTypographyStyleVars } from "@/lib/site-typography"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,13 +28,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return await generateSeoMetadata("Home")
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const typography = await getSiteTypography()
+  const typographyVars = siteTypographyStyleVars(typography)
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="light" suppressHydrationWarning style={typographyVars}>
       <body className={`${inter.variable} ${geistMono.variable} ${playfair.variable} font-sans antialiased`}>
         <ThemeProvider>
           {children}

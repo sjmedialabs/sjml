@@ -58,7 +58,7 @@ export default async function CaseStudiesPage() {
     console.error("Failed to fetch case studies:", error)
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center px-4">
+        <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
           <p className="text-muted-foreground">Case studies page content has not been set up yet. Please contact the administrator.</p>
         </div>
@@ -71,14 +71,14 @@ export default async function CaseStudiesPage() {
   const heroDescription = hero.description || hero.subtitle || ""
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="site-page min-h-screen bg-white">
       <Header />
 
       <PageHero title={hero.title} description={heroDescription} image={hero.image} />
 
       {/* Case Studies Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16">
+        <div className="site-container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] italic mb-4">{section.title}</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">{section.description}</p>

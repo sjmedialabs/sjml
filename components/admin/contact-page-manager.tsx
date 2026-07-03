@@ -2,344 +2,141 @@
 
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
-
-interface ContactData {
-  hero: {
-    title: string
-    subtitle: string
-    backgroundImage: string
-  }
-  form: {
-    badge: string
-    title: string
-    highlightedWords: string[]
-    buttonText: string
-  }
-  offices: Array<{
-    country: string
-    flag: string
-    address: string
-  }>
-  contact: {
-    title: string
-    phone: string
-    email: string
-  }
-}
-
-const defaultData: ContactData = {
-  hero: {
-    title: "Empowering Your Vision, Driving Transformation",
-    subtitle: "",
-    backgroundImage: "/placeholder.svg?height=500&width=1920",
-  },
-  form: {
-    badge: "Our Achievements",
-    title: "Feel free to get in touch with agency",
-    highlightedWords: ["touch", "with agency"],
-    buttonText: "Let's Get Started !",
-  },
-  offices: [
-    {
-      country: "India",
-      flag: "🇮🇳",
-      address: "E-307, 3rd Floor, guttalabegempet, kavuri hills, madhapur, hyderabad, Telangana, -500033",
-    },
-    {
-      country: "Singapore",
-      flag: "🇸🇬",
-      address: "160 Robinson Road, #14-04 Singapore Business Federation Centre, Singapore, 068914",
-    },
-    {
-      country: "USA",
-      flag: "🇺🇸",
-      address: "1021 E Lincolnway 7542 Cheyenne, WY 82001",
-    },
-  ],
-  contact: {
-    title: "Reach out to us",
-    phone: "+91 89299 96900",
-    email: "info@sjmedialabs.com",
-  },
-}
+import { Button } from "@/components/ui/button"
+import {
+  AdminCompactCard,
+  AdminFieldGrid,
+  CompactField,
+  CompactTextarea,
+  FontSizePill,
+  TypographyPillRow,
+} from "./admin-compact-fields"
+import {
+  createDefaultContactPageContent,
+  normalizeContactPageContent,
+  type NormalizedContactPageContent,
+} from "@/lib/contact-page-content"
 
 export function ContactPageManager() {
-  const [data, setData] = useState<ContactData>(defaultData)
+  const [content, setContent] = useState<NormalizedContactPageContent>(createDefaultContactPageContent())
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
-  const [activeTab, setActiveTab] = useState("hero")
 
   useEffect(() => {
-    fetchData()
+    fetch("/api/content/contact-page")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((raw) => {
+        if (raw) setContent(normalizeContactPageContent(raw))
+      })
+      .catch(() => {})
   }, [])
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch("/api/content/contact")
-      if (res.ok) {
-        const fetchedData = await res.json()
-        setData({ ...defaultData, ...fetchedData })
-      }
-    } catch (error) {
-      console.error("Failed to fetch contact data")
-    }
-  }
-
-  const saveData = async () => {
+  const save = async () => {
     setSaving(true)
+    setMessage("")
     try {
       const token = localStorage.getItem("adminToken")
-      const res = await fetch("/api/content/contact", {
+      const res = await fetch("/api/content/contact-page", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(content),
       })
-      if (res.ok) {
-        setMessage("Contact page saved successfully!")
-        setTimeout(() => setMessage(""), 3000)
-      }
+      setMessage(res.ok ? "Contact page saved!" : "Failed to save")
+      if (res.ok) setTimeout(() => setMessage(""), 3000)
     } catch {
       setMessage("Failed to save")
     }
     setSaving(false)
   }
 
-  const addOffice = () => {
-    setData({
-      ...data,
-      offices: [...data.offices, { country: "", flag: "", address: "" }],
-    })
-  }
+  const setHero = (patch: Partial<NormalizedContactPageContent["hero"]>) =>
+    setContent({ ...content, hero: { ...content.hero, ...patch } })
+  const setInfo = (patch: Partial<NormalizedContactPageContent["info"]>) =>
+    setContent({ ...content, info: { ...content.info, ...patch } })
+  const setForm = (patch: Partial<NormalizedContactPageContent["form"]>) =>
+    setContent({ ...content, form: { ...content.form, ...patch } })
+  const setMap = (patch: Partial<NormalizedContactPageContent["map"]>) =>
+    setContent({ ...content, map: { ...content.map, ...patch } })
+  const setBottomCta = (patch: Partial<NormalizedContactPageContent["bottomCta"]>) =>
+    setContent({ ...content, bottomCta: { ...content.bottomCta, ...patch } })
+  const setTypo = (patch: Partial<NormalizedContactPageContent["typography"]>) =>
+    setContent({ ...content, typography: { ...content.typography, ...patch } })
 
-  const removeOffice = (index: number) => {
-    setData({
-      ...data,
-      offices: data.offices.filter((_, i) => i !== index),
-    })
+  const updateInfoItem = (index: number, value: string, href?: string) => {
+    const items = [...content.info.items]
+    items[index] = { ...items[index], value, href }
+    setInfo({ items })
   }
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold admin-text-primary mb-2">Contact Page</h1>
-        <p className="admin-text-secondary">Manage contact page content, offices, and form settings</p>
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold admin-text-primary mb-1">Contact Page</h1>
+          <p className="admin-text-secondary text-sm">Hero, contact info, form, map and bottom CTA</p>
+        </div>
+        <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Page"}</Button>
       </div>
 
       {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
+        <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-sm">{message}</div>
       )}
 
-      <div className="flex gap-2 mb-6">
-        {["hero", "form", "offices", "contact"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
-              activeTab === tab ? "bg-[#E63946] admin-text-primary" : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      <div className="space-y-2.5">
+        <AdminCompactCard title="Typography">
+          <TypographyPillRow>
+            <FontSizePill label="Hero title" value={content.typography.heroTitleFontSize} onChange={(v) => setTypo({ heroTitleFontSize: v })} min={16} max={56} />
+            <FontSizePill label="Section heading" value={content.typography.sectionHeadingFontSize} onChange={(v) => setTypo({ sectionHeadingFontSize: v })} min={16} max={40} />
+            <FontSizePill label="Info text" value={content.typography.infoValueFontSize} onChange={(v) => setTypo({ infoValueFontSize: v })} min={10} max={18} />
+          </TypographyPillRow>
+        </AdminCompactCard>
 
-      <div className="admin-card border admin-border rounded-xl p-6">
-        {activeTab === "hero" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Title</label>
-              <input
-                type="text"
-                value={data.hero.title}
-                onChange={(e) => setData({ ...data, hero: { ...data.hero, title: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Description / Subtitle</label>
-              <textarea
-                value={data.hero.description ?? data.hero.subtitle ?? ""}
-                onChange={(e) => setData({ ...data, hero: { ...data.hero, description: e.target.value, subtitle: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-            <ImageUpload
-              label="Hero Background Image"
-              value={data.hero.backgroundImage ?? (data.hero as any).image ?? ""}
-              onChange={(url) => setData({ ...data, hero: { ...data.hero, backgroundImage: url, image: url } })}
-            />
-          </div>
-        )}
+        <AdminCompactCard title="Hero">
+          <AdminFieldGrid cols={3}>
+            <CompactField label="Title line 1" value={content.hero.titleLine1} onChange={(v) => setHero({ titleLine1: v })} />
+            <CompactField label="Title highlight" value={content.hero.titleHighlight} onChange={(v) => setHero({ titleHighlight: v })} />
+            <CompactField label="Title line 2" value={content.hero.titleLine2} onChange={(v) => setHero({ titleLine2: v })} />
+          </AdminFieldGrid>
+          <CompactTextarea label="Description" value={content.hero.description} onChange={(v) => setHero({ description: v })} rows={2} />
+          <ImageUpload label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
+        </AdminCompactCard>
 
-        {activeTab === "form" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Form Section</h2>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Badge Text</label>
-              <input
-                type="text"
-                value={data.form.badge}
-                onChange={(e) => setData({ ...data, form: { ...data.form, badge: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Title</label>
-              <input
-                type="text"
-                value={data.form.title}
-                onChange={(e) => setData({ ...data, form: { ...data.form, title: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Highlighted Words (comma separated)</label>
-              <input
-                type="text"
-                value={data.form.highlightedWords.join(", ")}
-                onChange={(e) =>
-                  setData({
-                    ...data,
-                    form: {
-                      ...data.form,
-                      highlightedWords: e.target.value
-                        .split(",")
-                        .map((w) => w.trim())
-                        .filter(Boolean),
-                    },
-                  })
-                }
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-                placeholder="touch, with agency"
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Button Text</label>
-              <input
-                type="text"
-                value={data.form.buttonText}
-                onChange={(e) => setData({ ...data, form: { ...data.form, buttonText: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-          </div>
-        )}
+        <AdminCompactCard title="Get in touch">
+          <AdminFieldGrid cols={2}>
+            <CompactField label="Label" value={content.info.label} onChange={(v) => setInfo({ label: v })} />
+            <CompactField label="Heading" value={content.info.heading} onChange={(v) => setInfo({ heading: v })} />
+          </AdminFieldGrid>
+          {content.info.items.map((item, index) => (
+            <CompactField key={item.id} label={item.icon} value={item.value} onChange={(v) => updateInfoItem(index, v, item.href)} />
+          ))}
+          <CompactField label="Email callout text" value={content.info.emailCalloutText} onChange={(v) => setInfo({ emailCalloutText: v })} />
+          <CompactField label="Email callout email" value={content.info.emailCalloutEmail} onChange={(v) => setInfo({ emailCalloutEmail: v })} />
+        </AdminCompactCard>
 
-        {activeTab === "offices" && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold admin-text-primary">Office Locations</h2>
-              <button
-                onClick={addOffice}
-                className="px-3 py-1.5 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] text-sm"
-              >
-                + Add Office
-              </button>
-            </div>
-            {data.offices.map((office, index) => (
-              <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3">
-                <div className="flex justify-between items-start">
-                  <span className="admin-text-secondary text-sm">Office #{index + 1}</span>
-                  <button onClick={() => removeOffice(index)} className="text-red-500 hover:text-red-400 text-sm">
-                    Remove
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs admin-text-muted mb-1">Country</label>
-                    <input
-                      type="text"
-                      value={office.country}
-                      onChange={(e) => {
-                        const newOffices = [...data.offices]
-                        newOffices[index].country = e.target.value
-                        setData({ ...data, offices: newOffices })
-                      }}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs admin-text-muted mb-1">Flag Emoji</label>
-                    <input
-                      type="text"
-                      value={office.flag}
-                      onChange={(e) => {
-                        const newOffices = [...data.offices]
-                        newOffices[index].flag = e.target.value
-                        setData({ ...data, offices: newOffices })
-                      }}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
-                      placeholder="🇮🇳"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs admin-text-muted mb-1">Full Address</label>
-                  <textarea
-                    value={office.address}
-                    onChange={(e) => {
-                      const newOffices = [...data.offices]
-                      newOffices[index].address = e.target.value
-                      setData({ ...data, offices: newOffices })
-                    }}
-                    rows={2}
-                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <AdminCompactCard title="Contact form">
+          <AdminFieldGrid cols={2}>
+            <CompactField label="Label" value={content.form.label} onChange={(v) => setForm({ label: v })} />
+            <CompactField label="Heading" value={content.form.heading} onChange={(v) => setForm({ heading: v })} />
+          </AdminFieldGrid>
+          <CompactField label="Button text" value={content.form.buttonText} onChange={(v) => setForm({ buttonText: v })} />
+          <CompactField
+            label="Service options (comma separated)"
+            value={content.form.serviceOptions.join(", ")}
+            onChange={(v) => setForm({ serviceOptions: v.split(",").map((s) => s.trim()).filter(Boolean) })}
+          />
+        </AdminCompactCard>
 
-        {activeTab === "contact" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Contact Information</h2>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Section Title</label>
-              <input
-                type="text"
-                value={data.contact.title}
-                onChange={(e) => setData({ ...data, contact: { ...data.contact, title: e.target.value } })}
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Phone Number</label>
-                <input
-                  type="text"
-                  value={data.contact.phone}
-                  onChange={(e) => setData({ ...data, contact: { ...data.contact, phone: e.target.value } })}
-                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Email Address</label>
-                <input
-                  type="email"
-                  value={data.contact.email}
-                  onChange={(e) => setData({ ...data, contact: { ...data.contact, email: e.target.value } })}
-                  className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-[#E63946]"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <AdminCompactCard title="Map">
+          <CompactField label="Embed URL" value={content.map.embedUrl} onChange={(v) => setMap({ embedUrl: v })} />
+        </AdminCompactCard>
 
-        <div className="mt-6 pt-6 border-t admin-border">
-          <button
-            onClick={saveData}
-            disabled={saving}
-            className="px-6 py-3 bg-[#E63946] admin-text-primary rounded-lg hover:bg-[#d62839] disabled:opacity-50 transition-colors"
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
+        <AdminCompactCard title="Bottom CTA">
+          <CompactTextarea label="Text" value={content.bottomCta.text} onChange={(v) => setBottomCta({ text: v })} rows={2} />
+          <AdminFieldGrid cols={2}>
+            <CompactField label="Button text" value={content.bottomCta.buttonText} onChange={(v) => setBottomCta({ buttonText: v })} />
+            <CompactField label="Button URL" value={content.bottomCta.buttonUrl} onChange={(v) => setBottomCta({ buttonUrl: v })} />
+          </AdminFieldGrid>
+        </AdminCompactCard>
       </div>
     </div>
   )
