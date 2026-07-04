@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, type CSSProperties } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import type { HomeHero, HeroSlide } from "@/lib/home-content"
+import { HOME_HERO_DEFAULT_COLORS } from "@/lib/home-content"
 
 interface HeroSectionProps {
   data: HomeHero
@@ -27,22 +28,44 @@ function ScrollMouseIcon({ className }: { className?: string }) {
   )
 }
 
-function SlideContent({ slide, titleFontSize }: { slide: HeroSlide; titleFontSize: number }) {
+function SlideContent({
+  slide,
+  titleFontSize,
+  colors,
+}: {
+  slide: HeroSlide
+  titleFontSize: number
+  colors: {
+    overTitle: string
+    headline: string
+    highlight: string
+    description: string
+  }
+}) {
   return (
     <div className="home-hero-content max-w-xl lg:max-w-2xl">
       {slide.overTitle && (
-        <p className="site-subtitle text-[11px] uppercase tracking-[0.2em] text-home-on-dark/90 mb-3">{slide.overTitle}</p>
+        <p
+          className="site-subtitle text-[11px] uppercase tracking-[0.2em] mb-3"
+          style={{ color: colors.overTitle }}
+        >
+          {slide.overTitle}
+        </p>
       )}
       <h1
         className="font-bold uppercase leading-[1.1] tracking-tight mb-3 md:mb-4"
-        style={{ fontSize: `clamp(1.75rem, 4vw, ${titleFontSize}px)` }}
+        style={{ fontSize: `clamp(1.75rem, 4vw, ${titleFontSize}px)`, color: colors.headline }}
       >
         {slide.headline && <span className="block">{slide.headline}</span>}
         {slide.headlineLine2 && <span className="block">{slide.headlineLine2}</span>}
-        {slide.highlightText && <span className="home-hero-highlight block">{slide.highlightText}</span>}
+        {slide.highlightText && (
+          <span className="home-hero-highlight block" style={{ color: colors.highlight }}>
+            {slide.highlightText}
+          </span>
+        )}
       </h1>
       {slide.description && (
-        <p className="site-paragraph max-w-md mb-5 text-home-on-dark/90 line-clamp-2">
+        <p className="site-paragraph max-w-md mb-5 line-clamp-2" style={{ color: colors.description }}>
           {slide.description}
         </p>
       )}
@@ -95,6 +118,12 @@ export function HeroSection({ data }: HeroSectionProps) {
   const activeSlide = slides[activeIndex] ?? slides[0]
   const titleFontSize = data.titleFontSize ?? 42
   const maxHeight = data.maxHeight ?? 500
+  const colors = {
+    overTitle: data.overTitleColor ?? HOME_HERO_DEFAULT_COLORS.overTitle,
+    headline: data.headlineColor ?? HOME_HERO_DEFAULT_COLORS.headline,
+    highlight: data.highlightColor ?? HOME_HERO_DEFAULT_COLORS.highlight,
+    description: data.descriptionColor ?? HOME_HERO_DEFAULT_COLORS.description,
+  }
 
   return (
     <section className="home-hero-section bg-white">
@@ -159,7 +188,7 @@ export function HeroSection({ data }: HeroSectionProps) {
           )}
 
           <div className="relative z-[2] flex h-full items-center pl-14 md:pl-16 pr-6 md:pr-10">
-            <SlideContent slide={activeSlide} titleFontSize={titleFontSize} />
+            <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
           </div>
 
           {data.showScrollIndicator && (

@@ -40,7 +40,33 @@ export interface HomeHero {
   titleFontSize?: number
   /** Carousel max height in px (default 500) */
   maxHeight?: number
+  /** Over-title text color (hex) */
+  overTitleColor?: string
+  /** Headline lines 1 & 2 color (hex) */
+  headlineColor?: string
+  /** Highlight line color (hex) */
+  highlightColor?: string
+  /** Description text color (hex) */
+  descriptionColor?: string
   slides: HeroSlide[]
+}
+
+export const HOME_HERO_DEFAULT_COLORS = {
+  overTitle: "#ffffff",
+  headline: "#ffffff",
+  highlight: HOME_COLORS.primary,
+  description: "#ffffff",
+} as const
+
+function normalizeHexColor(value: unknown, fallback: string): string {
+  if (typeof value !== "string") return fallback
+  const trimmed = value.trim()
+  if (/^#[0-9A-Fa-f]{6}$/.test(trimmed)) return trimmed.toLowerCase()
+  if (/^#[0-9A-Fa-f]{3}$/.test(trimmed)) {
+    const hex = trimmed.slice(1)
+    return `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`.toLowerCase()
+  }
+  return fallback
 }
 
 export interface HomeStat {
@@ -104,6 +130,10 @@ export function createDefaultHero(): HomeHero {
     scrollIndicatorText: "SCROLL DOWN",
     titleFontSize: 42,
     maxHeight: 500,
+    overTitleColor: HOME_HERO_DEFAULT_COLORS.overTitle,
+    headlineColor: HOME_HERO_DEFAULT_COLORS.headline,
+    highlightColor: HOME_HERO_DEFAULT_COLORS.highlight,
+    descriptionColor: HOME_HERO_DEFAULT_COLORS.description,
     slides: [
       {
         id: "1",
@@ -393,6 +423,10 @@ export function normalizeHomeContent(
       titleFontSize:
         typeof heroRaw.titleFontSize === "number" ? heroRaw.titleFontSize : heroDefaults.titleFontSize,
       maxHeight: typeof heroRaw.maxHeight === "number" ? heroRaw.maxHeight : heroDefaults.maxHeight,
+      overTitleColor: normalizeHexColor(heroRaw.overTitleColor, HOME_HERO_DEFAULT_COLORS.overTitle),
+      headlineColor: normalizeHexColor(heroRaw.headlineColor, HOME_HERO_DEFAULT_COLORS.headline),
+      highlightColor: normalizeHexColor(heroRaw.highlightColor, HOME_HERO_DEFAULT_COLORS.highlight),
+      descriptionColor: normalizeHexColor(heroRaw.descriptionColor, HOME_HERO_DEFAULT_COLORS.description),
       slides: normalizeSlides(heroRaw, options),
     },
     stats: normalizeStats(data.stats),

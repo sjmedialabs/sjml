@@ -13,6 +13,7 @@ import {
   createDefaultStats,
   createDefaultServicesSection,
   normalizeHomeContent,
+  HOME_HERO_DEFAULT_COLORS,
   type HomeHero,
   type HomeStat,
   type HomeServicesSection,
@@ -20,6 +21,7 @@ import {
   type HomeServiceCard,
 } from "@/lib/home-content"
 import { STAT_ICON_PRESETS, isStatIconPreset } from "@/components/stats-icons"
+import { ColorPill, TypographyPillRow } from "./admin-compact-fields"
 
 const ICON_OPTIONS = [
   { value: "users", label: "Users / Clients" },
@@ -221,6 +223,31 @@ export function HomePageManager() {
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Title & content colors</label>
+              <TypographyPillRow>
+                <ColorPill
+                  label="Over-title"
+                  value={hero.overTitleColor ?? HOME_HERO_DEFAULT_COLORS.overTitle}
+                  onChange={(overTitleColor) => setHero({ ...hero, overTitleColor })}
+                />
+                <ColorPill
+                  label="Title"
+                  value={hero.headlineColor ?? HOME_HERO_DEFAULT_COLORS.headline}
+                  onChange={(headlineColor) => setHero({ ...hero, headlineColor })}
+                />
+                <ColorPill
+                  label="Highlight"
+                  value={hero.highlightColor ?? HOME_HERO_DEFAULT_COLORS.highlight}
+                  onChange={(highlightColor) => setHero({ ...hero, highlightColor })}
+                />
+                <ColorPill
+                  label="Description"
+                  value={hero.descriptionColor ?? HOME_HERO_DEFAULT_COLORS.description}
+                  onChange={(descriptionColor) => setHero({ ...hero, descriptionColor })}
+                />
+              </TypographyPillRow>
             </div>
           </div>
 

@@ -127,3 +127,37 @@ export function AdminCompactCard({ children, title }: { children: ReactNode; tit
 export function TypographyPillRow({ children }: { children: ReactNode }) {
   return <div className="flex flex-wrap gap-1.5">{children}</div>
 }
+
+interface ColorPillProps {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}
+
+/** Compact color picker for admin typography controls. */
+export function ColorPill({ label, value, onChange }: ColorPillProps) {
+  const pickerValue = /^#[0-9A-Fa-f]{6}$/i.test(value) ? value : "#ffffff"
+
+  return (
+    <div className="admin-font-pill inline-flex items-center gap-1.5 rounded-full border admin-border admin-bg-tertiary px-2 py-0.5 text-[11px] admin-text-secondary">
+      <span className="whitespace-nowrap">{label}</span>
+      <label className="cursor-pointer shrink-0">
+        <input
+          type="color"
+          value={pickerValue}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-5 w-5 cursor-pointer rounded border admin-border bg-transparent p-0"
+          aria-label={`${label} color`}
+        />
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-[4.5rem] bg-transparent admin-text-primary text-[11px] font-mono outline-none uppercase"
+        spellCheck={false}
+        aria-label={`${label} hex value`}
+      />
+    </div>
+  )
+}
