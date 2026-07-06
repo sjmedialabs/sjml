@@ -41,7 +41,7 @@ export function ServiceDetailContent({ template }: { template: ServiceDetailTemp
             )}
           </div>
           {template.introImage && (
-            <div className="service-detail-intro-media flex items-start justify-center lg:justify-end">
+            <div className="service-detail-intro-media flex items-start justify-center lg:justify-end pt-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={template.introImage} alt="" className="service-detail-intro-image max-w-full h-auto rounded-xl" />
             </div>
