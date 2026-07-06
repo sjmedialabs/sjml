@@ -3,11 +3,54 @@ import { Footer } from "@/components/footer"
 import { notFound } from "next/navigation"
 import { clientPromise } from "@/lib/mongodb"
 import { normalizeServiceDetailTemplate } from "@/lib/service-detail-template"
+import { normalizeSubServiceMeta } from "@/lib/sub-service-document"
 import { ServiceDetailLayout } from "@/components/services/service-detail-layout"
 import { sortByDisplayOrder } from "@/lib/service-order"
+import { generateSeoMetadata } from "@/lib/seo"
+import type { Metadata } from "next"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string; subslug: string }>
+}): Promise<Metadata> {
+  const { slug: parentSlug, subslug } = await props.params
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const sub = await db.collection("sub-services").findOne({ parentSlug, slug: subslug, isActive: true })
+    if (sub) {
+      const meta = normalizeSubServiceMeta(sub as Record<string, unknown>, String(sub.name ?? ""))
+      const base = await generateSeoMetadata("Services")
+      const siteName =
+        typeof base.title === "string" ? base.title.split("|").pop()?.trim() || "SJ Media Labs" : "SJ Media Labs"
+      const title = meta.metaTitle.includes("|") ? meta.metaTitle : `${meta.metaTitle} | ${siteName}`
+      const description = meta.metaDescription || base.description
+      const image = String(sub.bannerImage ?? "").trim() || undefined
+      return {
+        ...base,
+        title,
+        description,
+        openGraph: {
+          ...base.openGraph,
+          title: meta.metaTitle,
+          description: description ?? undefined,
+          images: image ? [image] : base.openGraph?.images,
+        },
+        twitter: {
+          ...base.twitter,
+          title: meta.metaTitle,
+          description: description ?? undefined,
+          images: image ? [image] : base.twitter?.images,
+        },
+      }
+    }
+  } catch {
+    /* fall through */
+  }
+  return generateSeoMetadata("Services")
+}
 
 export default async function SubServiceDetailPage(props: {
   params: Promise<{ slug: string; subslug: string }>

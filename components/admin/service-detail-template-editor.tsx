@@ -55,7 +55,7 @@ export function ServiceDetailTemplateEditor({
       <AdminCompactCard title="Intro">
         <AdminFieldGrid cols={2}>
           <CompactField label="Category label" value={template.categoryLabel} onChange={(v) => onChange({ ...template, categoryLabel: v })} />
-          <CompactField label="Page title" value={template.title} onChange={(v) => onChange({ ...template, title: v })} />
+          <CompactField label="Page title (on-page H1)" value={template.title} onChange={(v) => onChange({ ...template, title: v })} />
         </AdminFieldGrid>
         <CompactTextarea label="Paragraph 1" value={template.introParagraph1} onChange={(v) => onChange({ ...template, introParagraph1: v })} rows={2} />
         <CompactTextarea label="Paragraph 2" value={template.introParagraph2} onChange={(v) => onChange({ ...template, introParagraph2: v })} rows={2} />

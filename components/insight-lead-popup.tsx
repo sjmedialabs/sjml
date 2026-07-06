@@ -17,6 +17,8 @@ interface InsightLeadPopupProps {
   onSuccess: () => void
 }
 
+const inputClass = "site-modal-input w-full rounded-lg"
+
 export function InsightLeadPopup({ isOpen, onClose, insightSlug, onSuccess }: InsightLeadPopupProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -66,22 +68,32 @@ export function InsightLeadPopup({ isOpen, onClose, insightSlug, onSuccess }: In
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-background border border-border rounded-2xl w-full max-w-lg mx-4 p-8 animate-in fade-in zoom-in duration-200">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-foreground transition-colors" aria-label="Close">
+      <div className="absolute inset-0 site-modal-backdrop" onClick={onClose} />
+      <div className="relative site-modal-panel rounded-2xl w-full max-w-lg mx-4 p-8 animate-in fade-in zoom-in duration-200">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-black/45 hover:text-black transition-colors"
+          aria-label="Close"
+        >
           <X className="w-6 h-6" />
         </button>
         <div className="text-center mb-6">
-          <span className="text-[#E63946] text-sm font-medium">Read full article</span>
-          <h2 className="text-xl font-bold text-foreground mt-2">Enter your details to continue</h2>
+          <span className="text-home-primary text-sm font-semibold uppercase tracking-wide">Read full article</span>
+          <h2 className="text-xl font-bold text-black mt-2">Enter your details to continue</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input placeholder="Name *" value={name} onChange={(e) => setName(e.target.value)} className="bg-background border-border text-foreground" required />
-          <Input type="email" placeholder="Email *" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background border-border text-foreground" required />
-          <Input placeholder="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-background border-border text-foreground" required />
-          <Input placeholder="Company (optional)" value={company} onChange={(e) => setCompany(e.target.value)} className="bg-background border-border text-foreground" />
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full bg-[#E63946] hover:bg-[#d32f3d]">{submitting ? "Submitting…" : "Continue to article"}</Button>
+          <Input placeholder="Name *" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
+          <Input type="email" placeholder="Email *" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
+          <Input placeholder="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} required />
+          <Input placeholder="Company (optional)" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
+          {error && <p className="text-sm admin-alert-error px-3 py-2 rounded-lg">{error}</p>}
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-home-primary hover:bg-home-primary-hover text-black font-semibold"
+          >
+            {submitting ? "Submitting…" : "Continue to article"}
+          </Button>
         </form>
       </div>
     </div>

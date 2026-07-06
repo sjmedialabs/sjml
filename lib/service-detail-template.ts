@@ -231,7 +231,11 @@ export function normalizeServiceDetailTemplate(
       sections?.[0]?.description?.split("\n\n")[1] ??
       (data.fullDescription as string)?.split("\n\n")[1] ??
       defaults.introParagraph2,
-    introImage: raw.introImage ?? (data.bannerImage as string) ?? (data.image as string) ?? defaults.introImage,
+    introImage:
+      raw.introImage?.trim() ||
+      (data.bannerImage as string)?.trim() ||
+      (data.image as string)?.trim() ||
+      defaults.introImage,
     features: raw.features?.length ? mapFeatures(raw.features) : defaults.features,
     processLabel: raw.processLabel ?? defaults.processLabel,
     processTitleLine1: raw.processTitleLine1 ?? defaults.processTitleLine1,

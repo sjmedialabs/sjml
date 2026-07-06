@@ -4,6 +4,7 @@ import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { getDisplayOrder } from "@/lib/service-order"
+import { normalizeSubServiceMeta, syncSubServiceImages } from "@/lib/sub-service-document"
 
 export const dynamic = "force-dynamic"
 const COLLECTION = "sub-services"
@@ -49,26 +50,30 @@ export async function PUT(
 
     const { id } = await params
     const data = await request.json()
+    const synced = syncSubServiceImages(data as Record<string, unknown>)
+    const meta = normalizeSubServiceMeta(synced, String(synced.name ?? ""))
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
     const update: Record<string, unknown> = {
-      parentSlug: data.parentSlug,
-      slug: data.slug,
-      name: data.name,
-      bannerImage: data.bannerImage,
-      shortDescription: data.shortDescription,
-      fullDescription: data.fullDescription,
-      detailTemplate: data.detailTemplate,
-      sections: data.sections,
-      pageLayout: data.pageLayout,
-      portfolioUrl: data.portfolioUrl,
-      brochureUrl: data.brochureUrl,
-      isActive: data.isActive,
+      parentSlug: synced.parentSlug,
+      slug: synced.slug,
+      name: synced.name,
+      bannerImage: synced.bannerImage,
+      shortDescription: synced.shortDescription,
+      fullDescription: synced.fullDescription,
+      metaTitle: meta.metaTitle,
+      metaDescription: meta.metaDescription,
+      detailTemplate: synced.detailTemplate,
+      sections: synced.sections,
+      pageLayout: synced.pageLayout,
+      portfolioUrl: synced.portfolioUrl,
+      brochureUrl: synced.brochureUrl,
+      isActive: synced.isActive,
       updatedAt: new Date(),
     }
-    if (data.displayOrder !== undefined) {
-      update.displayOrder = getDisplayOrder(data.displayOrder)
+    if (synced.displayOrder !== undefined) {
+      update.displayOrder = getDisplayOrder(synced.displayOrder)
     }
     Object.keys(update).forEach((k) => update[k] === undefined && delete update[k])
 
@@ -76,12 +81,17 @@ export async function PUT(
     const existing = await db.collection(COLLECTION).findOne(filter)
     if (!existing) return NextResponse.json({ error: "Sub-service not found" }, { status: 404 })
     await db.collection(COLLECTION).updateOne(filter, { $set: update })
-    const parentSlug = (data.parentSlug ?? existing.parentSlug) as string
-    const subSlug = (data.slug ?? existing.slug) as string
+    const parentSlug = (synced.parentSlug ?? existing.parentSlug) as string
+    const subSlug = (synced.slug ?? existing.slug) as string
+    const oldParentSlug = existing.parentSlug as string
+    const oldSlug = existing.slug as string
     revalidatePath("/services")
     if (parentSlug) {
       revalidatePath(`/services/${parentSlug}`)
       if (subSlug) revalidatePath(`/services/${parentSlug}/${subSlug}`)
+    }
+    if (oldParentSlug && oldSlug && (oldParentSlug !== parentSlug || oldSlug !== subSlug)) {
+      revalidatePath(`/services/${oldParentSlug}/${oldSlug}`)
     }
     return NextResponse.json({ success: true, ...update })
   } catch (error) {

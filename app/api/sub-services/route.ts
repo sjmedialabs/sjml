@@ -5,6 +5,7 @@ import { clientPromise } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { getDisplayOrder, sortByDisplayOrder } from "@/lib/service-order"
 import { createDefaultServiceDetailTemplate } from "@/lib/service-detail-template"
+import { normalizeSubServiceMeta, syncSubServiceImages } from "@/lib/sub-service-document"
 
 export const dynamic = "force-dynamic"
 const COLLECTION = "sub-services"
@@ -77,26 +78,30 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json()
+    const synced = syncSubServiceImages(data as Record<string, unknown>)
+    const meta = normalizeSubServiceMeta(synced, String(synced.name ?? ""))
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
-    const parentTitle = data.parentTitle ?? data.parentSlug ?? ""
+    const parentTitle = synced.parentTitle ?? synced.parentSlug ?? ""
     const doc = {
-      parentSlug: data.parentSlug ?? "",
-      slug: data.slug ?? "",
-      name: data.name ?? "",
-      bannerImage: data.bannerImage ?? "",
-      shortDescription: data.shortDescription ?? "",
-      fullDescription: data.fullDescription ?? "",
+      parentSlug: synced.parentSlug ?? "",
+      slug: synced.slug ?? "",
+      name: synced.name ?? "",
+      bannerImage: synced.bannerImage ?? "",
+      shortDescription: synced.shortDescription ?? "",
+      fullDescription: synced.fullDescription ?? "",
+      metaTitle: meta.metaTitle,
+      metaDescription: meta.metaDescription,
       detailTemplate:
-        data.detailTemplate ??
-        createDefaultServiceDetailTemplate(data.name ?? "", parentTitle.toUpperCase()),
-      sections: Array.isArray(data.sections) ? data.sections : [],
-      pageLayout: data.pageLayout ?? {},
-      portfolioUrl: data.portfolioUrl ?? "",
-      brochureUrl: data.brochureUrl ?? "",
-      displayOrder: getDisplayOrder(data.displayOrder),
-      isActive: data.isActive !== false,
+        synced.detailTemplate ??
+        createDefaultServiceDetailTemplate(String(synced.name ?? ""), String(parentTitle).toUpperCase()),
+      sections: Array.isArray(synced.sections) ? synced.sections : [],
+      pageLayout: synced.pageLayout ?? {},
+      portfolioUrl: synced.portfolioUrl ?? "",
+      brochureUrl: synced.brochureUrl ?? "",
+      displayOrder: getDisplayOrder(synced.displayOrder),
+      isActive: synced.isActive !== false,
       createdAt: new Date(),
       updatedAt: new Date(),
     }

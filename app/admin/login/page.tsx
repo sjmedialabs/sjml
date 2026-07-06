@@ -43,43 +43,43 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 font-sans">
+    <div className="admin-content-area min-h-screen flex items-center justify-center p-4 font-sans bg-white">
       <div className="w-full max-w-[400px]">
         <div className="text-center mb-8">
           <div className="w-10 h-10 bg-primary rounded inline-flex items-center justify-center mb-4">
             <span className="text-primary-foreground font-bold">SJ</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">SJ Media Labs</h1>
-          <p className="text-[#999]">Admin Portal - Welcome Back</p>
+          <h1 className="text-2xl font-bold admin-text-primary mb-2">SJ Media Labs</h1>
+          <p className="admin-text-secondary">Admin Portal — Welcome Back</p>
         </div>
 
-        <div className="bg-[#111] border border-[#333] rounded-lg p-8">
+        <div className="admin-card border admin-border rounded-lg p-8 shadow-sm">
           <div className="mb-4">
-            <label htmlFor="email" className="block text-white mb-2">
+            <label htmlFor="email" className="block admin-text-primary mb-2 text-sm font-medium">
               Email Address
             </label>
             <input
               id="email"
               type="email"
-              className="w-full p-3 bg-[#1a1a1a] border border-[#333] rounded text-white"
+              className="w-full p-3 admin-bg-tertiary border admin-border-light rounded admin-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
 
           <div className="mb-6">
-            <label htmlFor="password" className="block text-white mb-2">
+            <label htmlFor="password" className="block admin-text-primary mb-2 text-sm font-medium">
               Password
             </label>
             <input
               id="password"
               type="password"
-              className="w-full p-3 bg-[#1a1a1a] border border-[#333] rounded text-white"
+              className="w-full p-3 admin-bg-tertiary border admin-border-light rounded admin-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
 
           <button
             type="button"
             onClick={handleLogin}
-            className="w-full p-3 bg-primary text-primary-foreground border-none rounded font-medium cursor-pointer"
+            className="w-full p-3 bg-primary text-primary-foreground border-none rounded font-semibold cursor-pointer hover:bg-primary/90 transition-colors"
           >
             Sign In
           </button>

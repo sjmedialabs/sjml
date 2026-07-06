@@ -38,6 +38,7 @@ import { ServiceDetailTemplateEditor } from "./service-detail-template-editor"
 import { CompactSelect } from "./admin-compact-fields"
 import { SERVICE_ICON_OPTIONS, ServiceCardIconDisplay } from "@/components/services/service-card-icons"
 import { sortByDisplayOrder } from "@/lib/service-order"
+import { normalizeSubServiceMeta, syncSubServiceImages } from "@/lib/sub-service-document"
 
 interface ServiceItem {
   id: string
@@ -116,6 +117,8 @@ interface SubServiceItem {
   bannerImage: string
   shortDescription: string
   fullDescription: string
+  metaTitle: string
+  metaDescription: string
   portfolioUrl: string
   brochureUrl: string
   displayOrder: number
@@ -188,12 +191,18 @@ export function ServicesPageManager() {
     setSubSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
+      const meta = normalizeSubServiceMeta(editingSub as unknown as Record<string, unknown>, editingSub.name)
+      const payload = syncSubServiceImages({
+        ...editingSub,
+        metaTitle: editingSub.metaTitle?.trim() || meta.metaTitle,
+        metaDescription: editingSub.metaDescription?.trim() || meta.metaDescription,
+      })
       const url = subIsNew ? "/api/sub-services" : `/api/sub-services/${editingSub.id}`
       const method = subIsNew ? "POST" : "PUT"
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(editingSub),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         setMessage(subIsNew ? "Sub-service created." : "Sub-service updated.")
@@ -232,6 +241,8 @@ export function ServicesPageManager() {
       bannerImage: "",
       shortDescription: "",
       fullDescription: "",
+      metaTitle: "",
+      metaDescription: "",
       portfolioUrl: "",
       brochureUrl: "",
       displayOrder: 0,
@@ -249,6 +260,8 @@ export function ServicesPageManager() {
     const parentTitle = getParentServiceTitle(sub.parentSlug)
     setEditingSub({
       ...sub,
+      metaTitle: (sub as SubServiceItem & { metaTitle?: string }).metaTitle ?? sub.name ?? "",
+      metaDescription: (sub as SubServiceItem & { metaDescription?: string }).metaDescription ?? sub.shortDescription ?? "",
       sections: normalizeSubServiceSections(sub as unknown as Record<string, unknown>),
       pageLayout: normalizeSubServicePageLayout(sub as unknown as Record<string, unknown>),
       detailTemplate: normalizeServiceDetailTemplate(
@@ -482,7 +495,7 @@ export function ServicesPageManager() {
         </div>
 
         {message && (
-          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
+          <div className="mb-4 p-4 admin-alert-success rounded-lg">{message}</div>
         )}
 
         <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
@@ -512,9 +525,38 @@ export function ServicesPageManager() {
               <Input value={editingSub.slug} onChange={(e) => setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
             </div>
           </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Meta title (browser tab / SEO)</label>
+              <Input
+                value={editingSub.metaTitle}
+                onChange={(e) => setEditingSub({ ...editingSub, metaTitle: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder={editingSub.name || "Logo Design | SJ Media Labs"}
+              />
+            </div>
+            <div>
+              <label className="block text-sm admin-text-secondary mb-2">Meta description (SEO)</label>
+              <Input
+                value={editingSub.metaDescription}
+                onChange={(e) => setEditingSub({ ...editingSub, metaDescription: e.target.value })}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder={editingSub.shortDescription || "Short description for search results"}
+              />
+            </div>
+          </div>
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Banner Image</label>
-            <ImageUpload value={editingSub.bannerImage} onChange={(url) => setEditingSub({ ...editingSub, bannerImage: url })} />
+            <ImageUpload
+              value={editingSub.bannerImage}
+              onChange={(url) =>
+                setEditingSub({
+                  ...editingSub,
+                  bannerImage: url,
+                  detailTemplate: { ...editingSub.detailTemplate, introImage: url },
+                })
+              }
+            />
           </div>
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
@@ -522,7 +564,13 @@ export function ServicesPageManager() {
           </div>
           <ServiceDetailTemplateEditor
             template={editingSub.detailTemplate}
-            onChange={(detailTemplate) => setEditingSub({ ...editingSub, detailTemplate })}
+            onChange={(detailTemplate) =>
+              setEditingSub({
+                ...editingSub,
+                detailTemplate,
+                bannerImage: detailTemplate.introImage?.trim() || editingSub.bannerImage,
+              })
+            }
           />
 
           {/* Section 5: Gallery images */}
