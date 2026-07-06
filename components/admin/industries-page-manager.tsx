@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -105,9 +106,7 @@ export function IndustriesPageManager() {
         </Button>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="flex gap-2 border-b admin-border pb-4 mb-6">
         {(["content", "cards", "stats"] as const).map((tab) => (

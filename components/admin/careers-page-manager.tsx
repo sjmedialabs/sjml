@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 
@@ -137,9 +138,7 @@ export function CareersPageManager() {
         <p className="admin-text-secondary">Manage job postings and career page content</p>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
@@ -418,7 +417,7 @@ export function CareersPageManager() {
             <h2 className="text-lg font-semibold admin-text-primary">Employee Benefits</h2>
             <button
               onClick={() =>
-                setData({ ...data, benefits: [...data.benefits, { icon: "Star", title: "", description: "" }] })
+                setData({ ...data, benefits: [...data.benefits, { icon: "", title: "", description: "" }] })
               }
               className="px-3 py-1.5 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
             >
@@ -437,21 +436,20 @@ export function CareersPageManager() {
                     Remove
                   </button>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ImageUpload
+                    label="Icon"
+                    value={benefit.icon}
+                    onChange={(url) => {
+                      const newBenefits = [...data.benefits]
+                      newBenefits[index].icon = url
+                      setData({ ...data, benefits: newBenefits })
+                    }}
+                    maxSizeMB={1}
+                    maxWidth={256}
+                    maxHeight={256}
+                  />
                   <div>
-                    <label className="block text-xs admin-text-muted mb-1">Icon</label>
-                    <input
-                      type="text"
-                      value={benefit.icon}
-                      onChange={(e) => {
-                        const newBenefits = [...data.benefits]
-                        newBenefits[index].icon = e.target.value
-                        setData({ ...data, benefits: newBenefits })
-                      }}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2">
                     <label className="block text-xs admin-text-muted mb-1">Title</label>
                     <input
                       type="text"

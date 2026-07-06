@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -84,9 +85,7 @@ export function WorkPageContentManager() {
         <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Page"}</Button>
       </div>
 
-      {message && (
-        <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-sm">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="space-y-2.5">
         <AdminCompactCard title="Typography">

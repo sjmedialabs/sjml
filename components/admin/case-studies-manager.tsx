@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Trash2, Save, ImageIcon } from "lucide-react"
+import { Plus, Trash2, Save } from "lucide-react"
+import { ImageUpload } from "./image-upload"
 
 interface CaseStudy {
   id: string
@@ -113,17 +114,11 @@ export function CaseStudiesManager() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="admin-text-primary">Image URL</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={caseStudy.image}
-                      onChange={(e) => updateCaseStudy(caseStudy.id, "image", e.target.value)}
-                      className="admin-bg-secondary admin-border-light admin-text-primary"
-                    />
-                    <Button variant="outline" className="admin-border-light admin-text-primary bg-transparent">
-                      <ImageIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  <ImageUpload
+                    label="Featured image"
+                    value={caseStudy.image}
+                    onChange={(url) => updateCaseStudy(caseStudy.id, "image", url)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">

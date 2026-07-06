@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { normalizeHeaderContent } from "@/lib/header-content"
@@ -105,9 +106,7 @@ export function HeaderManager() {
         <p className="admin-text-secondary">Manage your site header and navigation menu</p>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       {/* Logo Section */}
       <div className="admin-card border admin-border rounded-xl p-6 mb-6">

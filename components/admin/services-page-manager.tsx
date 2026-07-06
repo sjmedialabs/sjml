@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ImageUpload } from "./image-upload"
@@ -494,9 +495,7 @@ export function ServicesPageManager() {
           </div>
         </div>
 
-        {message && (
-          <div className="mb-4 p-4 admin-alert-success rounded-lg">{message}</div>
-        )}
+        <AdminToast message={message} onClose={() => setMessage("")} />
 
         <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
           <div className="grid grid-cols-2 gap-4">
@@ -789,9 +788,7 @@ export function ServicesPageManager() {
           )}
         </div>
 
-        {message && (
-          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-        )}
+        <AdminToast message={message} onClose={() => setMessage("")} />
 
         {/* Tabs */}
         <div className="flex gap-2 border-b admin-border pb-4 mb-6">
@@ -1053,9 +1050,7 @@ export function ServicesPageManager() {
         </div>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingService && (
         <div className="space-y-6">

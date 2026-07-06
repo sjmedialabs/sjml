@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { normalizeSiteTypography } from "@/lib/site-typography"
 import { FontSizePill, TypographyPillRow } from "./admin-compact-fields"
+import { AdminToast } from "./admin-toast"
 
 interface SettingsData {
   contactEmail: string
@@ -124,15 +125,7 @@ export function SettingsManager() {
         </div>
       </div>
 
-      {message && (
-        <div className={`mb-6 p-4 rounded-lg ${
-          message.includes("✅") 
-            ? "bg-green-500/20 border border-green-500/50 text-green-400" 
-            : "bg-red-500/20 border border-red-500/50 text-red-400"
-        }`}>
-          {message}
-        </div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="space-y-8 max-w-3xl">
         {/* Typography */}

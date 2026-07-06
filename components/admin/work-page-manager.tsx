@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -243,9 +244,7 @@ export function WorkPageManager() {
           </div>
         </div>
 
-        {message && (
-          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-        )}
+        <AdminToast message={message} onClose={() => setMessage("")} />
 
         {/* Search */}
         <div className="mb-6 relative">
@@ -397,9 +396,7 @@ export function WorkPageManager() {
         </div>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingWork && (
         <div className="space-y-6">

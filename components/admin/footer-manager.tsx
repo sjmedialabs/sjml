@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ImageUpload } from "./image-upload"
+import { AdminToast } from "./admin-toast"
 import { Plus, Trash2 } from "lucide-react"
 import { createDefaultFooter, normalizeFooterContent, type FooterContent, type FooterLink } from "@/lib/footer-content"
 
@@ -119,17 +120,7 @@ export function FooterManager() {
         </Button>
       </div>
 
-      {message && (
-        <div
-          className={`p-4 rounded-lg border ${
-            message.includes("success") || message.includes("loaded")
-              ? "bg-green-500/20 border-green-500/50 text-green-400"
-              : "bg-red-500/20 border-red-500/50 text-red-400"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
         <h3 className="font-semibold admin-text-primary">Logo & brand</h3>

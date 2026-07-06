@@ -54,11 +54,17 @@ export async function generateSeoMetadata(pageName: string): Promise<Metadata> {
   const description = pageSeo?.description || seoData?.globalDescription || "Transform Your Brand"
   const ogImage = pageSeo?.ogImage || seoData?.ogImage || "/og-image.jpg"
   const keywords = pageSeo?.keywords || ""
-  
+  const favicon = seoData?.favicon?.trim() || "/favicon.ico"
+
   return {
     title,
     description,
     keywords,
+    icons: {
+      icon: favicon,
+      shortcut: favicon,
+      apple: favicon,
+    },
     openGraph: {
       title,
       description,

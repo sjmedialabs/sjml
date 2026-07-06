@@ -67,8 +67,13 @@ export default async function CareersPage() {
             <div className="grid md:grid-cols-3 gap-6">
               {data.benefits.map((benefit, index) => (
                 <div key={index} className="bg-background border border-border rounded-2xl p-6 text-center">
-                  <div className="w-16 h-16 bg-[#E63946]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-[#E63946]">{benefit.icon}</span>
+                  <div className="w-16 h-16 bg-home-primary/15 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                    {benefit.icon && (benefit.icon.startsWith("/") || benefit.icon.startsWith("http")) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={benefit.icon} alt="" className="w-10 h-10 object-contain" />
+                    ) : benefit.icon ? (
+                      <span className="text-2xl text-home-primary">{benefit.icon}</span>
+                    ) : null}
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">{benefit.title}</h3>
                   <p className="text-muted-foreground text-sm">{benefit.description}</p>

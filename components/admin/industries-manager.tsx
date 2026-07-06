@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
+import { ImageUpload } from "./image-upload"
 
 interface Industry {
   id: string
@@ -99,14 +100,11 @@ export function IndustriesManager() {
                   className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="admin-text-primary">Image URL</Label>
-                <Input
-                  value={industry.image}
-                  onChange={(e) => updateIndustry(industry.id, "image", e.target.value)}
-                  className="admin-bg-secondary admin-border-light admin-text-primary"
-                />
-              </div>
+              <ImageUpload
+                label="Image"
+                value={industry.image}
+                onChange={(url) => updateIndustry(industry.id, "image", url)}
+              />
             </CardContent>
           </Card>
         ))}

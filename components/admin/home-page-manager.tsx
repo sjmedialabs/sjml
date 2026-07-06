@@ -20,7 +20,7 @@ import {
   type HeroSlide,
   type HomeServiceCard,
 } from "@/lib/home-content"
-import { STAT_ICON_PRESETS, isStatIconPreset } from "@/components/stats-icons"
+import { AdminToast } from "./admin-toast"
 import { ColorPill, TypographyPillRow } from "./admin-compact-fields"
 
 const ICON_OPTIONS = [
@@ -142,17 +142,7 @@ export function HomePageManager() {
         </Button>
       </div>
 
-      {message && (
-        <div
-          className={`mb-4 p-4 rounded-lg border ${
-            message.includes("success")
-              ? "bg-green-500/20 border-green-500/50 text-green-400"
-              : "bg-red-500/20 border-red-500/50 text-red-400"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="flex flex-wrap gap-2 mb-6">
         {tabs.map((tab) => (
@@ -374,15 +364,6 @@ export function HomePageManager() {
                 value={slide.backgroundVideo ?? ""}
                 onChange={(url) => updateSlide(index, { backgroundVideo: url })}
               />
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Or paste video URL</label>
-                <Input
-                  value={slide.backgroundVideo ?? ""}
-                  onChange={(e) => updateSlide(index, { backgroundVideo: e.target.value })}
-                  placeholder="https://..."
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
-              </div>
             </div>
           ))}
         </div>

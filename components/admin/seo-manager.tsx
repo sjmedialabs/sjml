@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ImageUpload } from "./image-upload"
+import { AdminToast } from "./admin-toast"
 
 interface PageSeo {
   page: string
@@ -138,15 +140,7 @@ export function SeoManager() {
         </p>
       </div>
 
-      {message && (
-        <div className={`mb-6 p-4 rounded-lg border ${
-          message.includes("✅") 
-            ? "bg-green-500/10 border-green-500/50 text-green-400" 
-            : "bg-red-500/10 border-red-500/50 text-red-400"
-        }`}>
-          {message}
-        </div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <Tabs defaultValue="global" className="w-full">
         <TabsList className="mb-6">
@@ -229,41 +223,31 @@ export function SeoManager() {
                 </div>
 
                 <div>
-                  <Label className="text-base">Favicon</Label>
-                  <p className="text-xs admin-text-secondary mb-2">
-                    Small icon shown in browser tab (path to favicon file)
-                  </p>
-                  <Input
+                  <ImageUpload
+                    label="Favicon"
                     value={data.favicon}
-                    onChange={(e) => setData({ ...data, favicon: e.target.value })}
-                    placeholder="/favicon.ico"
-                    className="text-base"
+                    onChange={(url) => setData({ ...data, favicon: url })}
+                    maxSizeMB={1}
+                    maxWidth={512}
+                    maxHeight={512}
                   />
+                  <p className="text-xs admin-text-secondary mt-2">
+                    Small icon shown in the browser tab (PNG, ICO, or JPG — square recommended)
+                  </p>
                 </div>
 
                 <div>
-                  <Label className="text-base">Default Open Graph Image</Label>
-                  <p className="text-xs admin-text-secondary mb-2">
-                    Image shown when sharing on social media (1200x630px recommended)
-                  </p>
-                  <Input
+                  <ImageUpload
+                    label="Default Open Graph Image"
                     value={data.ogImage}
-                    onChange={(e) => setData({ ...data, ogImage: e.target.value })}
-                    placeholder="/og-image.jpg"
-                    className="text-base"
+                    onChange={(url) => setData({ ...data, ogImage: url })}
+                    maxSizeMB={5}
+                    maxWidth={2400}
+                    maxHeight={1260}
                   />
-                  {data.ogImage && (
-                    <div className="mt-2 p-2 admin-card">
-                      <img 
-                        src={data.ogImage} 
-                        alt="OG Preview" 
-                        className="max-w-xs rounded border border-[#333]"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                        }}
-                      />
-                    </div>
-                  )}
+                  <p className="text-xs admin-text-secondary mt-2">
+                    Image shown when sharing on social media (1200×630px recommended)
+                  </p>
                 </div>
               </div>
             </div>
@@ -335,15 +319,17 @@ export function SeoManager() {
                   </div>
 
                   <div>
-                    <Label>Custom OG Image (Optional)</Label>
-                    <p className="text-xs admin-text-secondary mb-2">
-                      Custom image for social sharing (leave blank to use default)
-                    </p>
-                    <Input
+                    <ImageUpload
+                      label="Custom OG Image (optional)"
                       value={page.ogImage}
-                      onChange={(e) => updatePageSeo(index, { ogImage: e.target.value })}
-                      placeholder={data.ogImage}
+                      onChange={(url) => updatePageSeo(index, { ogImage: url })}
+                      maxSizeMB={5}
+                      maxWidth={2400}
+                      maxHeight={1260}
                     />
+                    <p className="text-xs admin-text-secondary mt-2">
+                      Leave empty to use the default Open Graph image
+                    </p>
                   </div>
                 </div>
               </div>

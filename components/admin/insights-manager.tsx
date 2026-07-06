@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
+import { ImageUpload } from "./image-upload"
 
 interface Insight {
   id: string
@@ -108,12 +109,11 @@ export function InsightsManager() {
                     className="admin-bg-secondary admin-border-light admin-text-primary"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="admin-text-primary">Image URL</Label>
-                  <Input
+                <div className="space-y-2 md:col-span-2">
+                  <ImageUpload
+                    label="Featured image"
                     value={insight.image}
-                    onChange={(e) => updateInsight(insight.id, "image", e.target.value)}
-                    className="admin-bg-secondary admin-border-light admin-text-primary"
+                    onChange={(url) => updateInsight(insight.id, "image", url)}
                   />
                 </div>
               </div>

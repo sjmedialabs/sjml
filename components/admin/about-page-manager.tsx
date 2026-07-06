@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
+import { AdminToast } from "./admin-toast"
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
 import {
@@ -106,17 +107,7 @@ export function AboutPageManager() {
         </Button>
       </div>
 
-      {message && (
-        <div
-          className={`mb-3 p-2.5 rounded-lg border text-xs ${
-            message.includes("success")
-              ? "bg-green-500/20 border-green-500/50 text-green-400"
-              : "bg-red-500/20 border-red-500/50 text-red-400"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       <div className="flex flex-wrap gap-1.5 mb-4">
         {tabs.map((tab) => (

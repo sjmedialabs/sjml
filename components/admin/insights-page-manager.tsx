@@ -1,5 +1,6 @@
 "use client"
 
+import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -247,9 +248,7 @@ export function InsightsPageManager() {
           </div>
         </div>
 
-        {message && (
-          <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-        )}
+        <AdminToast message={message} onClose={() => setMessage("")} />
 
         <div className="mb-6 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 admin-text-secondary" />
@@ -356,9 +355,7 @@ export function InsightsPageManager() {
         </div>
       </div>
 
-      {message && (
-        <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">{message}</div>
-      )}
+      <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingInsight && (
         <div className="space-y-6">
