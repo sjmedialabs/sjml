@@ -20,6 +20,7 @@ interface TestimonialsData {
   heroSubtitle: string
   heroImage?: string
   hero?: { title: string; subtitle?: string; description?: string; image?: string }
+  cta: { title: string; description: string; buttonText: string; buttonUrl: string }
   testimonials: Testimonial[]
 }
 
@@ -27,6 +28,7 @@ const defaultData: TestimonialsData = {
   heroTitle: "What Our Clients Say",
   heroSubtitle: "Don't just take our word for it. Hear from the brands we've helped transform.",
   heroImage: "",
+  cta: { title: "", description: "", buttonText: "", buttonUrl: "" },
   testimonials: [],
 }
 
@@ -49,6 +51,7 @@ export function TestimonialsPageManager() {
           heroTitle: fetchedData.heroTitle ?? defaultData.heroTitle,
           heroSubtitle: fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
           heroImage: fetchedData.heroImage ?? "",
+          cta: fetchedData.cta ?? defaultData.cta,
           testimonials: Array.isArray(fetchedData.testimonials) ? fetchedData.testimonials : [],
         })
       }
@@ -65,6 +68,7 @@ export function TestimonialsPageManager() {
         heroTitle: data.heroTitle,
         heroSubtitle: data.heroSubtitle,
         heroImage: data.heroImage ?? "",
+        cta: data.cta,
         testimonials: data.testimonials,
       }
       const res = await fetch("/api/content/testimonials-page", {
@@ -143,6 +147,43 @@ export function TestimonialsPageManager() {
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
           />
+        </div>
+      </div>
+
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Bottom CTA</h2>
+        <p className="text-sm admin-text-muted mb-4">Call-to-action block at the bottom of /testimonials.</p>
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={data.cta.title}
+            onChange={(e) => setData({ ...data, cta: { ...data.cta, title: e.target.value } })}
+            placeholder="CTA title"
+            className="w-full px-4 py-3 admin-input rounded-lg"
+          />
+          <textarea
+            value={data.cta.description}
+            onChange={(e) => setData({ ...data, cta: { ...data.cta, description: e.target.value } })}
+            rows={2}
+            placeholder="CTA description"
+            className="w-full px-4 py-3 admin-input rounded-lg"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={data.cta.buttonText}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta, buttonText: e.target.value } })}
+              placeholder="Button text"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+            <input
+              type="text"
+              value={data.cta.buttonUrl}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta, buttonUrl: e.target.value } })}
+              placeholder="Button URL"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+          </div>
         </div>
       </div>
 

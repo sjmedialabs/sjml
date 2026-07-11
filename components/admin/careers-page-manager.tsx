@@ -25,9 +25,11 @@ interface CareersData {
   culture: {
     title: string
     description: string
+    image?: string
     values: Array<{ title: string; description: string }>
   }
   benefits: Array<{ icon: string; title: string; description: string }>
+  cta?: { title: string; description: string; email: string; buttonText: string }
   jobs: JobPosting[]
 }
 
@@ -38,9 +40,11 @@ const defaultData: CareersData = {
   culture: {
     title: "Our Culture",
     description: "We believe in fostering a creative environment where innovation thrives.",
+    image: "",
     values: [],
   },
   benefits: [],
+  cta: { title: "", description: "", email: "", buttonText: "Send your resume" },
   jobs: [],
 }
 
@@ -67,6 +71,8 @@ export function CareersPageManager() {
           heroTitle: hero.title ?? fetchedData.heroTitle ?? defaultData.heroTitle,
           heroSubtitle: hero.description ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
           heroImage: hero.image ?? fetchedData.heroImage ?? "",
+          culture: { ...defaultData.culture, ...fetchedData.culture },
+          cta: fetchedData.cta ?? defaultData.cta,
         })
       }
     } catch (error) {
@@ -142,7 +148,7 @@ export function CareersPageManager() {
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
-        {["jobs", "hero", "culture", "benefits"].map((tab) => (
+        {["jobs", "hero", "culture", "benefits", "cta"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -370,6 +376,24 @@ export function CareersPageManager() {
                     className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Job benefits (comma separated)</label>
+                  <textarea
+                    value={editingJob.benefits.join(", ")}
+                    onChange={(e) =>
+                      updateJob({
+                        ...editingJob,
+                        benefits: e.target.value
+                          .split(",")
+                          .map((b) => b.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                    rows={2}
+                    placeholder="Health insurance, Flexible hours, ..."
+                    className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
+                  />
+                </div>
                 <label className="flex items-center gap-2 text-sm admin-text-secondary">
                   <input
                     type="checkbox"
@@ -407,6 +431,48 @@ export function CareersPageManager() {
                 className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
               />
             </div>
+            <ImageUpload
+              label="Culture section image"
+              value={data.culture.image ?? ""}
+              onChange={(url) => setData({ ...data, culture: { ...data.culture, image: url } })}
+            />
+          </div>
+        </div>
+      )}
+
+      {activeTab === "cta" && (
+        <div className="admin-card border admin-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Bottom CTA</h2>
+          <p className="text-sm admin-text-muted mb-4">Shown at the bottom of /careers. Button opens the email address.</p>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={data.cta?.title ?? ""}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta!, title: e.target.value } })}
+              placeholder="CTA title"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+            <textarea
+              value={data.cta?.description ?? ""}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta!, description: e.target.value } })}
+              rows={2}
+              placeholder="CTA description"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+            <input
+              type="email"
+              value={data.cta?.email ?? ""}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta!, email: e.target.value } })}
+              placeholder="Email address (mailto link)"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+            <input
+              type="text"
+              value={data.cta?.buttonText ?? ""}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta!, buttonText: e.target.value } })}
+              placeholder="Button text"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
           </div>
         </div>
       )}

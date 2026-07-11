@@ -21,9 +21,12 @@ import {
 export function ServiceDetailTemplateEditor({
   template,
   onChange,
+  hideIntroImage = false,
 }: {
   template: ServiceDetailTemplate
   onChange: (template: ServiceDetailTemplate) => void
+  /** Hide when banner image is managed separately (sub-services). */
+  hideIntroImage?: boolean
 }) {
   const setTypo = (patch: Partial<ServiceDetailTemplate["typography"]>) =>
     onChange({ ...template, typography: { ...template.typography, ...patch } })
@@ -59,7 +62,9 @@ export function ServiceDetailTemplateEditor({
         </AdminFieldGrid>
         <CompactTextarea label="Paragraph 1" value={template.introParagraph1} onChange={(v) => onChange({ ...template, introParagraph1: v })} rows={2} />
         <CompactTextarea label="Paragraph 2" value={template.introParagraph2} onChange={(v) => onChange({ ...template, introParagraph2: v })} rows={2} />
-        <ImageUpload label="Intro image" value={template.introImage} onChange={(url) => onChange({ ...template, introImage: url })} />
+        {!hideIntroImage && (
+          <ImageUpload label="Intro image" value={template.introImage} onChange={(url) => onChange({ ...template, introImage: url })} />
+        )}
       </AdminCompactCard>
 
       <AdminCompactCard title="Features (4 columns)">

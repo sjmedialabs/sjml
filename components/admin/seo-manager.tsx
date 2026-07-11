@@ -41,11 +41,14 @@ const defaultData: SeoData = {
     { page: "Home", title: "", description: "", keywords: "", ogImage: "" },
     { page: "About", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Services", title: "", description: "", keywords: "", ogImage: "" },
+    { page: "Industries", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Work", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Contact", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Case Studies", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Insights", title: "", description: "", keywords: "", ogImage: "" },
     { page: "Careers", title: "", description: "", keywords: "", ogImage: "" },
+    { page: "Clients", title: "", description: "", keywords: "", ogImage: "" },
+    { page: "Testimonials", title: "", description: "", keywords: "", ogImage: "" },
   ],
 }
 
@@ -65,8 +68,17 @@ export function SeoManager() {
       if (res.ok) {
         const fetchedData = await res.json()
         // Remove _id and other MongoDB fields before setting state
-        const { _id, __v, ...cleanData } = fetchedData
-        setData({ ...defaultData, ...cleanData })
+        const { _id, __v, pages: fetchedPages, ...cleanData } = fetchedData
+        const mergedPages = defaultData.pages.map((defaultPage) => {
+          const saved = Array.isArray(fetchedPages)
+            ? fetchedPages.find((p: PageSeo) => p.page === defaultPage.page)
+            : undefined
+          return saved ? { ...defaultPage, ...saved } : defaultPage
+        })
+        const extraPages = Array.isArray(fetchedPages)
+          ? fetchedPages.filter((p: PageSeo) => !defaultData.pages.some((d) => d.page === p.page))
+          : []
+        setData({ ...defaultData, ...cleanData, pages: [...mergedPages, ...extraPages] })
       }
     } catch (error) {
       console.error("Failed to fetch SEO data:", error)

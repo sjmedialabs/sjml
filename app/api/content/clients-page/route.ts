@@ -7,6 +7,8 @@ import { getClientsPageData } from "@/lib/data/clients-page"
 
 export const dynamic = "force-dynamic"
 
+const DEFAULT_CTA = { title: "", description: "", buttonText: "", buttonUrl: "" }
+
 export async function GET() {
   try {
     const data = await getClientsPageData()
@@ -39,23 +41,19 @@ export async function PUT(request: NextRequest) {
     const collection = await getCollection<any>("clients")
     const existingPage = await getPageContent("clients")
 
-    // Hero/content doc update (clients list lives only in the "clients" collection)
-    if (data.heroTitle != null || data.heroSubtitle != null || data.heroImage != null) {
-      await updatePageContent("clients", {
-        pageKey: "clients",
-        hero: {
-          title: data.heroTitle ?? existingPage?.hero?.title ?? "Our Clients",
-          description: data.heroSubtitle ?? existingPage?.hero?.description ?? "",
-          image: data.heroImage ?? existingPage?.hero?.image ?? "",
-        },
-        stats: existingPage?.stats ?? [],
-        cta: existingPage?.cta ?? { title: "", description: "", buttonText: "", buttonUrl: "" },
-        industries: existingPage?.industries ?? [],
-        clients: [], // not used; client list is only in db.collection("clients")
-      })
-    }
+    await updatePageContent("clients", {
+      pageKey: "clients",
+      hero: {
+        title: data.heroTitle ?? existingPage?.hero?.title ?? "Our Clients",
+        description: data.heroSubtitle ?? existingPage?.hero?.description ?? "",
+        image: data.heroImage ?? existingPage?.hero?.image ?? "",
+      },
+      stats: Array.isArray(data.stats) ? data.stats : existingPage?.stats ?? [],
+      cta: data.cta ?? existingPage?.cta ?? DEFAULT_CTA,
+      industries: existingPage?.industries ?? [],
+      clients: [],
+    })
 
-    // Single source of truth: replace entire clients collection with admin payload
     await collection.deleteMany({})
     if (data.clients && data.clients.length > 0) {
       const toInsert = data.clients.map((c: any) => ({
@@ -70,28 +68,16 @@ export async function PUT(request: NextRequest) {
       await collection.insertMany(toInsert)
     }
 
-    const clientsData = await collection.find({}).sort({ createdAt: -1 }).toArray()
-    const clients = clientsData.map((doc: any) => ({
-      id: doc._id.toString(),
-      name: doc.name || "",
-      logo: doc.logo || "",
-      industry: doc.industry || "",
-      website: doc.website || "",
-      featured: doc.featured ?? false,
-    }))
-
-    const pageContent = await getPageContent("clients")
-    const hero = pageContent?.hero || {}
-
     revalidatePath("/clients")
 
+    const saved = await getClientsPageData()
     return NextResponse.json({
-      heroTitle: hero.title ?? "Our Clients",
-      heroSubtitle: hero.description ?? hero.subtitle ?? "",
-      heroImage: hero.image ?? "",
-      clients,
-      stats: pageContent?.stats ?? [],
-      cta: pageContent?.cta ?? {},
+      heroTitle: saved.heroTitle,
+      heroSubtitle: saved.heroSubtitle,
+      heroImage: saved.heroImage,
+      clients: saved.clients,
+      stats: saved.stats,
+      cta: saved.cta,
     })
   } catch (error) {
     console.error("Update clients page error:", error)

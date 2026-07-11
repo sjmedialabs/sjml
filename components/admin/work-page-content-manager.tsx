@@ -92,10 +92,17 @@ export function WorkPageContentManager() {
           <TypographyPillRow>
             <FontSizePill label="Hero label" value={content.typography.heroLabelFontSize} onChange={(v) => setTypo({ heroLabelFontSize: v })} min={8} max={20} />
             <FontSizePill label="Hero title" value={content.typography.heroTitleFontSize} onChange={(v) => setTypo({ heroTitleFontSize: v })} min={16} max={56} />
+            <FontSizePill label="Hero text" value={content.typography.heroDescriptionFontSize} onChange={(v) => setTypo({ heroDescriptionFontSize: v })} min={10} max={24} />
             <FontSizePill label="Filter" value={content.typography.filterFontSize} onChange={(v) => setTypo({ filterFontSize: v })} min={8} max={16} />
+            <FontSizePill label="Card category" value={content.typography.cardCategoryFontSize} onChange={(v) => setTypo({ cardCategoryFontSize: v })} min={8} max={14} />
             <FontSizePill label="Card title" value={content.typography.cardTitleFontSize} onChange={(v) => setTypo({ cardTitleFontSize: v })} min={10} max={24} />
+            <FontSizePill label="Card subtitle" value={content.typography.cardSubtitleFontSize} onChange={(v) => setTypo({ cardSubtitleFontSize: v })} min={9} max={18} />
             <FontSizePill label="Stat value" value={content.typography.statValueFontSize} onChange={(v) => setTypo({ statValueFontSize: v })} min={16} max={40} />
+            <FontSizePill label="Stat label" value={content.typography.statLabelFontSize} onChange={(v) => setTypo({ statLabelFontSize: v })} min={9} max={18} />
+            <FontSizePill label="Stat text" value={content.typography.statDescriptionFontSize} onChange={(v) => setTypo({ statDescriptionFontSize: v })} min={9} max={18} />
+            <FontSizePill label="Testimonial" value={content.typography.testimonialFontSize} onChange={(v) => setTypo({ testimonialFontSize: v })} min={10} max={20} />
             <FontSizePill label="CTA text" value={content.typography.ctaTextFontSize} onChange={(v) => setTypo({ ctaTextFontSize: v })} min={12} max={28} />
+            <FontSizePill label="CTA button" value={content.typography.ctaButtonFontSize} onChange={(v) => setTypo({ ctaButtonFontSize: v })} min={10} max={18} />
           </TypographyPillRow>
         </AdminCompactCard>
 

@@ -6,6 +6,8 @@ import { getPageContent, updatePageContent } from "@/lib/models/content"
 
 export const dynamic = "force-dynamic"
 
+const DEFAULT_CTA = { title: "", description: "", buttonText: "", buttonUrl: "" }
+
 export async function GET() {
   try {
     const collection = await getCollection<any>("testimonials")
@@ -29,6 +31,7 @@ export async function GET() {
       heroTitle: hero.title ?? "What Our Clients Say",
       heroSubtitle: hero.description ?? hero.subtitle ?? "Don't just take our word for it. Hear from the brands we've helped transform.",
       heroImage: hero.image ?? "",
+      cta: pageContent?.cta ?? DEFAULT_CTA,
       testimonials: transformed,
     })
   } catch (error) {
@@ -50,19 +53,17 @@ export async function PUT(request: NextRequest) {
 
     const data = await request.json()
     const collection = await getCollection<any>("testimonials")
-
     const existingPage = await getPageContent("testimonials")
-    if (data.heroTitle != null || data.heroSubtitle != null || data.heroImage != null) {
-      await updatePageContent("testimonials", {
-        pageKey: "testimonials",
-        hero: {
-          title: data.heroTitle ?? existingPage?.hero?.title ?? "",
-          description: data.heroSubtitle ?? existingPage?.hero?.description ?? "",
-          image: data.heroImage ?? existingPage?.hero?.image ?? "",
-        },
-        cta: existingPage?.cta ?? { title: "", description: "", buttonText: "", buttonUrl: "" },
-      })
-    }
+
+    await updatePageContent("testimonials", {
+      pageKey: "testimonials",
+      hero: {
+        title: data.heroTitle ?? existingPage?.hero?.title ?? "",
+        description: data.heroSubtitle ?? existingPage?.hero?.description ?? "",
+        image: data.heroImage ?? existingPage?.hero?.image ?? "",
+      },
+      cta: data.cta ?? existingPage?.cta ?? DEFAULT_CTA,
+    })
 
     await collection.deleteMany({})
     if (data.testimonials && data.testimonials.length > 0) {
@@ -80,6 +81,8 @@ export async function PUT(request: NextRequest) {
       await collection.insertMany(toInsert)
     }
 
+    const pageContent = await getPageContent("testimonials")
+    const hero = pageContent?.hero || {}
     const testimonials = await collection.find({}).sort({ createdAt: -1 }).toArray()
     const transformed = testimonials.map((doc: any) => ({
       id: doc._id.toString(),
@@ -92,16 +95,13 @@ export async function PUT(request: NextRequest) {
       featured: doc.featured ?? false,
     }))
 
-    const pageContent = await getPageContent("testimonials")
-    const hero = pageContent?.hero || {}
-
-    revalidatePath("/")
     revalidatePath("/testimonials")
 
     return NextResponse.json({
       heroTitle: hero.title ?? "What Our Clients Say",
       heroSubtitle: hero.description ?? hero.subtitle ?? "",
       heroImage: hero.image ?? "",
+      cta: pageContent?.cta ?? DEFAULT_CTA,
       testimonials: transformed,
     })
   } catch (error) {

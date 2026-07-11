@@ -83,9 +83,19 @@ export function InsightsPageContentManager() {
           <TypographyPillRow>
             <FontSizePill label="Hero label" value={content.typography.heroLabelFontSize} onChange={(v) => setTypo({ heroLabelFontSize: v })} min={8} max={20} />
             <FontSizePill label="Hero title" value={content.typography.heroTitleFontSize} onChange={(v) => setTypo({ heroTitleFontSize: v })} min={16} max={56} />
+            <FontSizePill label="Hero text" value={content.typography.heroDescriptionFontSize} onChange={(v) => setTypo({ heroDescriptionFontSize: v })} min={10} max={24} />
             <FontSizePill label="Filter" value={content.typography.filterFontSize} onChange={(v) => setTypo({ filterFontSize: v })} min={8} max={16} />
+            <FontSizePill label="Search" value={content.typography.searchFontSize} onChange={(v) => setTypo({ searchFontSize: v })} min={10} max={18} />
+            <FontSizePill label="Card category" value={content.typography.cardCategoryFontSize} onChange={(v) => setTypo({ cardCategoryFontSize: v })} min={8} max={14} />
             <FontSizePill label="Card title" value={content.typography.cardTitleFontSize} onChange={(v) => setTypo({ cardTitleFontSize: v })} min={10} max={24} />
+            <FontSizePill label="Card excerpt" value={content.typography.cardExcerptFontSize} onChange={(v) => setTypo({ cardExcerptFontSize: v })} min={10} max={18} />
+            <FontSizePill label="Card meta" value={content.typography.cardMetaFontSize} onChange={(v) => setTypo({ cardMetaFontSize: v })} min={9} max={16} />
+            <FontSizePill label="Load more" value={content.typography.loadMoreFontSize} onChange={(v) => setTypo({ loadMoreFontSize: v })} min={9} max={16} />
             <FontSizePill label="Sidebar heading" value={content.typography.sidebarHeadingFontSize} onChange={(v) => setTypo({ sidebarHeadingFontSize: v })} min={8} max={16} />
+            <FontSizePill label="Sidebar card title" value={content.typography.sidebarCardTitleFontSize} onChange={(v) => setTypo({ sidebarCardTitleFontSize: v })} min={10} max={18} />
+            <FontSizePill label="Sidebar card meta" value={content.typography.sidebarCardMetaFontSize} onChange={(v) => setTypo({ sidebarCardMetaFontSize: v })} min={9} max={16} />
+            <FontSizePill label="Newsletter text" value={content.typography.newsletterTextFontSize} onChange={(v) => setTypo({ newsletterTextFontSize: v })} min={10} max={18} />
+            <FontSizePill label="Newsletter btn" value={content.typography.newsletterButtonFontSize} onChange={(v) => setTypo({ newsletterButtonFontSize: v })} min={9} max={16} />
           </TypographyPillRow>
         </AdminCompactCard>
 

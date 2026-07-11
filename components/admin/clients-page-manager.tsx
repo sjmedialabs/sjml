@@ -18,6 +18,8 @@ interface ClientsData {
   heroSubtitle: string
   heroImage?: string
   hero?: { title: string; subtitle?: string; description?: string; image?: string }
+  stats: Array<{ value: string; label: string }>
+  cta: { title: string; description: string; buttonText: string; buttonUrl: string }
   clients: Client[]
 }
 
@@ -25,6 +27,8 @@ const defaultData: ClientsData = {
   heroTitle: "Our Clients",
   heroSubtitle: "Trusted by industry leaders worldwide to deliver exceptional results.",
   heroImage: "",
+  stats: [],
+  cta: { title: "", description: "", buttonText: "", buttonUrl: "" },
   clients: [],
 }
 
@@ -47,6 +51,8 @@ export function ClientsPageManager() {
           heroTitle: fetchedData.heroTitle ?? defaultData.heroTitle,
           heroSubtitle: fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
           heroImage: fetchedData.heroImage ?? "",
+          stats: Array.isArray(fetchedData.stats) ? fetchedData.stats : [],
+          cta: fetchedData.cta ?? defaultData.cta,
           clients: Array.isArray(fetchedData.clients) ? fetchedData.clients : [],
         })
       }
@@ -63,6 +69,8 @@ export function ClientsPageManager() {
         heroTitle: data.heroTitle,
         heroSubtitle: data.heroSubtitle,
         heroImage: data.heroImage ?? "",
+        stats: data.stats,
+        cta: data.cta,
         clients: data.clients,
       }
       const res = await fetch("/api/content/clients-page", {
@@ -83,6 +91,8 @@ export function ClientsPageManager() {
           heroTitle: saved.heroTitle ?? data.heroTitle,
           heroSubtitle: saved.heroSubtitle ?? data.heroSubtitle,
           heroImage: saved.heroImage ?? data.heroImage,
+          stats: Array.isArray(saved.stats) ? saved.stats : data.stats,
+          cta: saved.cta ?? data.cta,
           clients: Array.isArray(saved.clients) ? saved.clients : data.clients,
         })
       }
@@ -148,6 +158,96 @@ export function ClientsPageManager() {
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
           />
+        </div>
+      </div>
+
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold admin-text-primary">Stats bar</h2>
+          <button
+            type="button"
+            onClick={() => setData({ ...data, stats: [...data.stats, { value: "", label: "" }] })}
+            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 text-sm"
+          >
+            + Add stat
+          </button>
+        </div>
+        <p className="text-sm admin-text-muted mb-4">Shown below the client grid on /clients.</p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {data.stats.map((stat, index) => (
+            <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
+              <div className="flex justify-between mb-2">
+                <span className="text-xs admin-text-muted">Stat {index + 1}</span>
+                <button
+                  type="button"
+                  onClick={() => setData({ ...data, stats: data.stats.filter((_, i) => i !== index) })}
+                  className="text-red-500 text-xs"
+                >
+                  Remove
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  value={stat.value}
+                  onChange={(e) => {
+                    const stats = [...data.stats]
+                    stats[index] = { ...stats[index], value: e.target.value }
+                    setData({ ...data, stats })
+                  }}
+                  placeholder="Value"
+                  className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
+                />
+                <input
+                  type="text"
+                  value={stat.label}
+                  onChange={(e) => {
+                    const stats = [...data.stats]
+                    stats[index] = { ...stats[index], label: e.target.value }
+                    setData({ ...data, stats })
+                  }}
+                  placeholder="Label"
+                  className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Bottom CTA</h2>
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={data.cta.title}
+            onChange={(e) => setData({ ...data, cta: { ...data.cta, title: e.target.value } })}
+            placeholder="CTA title"
+            className="w-full px-4 py-3 admin-input rounded-lg"
+          />
+          <textarea
+            value={data.cta.description}
+            onChange={(e) => setData({ ...data, cta: { ...data.cta, description: e.target.value } })}
+            rows={2}
+            placeholder="CTA description"
+            className="w-full px-4 py-3 admin-input rounded-lg"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={data.cta.buttonText}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta, buttonText: e.target.value } })}
+              placeholder="Button text"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+            <input
+              type="text"
+              value={data.cta.buttonUrl}
+              onChange={(e) => setData({ ...data, cta: { ...data.cta, buttonUrl: e.target.value } })}
+              placeholder="Button URL"
+              className="w-full px-4 py-3 admin-input rounded-lg"
+            />
+          </div>
         </div>
       </div>
 

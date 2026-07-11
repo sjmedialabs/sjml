@@ -6,9 +6,11 @@ import { ImageUpload } from "./image-upload"
 
 interface CaseStudy {
   id: string
+  slug: string
   title: string
   client: string
   industry: string
+  year: string
   tags: string[]
   description: string
   challenge: string
@@ -17,7 +19,7 @@ interface CaseStudy {
   image: string
   gallery: string[]
   stats: Array<{ label: string; value: string }>
-  testimonial: { quote: string; author: string; role: string }
+  testimonial: { quote: string; author: string; role: string; company: string }
   featured: boolean
 }
 
@@ -67,6 +69,24 @@ export function CaseStudiesPageManager() {
           heroSubtitle: hero.description ?? hero.subtitle ?? fetchedData.heroSubtitle ?? defaultData.heroSubtitle,
           heroImage: hero.image ?? fetchedData.heroImage ?? "",
           section: fetchedData.section ?? defaultData.section,
+          caseStudies: (fetchedData.caseStudies ?? []).map((study: CaseStudy) => ({
+            ...study,
+            slug: study.slug ?? "",
+            year: study.year ?? "",
+            stats:
+              study.stats?.length >= 2
+                ? study.stats
+                : [
+                    study.stats?.[0] ?? { label: "", value: "" },
+                    study.stats?.[1] ?? { label: "", value: "" },
+                  ],
+            testimonial: {
+              quote: study.testimonial?.quote ?? "",
+              author: study.testimonial?.author ?? "",
+              role: study.testimonial?.role ?? "",
+              company: study.testimonial?.company ?? "",
+            },
+          })),
         })
       }
     } catch (error) {
@@ -110,9 +130,11 @@ export function CaseStudiesPageManager() {
   const addCaseStudy = () => {
     const newStudy: CaseStudy = {
       id: Date.now().toString(),
+      slug: "",
       title: "New Case Study",
       client: "",
       industry: "",
+      year: "",
       tags: [],
       description: "",
       challenge: "",
@@ -120,8 +142,11 @@ export function CaseStudiesPageManager() {
       results: [],
       image: "/placeholder.svg?height=400&width=600",
       gallery: [],
-      stats: [],
-      testimonial: { quote: "", author: "", role: "" },
+      stats: [
+        { label: "", value: "" },
+        { label: "", value: "" },
+      ],
+      testimonial: { quote: "", author: "", role: "", company: "" },
       featured: false,
     }
     setData({ ...data, caseStudies: [...data.caseStudies, newStudy] })
@@ -174,6 +199,31 @@ export function CaseStudiesPageManager() {
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
           />
+        </div>
+      </div>
+
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-4">Listing Section</h2>
+        <p className="text-sm admin-text-muted mb-4">Heading and intro shown above the case study cards on /case-studies.</p>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Section title</label>
+            <input
+              type="text"
+              value={data.section?.title ?? ""}
+              onChange={(e) => setData({ ...data, section: { ...data.section!, title: e.target.value } })}
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="block text-sm admin-text-secondary mb-2">Section description</label>
+            <textarea
+              value={data.section?.description ?? ""}
+              onChange={(e) => setData({ ...data, section: { ...data.section!, description: e.target.value } })}
+              rows={2}
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
+            />
+          </div>
         </div>
       </div>
 
@@ -295,7 +345,7 @@ export function CaseStudiesPageManager() {
 
               {/* Tabs */}
               <div className="flex gap-2 mb-4">
-                {["basic", "content", "stats", "testimonial"].map((tab) => (
+                {["basic", "content", "stats", "gallery", "testimonial"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -323,6 +373,23 @@ export function CaseStudiesPageManager() {
                         />
                       </div>
                       <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">URL slug</label>
+                        <input
+                          type="text"
+                          value={editingStudy.slug}
+                          onChange={(e) =>
+                            updateCaseStudy({
+                              ...editingStudy,
+                              slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                          placeholder="auto-generated-from-title"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Client</label>
                         <input
                           type="text"
@@ -331,15 +398,25 @@ export function CaseStudiesPageManager() {
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                         />
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                      <input
-                        type="text"
-                        value={editingStudy.industry}
-                        onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                        <input
+                          type="text"
+                          value={editingStudy.industry}
+                          onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                        <input
+                          type="text"
+                          value={editingStudy.year}
+                          onChange={(e) => updateCaseStudy({ ...editingStudy, year: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                          placeholder="2024"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
@@ -426,42 +503,81 @@ export function CaseStudiesPageManager() {
 
                 {activeTab === "stats" && (
                   <>
-                    <div className="space-y-3">
-                      {editingStudy.stats.map((stat, idx) => (
-                        <div key={idx} className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-lg">
-                          <input
-                            type="text"
-                            value={stat.label}
-                            onChange={(e) => {
-                              const newStats = [...editingStudy.stats]
-                              newStats[idx].label = e.target.value
-                              updateCaseStudy({ ...editingStudy, stats: newStats })
+                    <p className="text-sm text-gray-600 mb-3">Shown on listing cards and the detail page stats bar.</p>
+                    {[0, 1].map((idx) => {
+                      const stat = editingStudy.stats[idx] ?? { label: "", value: "" }
+                      return (
+                        <div key={idx} className="p-3 bg-gray-100 rounded-lg mb-3">
+                          <p className="text-xs font-medium text-gray-600 mb-2">Stat {idx + 1}</p>
+                          <div className="grid grid-cols-2 gap-4">
+                            <input
+                              type="text"
+                              value={stat.value}
+                              onChange={(e) => {
+                                const newStats = [...editingStudy.stats]
+                                while (newStats.length <= idx) newStats.push({ label: "", value: "" })
+                                newStats[idx] = { ...newStats[idx], value: e.target.value }
+                                updateCaseStudy({ ...editingStudy, stats: newStats })
+                              }}
+                              placeholder="Value (e.g. 150%)"
+                              className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
+                            />
+                            <input
+                              type="text"
+                              value={stat.label}
+                              onChange={(e) => {
+                                const newStats = [...editingStudy.stats]
+                                while (newStats.length <= idx) newStats.push({ label: "", value: "" })
+                                newStats[idx] = { ...newStats[idx], label: e.target.value }
+                                updateCaseStudy({ ...editingStudy, stats: newStats })
+                              }}
+                              placeholder="Label (e.g. ROI Increase)"
+                              className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </>
+                )}
+
+                {activeTab === "gallery" && (
+                  <>
+                    <p className="text-sm text-gray-600 mb-3">Extra images shown on the case study detail page.</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      {editingStudy.gallery.map((img, index) => (
+                        <div key={index} className="relative">
+                          <ImageUpload
+                            label={`Gallery image ${index + 1}`}
+                            value={img}
+                            onChange={(url) => {
+                              const next = [...editingStudy.gallery]
+                              next[index] = url
+                              updateCaseStudy({ ...editingStudy, gallery: next })
                             }}
-                            placeholder="Label"
-                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
                           />
-                          <input
-                            type="text"
-                            value={stat.value}
-                            onChange={(e) => {
-                              const newStats = [...editingStudy.stats]
-                              newStats[idx].value = e.target.value
-                              updateCaseStudy({ ...editingStudy, stats: newStats })
-                            }}
-                            placeholder="Value"
-                            className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
-                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateCaseStudy({
+                                ...editingStudy,
+                                gallery: editingStudy.gallery.filter((_, i) => i !== index),
+                              })
+                            }
+                            className="absolute top-0 right-0 text-red-600 text-xs px-2 py-1"
+                          >
+                            Remove
+                          </button>
                         </div>
                       ))}
-                      <button
-                        onClick={() =>
-                          updateCaseStudy({ ...editingStudy, stats: [...editingStudy.stats, { label: "", value: "" }] })
-                        }
-                        className="text-primary text-sm hover:underline"
-                      >
-                        + Add Stat
-                      </button>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => updateCaseStudy({ ...editingStudy, gallery: [...editingStudy.gallery, ""] })}
+                      className="text-primary text-sm hover:underline mt-2"
+                    >
+                      + Add gallery image
+                    </button>
                   </>
                 )}
 
@@ -481,7 +597,7 @@ export function CaseStudiesPageManager() {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
                         <input
@@ -505,6 +621,20 @@ export function CaseStudiesPageManager() {
                             updateCaseStudy({
                               ...editingStudy,
                               testimonial: { ...editingStudy.testimonial, role: e.target.value },
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                        <input
+                          type="text"
+                          value={editingStudy.testimonial.company}
+                          onChange={(e) =>
+                            updateCaseStudy({
+                              ...editingStudy,
+                              testimonial: { ...editingStudy.testimonial, company: e.target.value },
                             })
                           }
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"

@@ -7,8 +7,7 @@ import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, X } from "lucide-react"
-import { ServiceSectionsEditor } from "./service-sections-editor"
+import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft } from "lucide-react"
 import {
   createEmptySections,
   createDefaultPageLayout,
@@ -17,13 +16,10 @@ import {
   normalizeSubServiceSections,
   normalizeServicePageLayout,
   normalizeSubServicePageLayout,
-  PARENT_SERVICE_SECTION_HINTS,
-  SUB_SERVICE_SECTION_HINTS,
   type ServiceContentSection,
   type ServicePageLayout,
   type SubServicePageLayout,
 } from "@/lib/service-sections"
-import { SectionEnableToggle } from "./section-enable-toggle"
 import {
   createDefaultServicesPageContent,
   normalizeServicesPageContent,
@@ -151,6 +147,7 @@ export function ServicesPageManager() {
   const [subView, setSubView] = useState<"list" | "edit">("list")
   const [subParentFilter, setSubParentFilter] = useState("")
   const [subIsNew, setSubIsNew] = useState(false)
+  const [editingServiceHasSubs, setEditingServiceHasSubs] = useState<boolean | null>(null)
 
   useEffect(() => {
     fetchServices()
@@ -171,6 +168,17 @@ export function ServicesPageManager() {
         .then((arr) => setAllServicesForParent(Array.isArray(arr) ? arr : []))
     }
   }, [subView, allServicesForParent.length])
+
+  useEffect(() => {
+    if (!editingService?.slug || view !== "edit") {
+      setEditingServiceHasSubs(null)
+      return
+    }
+    fetch(`/api/sub-services?parent=${encodeURIComponent(editingService.slug)}&limit=1`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setEditingServiceHasSubs((data?.pagination?.total ?? 0) > 0))
+      .catch(() => setEditingServiceHasSubs(null))
+  }, [editingService?.slug, view])
 
   const fetchSubServices = async () => {
     setSubLoading(true)
@@ -446,22 +454,6 @@ export function ServicesPageManager() {
     setEditingService({ ...editingService, [field]: value })
   }
 
-  const updatePageLayout = (updates: Partial<ServicePageLayout>) => {
-    if (!editingService) return
-    setEditingService({
-      ...editingService,
-      pageLayout: { ...editingService.pageLayout, ...updates },
-    })
-  }
-
-  const updateSubPageLayout = (updates: Partial<SubServicePageLayout>) => {
-    if (!editingSub) return
-    setEditingSub({
-      ...editingSub,
-      pageLayout: { ...editingSub.pageLayout, ...updates },
-    })
-  }
-
   const filteredServices = sortByDisplayOrder(
     services.filter(
       (s) =>
@@ -491,7 +483,7 @@ export function ServicesPageManager() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold admin-text-primary">{subIsNew ? "Add Sub-Service" : "Edit Sub-Service"}</h1>
-            <p className="admin-text-secondary">Fill in all the details for the sub-service</p>
+            <p className="admin-text-secondary">Fields below match what appears on the live sub-service page.</p>
           </div>
         </div>
 
@@ -540,12 +532,12 @@ export function ServicesPageManager() {
                 value={editingSub.metaDescription}
                 onChange={(e) => setEditingSub({ ...editingSub, metaDescription: e.target.value })}
                 className="admin-bg-tertiary admin-border-light admin-text-primary"
-                placeholder={editingSub.shortDescription || "Short description for search results"}
+                placeholder={editingSub.detailTemplate.introParagraph1 || "Short description for search results"}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm admin-text-secondary mb-2">Banner Image</label>
+            <label className="block text-sm admin-text-secondary mb-2">Banner image</label>
             <ImageUpload
               value={editingSub.bannerImage}
               onChange={(url) =>
@@ -557,12 +549,9 @@ export function ServicesPageManager() {
               }
             />
           </div>
-          <div>
-            <label className="block text-sm admin-text-secondary mb-2">Short Description</label>
-            <Textarea value={editingSub.shortDescription} onChange={(e) => setEditingSub({ ...editingSub, shortDescription: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" rows={2} />
-          </div>
           <ServiceDetailTemplateEditor
             template={editingSub.detailTemplate}
+            hideIntroImage
             onChange={(detailTemplate) =>
               setEditingSub({
                 ...editingSub,
@@ -572,178 +561,6 @@ export function ServicesPageManager() {
             }
           />
 
-          {/* Section 5: Gallery images */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-lg font-semibold admin-text-primary">Section 5: Images</h2>
-                <p className="text-sm admin-text-muted mt-1">Gallery grid shown after content sections.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <SectionEnableToggle
-                  id="sub-gallery-enabled"
-                  enabled={editingSub.pageLayout.galleryEnabled}
-                  onChange={(enabled) => updateSubPageLayout({ galleryEnabled: enabled })}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    updateSubPageLayout({
-                      galleryImages: [...editingSub.pageLayout.galleryImages, ""],
-                    })
-                  }
-                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Image
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {editingSub.pageLayout.galleryImages.map((img, index) => (
-                <div key={index} className="relative">
-                  <ImageUpload
-                    label={`Image ${index + 1}`}
-                    value={img}
-                    onChange={(url) => {
-                      const next = [...editingSub.pageLayout.galleryImages]
-                      next[index] = url
-                      updateSubPageLayout({ galleryImages: next })
-                    }}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateSubPageLayout({
-                        galleryImages: editingSub.pageLayout.galleryImages.filter((_, i) => i !== index),
-                      })
-                    }
-                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 6: Discover more */}
-          <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold admin-text-primary">Section 6: Discover More</h2>
-                <p className="text-sm admin-text-muted mt-1">
-                  Active parent services appear as clickable pills automatically on the website.
-                </p>
-              </div>
-              <SectionEnableToggle
-                id="sub-discover-enabled"
-                enabled={editingSub.pageLayout.discoverEnabled}
-                onChange={(enabled) => updateSubPageLayout({ discoverEnabled: enabled })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Section title</label>
-              <Input
-                value={editingSub.pageLayout.discoverTitle}
-                onChange={(e) => updateSubPageLayout({ discoverTitle: e.target.value })}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                placeholder="Discover more about SJ Media Labs"
-              />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Section subtitle</label>
-              <Input
-                value={editingSub.pageLayout.discoverSubtitle}
-                onChange={(e) => updateSubPageLayout({ discoverSubtitle: e.target.value })}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                placeholder="Optional subtitle"
-              />
-            </div>
-          </div>
-
-          {/* Section 7: Thumbnail images */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-lg font-semibold admin-text-primary">Section 7: Images</h2>
-                <p className="text-sm admin-text-muted mt-1">Shown as 100×100 px thumbnails on the website.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <SectionEnableToggle
-                  id="sub-bottom-images-enabled"
-                  enabled={editingSub.pageLayout.bottomImagesEnabled}
-                  onChange={(enabled) => updateSubPageLayout({ bottomImagesEnabled: enabled })}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    updateSubPageLayout({
-                      bottomThumbnailImages: [...editingSub.pageLayout.bottomThumbnailImages, ""],
-                    })
-                  }
-                  className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Thumbnail
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-              {editingSub.pageLayout.bottomThumbnailImages.map((img, index) => (
-                <div key={index} className="relative">
-                  <ImageUpload
-                    label={`Thumbnail ${index + 1}`}
-                    value={img}
-                    onChange={(url) => {
-                      const next = [...editingSub.pageLayout.bottomThumbnailImages]
-                      next[index] = url
-                      updateSubPageLayout({ bottomThumbnailImages: next })
-                    }}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateSubPageLayout({
-                        bottomThumbnailImages: editingSub.pageLayout.bottomThumbnailImages.filter((_, i) => i !== index),
-                      })
-                    }
-                    className="absolute top-0 right-0 text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
-              <Input value={editingSub.portfolioUrl ?? ""} onChange={(e) => setEditingSub({ ...editingSub, portfolioUrl: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="https://..." />
-            </div>
-            <div>
-              <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
-              <div className="flex items-center gap-2">
-                <Input type="file" accept="application/pdf" className="admin-bg-tertiary admin-border-light max-w-xs" onChange={async (e) => {
-                  const file = e.target.files?.[0]
-                  if (!file) return
-                  const form = new FormData()
-                  form.append("file", file)
-                  try {
-                    const token = localStorage.getItem("adminToken")
-                    const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
-                    const data = await res.json()
-                    if (data?.url) setEditingSub((s) => s ? { ...s, brochureUrl: data.url } : s)
-                  } catch (_) {}
-                  e.target.value = ""
-                }} />
-                {editingSub.brochureUrl && <a href={editingSub.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">View</a>}
-              </div>
-            </div>
-          </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" id="subActive" checked={editingSub.isActive} onChange={(e) => setEditingSub({ ...editingSub, isActive: e.target.checked })} className="rounded admin-border-light" />
             <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
@@ -1046,7 +863,7 @@ export function ServicesPageManager() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold admin-text-primary">{isNew ? "Create New Service" : "Edit Service"}</h1>
-          <p className="admin-text-secondary">Fill in all the details for the service</p>
+          <p className="admin-text-secondary">Fields below control the service card on /services.</p>
         </div>
       </div>
 
@@ -1127,55 +944,16 @@ export function ServicesPageManager() {
                 rows={2}
               />
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
-                <Input
-                  type="number"
-                  value={editingService.displayOrder ?? 0}
-                  onChange={(e) => updateField("displayOrder", Number(e.target.value) || 0)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="0"
-                />
-                <p className="text-xs admin-text-muted mt-1">Lower numbers appear first on /services</p>
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Portfolio URL</label>
-                <Input
-                  value={editingService.portfolioUrl ?? ""}
-                  onChange={(e) => updateField("portfolioUrl", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="https://..."
-                />
-                <p className="text-xs admin-text-muted mt-1">Shows &quot;View Portfolio&quot; when set</p>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm admin-text-secondary mb-2">Brochure PDF</label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Input
-                    type="file"
-                    accept="application/pdf"
-                    className="admin-bg-tertiary admin-border-light admin-text-primary max-w-xs"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0]
-                      if (!file) return
-                      const form = new FormData()
-                      form.append("file", file)
-                      try {
-                        const token = localStorage.getItem("adminToken")
-                        const res = await fetch("/api/upload/file", { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
-                        const data = await res.json()
-                        if (data?.url) updateField("brochureUrl", data.url)
-                      } catch (_) {}
-                      e.target.value = ""
-                    }}
-                  />
-                  {editingService.brochureUrl && (
-                    <a href={editingService.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">View current</a>
-                  )}
-                </div>
-                <p className="text-xs admin-text-muted mt-1">Shows &quot;Download Brochure&quot; when set</p>
-              </div>
+            <div className="mt-4">
+              <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
+              <Input
+                type="number"
+                value={editingService.displayOrder ?? 0}
+                onChange={(e) => updateField("displayOrder", Number(e.target.value) || 0)}
+                className="admin-bg-tertiary admin-border-light admin-text-primary"
+                placeholder="0"
+              />
+              <p className="text-xs admin-text-muted mt-1">Lower numbers appear first on /services</p>
             </div>
             <div className="mt-4 flex items-center gap-2">
               <input
@@ -1191,10 +969,17 @@ export function ServicesPageManager() {
             </div>
           </div>
 
-          <ServiceDetailTemplateEditor
-            template={editingService.detailTemplate}
-            onChange={(detailTemplate) => setEditingService({ ...editingService, detailTemplate })}
-          />
+          {editingServiceHasSubs === true && (
+            <p className="text-sm admin-text-muted admin-card border admin-border rounded-xl p-4">
+              This service has sub-services. Detail page content is edited under the <strong className="admin-text-secondary">Sub-Services</strong> tab — visitors are redirected to the first active sub-service.
+            </p>
+          )}
+          {editingServiceHasSubs === false && (
+            <ServiceDetailTemplateEditor
+              template={editingService.detailTemplate}
+              onChange={(detailTemplate) => setEditingService({ ...editingService, detailTemplate })}
+            />
+          )}
 
           {/* Save Button */}
           <div className="flex gap-4">

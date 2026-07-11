@@ -129,15 +129,19 @@ export function IndustriesPageManager() {
               <FontSizePill label="Hero label" value={content.typography.heroLabelFontSize} onChange={(v) => setTypo({ heroLabelFontSize: v })} min={8} max={20} />
               <FontSizePill label="Hero title" value={content.typography.heroTitleFontSize} onChange={(v) => setTypo({ heroTitleFontSize: v })} min={16} max={56} />
               <FontSizePill label="Hero text" value={content.typography.heroDescriptionFontSize} onChange={(v) => setTypo({ heroDescriptionFontSize: v })} min={10} max={24} />
+              <FontSizePill label="Expertise label" value={content.typography.expertiseLabelFontSize} onChange={(v) => setTypo({ expertiseLabelFontSize: v })} min={8} max={20} />
               <FontSizePill label="Expertise title" value={content.typography.expertiseTitleFontSize} onChange={(v) => setTypo({ expertiseTitleFontSize: v })} min={14} max={40} />
               <FontSizePill label="Expertise text" value={content.typography.expertiseDescriptionFontSize} onChange={(v) => setTypo({ expertiseDescriptionFontSize: v })} min={10} max={20} />
               <FontSizePill label="Card title" value={content.typography.cardTitleFontSize} onChange={(v) => setTypo({ cardTitleFontSize: v })} min={10} max={24} />
               <FontSizePill label="Card text" value={content.typography.cardDescriptionFontSize} onChange={(v) => setTypo({ cardDescriptionFontSize: v })} min={10} max={18} />
               <FontSizePill label="Card link" value={content.typography.cardLinkFontSize} onChange={(v) => setTypo({ cardLinkFontSize: v })} min={9} max={16} />
               <FontSizePill label="Card icon" value={content.typography.cardIconSize} onChange={(v) => setTypo({ cardIconSize: v })} min={16} max={32} />
+              <FontSizePill label="Explore btn" value={content.typography.exploreButtonFontSize} onChange={(v) => setTypo({ exploreButtonFontSize: v })} min={9} max={16} />
               <FontSizePill label="Stat value" value={content.typography.statValueFontSize} onChange={(v) => setTypo({ statValueFontSize: v })} min={16} max={40} />
               <FontSizePill label="Stat label" value={content.typography.statLabelFontSize} onChange={(v) => setTypo({ statLabelFontSize: v })} min={9} max={16} />
               <FontSizePill label="Stat text" value={content.typography.statDescriptionFontSize} onChange={(v) => setTypo({ statDescriptionFontSize: v })} min={9} max={16} />
+              <FontSizePill label="Stat icon" value={content.typography.statIconSize} onChange={(v) => setTypo({ statIconSize: v })} min={16} max={40} />
+              <FontSizePill label="CTA label" value={content.typography.ctaLabelFontSize} onChange={(v) => setTypo({ ctaLabelFontSize: v })} min={8} max={16} />
               <FontSizePill label="CTA heading" value={content.typography.ctaHeadingFontSize} onChange={(v) => setTypo({ ctaHeadingFontSize: v })} min={14} max={32} />
               <FontSizePill label="CTA text" value={content.typography.ctaTextFontSize} onChange={(v) => setTypo({ ctaTextFontSize: v })} min={10} max={20} />
               <FontSizePill label="CTA button" value={content.typography.ctaButtonFontSize} onChange={(v) => setTypo({ ctaButtonFontSize: v })} min={10} max={18} />

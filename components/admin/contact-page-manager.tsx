@@ -85,8 +85,13 @@ export function ContactPageManager() {
         <AdminCompactCard title="Typography">
           <TypographyPillRow>
             <FontSizePill label="Hero title" value={content.typography.heroTitleFontSize} onChange={(v) => setTypo({ heroTitleFontSize: v })} min={16} max={56} />
+            <FontSizePill label="Hero text" value={content.typography.heroDescriptionFontSize} onChange={(v) => setTypo({ heroDescriptionFontSize: v })} min={10} max={24} />
+            <FontSizePill label="Section label" value={content.typography.sectionLabelFontSize} onChange={(v) => setTypo({ sectionLabelFontSize: v })} min={8} max={20} />
             <FontSizePill label="Section heading" value={content.typography.sectionHeadingFontSize} onChange={(v) => setTypo({ sectionHeadingFontSize: v })} min={16} max={40} />
             <FontSizePill label="Info text" value={content.typography.infoValueFontSize} onChange={(v) => setTypo({ infoValueFontSize: v })} min={10} max={18} />
+            <FontSizePill label="Form label" value={content.typography.formLabelFontSize} onChange={(v) => setTypo({ formLabelFontSize: v })} min={10} max={18} />
+            <FontSizePill label="CTA text" value={content.typography.ctaTextFontSize} onChange={(v) => setTypo({ ctaTextFontSize: v })} min={10} max={20} />
+            <FontSizePill label="CTA button" value={content.typography.ctaButtonFontSize} onChange={(v) => setTypo({ ctaButtonFontSize: v })} min={10} max={18} />
           </TypographyPillRow>
         </AdminCompactCard>
 
@@ -106,7 +111,16 @@ export function ContactPageManager() {
             <CompactField label="Heading" value={content.info.heading} onChange={(v) => setInfo({ heading: v })} />
           </AdminFieldGrid>
           {content.info.items.map((item, index) => (
-            <CompactField key={item.id} label={item.icon} value={item.value} onChange={(v) => updateInfoItem(index, v, item.href)} />
+            <div key={item.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+              <CompactField label={`${item.icon} — value`} value={item.value} onChange={(v) => updateInfoItem(index, v, item.href)} />
+              {(item.icon === "phone" || item.icon === "email") && (
+                <CompactField
+                  label={`${item.icon} — link (optional)`}
+                  value={item.href ?? ""}
+                  onChange={(v) => updateInfoItem(index, item.value, v)}
+                />
+              )}
+            </div>
           ))}
           <CompactField label="Email callout text" value={content.info.emailCalloutText} onChange={(v) => setInfo({ emailCalloutText: v })} />
           <CompactField label="Email callout email" value={content.info.emailCalloutEmail} onChange={(v) => setInfo({ emailCalloutEmail: v })} />
@@ -117,12 +131,24 @@ export function ContactPageManager() {
             <CompactField label="Label" value={content.form.label} onChange={(v) => setForm({ label: v })} />
             <CompactField label="Heading" value={content.form.heading} onChange={(v) => setForm({ heading: v })} />
           </AdminFieldGrid>
+          <AdminFieldGrid cols={2}>
+            <CompactField label="Name placeholder" value={content.form.namePlaceholder} onChange={(v) => setForm({ namePlaceholder: v })} />
+            <CompactField label="Email placeholder" value={content.form.emailPlaceholder} onChange={(v) => setForm({ emailPlaceholder: v })} />
+            <CompactField label="Phone placeholder" value={content.form.phonePlaceholder} onChange={(v) => setForm({ phonePlaceholder: v })} />
+            <CompactField label="Company placeholder" value={content.form.companyPlaceholder} onChange={(v) => setForm({ companyPlaceholder: v })} />
+            <CompactField label="Service placeholder" value={content.form.servicePlaceholder} onChange={(v) => setForm({ servicePlaceholder: v })} />
+            <CompactField label="Message placeholder" value={content.form.messagePlaceholder} onChange={(v) => setForm({ messagePlaceholder: v })} />
+          </AdminFieldGrid>
           <CompactField label="Button text" value={content.form.buttonText} onChange={(v) => setForm({ buttonText: v })} />
           <CompactField
             label="Service options (comma separated)"
             value={content.form.serviceOptions.join(", ")}
             onChange={(v) => setForm({ serviceOptions: v.split(",").map((s) => s.trim()).filter(Boolean) })}
           />
+          <AdminFieldGrid cols={2}>
+            <CompactField label="Privacy label" value={content.form.privacyLabel} onChange={(v) => setForm({ privacyLabel: v })} />
+            <CompactField label="Privacy URL" value={content.form.privacyUrl} onChange={(v) => setForm({ privacyUrl: v })} />
+          </AdminFieldGrid>
         </AdminCompactCard>
 
         <AdminCompactCard title="Map">
