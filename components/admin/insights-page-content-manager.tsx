@@ -106,7 +106,7 @@ export function InsightsPageContentManager() {
             <CompactField label="Title highlight" value={content.hero.titleHighlight} onChange={(v) => setHero({ titleHighlight: v })} />
           </AdminFieldGrid>
           <CompactTextarea label="Description" value={content.hero.description} onChange={(v) => setHero({ description: v })} rows={3} />
-          <ImageUpload label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
+          <ImageUpload preset="hero" label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
         </AdminCompactCard>
 
         <AdminCompactCard title="Filter categories">

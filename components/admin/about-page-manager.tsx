@@ -157,6 +157,7 @@ export function AboutPageManager() {
             rows={3}
           />
           <ImageUpload
+            preset="hero"
             label="Hero image"
             value={content.hero.image}
             onChange={(url) => setContent({ ...content, hero: { ...content.hero, image: url } })}
@@ -207,6 +208,7 @@ export function AboutPageManager() {
             />
           </AdminFieldGrid>
           <ImageUpload
+            preset="sectionPhoto"
             label="Section image"
             value={content.whoWeAre.image}
             onChange={(url) => setContent({ ...content, whoWeAre: { ...content.whoWeAre, image: url } })}

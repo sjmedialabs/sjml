@@ -112,7 +112,7 @@ export function HeaderManager() {
       <div className="admin-card border admin-border rounded-xl p-6 mb-6">
         <h2 className="text-lg font-semibold admin-text-primary mb-4">Logo</h2>
         <div className="space-y-4">
-          <ImageUpload label="Logo Image" value={data.logo} onChange={(url) => setData({ ...data, logo: url })} />
+          <ImageUpload preset="logo" label="Logo Image" value={data.logo} onChange={(url) => setData({ ...data, logo: url })} />
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Logo Text</label>
             <input

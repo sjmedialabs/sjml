@@ -355,11 +355,13 @@ export function HomePageManager() {
                 />
               </div>
               <ImageUpload
+                preset="heroCarousel"
                 label="Background image"
                 value={slide.backgroundImage ?? ""}
                 onChange={(url) => updateSlide(index, { backgroundImage: url })}
               />
               <VideoUpload
+                preset="heroBackground"
                 label="Background video (optional — takes priority over image)"
                 value={slide.backgroundVideo ?? ""}
                 onChange={(url) => updateSlide(index, { backgroundVideo: url })}
@@ -471,6 +473,7 @@ export function HomePageManager() {
                 </div>
               </div>
               <ImageUpload
+                preset="statIcon"
                 label="Custom icon image (overrides preset)"
                 value={stat.icon.startsWith("/") || stat.icon.startsWith("http") ? stat.icon : ""}
                 onChange={(url) => {
@@ -735,6 +738,7 @@ export function HomePageManager() {
                 className="admin-bg-tertiary admin-border-light admin-text-primary"
               />
               <ImageUpload
+                preset="serviceIcon"
                 label="Icon"
                 value={item.icon}
                 onChange={(url) => {

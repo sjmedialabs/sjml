@@ -63,7 +63,7 @@ export function ServiceDetailTemplateEditor({
         <CompactTextarea label="Paragraph 1" value={template.introParagraph1} onChange={(v) => onChange({ ...template, introParagraph1: v })} rows={2} />
         <CompactTextarea label="Paragraph 2" value={template.introParagraph2} onChange={(v) => onChange({ ...template, introParagraph2: v })} rows={2} />
         {!hideIntroImage && (
-          <ImageUpload label="Intro image" value={template.introImage} onChange={(url) => onChange({ ...template, introImage: url })} />
+          <ImageUpload preset="banner" label="Intro image" value={template.introImage} onChange={(url) => onChange({ ...template, introImage: url })} />
         )}
       </AdminCompactCard>
 

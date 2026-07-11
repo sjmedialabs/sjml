@@ -155,7 +155,7 @@ export function IndustriesPageManager() {
               <CompactField label="Title highlight" value={content.hero.titleHighlight} onChange={(v) => setHero({ titleHighlight: v })} />
             </AdminFieldGrid>
             <CompactTextarea label="Description" value={content.hero.description} onChange={(v) => setHero({ description: v })} rows={3} />
-            <ImageUpload label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
+            <ImageUpload preset="hero" label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
           </AdminCompactCard>
 
           <AdminCompactCard title="Our Expertise">
@@ -205,7 +205,7 @@ export function IndustriesPageManager() {
                 <CompactField label="Display order" value={String(card.displayOrder)} onChange={(v) => updateCard(index, { displayOrder: Number(v) || 0 })} />
               </AdminFieldGrid>
               <CompactTextarea label="Description" value={card.description} onChange={(v) => updateCard(index, { description: v })} rows={2} />
-              <ImageUpload label="Card image" value={card.image} onChange={(url) => updateCard(index, { image: url })} />
+              <ImageUpload preset="card" label="Card image" value={card.image} onChange={(url) => updateCard(index, { image: url })} />
               <label className="inline-flex items-center gap-2 text-xs admin-text-secondary mt-1">
                 <input type="checkbox" checked={card.isActive} onChange={(e) => updateCard(index, { isActive: e.target.checked })} />
                 Active

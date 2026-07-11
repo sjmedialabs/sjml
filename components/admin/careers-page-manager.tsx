@@ -184,6 +184,7 @@ export function CareersPageManager() {
               />
             </div>
             <ImageUpload
+              preset="hero"
               label="Hero Background Image"
               value={data.heroImage ?? data.hero?.image ?? ""}
               onChange={(url) => setData({ ...data, heroImage: url })}
@@ -432,6 +433,7 @@ export function CareersPageManager() {
               />
             </div>
             <ImageUpload
+              preset="sectionPhoto"
               label="Culture section image"
               value={data.culture.image ?? ""}
               onChange={(url) => setData({ ...data, culture: { ...data.culture, image: url } })}
@@ -504,6 +506,7 @@ export function CareersPageManager() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageUpload
+                    preset="icon"
                     label="Icon"
                     value={benefit.icon}
                     onChange={(url) => {
@@ -511,9 +514,6 @@ export function CareersPageManager() {
                       newBenefits[index].icon = url
                       setData({ ...data, benefits: newBenefits })
                     }}
-                    maxSizeMB={1}
-                    maxWidth={256}
-                    maxHeight={256}
                   />
                   <div>
                     <label className="block text-xs admin-text-muted mb-1">Title</label>

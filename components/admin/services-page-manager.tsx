@@ -539,6 +539,8 @@ export function ServicesPageManager() {
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Banner image</label>
             <ImageUpload
+              preset="banner"
+              label="Banner image"
               value={editingSub.bannerImage}
               onChange={(url) =>
                 setEditingSub({
@@ -915,15 +917,13 @@ export function ServicesPageManager() {
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Custom icon image (optional)</label>
                 <ImageUpload
+                  preset="serviceIcon"
                   value={
                     editingService.icon.startsWith("/") || editingService.icon.startsWith("http")
                       ? editingService.icon
                       : ""
                   }
                   onChange={(url) => updateField("icon", url || editingService.icon || "branding")}
-                  maxSizeMB={1}
-                  maxWidth={512}
-                  maxHeight={512}
                 />
               </div>
               <div>

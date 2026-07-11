@@ -3,13 +3,21 @@
 import { useState, useRef, useCallback } from "react"
 import { uploadVideoAction } from "@/app/actions/upload"
 import { Film, Upload, X } from "lucide-react"
+import {
+  formatVideoSpecLine,
+  VIDEO_UPLOAD_PRESETS,
+  type VideoUploadPreset,
+  type VideoUploadSpec,
+} from "@/lib/admin-media-specs"
 
 interface VideoUploadProps {
   value: string
   onChange: (url: string) => void
   label?: string
   className?: string
+  preset?: VideoUploadPreset
   maxSizeMB?: number
+  hint?: string
 }
 
 export function VideoUpload({
@@ -17,8 +25,16 @@ export function VideoUpload({
   onChange,
   label = "Background video",
   className = "",
-  maxSizeMB = 10,
+  preset = "heroBackground",
+  maxSizeMB,
+  hint,
 }: VideoUploadProps) {
+  const spec: VideoUploadSpec = {
+    ...VIDEO_UPLOAD_PRESETS[preset],
+    ...(maxSizeMB != null ? { maxSizeMB } : {}),
+    ...(hint != null ? { hint } : {}),
+  }
+
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState("")
@@ -31,8 +47,8 @@ export function VideoUpload({
         return
       }
 
-      if (file.size > maxSizeMB * 1024 * 1024) {
-        setError(`Video must be less than ${maxSizeMB}MB`)
+      if (file.size > spec.maxSizeMB * 1024 * 1024) {
+        setError(`Video must be less than ${spec.maxSizeMB}MB`)
         return
       }
 
@@ -55,7 +71,7 @@ export function VideoUpload({
         setUploading(false)
       }
     },
-    [maxSizeMB, onChange],
+    [maxSizeMB, onChange, spec.maxSizeMB],
   )
 
   const onDrop = (e: React.DragEvent) => {
@@ -67,7 +83,9 @@ export function VideoUpload({
 
   return (
     <div className={className}>
-      {label && <label className="block text-sm admin-text-secondary mb-2">{label}</label>}
+      {label && <label className="block text-sm admin-text-secondary mb-1">{label}</label>}
+      <p className="text-xs admin-text-muted mb-2 leading-snug">{formatVideoSpecLine(spec)}</p>
+      {spec.hint && <p className="text-xs admin-text-muted mb-2 leading-snug">{spec.hint}</p>}
 
       {value ? (
         <div className="relative rounded-lg border admin-border-light overflow-hidden admin-bg-tertiary">
@@ -105,7 +123,7 @@ export function VideoUpload({
           <p className="text-sm admin-text-primary mb-1">
             {uploading ? "Uploading…" : "Drag & drop a video or click to browse"}
           </p>
-          <p className="text-xs admin-text-secondary">MP4, WebM — max {maxSizeMB}MB</p>
+          <p className="text-xs admin-text-secondary">Hard limit {spec.maxSizeMB}MB</p>
           <Upload className="w-4 h-4 mx-auto mt-2 admin-text-secondary" />
         </div>
       )}
@@ -118,11 +136,10 @@ export function VideoUpload({
         onChange={(e) => {
           const file = e.target.files?.[0]
           if (file) void handleFile(file)
-          e.target.value = ""
         }}
       />
 
-      {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
     </div>
   )
 }

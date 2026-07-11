@@ -154,6 +154,7 @@ export function ClientsPageManager() {
             />
           </div>
           <ImageUpload
+            preset="hero"
             label="Hero Background Image"
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
@@ -283,6 +284,7 @@ export function ClientsPageManager() {
                   />
                 </div>
                 <ImageUpload
+                  preset="clientLogo"
                   label="Client Logo"
                   value={client.logo}
                   onChange={(url) => updateClient(client.id, { logo: url })}

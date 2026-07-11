@@ -125,6 +125,7 @@ export function FooterManager() {
       <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
         <h3 className="font-semibold admin-text-primary">Logo & brand</h3>
         <ImageUpload
+          preset="logo"
           label="Footer logo"
           value={footerData.logo ?? ""}
           onChange={(url) => setFooterData({ ...footerData, logo: url })}

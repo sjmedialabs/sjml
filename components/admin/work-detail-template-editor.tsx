@@ -57,7 +57,7 @@ export function WorkDetailTemplateEditor({
         <CompactField label="Category tags" value={template.categoryTags} onChange={(v) => onChange({ ...template, categoryTags: v })} />
         <CompactField label="Subtitle" value={template.subtitle} onChange={(v) => onChange({ ...template, subtitle: v })} />
         <CompactTextarea label="Intro paragraph" value={template.introParagraph} onChange={(v) => onChange({ ...template, introParagraph: v })} rows={3} />
-        <ImageUpload label="Hero image" value={template.heroImage} onChange={(url) => onChange({ ...template, heroImage: url })} />
+        <ImageUpload preset="cardWide" label="Hero image" value={template.heroImage} onChange={(url) => onChange({ ...template, heroImage: url })} />
         <AdminFieldGrid cols={3}>
           <CompactField label="Year" value={template.meta.year} onChange={(v) => setMeta({ year: v })} />
           <CompactField label="Industry" value={template.meta.industry} onChange={(v) => setMeta({ industry: v })} />
@@ -99,7 +99,7 @@ export function WorkDetailTemplateEditor({
         {template.galleryImages.map((img, index) => (
           <div key={index} className="flex gap-2 items-end border-t admin-border pt-2 mt-2 first:border-0 first:pt-0 first:mt-0">
             <div className="flex-1">
-              <ImageUpload label={`Image ${index + 1}`} value={img} onChange={(url) => {
+              <ImageUpload preset="gallery" label={`Image ${index + 1}`} value={img} onChange={(url) => {
                 const galleryImages = [...template.galleryImages]; galleryImages[index] = url; onChange({ ...template, galleryImages })
               }} />
             </div>
@@ -143,7 +143,7 @@ export function WorkDetailTemplateEditor({
           <CompactField label="Author" value={template.testimonial.author} onChange={(v) => setTestimonial({ author: v })} />
           <CompactField label="Role" value={template.testimonial.role} onChange={(v) => setTestimonial({ role: v })} />
         </AdminFieldGrid>
-        <ImageUpload label="Author image" value={template.testimonial.image} onChange={(url) => setTestimonial({ image: url })} />
+        <ImageUpload preset="avatar" label="Author image" value={template.testimonial.image} onChange={(url) => setTestimonial({ image: url })} />
         <AdminFieldGrid cols={2}>
           <CompactField label="Client" value={template.projectDetails.client} onChange={(v) => setProjectDetails({ client: v })} />
           <CompactField label="Industry" value={template.projectDetails.industry} onChange={(v) => setProjectDetails({ industry: v })} />
@@ -152,7 +152,7 @@ export function WorkDetailTemplateEditor({
           <CompactField label="Team" value={template.projectDetails.team} onChange={(v) => setProjectDetails({ team: v })} />
           <CompactField label="Website" value={template.projectDetails.website} onChange={(v) => setProjectDetails({ website: v })} />
         </AdminFieldGrid>
-        <ImageUpload label="Side image" value={template.sideImage} onChange={(url) => onChange({ ...template, sideImage: url })} />
+        <ImageUpload preset="sideImage" label="Side image" value={template.sideImage} onChange={(url) => onChange({ ...template, sideImage: url })} />
       </AdminCompactCard>
 
       <AdminCompactCard title="Bottom CTA">

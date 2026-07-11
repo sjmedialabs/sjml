@@ -236,30 +236,20 @@ export function SeoManager() {
 
                 <div>
                   <ImageUpload
+                    preset="favicon"
                     label="Favicon"
                     value={data.favicon}
                     onChange={(url) => setData({ ...data, favicon: url })}
-                    maxSizeMB={1}
-                    maxWidth={512}
-                    maxHeight={512}
                   />
-                  <p className="text-xs admin-text-secondary mt-2">
-                    Small icon shown in the browser tab (PNG, ICO, or JPG — square recommended)
-                  </p>
                 </div>
 
                 <div>
                   <ImageUpload
+                    preset="og"
                     label="Default Open Graph Image"
                     value={data.ogImage}
                     onChange={(url) => setData({ ...data, ogImage: url })}
-                    maxSizeMB={5}
-                    maxWidth={2400}
-                    maxHeight={1260}
                   />
-                  <p className="text-xs admin-text-secondary mt-2">
-                    Image shown when sharing on social media (1200×630px recommended)
-                  </p>
                 </div>
               </div>
             </div>
@@ -332,16 +322,12 @@ export function SeoManager() {
 
                   <div>
                     <ImageUpload
+                      preset="og"
                       label="Custom OG Image (optional)"
                       value={page.ogImage}
                       onChange={(url) => updatePageSeo(index, { ogImage: url })}
-                      maxSizeMB={5}
-                      maxWidth={2400}
-                      maxHeight={1260}
                     />
-                    <p className="text-xs admin-text-secondary mt-2">
-                      Leave empty to use the default Open Graph image
-                    </p>
+                    <p className="text-xs admin-text-muted mt-1">Leave empty to use the default Open Graph image</p>
                   </div>
                 </div>
               </div>

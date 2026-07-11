@@ -143,6 +143,7 @@ export function TestimonialsPageManager() {
             />
           </div>
           <ImageUpload
+            preset="hero"
             label="Hero Background Image"
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
@@ -264,6 +265,7 @@ export function TestimonialsPageManager() {
                   </div>
                 </div>
                 <ImageUpload
+                  preset="avatar"
                   label="Author Image"
                   value={testimonial.image}
                   onChange={(url) => updateTestimonial(testimonial.id, { image: url })}

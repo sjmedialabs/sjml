@@ -576,7 +576,7 @@ export function WorkPageManager() {
           <div className="admin-card border admin-border rounded-xl p-6">
             <h2 className="text-lg font-semibold admin-text-primary mb-2">Listing thumbnail</h2>
             <p className="text-sm admin-text-muted mb-4">Used on the Work listing page grid.</p>
-            <ImageUpload label="Thumbnail / card image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
+            <ImageUpload preset="cardWide" label="Thumbnail / card image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
           </div>
 
           <WorkDetailTemplateEditor

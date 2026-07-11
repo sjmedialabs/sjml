@@ -195,6 +195,7 @@ export function CaseStudiesPageManager() {
             />
           </div>
           <ImageUpload
+            preset="hero"
             label="Hero Background Image"
             value={data.heroImage ?? ""}
             onChange={(url) => setData({ ...data, heroImage: url })}
@@ -436,6 +437,7 @@ export function CaseStudiesPageManager() {
                       />
                     </div>
                     <ImageUpload
+                      preset="caseStudy"
                       label="Featured Image"
                       value={editingStudy.image}
                       onChange={(url) => updateCaseStudy({ ...editingStudy, image: url })}
@@ -548,6 +550,7 @@ export function CaseStudiesPageManager() {
                       {editingStudy.gallery.map((img, index) => (
                         <div key={index} className="relative">
                           <ImageUpload
+                            preset="gallery"
                             label={`Gallery image ${index + 1}`}
                             value={img}
                             onChange={(url) => {

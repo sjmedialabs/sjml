@@ -102,7 +102,7 @@ export function ContactPageManager() {
             <CompactField label="Title line 2" value={content.hero.titleLine2} onChange={(v) => setHero({ titleLine2: v })} />
           </AdminFieldGrid>
           <CompactTextarea label="Description" value={content.hero.description} onChange={(v) => setHero({ description: v })} rows={2} />
-          <ImageUpload label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
+          <ImageUpload preset="hero" label="Hero image" value={content.hero.image} onChange={(url) => setHero({ image: url })} />
         </AdminCompactCard>
 
         <AdminCompactCard title="Get in touch">

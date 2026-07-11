@@ -5,15 +5,26 @@ import type React from "react"
 import { useState, useRef, useCallback } from "react"
 import Image from "next/image"
 import { uploadImageAction } from "@/app/actions/upload"
+import {
+  formatImageSpecLine,
+  resolveImageSpec,
+  type ImageUploadPreset,
+  type ImageUploadSpec,
+} from "@/lib/admin-media-specs"
 
 interface ImageUploadProps {
   value: string
   onChange: (url: string) => void
   label?: string
   className?: string
+  /** Applies recommended size, limits, and helper copy for common admin use cases. */
+  preset?: ImageUploadPreset
   maxSizeMB?: number
   maxWidth?: number
   maxHeight?: number
+  recommendedWidth?: number
+  recommendedHeight?: number
+  hint?: string
 }
 
 export function ImageUpload({
@@ -21,10 +32,23 @@ export function ImageUpload({
   onChange,
   label,
   className = "",
-  maxSizeMB = 10,
-  maxWidth = 4096,
-  maxHeight = 4096,
+  preset,
+  maxSizeMB,
+  maxWidth,
+  maxHeight,
+  recommendedWidth,
+  recommendedHeight,
+  hint,
 }: ImageUploadProps) {
+  const spec: ImageUploadSpec = resolveImageSpec(preset, {
+    ...(maxSizeMB != null ? { maxSizeMB } : {}),
+    ...(maxWidth != null ? { maxWidth } : {}),
+    ...(maxHeight != null ? { maxHeight } : {}),
+    ...(recommendedWidth != null ? { recommendedWidth } : {}),
+    ...(recommendedHeight != null ? { recommendedHeight } : {}),
+    ...(hint != null ? { hint } : {}),
+  })
+
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState("")
@@ -36,7 +60,7 @@ export function ImageUpload({
       img.onload = () => {
         URL.revokeObjectURL(img.src)
         resolve({
-          valid: img.width <= maxWidth && img.height <= maxHeight,
+          valid: img.width <= spec.maxWidth && img.height <= spec.maxHeight,
           width: img.width,
           height: img.height,
         })
@@ -53,15 +77,15 @@ export function ImageUpload({
         return
       }
 
-      if (file.size > maxSizeMB * 1024 * 1024) {
-        setError(`Image must be less than ${maxSizeMB}MB`)
+      if (file.size > spec.maxSizeMB * 1024 * 1024) {
+        setError(`Image must be less than ${spec.maxSizeMB}MB`)
         return
       }
 
       const dimensions = await validateImageDimensions(file)
       if (!dimensions.valid) {
         setError(
-          `Image resolution must be ${maxWidth}x${maxHeight} or smaller. Current: ${dimensions.width}x${dimensions.height}`,
+          `Image resolution must be ${spec.maxWidth}×${spec.maxHeight} or smaller. Current: ${dimensions.width}×${dimensions.height}`,
         )
         return
       }
@@ -73,7 +97,6 @@ export function ImageUpload({
       formData.append("file", file)
 
       try {
-        // Prefer Server Action so serverActions.bodySizeLimit (10mb) applies
         const result = await uploadImageAction(formData)
 
         if (result.url) {
@@ -81,7 +104,6 @@ export function ImageUpload({
           setUploading(false)
           return
         }
-        // If action failed, try Route Handler (good fallback)
         const fallbackForm = new FormData()
         fallbackForm.append("file", file)
         const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
@@ -112,7 +134,7 @@ export function ImageUpload({
 
       setUploading(false)
     },
-    [onChange, maxSizeMB, maxWidth, maxHeight],
+    [onChange, spec.maxHeight, spec.maxSizeMB, spec.maxWidth],
   )
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -158,10 +180,11 @@ export function ImageUpload({
 
   return (
     <div className={className}>
-      {label && <label className="block text-sm admin-text-secondary mb-2">{label}</label>}
+      {label && <label className="block text-sm admin-text-secondary mb-1">{label}</label>}
+      <p className="text-xs admin-text-muted mb-2 leading-snug">{formatImageSpecLine(spec)}</p>
+      {spec.hint && <p className="text-xs admin-text-muted mb-2 leading-snug">{spec.hint}</p>}
 
       <div className="flex items-start gap-4">
-        {/* Thumbnail preview */}
         {value && (
           <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border admin-border-light group">
             <Image src={value || "/placeholder.svg"} alt="Uploaded image" fill className="object-cover" />
@@ -175,7 +198,6 @@ export function ImageUpload({
           </div>
         )}
 
-        {/* Upload area */}
         <div
           onClick={handleClick}
           onDragEnter={handleDrag}
@@ -208,11 +230,10 @@ export function ImageUpload({
                 </svg>
                 <div className="text-left">
                   <p className="admin-text-secondary text-sm">
-                    <span className="text-primary">{value ? "Change image" : "Click to upload"}</span> or drag and
-                    drop
+                    <span className="text-primary">{value ? "Change image" : "Click to upload"}</span> or drag and drop
                   </p>
                   <p className="text-[#555] text-xs">
-                    PNG, JPG, GIF up to {maxSizeMB}MB (max {maxWidth}x{maxHeight}px)
+                    Hard limit {spec.maxWidth}×{spec.maxHeight}px, {spec.maxSizeMB}MB
                   </p>
                 </div>
               </div>

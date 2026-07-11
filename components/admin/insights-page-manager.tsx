@@ -405,7 +405,7 @@ export function InsightsPageManager() {
               <Textarea value={editingInsight.excerpt} onChange={(e) => updateField("excerpt", e.target.value)} rows={2} className="admin-bg-tertiary admin-border-light admin-text-primary" />
             </div>
             <div className="mt-4">
-              <ImageUpload label="Featured image" value={editingInsight.image} onChange={(url) => updateField("image", url)} />
+              <ImageUpload preset="cardWide" label="Featured image" value={editingInsight.image} onChange={(url) => updateField("image", url)} />
             </div>
             <div className="mt-4 flex gap-4">
               <label className="flex items-center gap-2 text-sm admin-text-secondary">
