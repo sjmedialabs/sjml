@@ -54,13 +54,19 @@ export function ImageUpload({
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const hasDimensionLimit = spec.maxWidth != null && spec.maxHeight != null
+
   const validateImageDimensions = (file: File): Promise<{ valid: boolean; width: number; height: number }> => {
+    if (!hasDimensionLimit) {
+      return Promise.resolve({ valid: true, width: 0, height: 0 })
+    }
+
     return new Promise((resolve) => {
       const img = document.createElement("img")
       img.onload = () => {
         URL.revokeObjectURL(img.src)
         resolve({
-          valid: img.width <= spec.maxWidth && img.height <= spec.maxHeight,
+          valid: img.width <= spec.maxWidth! && img.height <= spec.maxHeight!,
           width: img.width,
           height: img.height,
         })
@@ -82,12 +88,14 @@ export function ImageUpload({
         return
       }
 
-      const dimensions = await validateImageDimensions(file)
-      if (!dimensions.valid) {
-        setError(
-          `Image resolution must be ${spec.maxWidth}×${spec.maxHeight} or smaller. Current: ${dimensions.width}×${dimensions.height}`,
-        )
-        return
+      if (hasDimensionLimit) {
+        const dimensions = await validateImageDimensions(file)
+        if (!dimensions.valid) {
+          setError(
+            `Image resolution must be ${spec.maxWidth}×${spec.maxHeight} or smaller. Current: ${dimensions.width}×${dimensions.height}`,
+          )
+          return
+        }
       }
 
       setError("")
@@ -134,7 +142,7 @@ export function ImageUpload({
 
       setUploading(false)
     },
-    [onChange, spec.maxHeight, spec.maxSizeMB, spec.maxWidth],
+    [hasDimensionLimit, onChange, spec.maxHeight, spec.maxSizeMB, spec.maxWidth],
   )
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -233,7 +241,9 @@ export function ImageUpload({
                     <span className="text-primary">{value ? "Change image" : "Click to upload"}</span> or drag and drop
                   </p>
                   <p className="text-[#555] text-xs">
-                    Hard limit {spec.maxWidth}×{spec.maxHeight}px, {spec.maxSizeMB}MB
+                    {hasDimensionLimit
+                      ? `Hard limit ${spec.maxWidth}×${spec.maxHeight}px, ${spec.maxSizeMB}MB`
+                      : `Max file size ${spec.maxSizeMB}MB`}
                   </p>
                 </div>
               </div>

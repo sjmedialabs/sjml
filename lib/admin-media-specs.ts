@@ -3,8 +3,9 @@
 export interface ImageUploadSpec {
   recommendedWidth: number
   recommendedHeight: number
-  maxWidth: number
-  maxHeight: number
+  /** When omitted, uploads are not restricted by pixel dimensions. */
+  maxWidth?: number
+  maxHeight?: number
   maxSizeMB: number
   formats: string
   hint: string
@@ -55,11 +56,9 @@ export const IMAGE_UPLOAD_PRESETS = {
   logo: {
     recommendedWidth: 400,
     recommendedHeight: 120,
-    maxWidth: 800,
-    maxHeight: 400,
     maxSizeMB: 1,
     formats: "PNG with transparency",
-    hint: "Horizontal logo. Use a transparent PNG on a clear background.",
+    hint: "Horizontal logo. Any resolution is fine — keep the file under 1MB.",
   },
   /** Grid cards, listing thumbnails, insight/work cards */
   card: {
