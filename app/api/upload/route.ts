@@ -14,8 +14,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image (PNG, JPG, GIF, WebP)" }, { status: 400 })
+    const isImage = file.type.startsWith("image/")
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")
+
+    if (!isImage && !isPdf) {
+      return NextResponse.json({ error: "File must be an image (PNG, JPG, GIF, WebP) or PDF document" }, { status: 400 })
     }
 
     // 10MB max
@@ -33,7 +36,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { fileId, url } = await uploadToGridFS(buffer, file.name, file.type)
+    const contentType = isPdf ? "application/pdf" : file.type || "image/jpeg"
+    const { fileId, url } = await uploadToGridFS(buffer, file.name, contentType)
 
     return NextResponse.json({
       success: true,

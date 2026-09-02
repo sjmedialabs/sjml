@@ -29,13 +29,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     const buffer = Buffer.concat(chunks)
 
-    // Return image with proper headers
+    const isPdf = file.filename?.toLowerCase().endsWith(".pdf") || file.contentType?.toLowerCase().includes("pdf")
+    const contentType = isPdf ? "application/pdf" : file.contentType || "image/jpeg"
+
+    // Return file with proper headers for inline display in browser tab
     return new NextResponse(buffer, {
       status: 200,
       headers: {
-        "Content-Type": file.contentType,
+        "Content-Type": contentType,
         "Content-Disposition": `inline; filename="${file.filename}"`,
-        "Cache-Control": "public, max-age=31536000, immutable", // Cache for 1 year
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     })
   } catch (error) {

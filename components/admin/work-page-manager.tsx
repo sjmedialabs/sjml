@@ -76,10 +76,44 @@ export function WorkPageManager() {
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [seeding, setSeeding] = useState(false)
+  const [industriesOptions, setIndustriesOptions] = useState<string[]>([])
+  const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([])
 
   useEffect(() => {
     fetchWorks()
+    fetchIndustries()
+    fetchCategories()
   }, [pagination.page])
+
+  const fetchIndustries = async () => {
+    try {
+      const res = await fetch("/api/content/industries-page")
+      if (res.ok) {
+        const data = await res.json()
+        const cards = data.cards || []
+        const titles = cards.map((c: any) => c.title).filter(Boolean)
+        setIndustriesOptions(titles)
+      }
+    } catch (error) {
+      console.error("Failed to fetch industries options", error)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("/api/content/work-page")
+      if (res.ok) {
+        const data = await res.json()
+        const cats = data.filterCategories || []
+        const options = cats
+          .filter((c: any) => c.value !== "all")
+          .map((c: any) => ({ label: c.label, value: c.value }))
+        setCategoryOptions(options)
+      }
+    } catch (error) {
+      console.error("Failed to fetch category options", error)
+    }
+  }
 
   const seedDefaults = async () => {
     if (!confirm("Seed default portfolio works from mockup? Existing slugs will be skipped.")) return
@@ -198,8 +232,7 @@ export function WorkPageManager() {
   }
 
   const updateField = (field: string, value: any) => {
-    if (!editingWork) return
-    setEditingWork({ ...editingWork, [field]: value })
+    setEditingWork((prev) => (prev ? { ...prev, [field]: value } : null))
   }
 
   const filteredWorks = works.filter(
@@ -441,32 +474,6 @@ export function WorkPageManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Category tags</label>
-                <Input
-                  value={editingWork.categoryTags}
-                  onChange={(e) => updateField("categoryTags", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="BRANDING, PACKAGING"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Filter categories (comma)</label>
-                <Input
-                  value={editingWork.categories.join(", ")}
-                  onChange={(e) =>
-                    updateField(
-                      "categories",
-                      e.target.value
-                        .split(",")
-                        .map((t) => t.trim().toLowerCase())
-                        .filter(Boolean),
-                    )
-                  }
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="branding, packaging"
-                />
-              </div>
-              <div>
                 <label className="block text-sm admin-text-secondary mb-2">Display order</label>
                 <Input
                   type="number"
@@ -476,21 +483,53 @@ export function WorkPageManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Category (legacy)</label>
-                <Input
-                  value={editingWork.category}
-                  onChange={(e) => updateField("category", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Branding, Web Design, etc."
-                />
+                <label className="block text-sm admin-text-secondary mb-2">Category</label>
+                <select
+                  value={editingWork.category || ""}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    const selected = categoryOptions.find(
+                      (c) => c.value.toLowerCase() === val.toLowerCase() || c.label.toLowerCase() === val.toLowerCase()
+                    )
+                    const label = selected ? selected.label : val.toUpperCase()
+                    setEditingWork((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            category: val,
+                            categoryTags: label,
+                            categories: val ? [val] : [],
+                          }
+                        : null
+                    )
+                  }}
+                  className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
+                >
+                  <option value="">-- Select Category --</option>
+                  {categoryOptions.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Industry</label>
-                <Input
+                <select
                   value={editingWork.industry}
                   onChange={(e) => updateField("industry", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
+                  className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
+                >
+                  <option value="">-- Select Industry --</option>
+                  {industriesOptions.map((ind) => (
+                    <option key={ind} value={ind}>
+                      {ind}
+                    </option>
+                  ))}
+                  {editingWork.industry && !industriesOptions.includes(editingWork.industry) && (
+                    <option value={editingWork.industry}>{editingWork.industry}</option>
+                  )}
+                </select>
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Role</label>

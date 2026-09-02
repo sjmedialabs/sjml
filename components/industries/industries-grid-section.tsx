@@ -52,7 +52,11 @@ export function IndustriesGridSection({
                   </p>
                 )}
                 <Link
-                  href={card.linkUrl || "/work"}
+                  href={
+                    card.linkUrl && card.linkUrl !== "/work"
+                      ? card.linkUrl
+                      : `/work?industry=${encodeURIComponent(card.title)}`
+                  }
                   className="inline-flex items-center justify-center gap-1.5 w-full font-bold uppercase text-black/80 hover:text-home-primary transition-colors"
                   style={{ fontSize: `${typography.cardLinkFontSize}px` }}
                 >

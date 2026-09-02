@@ -17,6 +17,7 @@ interface CaseStudy {
   solution: string
   results: string[]
   image: string
+  pdfUrl?: string
   gallery: string[]
   stats: Array<{ label: string; value: string }>
   testimonial: { quote: string; author: string; role: string; company: string }
@@ -148,6 +149,7 @@ export function CaseStudiesPageManager() {
       ],
       testimonial: { quote: "", author: "", role: "", company: "" },
       featured: false,
+      pdfUrl: "",
     }
     setData({ ...data, caseStudies: [...data.caseStudies, newStudy] })
     setEditingStudy(newStudy)
@@ -344,308 +346,103 @@ export function CaseStudiesPageManager() {
               <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{modalError}</p>
             )}
 
-              {/* Tabs */}
-              <div className="flex gap-2 mb-4">
-                {["basic", "content", "stats", "gallery", "testimonial"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1.5 rounded text-sm capitalize ${
-                      activeTab === tab ? "bg-primary text-primary-foreground" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Category <span className="text-red-500">*</span></label>
+                  <select
+                    value={editingStudy.tags?.[0] || ""}
+                    onChange={(e) => {
+                      const selected = e.target.value
+                      updateCaseStudy({ ...editingStudy, tags: selected ? [selected] : [] })
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                   >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+                    <option value="">-- Select Category --</option>
+                    {data.categories.filter((c) => c !== "All" && c !== "all").map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="space-y-4">
-                {activeTab === "basic" && (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Title <span className="text-red-500">*</span></label>
-                        <input
-                          type="text"
-                          value={editingStudy.title}
-                          onChange={(e) => { updateCaseStudy({ ...editingStudy, title: e.target.value }); setModalError("") }}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                          placeholder="Required"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">URL slug</label>
-                        <input
-                          type="text"
-                          value={editingStudy.slug}
-                          onChange={(e) =>
-                            updateCaseStudy({
-                              ...editingStudy,
-                              slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                          placeholder="auto-generated-from-title"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Client</label>
-                        <input
-                          type="text"
-                          value={editingStudy.client}
-                          onChange={(e) => updateCaseStudy({ ...editingStudy, client: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                        <input
-                          type="text"
-                          value={editingStudy.industry}
-                          onChange={(e) => updateCaseStudy({ ...editingStudy, industry: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                        <input
-                          type="text"
-                          value={editingStudy.year}
-                          onChange={(e) => updateCaseStudy({ ...editingStudy, year: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                          placeholder="2024"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
-                      <input
-                        type="text"
-                        value={editingStudy.tags.join(", ")}
-                        onChange={(e) =>
-                          updateCaseStudy({
-                            ...editingStudy,
-                            tags: e.target.value
-                              .split(",")
-                              .map((t) => t.trim())
-                              .filter(Boolean),
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <ImageUpload
-                      preset="caseStudy"
-                      label="Featured Image"
-                      value={editingStudy.image}
-                      onChange={(url) => updateCaseStudy({ ...editingStudy, image: url })}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={editingStudy.title}
+                    onChange={(e) => {
+                      const newTitle = e.target.value
+                      updateCaseStudy({
+                        ...editingStudy,
+                        title: newTitle,
+                        slug: newTitle.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+                      })
+                      setModalError("")
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                    placeholder="Enter case study title"
+                  />
+                </div>
+
+                <ImageUpload
+                  preset="caseStudy"
+                  label="Image Upload"
+                  value={editingStudy.image}
+                  onChange={(url) => updateCaseStudy({ ...editingStudy, image: url })}
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    value={editingStudy.description}
+                    onChange={(e) => updateCaseStudy({ ...editingStudy, description: e.target.value })}
+                    rows={4}
+                    placeholder="Enter short description"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700">PDF Upload Options</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://... or upload PDF document"
+                      value={editingStudy.pdfUrl || ""}
+                      onChange={(e) => updateCaseStudy({ ...editingStudy, pdfUrl: e.target.value })}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm focus:outline-none focus:border-primary"
                     />
-                    <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <label className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium cursor-pointer hover:opacity-90 flex items-center shrink-0">
+                      <span>Upload PDF</span>
                       <input
-                        type="checkbox"
-                        checked={editingStudy.featured}
-                        onChange={(e) => updateCaseStudy({ ...editingStudy, featured: e.target.checked })}
-                        className="w-4 h-4 accent-primary"
-                      />
-                      Featured Case Study
-                    </label>
-                  </>
-                )}
-
-                {activeTab === "content" && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                      <textarea
-                        value={editingStudy.description}
-                        onChange={(e) => updateCaseStudy({ ...editingStudy, description: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Challenge</label>
-                      <textarea
-                        value={editingStudy.challenge}
-                        onChange={(e) => updateCaseStudy({ ...editingStudy, challenge: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Solution</label>
-                      <textarea
-                        value={editingStudy.solution}
-                        onChange={(e) => updateCaseStudy({ ...editingStudy, solution: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Results (comma separated)</label>
-                      <input
-                        type="text"
-                        value={editingStudy.results.join(", ")}
-                        onChange={(e) =>
-                          updateCaseStudy({
-                            ...editingStudy,
-                            results: e.target.value
-                              .split(",")
-                              .map((r) => r.trim())
-                              .filter(Boolean),
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {activeTab === "stats" && (
-                  <>
-                    <p className="text-sm text-gray-600 mb-3">Shown on listing cards and the detail page stats bar.</p>
-                    {[0, 1].map((idx) => {
-                      const stat = editingStudy.stats[idx] ?? { label: "", value: "" }
-                      return (
-                        <div key={idx} className="p-3 bg-gray-100 rounded-lg mb-3">
-                          <p className="text-xs font-medium text-gray-600 mb-2">Stat {idx + 1}</p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <input
-                              type="text"
-                              value={stat.value}
-                              onChange={(e) => {
-                                const newStats = [...editingStudy.stats]
-                                while (newStats.length <= idx) newStats.push({ label: "", value: "" })
-                                newStats[idx] = { ...newStats[idx], value: e.target.value }
-                                updateCaseStudy({ ...editingStudy, stats: newStats })
-                              }}
-                              placeholder="Value (e.g. 150%)"
-                              className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
-                            />
-                            <input
-                              type="text"
-                              value={stat.label}
-                              onChange={(e) => {
-                                const newStats = [...editingStudy.stats]
-                                while (newStats.length <= idx) newStats.push({ label: "", value: "" })
-                                newStats[idx] = { ...newStats[idx], label: e.target.value }
-                                updateCaseStudy({ ...editingStudy, stats: newStats })
-                              }}
-                              placeholder="Label (e.g. ROI Increase)"
-                              className="px-3 py-2 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:outline-none focus:border-primary"
-                            />
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </>
-                )}
-
-                {activeTab === "gallery" && (
-                  <>
-                    <p className="text-sm text-gray-600 mb-3">Extra images shown on the case study detail page.</p>
-                    <div className="grid grid-cols-2 gap-4">
-                      {editingStudy.gallery.map((img, index) => (
-                        <div key={index} className="relative">
-                          <ImageUpload
-                            preset="gallery"
-                            label={`Gallery image ${index + 1}`}
-                            value={img}
-                            onChange={(url) => {
-                              const next = [...editingStudy.gallery]
-                              next[index] = url
-                              updateCaseStudy({ ...editingStudy, gallery: next })
-                            }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateCaseStudy({
-                                ...editingStudy,
-                                gallery: editingStudy.gallery.filter((_, i) => i !== index),
-                              })
+                        type="file"
+                        accept="application/pdf,.pdf"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const formData = new FormData()
+                          formData.append("file", file)
+                          try {
+                            const res = await fetch("/api/upload", { method: "POST", body: formData })
+                            if (res.ok) {
+                              const data = await res.json()
+                              updateCaseStudy({ ...editingStudy, pdfUrl: data.url })
+                            } else {
+                              alert("PDF upload failed")
                             }
-                            className="absolute top-0 right-0 text-red-600 text-xs px-2 py-1"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => updateCaseStudy({ ...editingStudy, gallery: [...editingStudy.gallery, ""] })}
-                      className="text-primary text-sm hover:underline mt-2"
-                    >
-                      + Add gallery image
-                    </button>
-                  </>
-                )}
-
-                {activeTab === "testimonial" && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Quote</label>
-                      <textarea
-                        value={editingStudy.testimonial.quote}
-                        onChange={(e) =>
-                          updateCaseStudy({
-                            ...editingStudy,
-                            testimonial: { ...editingStudy.testimonial, quote: e.target.value },
-                          })
-                        }
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
+                          } catch {
+                            alert("PDF upload failed")
+                          }
+                        }}
                       />
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
-                        <input
-                          type="text"
-                          value={editingStudy.testimonial.author}
-                          onChange={(e) =>
-                            updateCaseStudy({
-                              ...editingStudy,
-                              testimonial: { ...editingStudy.testimonial, author: e.target.value },
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                        <input
-                          type="text"
-                          value={editingStudy.testimonial.role}
-                          onChange={(e) =>
-                            updateCaseStudy({
-                              ...editingStudy,
-                              testimonial: { ...editingStudy.testimonial, role: e.target.value },
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-                        <input
-                          type="text"
-                          value={editingStudy.testimonial.company}
-                          onChange={(e) =>
-                            updateCaseStudy({
-                              ...editingStudy,
-                              testimonial: { ...editingStudy.testimonial, company: e.target.value },
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+                    </label>
+                  </div>
+                  {editingStudy.pdfUrl && (
+                    <p className="text-xs text-green-600 font-medium">
+                      PDF Attached: <a href={editingStudy.pdfUrl} target="_blank" rel="noreferrer" className="underline">{editingStudy.pdfUrl}</a>
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-2 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">

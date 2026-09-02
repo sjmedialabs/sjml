@@ -29,6 +29,7 @@ function serializeStudy(doc: Record<string, unknown>) {
     solution: (doc.solution as string) || "",
     results: (doc.results as string[]) || [],
     image: (doc.image as string) || "",
+    pdfUrl: (doc.pdfUrl as string) || "",
     gallery: (doc.gallery as string[]) || [],
     stats: [
       { label: stat1?.label || (doc.stat1Label as string) || "", value: stat1?.value || (doc.stat1Value as string) || "" },
@@ -46,7 +47,7 @@ function serializeStudy(doc: Record<string, unknown>) {
 
 export async function GET() {
   try {
-    const collection = await getCollection<Record<string, unknown>>("case-studies")
+    const collection = await getCollection("case-studies")
     const caseStudies = await collection.find({}).sort({ createdAt: -1 }).toArray()
 
     const pageContent = await getPageContent("case-studies")
@@ -81,7 +82,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const data = await request.json()
-    const collection = await getCollection<Record<string, unknown>>("case-studies")
+    const collection = await getCollection("case-studies")
     const existingPage = await getPageContent("case-studies")
 
     await updatePageContent("case-studies", {
@@ -121,6 +122,7 @@ export async function PUT(request: NextRequest) {
           solution: study.solution ?? "",
           results: study.results ?? [],
           image: study.image ?? "",
+          pdfUrl: study.pdfUrl ?? "",
           gallery: study.gallery ?? [],
           stats,
           stat1Value: stat1?.value ?? "",
