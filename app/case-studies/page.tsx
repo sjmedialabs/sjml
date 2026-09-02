@@ -1,140 +1,75 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import Image from "next/image"
-import Link from "next/link"
 import { clientPromise } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
-import { PageHero } from "@/components/page-hero"
+import { CaseStudiesHeroSection } from "@/components/case-studies/case-studies-hero-section"
+import { CaseStudiesGridSection, type CaseStudyCardItem } from "@/components/case-studies/case-studies-grid-section"
+import { generateSeoMetadata } from "@/lib/seo"
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0 // Enable ISR: Revalidate every hour
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
-function TrendIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-      <path
-        d="M2 12L6 8L9 11L14 4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M10 4H14V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function ClockIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 5V8L10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
+export async function generateMetadata() {
+  return await generateSeoMetadata("Case Studies")
 }
 
 export default async function CaseStudiesPage() {
-  let caseStudies: any[] = []
-  let content
+  let caseStudies: CaseStudyCardItem[] = []
+  let content: any = null
 
   try {
-    // Fetch page content
-    content = await getPageContent("case-studies")
-    if (!content) {
-      throw new Error("Case studies page content not found")
-    }
-
-    // Fetch case studies directly from MongoDB
     const client = await clientPromise
     const db = client.db("sjmedialabs")
-    const studies = await db.collection("case-studies").find({ featured: true }).sort({ createdAt: -1 }).toArray()
-    
-    // Serialize MongoDB _id
-    caseStudies = studies.map(cs => ({
-      ...cs,
-      _id: cs._id.toString()
+
+    const [rawContent, studiesData] = await Promise.all([
+      getPageContent("case-studies"),
+      db.collection("case-studies").find({}).sort({ createdAt: -1 }).toArray(),
+    ])
+
+    content = rawContent
+
+    caseStudies = studiesData.map((doc: any) => ({
+      id: doc._id?.toString() || doc.id || doc.slug,
+      slug: doc.slug || "",
+      title: doc.title || "",
+      description: doc.description || "",
+      image: doc.image || "/placeholder.svg",
+      tags: Array.isArray(doc.tags) ? doc.tags : doc.tags ? [doc.tags] : ["Case Study"],
+      client: doc.client || "",
+      industry: doc.industry || "",
+      year: doc.year || "",
+      pdfUrl: doc.pdfUrl || "",
+      stat1Value: doc.stat1Value || doc.stats?.[0]?.value || "",
+      stat1Label: doc.stat1Label || doc.stats?.[0]?.label || "",
+      stat2Value: doc.stat2Value || doc.stats?.[1]?.value || "",
+      stat2Label: doc.stat2Label || doc.stats?.[1]?.label || "",
     }))
   } catch (error) {
     console.error("Failed to fetch case studies:", error)
-    return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Content Not Available</h2>
-          <p className="text-muted-foreground">Case studies page content has not been set up yet. Please contact the administrator.</p>
-        </div>
-      </main>
-    )
   }
 
-  const hero = content.hero
-  const section = content.section
-  const heroDescription = hero.description || hero.subtitle || ""
+  const heroTitle = content?.hero?.title || content?.heroTitle || "Case Studies"
+  const heroHighlight = content?.hero?.subtitle || "Extraordinary Results"
+  const heroDescription =
+    content?.hero?.description ||
+    content?.heroSubtitle ||
+    "Discover how we help leading brands achieve extraordinary results through strategy, innovation, and creative execution."
+  const heroImage = content?.hero?.image || content?.heroImage || ""
+
+  const categories = content?.categories?.length
+    ? content.categories
+    : ["All", "Branding", "Digital Marketing", "Web Development", "Advertising"]
 
   return (
     <main className="site-page min-h-screen bg-white">
       <Header />
-
-      <PageHero title={hero.title} description={heroDescription} image={hero.image} />
-
-      {/* Case Studies Section */}
-      <section className="py-16">
-        <div className="site-container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#E63946] italic mb-4">{section.title}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">{section.description}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {caseStudies.map((study: any) => (
-              <div key={study.id || study._id} className="bg-white rounded-2xl overflow-hidden">
-                <div className="relative">
-                  <Image
-                    src={study.image || "/placeholder.svg"}
-                    alt={study.title}
-                    width={400}
-                    height={300}
-                    className="w-full aspect-4/3 object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {study.tags?.map((tag: string, index: number) => (
-                      <span
-                        key={index}
-                        className="px-2.5 py-0.5 bg-[#E63946]/10 text-[#E63946] text-[10px] rounded-full border border-[#E63946]/20"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{study.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">{study.description}</p>
-
-                  {/* Stats */}
-                  <div className="flex gap-4 mb-4 text-gray-500 text-xs">
-                    <span className="flex items-center gap-1">
-                      <TrendIcon /> {study.stat1Value} {study.stat1Label}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ClockIcon /> {study.stat2Value} {study.stat2Label}
-                    </span>
-                  </div>
-
-                  <Link
-                    href={`/case-studies/${study.slug}`}
-                    className="block w-full py-3 bg-[#E63946] text-foreground text-center rounded-full text-sm font-medium hover:bg-[#d62839] transition-colors"
-                  >
-                    View Case Study
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      <CaseStudiesHeroSection
+        title={heroTitle}
+        titleHighlight={heroHighlight}
+        description={heroDescription}
+        image={heroImage}
+      />
+      <CaseStudiesGridSection studies={caseStudies} categories={categories} />
       <Footer />
     </main>
   )

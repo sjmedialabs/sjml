@@ -1,4 +1,12 @@
 import { MongoClient, type Db, type Collection, ObjectId } from "mongodb"
+import dns from "node:dns"
+
+// Set public DNS resolvers to prevent ECONNREFUSED on SRV record queries on Windows local ISP DNS
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"])
+} catch {
+  /* ignore fallback */
+}
 
 if (!process.env.MONGODB_URI) {
   throw new Error("Please add your MongoDB URI to environment variables")
@@ -25,7 +33,7 @@ if (process.env.NODE_ENV === "development") {
     client = new MongoClient(uri, options)
     global._mongoClientPromise = client.connect()
   }
-  clientPromise = global._mongoClientPromise
+  clientPromise = global._mongoClientPromise!
 } else {
   client = new MongoClient(uri, options)
   clientPromise = client.connect()

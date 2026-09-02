@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import type { WorkPageFilterCategory, WorkPageTypography } from "@/lib/work-page-content"
 import type { WorkGridItem } from "@/lib/work-grid-item"
 
@@ -16,25 +17,48 @@ function PlayIcon() {
 
 export function WorkGridSection({
   works,
+  availableIndustries = [],
   filterCategories,
   industryFilterLabel,
   typography,
 }: {
   works: WorkGridItem[]
+  availableIndustries?: string[]
   filterCategories: WorkPageFilterCategory[]
   industryFilterLabel: string
   typography: WorkPageTypography
 }) {
+  const searchParams = useSearchParams()
+  const initialIndustryParam = searchParams.get("industry") || ""
+
   const [activeCategory, setActiveCategory] = useState("all")
   const [activeIndustry, setActiveIndustry] = useState("all")
 
+  // Combine industries from created industries list + industries attached to work items
   const industries = useMemo(() => {
     const set = new Set<string>()
+    availableIndustries.forEach((ind) => {
+      if (ind && ind.trim()) set.add(ind.trim())
+    })
     works.forEach((w) => {
       if (w.industry?.trim()) set.add(w.industry.trim())
     })
-    return Array.from(set).sort()
-  }, [works])
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [availableIndustries, works])
+
+  // Sync activeIndustry with query parameter if present
+  useEffect(() => {
+    if (!initialIndustryParam) return
+    const paramLower = initialIndustryParam.toLowerCase().trim()
+
+    // Find exact or case-insensitive match in industries list
+    const matched = industries.find((ind) => ind.toLowerCase().trim() === paramLower)
+    if (matched) {
+      setActiveIndustry(matched)
+    } else {
+      setActiveIndustry(initialIndustryParam)
+    }
+  }, [initialIndustryParam, industries])
 
   const filtered = useMemo(() => {
     return works.filter((work) => {
@@ -43,7 +67,11 @@ export function WorkGridSection({
         activeCategory === "all" ||
         cats.includes(activeCategory) ||
         work.categoryTags?.toLowerCase().includes(activeCategory.replace("-", " "))
-      const industryMatch = activeIndustry === "all" || work.industry === activeIndustry
+
+      const workInd = (work.industry || "").toLowerCase().trim()
+      const selInd = activeIndustry.toLowerCase().trim()
+      const industryMatch = activeIndustry === "all" || workInd === selInd
+
       return categoryMatch && industryMatch
     })
   }, [works, activeCategory, activeIndustry])

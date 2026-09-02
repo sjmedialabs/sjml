@@ -1,14 +1,6 @@
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
-  },
-})
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 function formatValue(val: unknown): string {
   if (Array.isArray(val)) return val.length > 0 ? val.join(", ") : "—"
@@ -121,12 +113,18 @@ export async function sendDigitalMarketingFormEmail(data: Record<string, unknown
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f9fafb"><h1 style="color:#e63946;font-size:20px;border-bottom:2px solid #e63946;padding-bottom:8px">New Digital Marketing Requirement Form Submission</h1><p style="color:#6b7280;font-size:14px">Submitted on ${new Date().toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}</p>${body}</body></html>`
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@sjmedialabs.com",
-    to: "sridhar@sjmedialabs.com",
+  const fromAddress = process.env.RESEND_FROM || "info@sjmedialabs.com"
+  const { error } = await resend.emails.send({
+    from: fromAddress,
+    to: ["sridhar@sjmedialabs.com"],
     subject: "New Digital Marketing Requirement Form Submission",
     html,
   })
+
+  if (error) {
+    console.error("Resend delivery failed:", error)
+    throw new Error(`Resend Error: ${error.message}`)
+  }
 }
 
 export async function sendRestaurantMarketingFormEmail(data: Record<string, unknown>) {
@@ -204,10 +202,16 @@ export async function sendRestaurantMarketingFormEmail(data: Record<string, unkn
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f9fafb"><h1 style="color:#e63946;font-size:20px;border-bottom:2px solid #e63946;padding-bottom:8px">New Restaurant Marketing Requirement Form Submission</h1><p style="color:#6b7280;font-size:14px">Submitted on ${new Date().toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}</p>${body}</body></html>`
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@sjmedialabs.com",
-    to: "sridhar@sjmedialabs.com",
+  const fromAddress = process.env.RESEND_FROM || "info@sjmedialabs.com"
+  const { error } = await resend.emails.send({
+    from: fromAddress,
+    to: ["sridhar@sjmedialabs.com"],
     subject: "New Restaurant Marketing Requirement Form Submission",
     html,
   })
+
+  if (error) {
+    console.error("Resend delivery failed:", error)
+    throw new Error(`Resend Error: ${error.message}`)
+  }
 }
