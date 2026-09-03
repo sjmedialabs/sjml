@@ -96,23 +96,54 @@ export function WorkDetailTemplateEditor({
 
       <AdminCompactCard title="Gallery">
         <CompactField label="Section label" value={template.galleryLabel} onChange={(v) => onChange({ ...template, galleryLabel: v })} />
-        {template.galleryImages.map((img, index) => (
-          <div key={index} className="flex gap-2 items-end border-t admin-border pt-2 mt-2 first:border-0 first:pt-0 first:mt-0">
-            <div className="flex-1">
-              <ImageUpload preset="gallery" label={`Image ${index + 1}`} value={img} onChange={(url) => {
-                const galleryImages = [...template.galleryImages]; galleryImages[index] = url; onChange({ ...template, galleryImages })
-              }} />
+        <div className="mb-4">
+          <ImageUpload
+            preset="gallery"
+            label="Upload Gallery Images (Select multiple files)"
+            value=""
+            multiple
+            onMultipleChange={(newUrls) => {
+              const current = template.galleryImages.filter(Boolean)
+              onChange({ ...template, galleryImages: [...current, ...newUrls] })
+            }}
+            onChange={(url) => {
+              if (url) onChange({ ...template, galleryImages: [...template.galleryImages, url] })
+            }}
+          />
+        </div>
+
+        {template.galleryImages.filter(Boolean).length > 0 && (
+          <div className="mt-4 border-t admin-border pt-4">
+            <p className="text-xs admin-text-muted mb-3 font-semibold uppercase tracking-wider">
+              Uploaded Gallery Images ({template.galleryImages.filter(Boolean).length})
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+              {template.galleryImages.filter(Boolean).map((img, index) => (
+                <div
+                  key={index}
+                  className="group relative h-14 w-full rounded-md overflow-hidden border admin-border-light bg-black/40 shadow-xs"
+                >
+                  <img src={img} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onChange({
+                          ...template,
+                          galleryImages: template.galleryImages.filter((_, i) => i !== index),
+                        })
+                      }
+                      className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-transform hover:scale-110 shadow cursor-pointer"
+                      title="Delete Image"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400 mb-2" onClick={() =>
-              onChange({ ...template, galleryImages: template.galleryImages.filter((_, i) => i !== index) })
-            }>
-              <Trash2 className="w-3.5 h-3.5" />
-            </Button>
           </div>
-        ))}
-        <Button variant="outline" size="sm" onClick={() => onChange({ ...template, galleryImages: [...template.galleryImages, ""] })}>
-          <Plus className="w-3.5 h-3.5 mr-1" /> Add image
-        </Button>
+        )}
       </AdminCompactCard>
 
       <AdminCompactCard title="Results">
@@ -154,10 +185,25 @@ export function WorkDetailTemplateEditor({
         </AdminFieldGrid>
         <ImageUpload preset="sideImage" label="Side image" value={template.sideImage} onChange={(url) => onChange({ ...template, sideImage: url })} />
       </AdminCompactCard>
+    </div>
+  )
+}
 
-      <AdminCompactCard title="Bottom CTA">
+export function WorkCtaEditor({
+  template,
+  onChange,
+}: {
+  template: WorkDetailTemplate
+  onChange: (template: WorkDetailTemplate) => void
+}) {
+  const setBottomCta = (patch: Partial<WorkDetailTemplate["bottomCta"]>) =>
+    onChange({ ...template, bottomCta: { ...template.bottomCta, ...patch } })
+
+  return (
+    <div className="space-y-4">
+      <AdminCompactCard title="Call To Action (CTA) Section">
         <CompactField label="Label line" value={template.bottomCta.labelLine || ""} onChange={(v) => setBottomCta({ labelLine: v })} />
-        <CompactField label="Heading highlight" value={template.bottomCta.heading} onChange={(v) => setBottomCta({ heading: v })} />
+        <CompactField label="Heading / Highlight text" value={template.bottomCta.heading} onChange={(v) => setBottomCta({ heading: v })} />
         <AdminFieldGrid cols={2}>
           <CompactField label="Button text" value={template.bottomCta.buttonText} onChange={(v) => setBottomCta({ buttonText: v })} />
           <CompactField label="Button URL" value={template.bottomCta.buttonUrl} onChange={(v) => setBottomCta({ buttonUrl: v })} />

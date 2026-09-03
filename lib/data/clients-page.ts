@@ -1,5 +1,6 @@
 import { getCollection } from "@/lib/mongodb"
 import { getPageContent } from "@/lib/models/content"
+import { normalizeIndustriesPageContent } from "@/lib/industries-page-content"
 
 /**
  * Single source of truth for clients page data.
@@ -18,7 +19,19 @@ export async function getClientsPageData() {
     featured: doc.featured ?? false,
   }))
 
-  const pageContent = await getPageContent("clients")
+  const [pageContent, rawIndustries] = await Promise.all([
+    getPageContent("clients"),
+    getPageContent("industries"),
+  ])
+
+  let availableIndustries: string[] = []
+  if (rawIndustries) {
+    const norm = normalizeIndustriesPageContent(rawIndustries as unknown as Record<string, unknown>)
+    availableIndustries = norm.cards
+      .filter((c) => c.isActive && c.title?.trim())
+      .map((c) => c.title.trim())
+  }
+
   const hero = pageContent?.hero || {}
 
   return {
@@ -26,6 +39,7 @@ export async function getClientsPageData() {
     heroSubtitle: hero.description ?? hero.subtitle ?? "Trusted by industry leaders worldwide to deliver exceptional results.",
     heroImage: hero.image ?? "",
     clients,
+    availableIndustries,
     stats: pageContent?.stats ?? [],
     cta: pageContent?.cta ?? { title: "", description: "", buttonText: "", buttonUrl: "" },
     content: pageContent,

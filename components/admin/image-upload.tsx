@@ -15,6 +15,8 @@ import {
 interface ImageUploadProps {
   value: string
   onChange: (url: string) => void
+  onMultipleChange?: (urls: string[]) => void
+  multiple?: boolean
   label?: string
   className?: string
   /** Applies recommended size, limits, and helper copy for common admin use cases. */
@@ -30,6 +32,8 @@ interface ImageUploadProps {
 export function ImageUpload({
   value,
   onChange,
+  onMultipleChange,
+  multiple = false,
   label,
   className = "",
   preset,
@@ -54,95 +58,67 @@ export function ImageUpload({
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const hasDimensionLimit = spec.maxWidth != null && spec.maxHeight != null
+  const uploadSingleFile = async (file: File): Promise<string | null> => {
+    if (!file.type.startsWith("image/")) return null
+    if (file.size > spec.maxSizeMB * 1024 * 1024) return null
 
-  const validateImageDimensions = (file: File): Promise<{ valid: boolean; width: number; height: number }> => {
-    if (!hasDimensionLimit) {
-      return Promise.resolve({ valid: true, width: 0, height: 0 })
-    }
+    const formData = new FormData()
+    formData.append("file", file)
 
-    return new Promise((resolve) => {
-      const img = document.createElement("img")
-      img.onload = () => {
-        URL.revokeObjectURL(img.src)
-        resolve({
-          valid: img.width <= spec.maxWidth! && img.height <= spec.maxHeight!,
-          width: img.width,
-          height: img.height,
-        })
+    try {
+      const result = await uploadImageAction(formData)
+      if (result.url) return result.url
+      const fallbackForm = new FormData()
+      fallbackForm.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data.url) return data.url
+    } catch {
+      try {
+        const fallbackForm = new FormData()
+        fallbackForm.append("file", file)
+        const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
+        const data = await res.json().catch(() => ({}))
+        if (res.ok && data.url) return data.url
+      } catch {
+        return null
       }
-      img.onerror = () => resolve({ valid: false, width: 0, height: 0 })
-      img.src = URL.createObjectURL(file)
-    })
+    }
+    return null
   }
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      if (!file.type.startsWith("image/")) {
-        setError("Please upload an image file")
+  const handleFiles = useCallback(
+    async (fileList: FileList | File[]) => {
+      const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"))
+      if (files.length === 0) {
+        setError("Please upload image file(s)")
         return
-      }
-
-      if (file.size > spec.maxSizeMB * 1024 * 1024) {
-        setError(`Image must be less than ${spec.maxSizeMB}MB`)
-        return
-      }
-
-      if (hasDimensionLimit) {
-        const dimensions = await validateImageDimensions(file)
-        if (!dimensions.valid) {
-          setError(
-            `Image resolution must be ${spec.maxWidth}×${spec.maxHeight} or smaller. Current: ${dimensions.width}×${dimensions.height}`,
-          )
-          return
-        }
       }
 
       setError("")
       setUploading(true)
 
-      const formData = new FormData()
-      formData.append("file", file)
+      const uploadedUrls: string[] = []
+      for (const file of files) {
+        if (file.size <= spec.maxSizeMB * 1024 * 1024) {
+          const url = await uploadSingleFile(file)
+          if (url) uploadedUrls.push(url)
+        }
+      }
 
-      try {
-        const result = await uploadImageAction(formData)
-
-        if (result.url) {
-          onChange(result.url)
-          setUploading(false)
-          return
+      if (uploadedUrls.length > 0) {
+        if (multiple && onMultipleChange) {
+          onMultipleChange(uploadedUrls)
+        } else {
+          onChange(uploadedUrls[0])
         }
-        const fallbackForm = new FormData()
-        fallbackForm.append("file", file)
-        const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
-        const data = await res.json().catch(() => ({}))
-        if (res.ok && data.url) {
-          onChange(data.url)
-          setUploading(false)
-          return
-        }
-        setError(result?.error || data?.error || data?.detail || "Upload failed. Please try again.")
-      } catch (e) {
-        try {
-          const fallbackForm = new FormData()
-          fallbackForm.append("file", file)
-          const res = await fetch("/api/upload", { method: "POST", body: fallbackForm })
-          const data = await res.json().catch(() => ({}))
-          if (res.ok && data.url) {
-            onChange(data.url)
-            setUploading(false)
-            return
-          }
-          setError(data?.error || data?.detail || "Upload failed. Please try again.")
-        } catch {
-          const msg = e instanceof Error ? e.message : "Upload failed. Please try again."
-          setError(msg)
-        }
+      } else {
+        setError("Failed to upload image(s). Check size limit.")
       }
 
       setUploading(false)
     },
-    [hasDimensionLimit, onChange, spec.maxHeight, spec.maxSizeMB, spec.maxWidth],
+    [onChange, onMultipleChange, multiple, spec.maxSizeMB],
   )
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -161,20 +137,20 @@ export function ImageUpload({
       e.stopPropagation()
       setDragActive(false)
 
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        handleFile(e.dataTransfer.files[0])
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files)
       }
     },
-    [handleFile],
+    [handleFiles],
   )
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-        handleFile(e.target.files[0])
+      if (e.target.files && e.target.files.length > 0) {
+        handleFiles(e.target.files)
       }
     },
-    [handleFile],
+    [handleFiles],
   )
 
   const handleClick = () => {
@@ -193,7 +169,7 @@ export function ImageUpload({
       {spec.hint && <p className="text-xs admin-text-muted mb-2 leading-snug">{spec.hint}</p>}
 
       <div className="flex items-start gap-4">
-        {value && (
+        {value && !multiple && (
           <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border admin-border-light group">
             <Image src={value || "/placeholder.svg"} alt="Uploaded image" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -218,7 +194,14 @@ export function ImageUpload({
             ${uploading ? "pointer-events-none opacity-60" : ""}
           `}
         >
-          <input ref={inputRef} type="file" accept="image/*" onChange={handleChange} className="hidden" />
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            multiple={multiple}
+            onChange={handleChange}
+            className="hidden"
+          />
 
           <div className="p-4 text-center">
             {uploading ? (
@@ -241,9 +224,7 @@ export function ImageUpload({
                     <span className="text-primary">{value ? "Change image" : "Click to upload"}</span> or drag and drop
                   </p>
                   <p className="text-[#555] text-xs">
-                    {hasDimensionLimit
-                      ? `Hard limit ${spec.maxWidth}×${spec.maxHeight}px, ${spec.maxSizeMB}MB`
-                      : `Max file size ${spec.maxSizeMB}MB`}
+                    Max file size {spec.maxSizeMB}MB
                   </p>
                 </div>
               </div>

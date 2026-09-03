@@ -4,8 +4,10 @@ import { Footer } from "@/components/footer"
 import { HeroSection } from "@/components/hero-section"
 import { StatsSection } from "@/components/stats-section"
 import { ServicesSection } from "@/components/services-section"
+import { FeaturedClientsSection } from "@/components/featured-clients-section"
 import { getHomeContent } from "@/lib/models/content"
 import { normalizeHomeContent } from "@/lib/home-content"
+import { getClientsPageData } from "@/lib/data/clients-page"
 
 export async function generateMetadata() {
   return generateSeoMetadata("Home")
@@ -16,9 +18,20 @@ export const revalidate = 0
 
 export default async function HomePage() {
   let content
+  let featuredClients: any[] = []
+
   try {
-    content = await getHomeContent()
+    const [homeContent, clientsData] = await Promise.all([
+      getHomeContent(),
+      getClientsPageData().catch(() => null),
+    ])
+
+    content = homeContent
     if (!content) throw new Error("Home content not found")
+
+    if (clientsData?.clients) {
+      featuredClients = clientsData.clients.filter((c: any) => c.featured && c.logo)
+    }
   } catch (error) {
     console.error("Failed to fetch home content:", error)
     return (
@@ -41,6 +54,7 @@ export default async function HomePage() {
       <HeroSection data={home.hero} />
       <StatsSection data={home.stats} />
       <ServicesSection data={home.servicesSection} />
+      {featuredClients.length > 0 && <FeaturedClientsSection clients={featuredClients} />}
       <Footer data={(content as { footer?: unknown }).footer} />
     </main>
   )

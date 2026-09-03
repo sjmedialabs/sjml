@@ -8,22 +8,29 @@ interface Client {
   name: string
   logo: string
   industry: string
+  website?: string
 }
 
 interface ClientsListProps {
   initialClients: Client[]
+  availableIndustries?: string[]
 }
 
-export function ClientsList({ initialClients }: ClientsListProps) {
+export function ClientsList({ initialClients, availableIndustries = [] }: ClientsListProps) {
   const [filteredClients, setFilteredClients] = useState(initialClients)
   const [selectedIndustry, setSelectedIndustry] = useState("All Industries")
   const [industries, setIndustries] = useState<string[]>([])
 
   useEffect(() => {
     const industriesSet = new Set<string>(["All Industries"])
+    
+    // Only include industries that have at least one client assigned
     initialClients.forEach((c) => {
-      if (c.industry) industriesSet.add(c.industry)
+      if (c.industry?.trim()) {
+        industriesSet.add(c.industry.trim())
+      }
     })
+
     setIndustries(Array.from(industriesSet))
   }, [initialClients])
 
@@ -36,52 +43,79 @@ export function ClientsList({ initialClients }: ClientsListProps) {
   }, [selectedIndustry, initialClients])
 
   return (
-    <>
-      {/* Filters - extra space below hero and above grid */}
-      <section className="px-4 pt-12 pb-10">
-        <div className="site-container">
-          <div className="flex flex-wrap justify-center gap-3">
-            {industries.map((industry) => (
-              <button
-                key={industry}
-                onClick={() => setSelectedIndustry(industry)}
-                className={`px-6 py-2 rounded-full text-sm transition-colors ${
-                  industry === selectedIndustry
-                    ? "bg-[#E63946] text-foreground"
-                    : "bg-secondary text-muted-foreground hover:text-foreground border border-[#333]"
-                }`}
-              >
-                {industry}
-              </button>
-            ))}
+    <section className="py-8 md:py-12 bg-white">
+      <div className="site-container">
+        {/* Industry Filters */}
+        {industries.length > 1 && (
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+            {industries.map((industry) => {
+              const active = industry === selectedIndustry
+              return (
+                <button
+                  key={industry}
+                  type="button"
+                  onClick={() => setSelectedIndustry(industry)}
+                  className={`px-5 py-2 rounded-full text-xs md:text-sm font-semibold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
+                    active
+                      ? "bg-home-primary text-white shadow-sm"
+                      : "bg-[#f5f5f5] text-black/70 hover:text-black hover:bg-[#e8e8e8]"
+                  }`}
+                >
+                  {industry}
+                </button>
+              )
+            })}
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Clients Grid - space below tabs */}
-      <section className="pt-4 pb-12">
-        <div className="site-container">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredClients.map((client, index) => (
-              <div
-                key={client.id || index}
-                className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center hover:border-[#E63946]/50 transition-colors"
-              >
-                <div className="relative h-12 w-full mb-4">
+        {/* Clients Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+          {filteredClients.map((client, index) => {
+            const cardContent = (
+              <div className="group relative bg-[#fafafa] border border-black/10 hover:border-home-primary/50 rounded-xl p-3.5 md:p-4 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 min-h-[150px] cursor-pointer">
+                <div className="relative h-20 md:h-24 w-full flex items-center justify-center mb-2">
                   <Image
                     src={client.logo || "/placeholder.svg"}
                     alt={client.name}
                     fill
-                    className="object-contain opacity-70 hover:opacity-100 transition-opacity"
+                    className="object-contain filter grayscale group-hover:grayscale-0 opacity-85 group-hover:opacity-100 transition-all duration-300"
                   />
                 </div>
-                <p className="text-foreground font-medium text-center">{client.name}</p>
-                <p className="text-[#666] text-sm text-center">{client.industry}</p>
+                <p className="font-bold text-xs md:text-sm uppercase tracking-wider text-black group-hover:text-home-primary transition-colors text-center line-clamp-1">
+                  {client.name}
+                </p>
+                {client.industry && (
+                  <p className="text-[11px] md:text-xs uppercase tracking-widest text-black/50 text-center mt-0.5 line-clamp-1">
+                    {client.industry}
+                  </p>
+                )}
               </div>
-            ))}
-          </div>
+            )
+
+            if (client.website?.trim()) {
+              return (
+                <a
+                  key={client.id || index}
+                  href={client.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block focus:outline-none"
+                >
+                  {cardContent}
+                </a>
+              )
+            }
+
+            return <div key={client.id || index}>{cardContent}</div>
+          })}
         </div>
-      </section>
-    </>
+
+        {filteredClients.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-black/50 text-sm uppercase tracking-widest">No clients found in this category.</p>
+          </div>
+        )}
+      </div>
+    </section>
   )
 }
