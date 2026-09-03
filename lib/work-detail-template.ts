@@ -176,6 +176,21 @@ export function normalizeWorkDetailTemplate(data: Record<string, unknown>, title
     (data.category as string)?.toUpperCase() ??
     defaults.categoryTags
 
+  const rawGallery = Array.isArray(raw.galleryImages)
+    ? raw.galleryImages
+    : Array.isArray(data.galleryImages)
+      ? (data.galleryImages as string[])
+      : null
+
+  const heroImage =
+    typeof raw.heroImage === "string"
+      ? raw.heroImage
+      : typeof data.heroImage === "string" && (data.heroImage as string).trim() !== ""
+        ? (data.heroImage as string)
+        : typeof data.image === "string" && (data.image as string).trim() !== ""
+          ? (data.image as string)
+          : defaults.heroImage
+
   return {
     categoryTags,
     subtitle:
@@ -184,7 +199,7 @@ export function normalizeWorkDetailTemplate(data: Record<string, unknown>, title
         ? `${(data.description as string).split(".")[0]}.`
         : defaults.subtitle),
     introParagraph: raw.introParagraph ?? (data.description as string) ?? defaults.introParagraph,
-    heroImage: raw.heroImage ?? (data.image as string) ?? defaults.heroImage,
+    heroImage,
     meta: {
       year: raw.meta?.year ?? (data.year as string) ?? defaults.meta.year,
       industry: raw.meta?.industry ?? (data.industry as string) ?? defaults.meta.industry,
@@ -199,10 +214,10 @@ export function normalizeWorkDetailTemplate(data: Record<string, unknown>, title
     pillars: raw.pillars?.length ? raw.pillars : defaults.pillars,
     galleryLabel: raw.galleryLabel ?? defaults.galleryLabel,
     galleryImages:
-      raw.galleryImages?.length
-        ? raw.galleryImages
+      rawGallery !== null
+        ? rawGallery.filter(Boolean)
         : (((sections?.gallery as { items?: Array<{ image: string }> })?.items)?.map((i) => i.image).filter(Boolean) ??
-          defaults.galleryImages),
+          []),
     resultsLabel: raw.resultsLabel ?? defaults.resultsLabel,
     resultsTitle: raw.resultsTitle ?? defaults.resultsTitle,
     resultsText: raw.resultsText ?? defaults.resultsText,

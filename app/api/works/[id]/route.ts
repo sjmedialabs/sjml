@@ -50,6 +50,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
+    if (data.slug) {
+      const existing = await db.collection("works").findOne({ slug: data.slug, id: { $ne: id } })
+      if (existing) {
+        return NextResponse.json({ error: "This slug is already taken. Please change the slug." }, { status: 400 })
+      }
+    }
+
     const updateData = {
       ...data,
       updatedAt: new Date().toISOString(),

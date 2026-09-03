@@ -10,7 +10,9 @@ function getToastVariant(message: string): "success" | "error" {
     message.includes("❌") ||
     lower.includes("fail") ||
     lower.includes("error") ||
-    lower.includes("could not")
+    lower.includes("could not") ||
+    lower.includes("slug") ||
+    lower.includes("taken")
   ) {
     return "error"
   }
