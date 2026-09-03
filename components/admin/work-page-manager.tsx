@@ -33,6 +33,7 @@ interface WorkItem {
   year: string
   tags: string[]
   detailTemplate: WorkDetailTemplate
+  galleryImages?: string[]
   isActive: boolean
   isFeatured: boolean
 }
@@ -71,6 +72,7 @@ export function WorkPageManager() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
+  const [slugError, setSlugError] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [view, setView] = useState<"list" | "edit" | "pageContent">("list")
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
@@ -141,9 +143,7 @@ export function WorkPageManager() {
 
   const normalizeWorkItem = (work: WorkItem & Record<string, unknown>): WorkItem => {
     const title = work.title || ""
-    const detailTemplate = work.detailTemplate
-      ? { ...createDefaultWorkDetailTemplate(title), ...work.detailTemplate }
-      : normalizeWorkDetailTemplate(work as Record<string, unknown>, title)
+    const detailTemplate = normalizeWorkDetailTemplate(work as Record<string, unknown>, title)
     return {
       ...work,
       cardSubtitle: work.cardSubtitle ?? work.role ?? "",
@@ -177,24 +177,67 @@ export function WorkPageManager() {
       const url = isNew ? "/api/works" : `/api/works/${editingWork.id}`
       const method = isNew ? "POST" : "PUT"
 
+      const galleryImages =
+        Array.isArray(editingWork.detailTemplate?.galleryImages) && editingWork.detailTemplate.galleryImages.length > 0
+          ? editingWork.detailTemplate.galleryImages.filter(Boolean)
+          : Array.isArray(editingWork.galleryImages)
+            ? editingWork.galleryImages.filter(Boolean)
+            : []
+
+      const updatedTemplate = {
+        ...(editingWork.detailTemplate || {}),
+        heroImage: editingWork.detailTemplate?.heroImage || "",
+        galleryImages,
+      }
+
+      const payload = {
+        ...editingWork,
+        detailTemplate: updatedTemplate,
+        heroImage: updatedTemplate.heroImage || editingWork.image || "",
+        galleryImages,
+      }
+
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editingWork),
+        body: JSON.stringify(payload),
       })
 
       if (res.ok) {
+        // Trigger cache revalidation so updates reflect immediately on live website
+        try {
+          await fetch("/api/revalidate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              paths: ["/work", `/work/${editingWork.slug}`, "/"],
+            }),
+          })
+        } catch {
+          /* ignore revalidate errors */
+        }
+
         setMessage(isNew ? "Work created successfully!" : "Work updated successfully!")
         setTimeout(() => setMessage(""), 3000)
+        setSlugError(false)
         fetchWorks()
         setView("list")
         setEditingWork(null)
         setIsNew(false)
       } else {
-        setMessage("Failed to save work")
+        const errorData = await res.json().catch(() => ({}))
+        const errMsg = errorData.error || "Failed to save work"
+        setMessage(errMsg)
+        if (errMsg.toLowerCase().includes("slug")) {
+          setSlugError(true)
+          setEditTab("basic")
+        }
       }
     } catch {
       setMessage("Failed to save work")
@@ -223,6 +266,7 @@ export function WorkPageManager() {
   const addNewWork = () => {
     setEditingWork({ ...emptyWork, id: "" } as WorkItem)
     setIsNew(true)
+    setSlugError(false)
     setEditTab("basic")
     setView("edit")
   }
@@ -230,11 +274,13 @@ export function WorkPageManager() {
   const editWork = (work: WorkItem) => {
     setEditingWork(normalizeWorkItem(work as WorkItem & Record<string, unknown>))
     setIsNew(false)
+    setSlugError(false)
     setEditTab("basic")
     setView("edit")
   }
 
   const updateField = (field: string, value: any) => {
+    if (field === "slug") setSlugError(false)
     setEditingWork((prev) => (prev ? { ...prev, [field]: value } : null))
   }
 
@@ -499,13 +545,24 @@ export function WorkPageManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
+                  <label className={`block text-sm font-semibold mb-2 ${slugError ? "text-red-400" : "admin-text-secondary"}`}>
+                    Slug * {slugError && <span className="text-xs text-red-400 font-normal">(Already taken)</span>}
+                  </label>
                   <Input
                     value={editingWork.slug}
                     onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    className={`transition-all ${
+                      slugError
+                        ? "border-red-500 bg-red-500/10 text-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-500/30"
+                        : "admin-bg-tertiary admin-border-light admin-text-primary"
+                    }`}
                     placeholder="project-slug"
                   />
+                  {slugError && (
+                    <p className="text-xs text-red-400 font-medium mt-1.5 flex items-center gap-1">
+                      ⚠️ This slug is already taken. Please change the slug.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm admin-text-secondary mb-2">Client</label>

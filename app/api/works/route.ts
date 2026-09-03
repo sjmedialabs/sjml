@@ -73,6 +73,13 @@ export async function POST(request: NextRequest) {
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 
+    if (data.slug) {
+      const existing = await db.collection("works").findOne({ slug: data.slug })
+      if (existing) {
+        return NextResponse.json({ error: "This slug is already taken. Please change the slug." }, { status: 400 })
+      }
+    }
+
     const work = {
       ...data,
       id: Date.now().toString(),
