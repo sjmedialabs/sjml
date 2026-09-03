@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, ArrowLeft, Star } from "lucide-react"
-import { WorkDetailTemplateEditor } from "./work-detail-template-editor"
+import { WorkDetailTemplateEditor, WorkCtaEditor } from "./work-detail-template-editor"
 import { WorkPageContentManager } from "./work-page-content-manager"
 import {
   createDefaultWorkDetailTemplate,
@@ -78,6 +78,7 @@ export function WorkPageManager() {
   const [seeding, setSeeding] = useState(false)
   const [industriesOptions, setIndustriesOptions] = useState<string[]>([])
   const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([])
+  const [editTab, setEditTab] = useState<"basic" | "thumbnail" | "detailTemplate" | "cta">("basic")
 
   useEffect(() => {
     fetchWorks()
@@ -222,12 +223,14 @@ export function WorkPageManager() {
   const addNewWork = () => {
     setEditingWork({ ...emptyWork, id: "" } as WorkItem)
     setIsNew(true)
+    setEditTab("basic")
     setView("edit")
   }
 
   const editWork = (work: WorkItem) => {
     setEditingWork(normalizeWorkItem(work as WorkItem & Record<string, unknown>))
     setIsNew(false)
+    setEditTab("basic")
     setView("edit")
   }
 
@@ -433,202 +436,265 @@ export function WorkPageManager() {
 
       {editingWork && (
         <div className="space-y-6">
-          {/* Basic Info */}
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Title *</label>
-                <Input
-                  value={editingWork.title}
-                  onChange={(e) => updateField("title", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Project title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
-                <Input
-                  value={editingWork.slug}
-                  onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="project-slug"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Client</label>
-                <Input
-                  value={editingWork.client}
-                  onChange={(e) => updateField("client", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Client name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Card subtitle</label>
-                <Input
-                  value={editingWork.cardSubtitle}
-                  onChange={(e) => updateField("cardSubtitle", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Brand Identity, Packaging Design"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Display order</label>
-                <Input
-                  type="number"
-                  value={editingWork.displayOrder}
-                  onChange={(e) => updateField("displayOrder", Number.parseInt(e.target.value) || 999)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Category</label>
-                <select
-                  value={editingWork.category || ""}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    const selected = categoryOptions.find(
-                      (c) => c.value.toLowerCase() === val.toLowerCase() || c.label.toLowerCase() === val.toLowerCase()
-                    )
-                    const label = selected ? selected.label : val.toUpperCase()
-                    setEditingWork((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            category: val,
-                            categoryTags: label,
-                            categories: val ? [val] : [],
-                          }
-                        : null
-                    )
-                  }}
-                  className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
-                >
-                  <option value="">-- Select Category --</option>
-                  {categoryOptions.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Industry</label>
-                <select
-                  value={editingWork.industry}
-                  onChange={(e) => updateField("industry", e.target.value)}
-                  className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
-                >
-                  <option value="">-- Select Industry --</option>
-                  {industriesOptions.map((ind) => (
-                    <option key={ind} value={ind}>
-                      {ind}
-                    </option>
-                  ))}
-                  {editingWork.industry && !industriesOptions.includes(editingWork.industry) && (
-                    <option value={editingWork.industry}>{editingWork.industry}</option>
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Role</label>
-                <Input
-                  value={editingWork.role}
-                  onChange={(e) => updateField("role", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Branding / Web Design"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Technology</label>
-                <Input
-                  value={editingWork.technology}
-                  onChange={(e) => updateField("technology", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  placeholder="Web | UI | UX"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Year</label>
-                <Input
-                  value={editingWork.year}
-                  onChange={(e) => updateField("year", e.target.value)}
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
-              </div>
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm admin-text-secondary mb-2">Description</label>
-              <Textarea
-                value={editingWork.description}
-                onChange={(e) => updateField("description", e.target.value)}
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                rows={3}
-              />
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm admin-text-secondary mb-2">Tags (comma separated)</label>
-              <Input
-                value={editingWork.tags.join(", ")}
-                onChange={(e) =>
-                  updateField(
-                    "tags",
-                    e.target.value
-                      .split(",")
-                      .map((t) => t.trim())
-                      .filter(Boolean),
-                  )
-                }
-                className="admin-bg-tertiary admin-border-light admin-text-primary"
-                placeholder="Logo & Identity, Web Design, Development"
-              />
-            </div>
-            <div className="mt-4 flex gap-6">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={editingWork.isActive}
-                  onChange={(e) => updateField("isActive", e.target.checked)}
-                  className="rounded admin-border-light"
-                />
-                <label htmlFor="isActive" className="text-sm admin-text-primary">
-                  Active (visible on website)
-                </label>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isFeatured"
-                  checked={editingWork.isFeatured}
-                  onChange={(e) => updateField("isFeatured", e.target.checked)}
-                  className="rounded admin-border-light"
-                />
-                <label htmlFor="isFeatured" className="text-sm admin-text-primary">
-                  Featured (show on homepage)
-                </label>
-              </div>
-            </div>
+          {/* Tab Navigation Bar */}
+          <div className="flex border-b admin-border gap-2 pb-px">
+            <button
+              type="button"
+              onClick={() => setEditTab("basic")}
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+                editTab === "basic"
+                  ? "border-primary text-primary"
+                  : "border-transparent admin-text-secondary hover:admin-text-primary"
+              }`}
+            >
+              Basic Information
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditTab("thumbnail")}
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+                editTab === "thumbnail"
+                  ? "border-primary text-primary"
+                  : "border-transparent admin-text-secondary hover:admin-text-primary"
+              }`}
+            >
+              Listing Thumbnail
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditTab("detailTemplate")}
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+                editTab === "detailTemplate"
+                  ? "border-primary text-primary"
+                  : "border-transparent admin-text-secondary hover:admin-text-primary"
+              }`}
+            >
+              Detail Page Content & Sections
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditTab("cta")}
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+                editTab === "cta"
+                  ? "border-primary text-primary"
+                  : "border-transparent admin-text-secondary hover:admin-text-primary"
+              }`}
+            >
+              Call To Action (CTA)
+            </button>
           </div>
 
-          <div className="admin-card border admin-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold admin-text-primary mb-2">Listing thumbnail</h2>
-            <p className="text-sm admin-text-muted mb-4">Used on the Work listing page grid.</p>
-            <ImageUpload preset="cardWide" label="Thumbnail / card image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
-          </div>
+          {/* TAB 1: Basic Info */}
+          {editTab === "basic" && (
+            <div className="admin-card border admin-border rounded-xl p-6">
+              <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Title *</label>
+                  <Input
+                    value={editingWork.title}
+                    onChange={(e) => updateField("title", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Project title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
+                  <Input
+                    value={editingWork.slug}
+                    onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="project-slug"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Client</label>
+                  <Input
+                    value={editingWork.client}
+                    onChange={(e) => updateField("client", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Client name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Card subtitle</label>
+                  <Input
+                    value={editingWork.cardSubtitle}
+                    onChange={(e) => updateField("cardSubtitle", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Brand Identity, Packaging Design"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Display order</label>
+                  <Input
+                    type="number"
+                    value={editingWork.displayOrder}
+                    onChange={(e) => updateField("displayOrder", Number.parseInt(e.target.value) || 999)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Category</label>
+                  <select
+                    value={editingWork.category || ""}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      const selected = categoryOptions.find(
+                        (c) => c.value.toLowerCase() === val.toLowerCase() || c.label.toLowerCase() === val.toLowerCase()
+                      )
+                      const label = selected ? selected.label : val.toUpperCase()
+                      setEditingWork((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              category: val,
+                              categoryTags: label,
+                              categories: val ? [val] : [],
+                            }
+                          : null
+                      )
+                    }}
+                    className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
+                  >
+                    <option value="">-- Select Category --</option>
+                    {categoryOptions.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Industry</label>
+                  <select
+                    value={editingWork.industry}
+                    onChange={(e) => updateField("industry", e.target.value)}
+                    className="w-full h-10 px-3 py-2 border rounded-md admin-bg-tertiary admin-border-light admin-text-primary focus:outline-none focus:border-primary text-sm"
+                  >
+                    <option value="">-- Select Industry --</option>
+                    {industriesOptions.map((ind) => (
+                      <option key={ind} value={ind}>
+                        {ind}
+                      </option>
+                    ))}
+                    {editingWork.industry && !industriesOptions.includes(editingWork.industry) && (
+                      <option value={editingWork.industry}>{editingWork.industry}</option>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Role</label>
+                  <Input
+                    value={editingWork.role}
+                    onChange={(e) => updateField("role", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Branding / Web Design"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Technology</label>
+                  <Input
+                    value={editingWork.technology}
+                    onChange={(e) => updateField("technology", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                    placeholder="Web | UI | UX"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm admin-text-secondary mb-2">Year</label>
+                  <Input
+                    value={editingWork.year}
+                    onChange={(e) => updateField("year", e.target.value)}
+                    className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm admin-text-secondary mb-2">Description</label>
+                <Textarea
+                  value={editingWork.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  rows={3}
+                />
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm admin-text-secondary mb-2">Tags (comma separated)</label>
+                <Input
+                  value={editingWork.tags.join(", ")}
+                  onChange={(e) =>
+                    updateField(
+                      "tags",
+                      e.target.value
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean),
+                    )
+                  }
+                  className="admin-bg-tertiary admin-border-light admin-text-primary"
+                  placeholder="Logo & Identity, Web Design, Development"
+                />
+              </div>
+              <div className="mt-4 flex gap-6">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={editingWork.isActive}
+                    onChange={(e) => updateField("isActive", e.target.checked)}
+                    className="rounded admin-border-light"
+                  />
+                  <label htmlFor="isActive" className="text-sm admin-text-primary">
+                    Active (visible on website)
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isFeatured"
+                    checked={editingWork.isFeatured}
+                    onChange={(e) => updateField("isFeatured", e.target.checked)}
+                    className="rounded admin-border-light"
+                  />
+                  <label htmlFor="isFeatured" className="text-sm admin-text-primary">
+                    Featured (show on homepage)
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
 
-          <WorkDetailTemplateEditor
-            template={editingWork.detailTemplate}
-            onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
-          />
+          {/* TAB 2: Listing Thumbnail */}
+          {editTab === "thumbnail" && (
+            <div className="admin-card border admin-border rounded-xl p-6">
+              <h2 className="text-lg font-semibold admin-text-primary mb-2">Listing thumbnail</h2>
+              <p className="text-sm admin-text-muted mb-4">Used on the Work listing page grid.</p>
+              <ImageUpload preset="cardWide" label="Thumbnail / card image" value={editingWork.image} onChange={(url) => updateField("image", url)} />
+            </div>
+          )}
+
+          {/* TAB 3: Detail Template & Sections */}
+          {editTab === "detailTemplate" && (
+            <WorkDetailTemplateEditor
+              template={editingWork.detailTemplate}
+              onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
+            />
+          )}
+
+          {/* TAB 4: Call To Action (CTA) */}
+          {editTab === "cta" && (
+            <WorkCtaEditor
+              template={editingWork.detailTemplate}
+              onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
+            />
+          )}
 
           {/* Save Button */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 pt-4 border-t admin-border">
             <Button
               onClick={saveWork}
               disabled={saving || !editingWork.title || !editingWork.slug}
-             
             >
               {saving ? "Saving..." : isNew ? "Create Work" : "Save Changes"}
             </Button>

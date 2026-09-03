@@ -36,10 +36,29 @@ export function ClientsPageManager() {
   const [data, setData] = useState<ClientsData>(defaultData)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
+  const [industryOptions, setIndustryOptions] = useState<string[]>([])
 
   useEffect(() => {
     fetchData()
+    fetchIndustries()
   }, [])
+
+  const fetchIndustries = async () => {
+    try {
+      const res = await fetch("/api/content/industries-page")
+      if (res.ok) {
+        const raw = await res.json()
+        if (Array.isArray(raw?.cards)) {
+          const titles = raw.cards
+            .filter((c: any) => c.title && c.title.trim())
+            .map((c: any) => c.title.trim())
+          setIndustryOptions(titles)
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch industries options", error)
+    }
+  }
 
   const fetchData = async () => {
     try {
@@ -103,11 +122,12 @@ export function ClientsPageManager() {
   }
 
   const addClient = () => {
+    const defaultInd = industryOptions.length > 0 ? industryOptions[0] : ""
     const newClient: Client = {
       id: Date.now().toString(),
       name: "New Client",
       logo: "/placeholder.svg?height=100&width=200",
-      industry: "",
+      industry: defaultInd,
       website: "",
       featured: false,
     }
@@ -289,25 +309,23 @@ export function ClientsPageManager() {
                   value={client.logo}
                   onChange={(url) => updateClient(client.id, { logo: url })}
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs admin-text-muted mb-1">Industry</label>
-                    <input
-                      type="text"
-                      value={client.industry}
-                      onChange={(e) => updateClient(client.id, { industry: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs admin-text-muted mb-1">Website</label>
-                    <input
-                      type="text"
-                      value={client.website}
-                      onChange={(e) => updateClient(client.id, { website: e.target.value })}
-                      className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs admin-text-muted mb-1">Industry</label>
+                  <select
+                    value={client.industry}
+                    onChange={(e) => updateClient(client.id, { industry: e.target.value })}
+                    className="w-full px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm focus:outline-none focus:border-primary"
+                  >
+                    <option value="">Select Industry</option>
+                    {industryOptions.map((ind) => (
+                      <option key={ind} value={ind}>
+                        {ind}
+                      </option>
+                    ))}
+                    {client.industry && !industryOptions.includes(client.industry) && (
+                      <option value={client.industry}>{client.industry}</option>
+                    )}
+                  </select>
                 </div>
                 <label className="flex items-center gap-2 text-xs admin-text-secondary">
                   <input

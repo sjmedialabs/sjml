@@ -696,7 +696,6 @@ main h6:not(.typography-exempt) {
 .home-hero-carousel {
   position: relative;
   width: 100%;
-  max-width: 1440px;
   height: var(--home-hero-max-height, 500px);
   max-height: var(--home-hero-max-height, 500px);
   margin-inline: auto;
@@ -3048,3 +3047,21 @@ main h6:not(.typography-exempt) {
 .contact-bottom-cta-btn:hover {
   opacity: 0.92;
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
