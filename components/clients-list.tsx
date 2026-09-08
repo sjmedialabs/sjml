@@ -72,13 +72,13 @@ export function ClientsList({ initialClients, availableIndustries = [] }: Client
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
           {filteredClients.map((client, index) => {
             const cardContent = (
-              <div className="group relative bg-[#fafafa] border border-black/10 hover:border-home-primary/50 rounded-xl p-3.5 md:p-4 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 min-h-[150px] cursor-pointer">
-                <div className="relative h-20 md:h-24 w-full flex items-center justify-center mb-2">
+              <div className="group relative bg-white border border-black/10 hover:border-home-primary/50 rounded-xl p-3.5 md:p-4 flex flex-col items-center justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 min-h-[150px] cursor-pointer">
+                <div className="relative h-20 md:h-24 w-full flex items-center justify-center mb-2 bg-white">
                   <Image
                     src={client.logo || "/placeholder.svg"}
                     alt={client.name}
                     fill
-                    className="object-contain filter grayscale group-hover:grayscale-0 opacity-85 group-hover:opacity-100 transition-all duration-300"
+                    className="object-contain no-invert bg-transparent opacity-85 group-hover:opacity-100 transition-all duration-300"
                   />
                 </div>
                 <p className="font-bold text-xs md:text-sm uppercase tracking-wider text-black group-hover:text-home-primary transition-colors text-center line-clamp-1">
