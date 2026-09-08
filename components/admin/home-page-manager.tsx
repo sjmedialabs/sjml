@@ -22,6 +22,7 @@ import {
 } from "@/lib/home-content"
 import { AdminToast } from "./admin-toast"
 import { ColorPill, TypographyPillRow } from "./admin-compact-fields"
+import { STAT_ICON_PRESETS, isStatIconPreset } from "@/components/stats-icons"
 
 const ICON_OPTIONS = [
   { value: "users", label: "Users / Clients" },
