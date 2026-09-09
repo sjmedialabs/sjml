@@ -4,6 +4,7 @@ import { Inter, Geist_Mono, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { generateSeoMetadata } from "@/lib/seo"
 import { ThemeProvider } from "@/hooks/use-theme"
+import { SiteScrollReveal } from "@/components/site-scroll-reveal"
 import { getSiteTypography } from "@/lib/get-site-typography"
 import { siteTypographyStyleVars } from "@/lib/site-typography"
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
     <html lang="en" className="light" suppressHydrationWarning style={typographyVars}>
       <body className={`${inter.variable} ${geistMono.variable} ${playfair.variable} font-sans antialiased`}>
         <ThemeProvider>
+          <SiteScrollReveal />
           {children}
         </ThemeProvider>
       </body>

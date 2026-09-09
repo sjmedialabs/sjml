@@ -192,7 +192,7 @@ export function HeroSection({ data }: HeroSectionProps) {
           </div>
 
           {data.showScrollIndicator && (
-            <div className="absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-home-on-dark/70">
+            <div className="home-hero-scroll-indicator absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-home-on-dark/70">
               <ScrollMouseIcon />
               <span className="text-[9px] uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
             </div>

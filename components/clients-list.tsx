@@ -78,7 +78,7 @@ export function ClientsList({ initialClients, availableIndustries = [] }: Client
                     src={client.logo || "/placeholder.svg"}
                     alt={client.name}
                     fill
-                    className="object-contain no-invert bg-transparent opacity-85 group-hover:opacity-100 transition-all duration-300"
+                    className="object-contain no-invert bg-transparent opacity-85 group-hover:opacity-100 group-hover:scale-[1.04] transition-all duration-300"
                   />
                 </div>
                 <p className="font-bold text-xs md:text-sm uppercase tracking-wider text-black group-hover:text-home-primary transition-colors text-center line-clamp-1">
