@@ -178,7 +178,7 @@ export function Header({ data: propData }: HeaderProps = {}) {
 
             {/* Mobile actions */}
             <div className="flex lg:hidden items-center gap-2">
-              <button className="text-[#000000]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <button className="text-[#000000] transition-opacity hover:opacity-70" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>
                 {mobileMenuOpen ? <XIcon /> : <MenuIcon />}
               </button>
             </div>

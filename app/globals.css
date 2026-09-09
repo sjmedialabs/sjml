@@ -750,6 +750,11 @@ main h6:not(.typography-exempt) {
   border-radius: 4px;
   background-color: var(--home-primary);
   color: var(--home-text);
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-hero-cta-primary svg {
+  transition: transform 0.2s ease;
 }
 
 .home-hero-cta-primary:hover {
@@ -758,6 +763,7 @@ main h6:not(.typography-exempt) {
 
 .home-hero-cta-secondary {
   color: var(--home-text-on-dark);
+  transition: color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
 .home-hero-cta-secondary:hover {
@@ -3064,4 +3070,248 @@ main h6:not(.typography-exempt) {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ── Site-wide interaction + landing motion ── */
+@keyframes sjml-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sjml-scroll-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+.home-hero-content > .site-subtitle,
+.home-hero-content > h1,
+.home-hero-content > .site-paragraph,
+.home-hero-content > .flex {
+  animation: sjml-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-hero-content > .site-subtitle {
+  animation-delay: 0.04s;
+}
+
+.home-hero-content > h1 {
+  animation-delay: 0.12s;
+}
+
+.home-hero-content > .site-paragraph {
+  animation-delay: 0.22s;
+}
+
+.home-hero-content > .flex {
+  animation-delay: 0.32s;
+}
+
+.home-hero-scroll-indicator {
+  animation: sjml-scroll-nudge 2.2s ease-in-out infinite;
+}
+
+.home-page a,
+.home-page button,
+.site-page a,
+.site-page button {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow, filter;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+.work-card,
+.insight-card,
+.industry-card,
+.services-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.work-card-title,
+.insight-card-title {
+  transition: color 0.2s ease;
+}
+
+.industry-card-image {
+  transition: transform 0.4s ease;
+}
+
+.home-services-section a.snap-start {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-services-section a.snap-start img,
+.home-services-section a.snap-start svg,
+.services-card a svg,
+.industry-card a svg,
+.home-services-section a:not(.snap-start) svg {
+  transition: transform 0.25s ease;
+}
+
+.contact-bottom-cta-btn {
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.home-footer a {
+  transition: color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+header a img {
+  transition: opacity 0.2s ease;
+}
+
+header a:hover img {
+  opacity: 0.82;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-hero-cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgb(252 197 14 / 0.32);
+  }
+
+  .home-hero-cta-primary:hover svg {
+    transform: translateX(2px);
+  }
+
+  .home-hero-cta-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  .home-page [data-slot="button"]:hover:not(:disabled),
+  .site-page [data-slot="button"]:hover:not(:disabled),
+  header [data-slot="button"]:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgb(252 197 14 / 0.28);
+  }
+
+  .work-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .work-card:hover .work-card-title {
+    color: var(--home-primary);
+  }
+
+  .work-card-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0);
+    transition: background 0.3s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .work-card:hover .work-card-image-wrap::after {
+    background: rgb(0 0 0 / 0.08);
+  }
+
+  .insight-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .insight-card:hover .insight-card-title {
+    color: var(--home-primary);
+  }
+
+  .industry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.08);
+    border-color: rgb(252 197 14 / 0.35);
+  }
+
+  .industry-card:hover .industry-card-image {
+    transform: scale(1.04);
+  }
+
+  .services-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.08);
+    border-color: rgb(252 197 14 / 0.4);
+  }
+
+  .home-services-section a.snap-start:hover {
+    border-color: rgb(252 197 14 / 0.45);
+    box-shadow: 0 8px 28px rgb(0 0 0 / 0.1);
+  }
+
+  .home-services-section a.snap-start:hover img,
+  .home-services-section a.snap-start:hover svg {
+    transform: scale(1.06);
+  }
+
+  .services-card a:hover svg,
+  .industry-card a:hover svg,
+  .home-services-section a:not(.snap-start):hover svg {
+    transform: translateX(2px);
+  }
+
+  .contact-bottom-cta-btn:hover,
+  .contact-form-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgb(252 197 14 / 0.32);
+  }
+
+  .industries-explore-btn:hover,
+  .insights-load-more-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .home-footer-social:hover {
+    transform: translateY(-1px);
+  }
+
+  .home-stat-item {
+    transition: transform 0.25s ease;
+  }
+
+  .home-stat-item:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 767px) {
+  .home-hero-scroll-indicator {
+    animation-duration: 2.8s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-content > .site-subtitle,
+  .home-hero-content > h1,
+  .home-hero-content > .site-paragraph,
+  .home-hero-content > .flex,
+  .home-hero-scroll-indicator,
+  .animate-marquee {
+    animation: none !important;
+  }
+
+  .work-card,
+  .insight-card,
+  .industry-card,
+  .services-card,
+  .home-hero-cta-primary,
+  .home-stat-item,
+  .home-services-section a.snap-start {
+    transform: none !important;
+  }
+
+  .work-card:hover .work-card-image,
+  .insight-card:hover .insight-card-image,
+  .industry-card:hover .industry-card-image {
+    transform: none !important;
+  }
+}
+
 

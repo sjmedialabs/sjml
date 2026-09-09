@@ -1,10 +1,36 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, useLayoutEffect, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import type { WorkPageFilterCategory, WorkPageTypography } from "@/lib/work-page-content"
 import type { WorkGridItem } from "@/lib/work-grid-item"
+
+const WORK_FILTER_STORAGE_KEY = "sjml-work-page-filters"
+
+type StoredWorkFilters = {
+  category?: string
+  industry?: string
+  restore?: boolean
+}
+
+function readStoredWorkFilters(): StoredWorkFilters | null {
+  try {
+    const raw = sessionStorage.getItem(WORK_FILTER_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as StoredWorkFilters
+  } catch {
+    return null
+  }
+}
+
+function writeStoredWorkFilters(filters: StoredWorkFilters) {
+  try {
+    sessionStorage.setItem(WORK_FILTER_STORAGE_KEY, JSON.stringify(filters))
+  } catch {
+    // Ignore quota / private-mode failures
+  }
+}
 
 function PlayIcon() {
   return (
@@ -33,6 +59,7 @@ export function WorkGridSection({
 
   const [activeCategory, setActiveCategory] = useState("all")
   const [activeIndustry, setActiveIndustry] = useState("all")
+  const restoredFromDetailRef = useRef(false)
 
   // Combine industries from created industries list + industries attached to work items
   const industries = useMemo(() => {
@@ -46,8 +73,33 @@ export function WorkGridSection({
     return Array.from(set).sort((a, b) => a.localeCompare(b))
   }, [availableIndustries, works])
 
-  // Sync activeIndustry with query parameter if present
+  // Restore the tab/industry selected before opening a work detail page.
+  // useLayoutEffect applies it before paint so the UI does not flash back to ALL.
+  useLayoutEffect(() => {
+    const stored = readStoredWorkFilters()
+    if (!stored?.restore) return
+
+    restoredFromDetailRef.current = true
+
+    if (stored.category && filterCategories.some((cat) => cat.value === stored.category)) {
+      setActiveCategory(stored.category)
+    }
+    if (typeof stored.industry === "string" && stored.industry) {
+      setActiveIndustry(stored.industry)
+    }
+
+    // Delay clearing so React Strict Mode's immediate remount still sees restore=true.
+    const timeoutId = window.setTimeout(() => {
+      writeStoredWorkFilters({ ...stored, restore: false })
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [filterCategories])
+
+  // Sync activeIndustry with query parameter if present (e.g. /work?industry= from industries page).
+  // Skip when returning from a work detail so the restored dropdown is not overwritten.
   useEffect(() => {
+    if (restoredFromDetailRef.current) return
     if (!initialIndustryParam) return
     const paramLower = initialIndustryParam.toLowerCase().trim()
 
@@ -59,6 +111,14 @@ export function WorkGridSection({
       setActiveIndustry(initialIndustryParam)
     }
   }, [initialIndustryParam, industries])
+
+  const persistFiltersForDetail = () => {
+    writeStoredWorkFilters({
+      category: activeCategory,
+      industry: activeIndustry,
+      restore: true,
+    })
+  }
 
   const filtered = useMemo(() => {
     return works.filter((work) => {
@@ -116,7 +176,12 @@ export function WorkGridSection({
 
         <div className="work-card-grid">
           {filtered.map((work) => (
-            <Link key={work.id} href={`/work/${work.slug}`} className="work-card group">
+            <Link
+              key={work.id}
+              href={`/work/${work.slug}`}
+              className="work-card group"
+              onClick={persistFiltersForDetail}
+            >
               <div className="work-card-image-wrap">
                 {work.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
