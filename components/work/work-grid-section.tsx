@@ -136,12 +136,26 @@ export function WorkGridSection({
     })
   }, [works, activeCategory, activeIndustry])
 
+  // Only show filter category tabs that have at least 1 matching work project (or 'all')
+  const availableFilterCategories = useMemo(() => {
+    return filterCategories.filter((cat) => {
+      if (cat.value === "all") return true
+      return works.some((w) => {
+        const cats = w.categories ?? []
+        return (
+          cats.includes(cat.value) ||
+          w.categoryTags?.toLowerCase().includes(cat.value.replace("-", " "))
+        )
+      })
+    })
+  }, [filterCategories, works])
+
   return (
     <section className="work-grid-section bg-white py-8 md:py-12">
       <div className="site-container">
         <div className="work-filter-bar">
           <div className="work-filter-tabs">
-            {filterCategories.map((cat) => (
+            {availableFilterCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"

@@ -63,12 +63,23 @@ export function InsightsGridSection({
   const visible = filtered.slice(0, visibleCount)
   const canLoadMore = visibleCount < filtered.length
 
+  const availableFilterCategories = useMemo(() => {
+    return filterCategories.filter((cat) => {
+      if (cat.value === "all") return true
+      return posts.some(
+        (post) =>
+          post.categories.includes(cat.value) ||
+          post.categoryTags.toLowerCase().includes(cat.value.replace("-", " "))
+      )
+    })
+  }, [filterCategories, posts])
+
   return (
     <section className="insights-grid-section bg-white py-10 md:py-12">
       <div className="site-container">
         <div className="insights-filter-bar">
           <div className="insights-filter-tabs">
-            {filterCategories.map((cat) => (
+            {availableFilterCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"

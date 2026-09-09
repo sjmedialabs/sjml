@@ -5,23 +5,24 @@ export interface PageHeroProps {
   description?: string
   /** Background image URL for the hero section */
   image?: string
+  titleClassName?: string
 }
 
 const TITLE_BASE_CLASS = "site-title font-bold leading-tight page-hero-heading"
 const DESCRIPTION_CLASS =
   "site-paragraph max-w-3xl text-white/85 leading-relaxed mt-3 page-hero-description typography-exempt"
 
-/** Renders title in white; use "|" in title to split: part before | is white, part after | is gold. */
-function HeroTitle({ title }: { title: string }) {
+/** Renders title in white or custom titleClassName; use "|" in title to split: part before | is white, part after | is gold. */
+function HeroTitle({ title, titleClassName }: { title: string; titleClassName?: string }) {
   if (!title) return null
   const pipeIndex = title.indexOf("|")
   if (pipeIndex === -1) {
-    return <h1 className={TITLE_BASE_CLASS}>{title}</h1>
+    return <h1 className={`${TITLE_BASE_CLASS} ${titleClassName || ""}`}>{title}</h1>
   }
   const beforePart = title.slice(0, pipeIndex).trim()
   const highlightPart = title.slice(pipeIndex + 1).trim()
   return (
-    <h1 className={TITLE_BASE_CLASS}>
+    <h1 className={`${TITLE_BASE_CLASS} ${titleClassName || ""}`}>
       <span>{beforePart}</span>
       {highlightPart && <span className="text-home-primary"> {highlightPart}</span>}
     </h1>
@@ -31,7 +32,7 @@ function HeroTitle({ title }: { title: string }) {
 /**
  * Shared hero section for legacy inner pages (Careers, Clients, Testimonials, etc.).
  */
-export function PageHero({ title, description, image }: PageHeroProps) {
+export function PageHero({ title, description, image, titleClassName }: PageHeroProps) {
   return (
     <section className="about-hero bg-home-secondary">
       <InnerPageHeroBackground image={image} overlayClassName="about-hero-overlay" />
@@ -39,7 +40,7 @@ export function PageHero({ title, description, image }: PageHeroProps) {
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content w-full max-w-5xl">
-            <HeroTitle title={title} />
+            <HeroTitle title={title} titleClassName={titleClassName} />
             {description && <p className={DESCRIPTION_CLASS}>{description}</p>}
           </div>
         </div>

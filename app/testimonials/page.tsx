@@ -53,7 +53,7 @@ export default async function TestimonialsPage() {
     <main className="site-page min-h-screen bg-white">
       <Header />
 
-      <PageHero title={hero.title} description={heroDescription} image={hero.image} />
+      <PageHero title={hero.title} description={heroDescription} image={hero.image} titleClassName="text-home-primary" />
 
       {/* Testimonials Grid */}
       <section className="py-8">
@@ -102,7 +102,7 @@ export default async function TestimonialsPage() {
           <p className="text-muted-foreground mb-8">{cta.description}</p>
           <a
             href={cta.buttonUrl}
-            className="inline-block px-8 py-4 bg-[#E63946] text-foreground rounded-full font-medium hover:bg-[#d62839] transition-colors"
+            className="inline-block px-8 py-4 bg-home-primary text-black rounded-full font-semibold hover:bg-home-primary-hover transition-colors"
           >
             {cta.buttonText}
           </a>

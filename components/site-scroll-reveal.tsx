@@ -29,47 +29,54 @@ function prefersReducedMotion() {
 function attachSection(el: HTMLElement, stops: Array<() => void>) {
   if (el.getAttribute(ATTACHED)) return
   if (isHeroSection(el)) {
-    el.setAttribute(ATTACHED, "skip-hero")
+    window.setTimeout(() => {
+      if (!el.getAttribute(ATTACHED)) {
+        el.setAttribute(ATTACHED, "skip-hero")
+      }
+    }, 0)
     return
   }
 
-  el.setAttribute(ATTACHED, "pending")
+  window.setTimeout(() => {
+    if (el.getAttribute(ATTACHED)) return
+    el.setAttribute(ATTACHED, "pending")
 
-  if (prefersReducedMotion() || isInViewport(el)) {
-    el.setAttribute(ATTACHED, "done")
-    return
-  }
+    if (prefersReducedMotion() || isInViewport(el)) {
+      el.setAttribute(ATTACHED, "done")
+      return
+    }
 
-  const offset = window.matchMedia("(max-width: 767px)").matches ? 16 : 28
-  el.style.opacity = "0"
-  el.style.transform = `translate3d(0, ${offset}px, 0)`
+    const offset = window.matchMedia("(max-width: 767px)").matches ? 16 : 28
+    el.style.opacity = "0"
+    el.style.transform = `translate3d(0, ${offset}px, 0)`
 
-  const stop = inView(
-    el,
-    () => {
-      if (el.getAttribute(ATTACHED) !== "pending") return
-      el.setAttribute(ATTACHED, "animating")
-      const controls = animate(
-        el,
-        { opacity: 1, transform: "translate3d(0, 0, 0)" },
-        { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-      )
-      void controls.finished.then(() => {
+    const stop = inView(
+      el,
+      () => {
+        if (el.getAttribute(ATTACHED) !== "pending") return
+        el.setAttribute(ATTACHED, "animating")
+        const controls = animate(
+          el,
+          { opacity: 1, transform: "translate3d(0, 0, 0)" },
+          { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+        )
+        void controls.finished.then(() => {
+          el.style.opacity = ""
+          el.style.transform = ""
+          el.setAttribute(ATTACHED, "done")
+        })
+      },
+      { amount: 0.16, margin: "0px 0px -8% 0px" },
+    )
+
+    stops.push(() => {
+      stop()
+      if (el.getAttribute(ATTACHED) === "pending") {
         el.style.opacity = ""
         el.style.transform = ""
-        el.setAttribute(ATTACHED, "done")
-      })
-    },
-    { amount: 0.16, margin: "0px 0px -8% 0px" },
-  )
-
-  stops.push(() => {
-    stop()
-    if (el.getAttribute(ATTACHED) === "pending") {
-      el.style.opacity = ""
-      el.style.transform = ""
-    }
-  })
+      }
+    })
+  }, 0)
 }
 
 function scan(stops: Array<() => void>) {

@@ -55,7 +55,11 @@ export function ServicesGridSection({
         )}
         <div className="services-card-grid">
           {services.map((service, index) => (
-            <article key={service.id} className="services-card border border-black/10 rounded-lg p-5 flex flex-col bg-white">
+            <Link
+              key={service.id}
+              href={`/services/${service.slug}`}
+              className="services-card border border-black/10 rounded-lg p-5 flex flex-col bg-white group cursor-pointer block"
+            >
               <div className="text-home-primary mb-4" style={{ width: typography.cardIconSize, height: typography.cardIconSize }}>
                 <ServiceCardIconDisplay icon={service.icon} index={index} />
               </div>
@@ -71,15 +75,14 @@ export function ServicesGridSection({
               >
                 {service.description}
               </p>
-              <Link
-                href={`/services/${service.slug}`}
-                className="inline-flex items-center gap-1.5 font-bold uppercase text-home-primary hover:opacity-80 transition-opacity"
+              <div
+                className="inline-flex items-center gap-1.5 font-bold uppercase text-home-primary group-hover:opacity-80 transition-opacity"
                 style={{ fontSize: `${typography.cardLinkFontSize}px` }}
               >
                 {service.linkText || "EXPLORE SERVICES"}
                 <ArrowIcon />
-              </Link>
-            </article>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

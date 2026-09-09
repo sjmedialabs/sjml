@@ -65,7 +65,7 @@ function SlideContent({
         )}
       </h1>
       {slide.description && (
-        <p className="site-paragraph max-w-md mb-5 line-clamp-2" style={{ color: colors.description }}>
+        <p className="site-paragraph max-w-md mb-5" style={{ color: colors.description }}>
           {slide.description}
         </p>
       )}
@@ -160,7 +160,7 @@ export function HeroSection({ data }: HeroSectionProps) {
           })}
 
           {slides.length > 1 && (
-            <div className="absolute left-5 md:left-6 top-1/2 -translate-y-1/2 z-[3] flex flex-col gap-3">
+            <div className="hidden md:flex absolute left-5 md:left-6 top-1/2 -translate-y-1/2 z-[3] flex-col gap-3">
               {slides.map((slide, index) => (
                 <button
                   key={slide.id}
@@ -187,12 +187,12 @@ export function HeroSection({ data }: HeroSectionProps) {
             </div>
           )}
 
-          <div className="relative z-[2] flex h-full items-center pl-14 md:pl-16 pr-6 md:pr-10">
+          <div className="relative z-[2] flex h-full items-center pl-6 md:pl-16 pr-6 md:pr-10">
             <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
           </div>
 
           {data.showScrollIndicator && (
-            <div className="home-hero-scroll-indicator absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-home-on-dark/70">
+            <div className="home-hero-scroll-indicator absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-white">
               <ScrollMouseIcon />
               <span className="text-[9px] uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
             </div>

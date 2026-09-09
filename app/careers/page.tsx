@@ -40,7 +40,7 @@ export default async function CareersPage() {
     <main className="site-page min-h-screen bg-white">
       <Header />
 
-      <PageHero title={heroTitle} description={heroDescription} image={heroImage} />
+      <PageHero title={heroTitle} description={heroDescription} image={heroImage} titleClassName="text-home-primary" />
 
       {/* Culture Section */}
       <section className="py-16 bg-background">
@@ -106,11 +106,11 @@ export default async function CareersPage() {
                       </h3>
                       <p className="text-muted-foreground text-sm mb-4">{job.description}</p>
                       <div className="flex flex-wrap gap-3">
-                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-muted-foreground text-xs rounded-full">
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-white text-xs rounded-full">
                           <Briefcase size={12} />
                           {job.department}
                         </span>
-                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-muted-foreground text-xs rounded-full">
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-white text-xs rounded-full">
                           <MapPin size={12} />
                           {job.location}
                         </span>
@@ -119,7 +119,7 @@ export default async function CareersPage() {
                           {job.type}
                         </span>
                         {job.salary && (
-                          <span className="px-3 py-1.5 bg-secondary text-muted-foreground text-xs rounded-full">
+                          <span className="px-3 py-1.5 bg-secondary text-white text-xs rounded-full">
                             {job.salary}
                           </span>
                         )}
@@ -127,7 +127,7 @@ export default async function CareersPage() {
                     </div>
                     <Link
                       href={`/careers/${job.id}`}
-                      className="flex items-center gap-2 px-6 py-3 bg-[#E63946] text-foreground rounded-full hover:bg-[#d62839] transition-colors whitespace-nowrap"
+                      className="careers-apply-btn inline-flex items-center gap-2 px-6 py-3 bg-home-primary text-black font-semibold rounded-full hover:bg-home-primary-hover transition-colors whitespace-nowrap"
                     >
                       Apply Now
                       <ArrowRight size={16} />
