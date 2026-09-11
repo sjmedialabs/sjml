@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Geist_Mono, Playfair_Display } from "next/font/google"
+import { Poppins } from "next/font/google"
 import "./globals.css"
 import { generateSeoMetadata } from "@/lib/seo"
 import { ThemeProvider } from "@/hooks/use-theme"
@@ -8,20 +8,10 @@ import { SiteScrollReveal } from "@/components/site-scroll-reveal"
 import { getSiteTypography } from "@/lib/get-site-typography"
 import { siteTypographyStyleVars } from "@/lib/site-typography"
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-inter",
-})
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
-})
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  style: ["normal", "italic"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
 })
 
 // Generate metadata dynamically from database
@@ -39,7 +29,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="light" suppressHydrationWarning style={typographyVars}>
-      <body className={`${inter.variable} ${geistMono.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SiteScrollReveal />
           {children}

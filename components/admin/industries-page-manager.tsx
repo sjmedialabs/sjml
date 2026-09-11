@@ -167,12 +167,7 @@ export function IndustriesPageManager() {
             <CompactTextarea label="Description" value={content.expertise.description} onChange={(v) => setExpertise({ description: v })} rows={3} />
           </AdminCompactCard>
 
-          <AdminCompactCard title="Grid button">
-            <AdminFieldGrid cols={2}>
-              <CompactField label="Button text" value={content.grid.exploreButtonText} onChange={(v) => setGrid({ exploreButtonText: v })} />
-              <CompactField label="Button URL" value={content.grid.exploreButtonUrl} onChange={(v) => setGrid({ exploreButtonUrl: v })} />
-            </AdminFieldGrid>
-          </AdminCompactCard>
+
 
           <AdminCompactCard title="Bottom CTA">
             <CompactField label="Label" value={content.cta.label} onChange={(v) => setCta({ label: v })} />

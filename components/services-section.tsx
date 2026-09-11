@@ -38,9 +38,11 @@ export function ServicesSection({ data }: ServicesSectionProps) {
 
   const labelSize = data.labelFontSize ?? 11
   const sectionTitleSize = data.sectionTitleFontSize ?? 38
+  const sectionDescriptionSize = data.sectionDescriptionFontSize ?? 15
   const cardWidth = data.cardWidth ?? 190
   const cardHeight = data.cardHeight ?? 220
   const cardTitleSize = data.cardTitleFontSize ?? 13
+  const cardDescriptionSize = data.cardDescriptionFontSize ?? 11
   const iconSize = Math.min(40, Math.round(cardHeight * 0.18))
 
   const updateScrollState = useCallback(() => {
@@ -86,31 +88,38 @@ export function ServicesSection({ data }: ServicesSectionProps) {
               {data.title}
             </h2>
             {data.description && (
-              <p className="site-paragraph leading-[1.65] text-[#757575] mb-8 max-w-[300px]">
+              <p
+                className="site-paragraph leading-[1.65] text-[#757575] mb-8 max-w-[300px]"
+                style={{ fontSize: `${sectionDescriptionSize}px` }}
+              >
                 {data.description}
               </p>
             )}
             <Link
               href={data.exploreLinkUrl || "/services"}
-              className="site-paragraph inline-flex items-center gap-1.5 font-bold uppercase tracking-wider text-black border-b border-black pb-0.5 transition-colors hover:text-home-primary hover:border-home-primary"
+              className="hidden md:inline-flex home-hero-cta-primary items-center gap-2 h-10 px-5 font-semibold text-xs uppercase tracking-wide shrink-0"
             >
               {data.exploreLinkText || "EXPLORE ALL SERVICES"}
-              <ChevronRight className="w-4 h-4 text-home-primary shrink-0" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
             </Link>
           </div>
 
-          <div className="relative min-w-0">
+          <div className="relative min-w-0 flex flex-col items-center md:block">
             <div
               ref={scrollRef}
               onScroll={updateScrollState}
-              className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide scroll-smooth"
+              className="flex flex-col md:flex-row w-full md:w-auto items-center md:items-stretch gap-5 md:overflow-x-auto pb-4 md:snap-x md:snap-mandatory scrollbar-hide scroll-smooth"
             >
               {items.map((service, index) => (
                 <Link
                   key={service.id}
                   href={service.link || "/services"}
-                  className="snap-start shrink-0 rounded-lg border border-black/[0.06] bg-white px-4 py-5 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex flex-col items-center text-center"
-                  style={{ width: cardWidth, height: cardHeight, minWidth: cardWidth, minHeight: cardHeight }}
+                  className="snap-start shrink-0 rounded-lg border border-black/[0.06] bg-white px-5 py-6 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex flex-col items-center text-center w-full max-w-[340px] md:w-auto"
+                  style={{
+                    height: cardHeight,
+                    minHeight: cardHeight,
+                    ["--card-width" as any]: `${cardWidth}px`,
+                  }}
                 >
                   <div className="mb-3 flex items-center justify-center shrink-0">
                     <ServiceIcon icon={service.icon} index={index} size={iconSize} />
@@ -121,11 +130,25 @@ export function ServicesSection({ data }: ServicesSectionProps) {
                   >
                     {service.title}
                   </h3>
-                  <p className="site-paragraph leading-[1.5] text-[#757575] line-clamp-3 flex-1">
+                  <p
+                    className="site-paragraph leading-[1.5] text-[#757575] line-clamp-3 flex-1"
+                    style={{ fontSize: `${cardDescriptionSize}px` }}
+                  >
                     {service.description}
                   </p>
                 </Link>
               ))}
+            </div>
+
+            {/* Explore button visible at bottom only on mobile */}
+            <div className="mt-6 md:hidden w-full flex justify-center">
+              <Link
+                href={data.exploreLinkUrl || "/services"}
+                className="home-hero-cta-primary inline-flex items-center justify-center gap-2 h-10 px-6 font-semibold text-xs uppercase tracking-wide shrink-0"
+              >
+                {data.exploreLinkText || "EXPLORE ALL SERVICES"}
+                <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              </Link>
             </div>
 
             {showScrollButtons && canScrollLeft && (
