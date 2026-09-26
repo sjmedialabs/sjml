@@ -38,6 +38,7 @@ const menuCategories = [
       { id: "header", label: "Header/Nav", icon: "Menu" },
       { id: "footer", label: "Footer", icon: "PanelBottom" },
       { id: "seo", label: "SEO Settings", icon: "Search" },
+      { id: "scripts", label: "Header/Footer Scripts", icon: "Code" },
       { id: "settings", label: "General Settings", icon: "Settings" },
     ],
   },
@@ -280,6 +281,22 @@ const icons: Record<string, React.ReactNode> = {
     >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
+    </svg>
+  ),
+  Code: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
     </svg>
   ),
   Settings: (

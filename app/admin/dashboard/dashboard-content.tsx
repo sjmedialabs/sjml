@@ -29,6 +29,7 @@ const LeadsManager = dynamic(() => import("@/components/admin/leads-manager").th
 const HeaderManager = dynamic(() => import("@/components/admin/header-manager").then(mod => mod.HeaderManager), { loading: LoadingManager })
 const FooterManager = dynamic(() => import("@/components/admin/footer-manager").then(mod => mod.FooterManager), { loading: LoadingManager })
 const SeoManager = dynamic(() => import("@/components/admin/seo-manager").then(mod => mod.SeoManager), { loading: LoadingManager })
+const ScriptsManager = dynamic(() => import("@/components/admin/scripts-manager").then(mod => mod.ScriptsManager), { loading: LoadingManager })
 const SettingsManager = dynamic(() => import("@/components/admin/settings-manager").then(mod => mod.SettingsManager), { loading: LoadingManager })
 
 interface AdminDashboardContentProps {
@@ -86,6 +87,8 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
         return <FooterManager />
       case "seo":
         return <SeoManager />
+      case "scripts":
+        return <ScriptsManager />
       case "settings":
         return <SettingsManager />
       default:

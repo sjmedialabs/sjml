@@ -411,10 +411,11 @@ export function SeoManager() {
                 )}
 
                 <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-lg">
-                  <h4 className="font-semibold text-yellow-400 mb-2">⚠️ Implementation Note</h4>
+                  <h4 className="font-semibold text-yellow-400 mb-2">Custom header & footer scripts</h4>
                   <p className="text-sm admin-text-secondary">
-                    After adding your Google Analytics ID, you'll need to add the GA tracking script to your website's layout.
-                    Contact your developer to implement the tracking code in the root layout.
+                    To add Google Tag Manager, pixels, chat widgets, or any other snippet to specific pages, use
+                    <strong> Header/Footer Scripts</strong> in the CMS sidebar. You can attach multiple scripts to
+                    header or footer and choose All pages or a page list.
                   </p>
                 </div>
               </div>

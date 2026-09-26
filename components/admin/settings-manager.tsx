@@ -121,7 +121,8 @@ export function SettingsManager() {
           Manage contact information and social media links
         </p>
         <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/50 rounded-lg text-sm text-blue-400">
-          ℹ️ For SEO settings (page titles, descriptions, meta tags), go to <strong>SEO Settings</strong> section
+          ℹ️ For SEO settings (page titles, descriptions, meta tags), go to <strong>SEO Settings</strong>. For tracking
+          or custom snippets, go to <strong>Header/Footer Scripts</strong>.
         </div>
       </div>
 
