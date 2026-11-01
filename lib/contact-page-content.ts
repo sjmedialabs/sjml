@@ -143,7 +143,7 @@ export function createDefaultContactPageContent(): NormalizedContactPageContent 
       ],
       messagePlaceholder: "Tell us about your project*",
       privacyLabel: "I agree to the Privacy Policy",
-      privacyUrl: "/privacy-policy",
+      privacyUrl: "/privacy",
       buttonText: "SEND MESSAGE",
     },
     map: {

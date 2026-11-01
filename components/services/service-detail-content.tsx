@@ -56,9 +56,9 @@ export function ServiceDetailContent({ template }: { template: ServiceDetailTemp
               <div className="mb-3">
                 <ServiceDetailFeatureIcon icon={feature.icon} size={t.featureIconSize} />
               </div>
-              <h3 className="font-bold text-black mb-2 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
+              <h2 className="font-bold text-black mb-2 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
                 {feature.title}
-              </h3>
+              </h2>
               {feature.description && (
                 <p className="text-black/65 leading-relaxed" style={{ fontSize: `${t.featureDescriptionFontSize}px` }}>
                   {feature.description}

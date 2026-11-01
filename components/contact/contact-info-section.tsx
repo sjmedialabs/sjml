@@ -1,11 +1,12 @@
 import type { ContactInfoBlock, ContactPageTypography } from "@/lib/contact-page-content"
+import { FlatSvg } from "@/components/flat-svg"
 
 function PinIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+    <FlatSvg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
       <path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z" />
       <circle cx="12" cy="11" r="2.5" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -19,19 +20,19 @@ function PhoneIcon() {
 
 function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+    <FlatSvg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="m3 7 9 6 9-6" />
-    </svg>
+    </FlatSvg>
   )
 }
 
 function ClockIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+    <FlatSvg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
       <circle cx="12" cy="12" r="8" />
       <path d="M12 8v4l3 2" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -46,8 +47,7 @@ function PlaneIcon() {
 function ArrowIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }

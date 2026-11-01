@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react"
+import { Facebook, Instagram, Linkedin, Youtube } from "@/components/flat-lucide"
+import { FlatSvg } from "@/components/flat-svg"
 import { normalizeFooterContent, type FooterContent, type FooterSocialLinks } from "@/lib/footer-content"
 
 function XIcon({ className }: { className?: string }) {
@@ -24,19 +25,19 @@ function PhoneIcon({ className }: { className?: string }) {
 
 function MailIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <FlatSvg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <rect width="20" height="16" x="2" y="4" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
+    </FlatSvg>
   )
 }
 
 function MapPinIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <FlatSvg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
       <circle cx="12" cy="10" r="3" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -136,7 +137,10 @@ export function Footer({ data: propData }: FooterProps = {}) {
     }
   }, [propData])
 
-  const { companyLinks, serviceLinks, socialLinks, siteName, siteTagline } = footerData
+  const { serviceLinks, socialLinks, siteName, siteTagline } = footerData
+  const companyLinks = footerData.companyLinks.some((link) => link.href === "/careers")
+    ? footerData.companyLinks
+    : [...footerData.companyLinks, { name: "Careers", href: "/careers" }]
 
   return (
     <footer className="home-footer bg-home-primary text-black">
@@ -160,7 +164,7 @@ export function Footer({ data: propData }: FooterProps = {}) {
               )}
             </Link>
             {siteTagline && (
-              <p className="site-subtitle text-[10px] uppercase tracking-[0.18em] text-black/70 mb-4">{siteTagline}</p>
+              <p className="site-subtitle text-sm uppercase tracking-[0.18em] text-black/70 mb-4">{siteTagline}</p>
             )}
             <div className="space-y-2.5 mb-5">
               {footerData.address && (
@@ -191,7 +195,7 @@ export function Footer({ data: propData }: FooterProps = {}) {
 
           {/* Company */}
           <div>
-            <h3 className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Company</h3>
+            <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Company</p>
             <ul className="space-y-2">
               {companyLinks.map((link) => (
                 <li key={`${link.href}-${link.name}`}>
@@ -205,7 +209,7 @@ export function Footer({ data: propData }: FooterProps = {}) {
 
           {/* Services */}
           <div>
-            <h3 className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Services</h3>
+            <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Services</p>
             <ul className="space-y-2">
               {serviceLinks.map((link) => (
                 <li key={`${link.href}-${link.name}`}>
@@ -219,7 +223,7 @@ export function Footer({ data: propData }: FooterProps = {}) {
 
           {/* Quick links */}
           <div>
-            <h3 className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Legal</h3>
+            <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Legal</p>
             <ul className="space-y-2">
               <li>
                 <Link href="/privacy" className="site-paragraph text-black/80 hover:text-black transition-colors">

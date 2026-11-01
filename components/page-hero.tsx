@@ -1,4 +1,4 @@
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export interface PageHeroProps {
   title: string
@@ -34,9 +34,7 @@ function HeroTitle({ title, titleClassName }: { title: string; titleClassName?: 
  */
 export function PageHero({ title, description, image, titleClassName }: PageHeroProps) {
   return (
-    <section className="about-hero bg-home-secondary">
-      <InnerPageHeroBackground image={image} overlayClassName="about-hero-overlay" />
-      {!image && <div className="absolute inset-0 bg-home-secondary z-0" aria-hidden="true" />}
+    <section className="about-hero bg-home-secondary" style={heroBackgroundStyle(image)}>
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content w-full max-w-5xl">

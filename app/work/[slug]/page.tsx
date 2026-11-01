@@ -28,10 +28,14 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     const db = client.db("sjmedialabs")
     const work = await db.collection("works").findOne({ slug })
     if (work) {
-      const base = await generateSeoMetadata("Work")
+      const base = await generateSeoMetadata("Work", {
+        title: `${work.title} | SJ Media Labs`,
+        description: (work.description as string) || `A project by SJ Media Labs: ${work.title}.`,
+        path: `/work/${slug}`,
+      })
       return {
         ...base,
-        title: `${work.title} | ${typeof base.title === "string" ? base.title.split("|").pop()?.trim() || "SJ Media Labs" : "SJ Media Labs"}`,
+        title: `${work.title} | SJ Media Labs`,
         description: (work.description as string) || base.description,
         openGraph: {
           ...base.openGraph,
@@ -44,7 +48,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   } catch {
     /* fall through */
   }
-  return generateSeoMetadata("Work")
+  return generateSeoMetadata("Work", { path: `/work/${slug}` })
 }
 
 export default async function WorkDetailPage(props: { params: Promise<{ slug: string }> }) {

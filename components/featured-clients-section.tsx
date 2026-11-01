@@ -14,22 +14,14 @@ export interface FeaturedClientItem {
 export function FeaturedClientsSection({ clients }: { clients: FeaturedClientItem[] }) {
   if (!clients || clients.length === 0) return null
 
-  // Duplicate list to create a seamless infinite marquee loop
-  const marqueeClients = [...clients, ...clients, ...clients, ...clients]
-
   return (
-    <section className="py-10 md:py-14 bg-[#fafafa] border-y border-black/5 overflow-hidden">
-      {/* Infinite Horizontal Logo Marquee */}
-      <div className="relative w-full overflow-hidden flex select-none mb-8">
-        {/* Left & Right gradient fades for premium look */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-[#fafafa] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-[#fafafa] to-transparent z-10 pointer-events-none" />
-
-        <div className="flex shrink-0 animate-marquee items-center gap-6 md:gap-10">
-          {marqueeClients.map((client, idx) => (
+    <section className="py-10 md:py-14 bg-[#fafafa] border-y border-black/5">
+      <div className="site-container mb-8">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+          {clients.map((client) => (
             <div
-              key={`${client.id}-${idx}`}
-              className="bg-white border border-black/10 rounded-xl px-6 py-4 flex items-center justify-center min-w-[170px] md:min-w-[200px] h-24 hover:border-home-primary/50 hover:shadow-md transition-all group shrink-0"
+              key={client.id}
+              className="bg-white border border-black/10 rounded-xl px-4 py-3 flex items-center justify-center w-[calc(50%-0.5rem)] max-w-[200px] min-w-0 h-24 hover:border-home-primary/50 hover:shadow-md transition-all group"
             >
               <div className="relative h-14 w-full flex items-center justify-center">
                 <Image

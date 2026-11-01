@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle } from "lucide-react"
+import { CheckCircle } from "@/components/flat-lucide"
 
 export function JobApplicationForm() {
   const [formData, setFormData] = useState({

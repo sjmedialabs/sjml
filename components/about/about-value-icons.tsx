@@ -1,14 +1,15 @@
 /** Gold line-art value icons on dark circles — matches About mockup. */
 
 import type { ReactNode } from "react"
+import { FlatSvg } from "@/components/flat-svg"
 
 const svgClass = "w-full h-full"
 
 function ValueIconBase({ children }: { children: ReactNode }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={svgClass} aria-hidden="true">
+    <FlatSvg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={svgClass} aria-hidden="true">
       {children}
-    </svg>
+    </FlatSvg>
   )
 }
 

@@ -26,7 +26,7 @@ export function ServiceContentSections({ sections }: ServiceContentSectionsProps
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{section.title}</h2>
             )}
             {section.subtitle && (
-              <p className="text-lg text-[#E63946] mb-4">{section.subtitle}</p>
+              <p className="text-sm text-[#E63946] mb-4">{section.subtitle}</p>
             )}
             {section.description &&
               (isHtmlContent(section.description) ? (

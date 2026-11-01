@@ -1,5 +1,5 @@
 import type { ServicesPageHero, ServicesPageTypography } from "@/lib/services-page-content"
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export function ServicesHeroSection({
   data,
@@ -9,8 +9,7 @@ export function ServicesHeroSection({
   typography: ServicesPageTypography
 }) {
   return (
-    <section className="about-hero bg-home-secondary">
-      <InnerPageHeroBackground image={data.image} />
+    <section className="about-hero bg-home-secondary" style={heroBackgroundStyle(data.image)}>
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content">

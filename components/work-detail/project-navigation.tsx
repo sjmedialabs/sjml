@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "@/components/flat-lucide"
 import type { AdjacentWork } from "@/lib/work-sections"
 import { isValidWorkImage } from "@/lib/work-detail"
 

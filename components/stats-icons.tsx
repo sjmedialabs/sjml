@@ -1,20 +1,15 @@
 /** Line-art stats icons matching homepage mockup (gold stroke, no fill). */
 
 import type { ReactNode } from "react"
+import { FlatSvg } from "@/components/flat-svg"
 
 const iconClass = "w-[34px] h-[34px] md:w-[38px] md:h-[38px]"
 
 function StatIconBase({ children }: { children: ReactNode }) {
   return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={iconClass}
-      aria-hidden="true"
-    >
+    <FlatSvg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={iconClass} aria-hidden="true">
       {children}
-    </svg>
+    </FlatSvg>
   )
 }
 

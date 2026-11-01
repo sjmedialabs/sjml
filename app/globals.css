@@ -496,8 +496,33 @@ div {
   flex-direction: column;
 }
 
+.home-page,
 .site-page {
-  padding-top: var(--site-header-height);
+  padding-top: calc(var(--site-header-height) + 1px);
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+html {
+  --site-header-height: 4rem;
+}
+
+header.fixed.top-0 {
+  box-sizing: border-box;
+  height: var(--site-header-height);
+  max-width: 100%;
+}
+
+header.fixed.top-0 > .site-container {
+  height: 100%;
+}
+
+header.fixed.top-0 > .site-container > .flex {
+  height: 100%;
 }
 
 .home-page>section,
@@ -527,13 +552,14 @@ div {
 .about-hero,
 .work-detail-hero {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  margin-top: calc(-1 * var(--site-header-height));
-  padding-top: var(--site-header-height);
-  height: calc(var(--inner-page-hero-height, 350px) + var(--site-header-height));
-  max-height: calc(var(--inner-page-hero-height, 350px) + var(--site-header-height));
+  margin-top: 0;
+  padding-top: 0;
+  height: auto;
+  min-height: var(--inner-page-hero-height, 350px);
+  max-height: none;
   box-sizing: border-box;
 }
 
@@ -785,11 +811,14 @@ div {
 .home-hero-carousel {
   position: relative;
   width: 100%;
-  height: var(--home-hero-max-height, 500px);
-  max-height: var(--home-hero-max-height, 500px);
+  height: auto;
+  min-height: var(--home-hero-max-height, 500px);
+  max-height: none;
   margin-inline: auto;
-  overflow: hidden;
+  overflow: visible;
   background-color: var(--home-secondary);
+  background-size: cover;
+  background-position: center;
   isolation: isolate;
 }
 
@@ -823,6 +852,10 @@ div {
 
 .home-stat-label {
   color: #ffffff;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 @media (max-width: 1023px) {
@@ -839,7 +872,7 @@ header [data-slot="button"],
 .careers-apply-btn,
 .home-hero-cta-primary {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 4px;
   background-color: var(--home-primary);
   color: var(--home-text);
@@ -919,8 +952,9 @@ header [data-slot="button"]:hover,
   }
 
   .home-hero-carousel {
-    height: min(var(--home-hero-max-height, 500px), 70vh);
-    max-height: var(--home-hero-max-height, 500px);
+    height: auto;
+    min-height: 32rem;
+    max-height: none;
   }
 }
 
@@ -1355,12 +1389,13 @@ header [data-slot="button"]:hover,
 }
 
 .service-feature-divider {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1px;
-  height: 100%;
-  background: rgb(0 0 0 / 0.1);
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .service-feature-cell:not(:last-child) {
+    border-right: 1px solid rgb(0 0 0 / 0.1);
+  }
 }
 
 .service-process-steps {
@@ -1387,13 +1422,7 @@ header [data-slot="button"]:hover,
 }
 
 .service-process-line {
-  position: absolute;
-  top: calc(var(--process-icon-size, 48px) / 2);
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: rgb(0 0 0 / 0.12);
-  z-index: 0;
+  display: none;
 }
 
 /* ── Industries page ── */
@@ -1452,23 +1481,20 @@ header [data-slot="button"]:hover,
 }
 
 .industry-card-icon-badge {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 50%);
+  position: relative;
   width: 44px;
   height: 44px;
+  margin: 0 auto 0.75rem;
   border-radius: 9999px;
   background: var(--home-secondary);
   border: 3px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
 }
 
 .industry-card-body {
-  padding: 2rem 1rem 1.25rem;
+  padding: 1rem 1rem 1.25rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1491,6 +1517,22 @@ header [data-slot="button"]:hover,
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.5rem;
   }
+}
+
+.industries-cta-section,
+.industries-stats-section,
+.industries-cta-panel,
+.industries-stats-panel,
+.industries-cta-grid,
+.industries-stats-grid,
+.industries-stat-item {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.industries-stat-item,
+.industries-cta-panel {
+  overflow-wrap: anywhere;
 }
 
 .industries-cta-panel {
@@ -1627,12 +1669,7 @@ header [data-slot="button"]:hover,
 }
 
 .work-card-play-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+  display: none;
 }
 
 .work-card-body {
@@ -3418,20 +3455,6 @@ header a:hover img {
     color: var(--home-primary);
   }
 
-  .work-card-image-wrap::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgb(0 0 0 / 0);
-    transition: background 0.3s ease;
-    pointer-events: none;
-    border-radius: inherit;
-  }
-
-  .work-card:hover .work-card-image-wrap::after {
-    background: rgb(0 0 0 / 0.08);
-  }
-
   .insight-card:hover {
     transform: translateY(-4px);
   }
@@ -3528,4 +3551,95 @@ header a:hover img {
   .industry-card:hover .industry-card-image {
     transform: none !important;
   }
+}
+
+/* Shared primary action height and readable type from the site audit. */
+header [data-slot="button"],
+.home-hero-cta-primary,
+.home-hero-cta-secondary,
+.home-hero-slide-btn,
+.home-menu-btn,
+.home-services-scroll-btn,
+.careers-apply-btn,
+.contact-form-submit,
+.contact-bottom-cta-btn,
+.insights-load-more-btn,
+.industries-explore-btn {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+header [data-slot="button"]::before,
+.home-hero-cta-primary::before,
+.careers-apply-btn::before,
+.contact-form-submit::before,
+.contact-bottom-cta-btn::before {
+  content: none !important;
+  display: none !important;
+}
+
+main h1 {
+  font-size: var(--site-heading-font-size);
+}
+
+main h2 {
+  font-size: calc(var(--site-heading-font-size) * 0.75);
+}
+
+.home-page .text-xs,
+.site-page .text-xs,
+.home-page .text-\[9px\],
+.home-page .text-\[10px\],
+.home-page .text-\[11px\],
+.site-page .text-\[9px\],
+.site-page .text-\[10px\],
+.site-page .text-\[11px\],
+header .text-\[9px\],
+header .text-\[10px\],
+header .text-\[11px\],
+footer .text-\[9px\],
+footer .text-\[10px\],
+footer .text-\[11px\] {
+  font-size: 14px !important;
+}
+
+main section {
+  padding-top: 50px !important;
+  padding-bottom: 50px !important;
+}
+
+@media (max-width: 1023px) {
+  header [data-slot="button"] {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-menu-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .home-hero-slide-btn {
+    display: none !important;
+  }
+}
+
+.contact-email-error {
+  display: none;
+  margin: 0.35rem 0 0;
+  color: #dc2626;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.contact-page-form:has(#contact-email:user-invalid) .contact-email-error,
+.contact-email-error.is-visible {
+  display: block;
 }

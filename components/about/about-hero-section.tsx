@@ -1,10 +1,9 @@
 import type { AboutHero } from "@/lib/about-content"
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export function AboutHeroSection({ data }: { data: AboutHero }) {
   return (
-    <section className="about-hero bg-home-secondary">
-      <InnerPageHeroBackground image={data.image} />
+    <section className="about-hero bg-home-secondary" style={heroBackgroundStyle(data.image)}>
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content">

@@ -1,9 +1,14 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { Briefcase, MapPin, Clock, ArrowRight } from "lucide-react"
+import { Briefcase, MapPin, Clock, ArrowRight } from "@/components/flat-lucide"
 import Link from "next/link"
 import { getPageContent, type CareersPageData } from "@/lib/models/content"
 import { PageHero } from "@/components/page-hero"
+import { generateSeoMetadata } from "@/lib/seo"
+
+export function generateMetadata() {
+  return generateSeoMetadata("Careers")
+}
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0 // Enable ISR: Revalidate every hour

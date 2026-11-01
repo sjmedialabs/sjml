@@ -1,4 +1,4 @@
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export function CaseStudiesHeroSection({
   title = "Case Studies",
@@ -12,16 +12,15 @@ export function CaseStudiesHeroSection({
   image?: string
 }) {
   return (
-    <section className="about-hero bg-home-secondary">
-      <InnerPageHeroBackground image={image} />
+    <section className="about-hero bg-home-secondary" style={heroBackgroundStyle(image)}>
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content">
             <span className="about-hero-accent-line block mb-2" aria-hidden="true" />
-            <p className="uppercase tracking-[0.22em] text-home-primary font-bold mb-2 text-xs">
+            <p className="uppercase tracking-[0.22em] text-home-primary font-bold mb-2 text-sm">
               PORTFOLIO & CASE STUDIES
             </p>
-            <h1 className="font-bold leading-[1.12] tracking-tight mb-3 text-3xl md:text-5xl">
+            <h1 className="font-bold leading-normal tracking-tight mb-3 text-3xl md:text-5xl">
               <span className="text-white block">{title}</span>
               {titleHighlight && <span className="text-home-primary block">{titleHighlight}</span>}
             </h1>

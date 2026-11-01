@@ -95,7 +95,7 @@ export function StatsSection({ data }: StatsSectionProps) {
                   </div>
                   <div className="min-w-0">
                     <AnimatedValue value={stat.value} />
-                    <p className="home-stat-label site-paragraph uppercase tracking-[0.14em] mt-2 leading-none">
+                    <p className="home-stat-label site-paragraph uppercase mt-2">
                       {stat.label}
                     </p>
                   </div>

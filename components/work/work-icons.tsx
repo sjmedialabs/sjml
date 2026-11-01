@@ -1,19 +1,13 @@
 import type { ComponentType, ReactNode, SVGProps } from "react"
+import { FlatSvg } from "@/components/flat-svg"
 
 type WorkIconProps = SVGProps<SVGSVGElement>
 
 function IconBase({ children, className, ...props }: WorkIconProps & { children: ReactNode }) {
   return (
-    <svg
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
+    <FlatSvg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden="true" {...props}>
       {children}
-    </svg>
+    </FlatSvg>
   )
 }
 

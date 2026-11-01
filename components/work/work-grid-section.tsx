@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import type { WorkPageFilterCategory, WorkPageTypography } from "@/lib/work-page-content"
 import type { WorkGridItem } from "@/lib/work-grid-item"
+import { FlatSvg } from "@/components/flat-svg"
 
 const WORK_FILTER_STORAGE_KEY = "sjml-work-page-filters"
 
@@ -34,10 +35,10 @@ function writeStoredWorkFilters(filters: StoredWorkFilters) {
 
 function PlayIcon() {
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <FlatSvg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
       <circle cx="24" cy="24" r="23" stroke="white" strokeWidth="2" fill="rgb(0 0 0 / 0.35)" />
       <path d="M20 16.5v15l12-7.5-12-7.5Z" fill="white" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -215,9 +216,9 @@ export function WorkGridSection({
                     {work.categoryTags}
                   </p>
                 )}
-                <h3 className="work-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
+                <h2 className="work-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
                   {work.title}
-                </h3>
+                </h2>
                 {work.cardSubtitle && (
                   <p className="work-card-subtitle" style={{ fontSize: `${typography.cardSubtitleFontSize}px` }}>
                     {work.cardSubtitle}

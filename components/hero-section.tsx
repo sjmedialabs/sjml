@@ -1,10 +1,14 @@
 "use client"
 
 import { useState, useEffect, useCallback, type CSSProperties } from "react"
-import Image from "next/image"
+import { FlatSvg } from "@/components/flat-svg"
 import Link from "next/link"
 import type { HomeHero, HeroSlide } from "@/lib/home-content"
 import { HOME_HERO_DEFAULT_COLORS } from "@/lib/home-content"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
+
+const HOME_HERO_OVERLAY =
+  "linear-gradient(90deg, rgb(22 22 23 / 0.88) 0%, rgb(22 22 23 / 0.55) 55%, rgb(22 22 23 / 0.35) 100%)"
 
 interface HeroSectionProps {
   data: HomeHero
@@ -13,18 +17,17 @@ interface HeroSectionProps {
 function ArrowIcon({ className }: { className?: string }) {
   return (
     <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }
 
 function ScrollMouseIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} width="22" height="32" viewBox="0 0 24 36" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <FlatSvg className={className} width="22" height="32" viewBox="0 0 24 36" fill="none" stroke="currentColor" strokeWidth="1.5">
       <rect x="4" y="2" width="16" height="26" rx="8" />
       <line x1="12" y1="8" x2="12" y2="14" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -46,7 +49,7 @@ function SlideContent({
     <div className="home-hero-content max-w-xl lg:max-w-2xl">
       {slide.overTitle && (
         <p
-          className="site-subtitle text-[11px] uppercase tracking-[0.2em] mb-3"
+          className="site-subtitle text-sm uppercase tracking-[0.2em] mb-3"
           style={{ color: colors.overTitle }}
         >
           {slide.overTitle}
@@ -54,7 +57,7 @@ function SlideContent({
       )}
       <h1
         className="font-bold uppercase leading-[1.1] tracking-tight mb-3 md:mb-4"
-        style={{ fontSize: `clamp(1.75rem, 4vw, ${titleFontSize}px)`, color: colors.headline }}
+        style={{ fontSize: `clamp(2.15rem, 5vw, ${titleFontSize}px)`, color: colors.headline }}
       >
         {slide.headline && <span className="block">{slide.headline}</span>}
         {slide.headlineLine2 && <span className="block">{slide.headlineLine2}</span>}
@@ -72,14 +75,14 @@ function SlideContent({
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
         <Link
           href={slide.primaryButtonUrl || "/services"}
-          className="home-hero-cta-primary inline-flex items-center gap-2 h-9 px-4 font-semibold text-sm uppercase tracking-wide transition-colors"
+          className="home-hero-cta-primary inline-flex items-center gap-2 px-4 font-semibold text-sm uppercase tracking-wide transition-colors"
         >
           {slide.primaryButtonText || "OUR SERVICES"}
           <ArrowIcon />
         </Link>
         <Link
           href={slide.secondaryButtonUrl || "/work"}
-          className="home-hero-cta-secondary inline-flex items-center text-xs md:text-sm uppercase tracking-wide font-medium border-b-2 border-home-primary pb-0.5 text-white transition-colors hover:text-home-primary"
+          className="home-hero-cta-secondary inline-flex items-center text-sm uppercase tracking-wide font-medium border-b-2 border-home-primary pb-0.5 text-white transition-colors hover:text-home-primary"
         >
           {slide.secondaryButtonText || "VIEW OUR WORK"}
         </Link>
@@ -128,73 +131,63 @@ export function HeroSection({ data }: HeroSectionProps) {
   return (
     <section className="home-hero-section bg-white">
         <div
-          className="home-hero-carousel relative isolate w-full mx-auto overflow-hidden bg-home-secondary"
-          style={{ "--home-hero-max-height": `${maxHeight}px` } as CSSProperties}
+          className="home-hero-carousel relative isolate w-full mx-auto bg-home-secondary"
+          style={{
+            "--home-hero-max-height": `${maxHeight}px`,
+            ...heroBackgroundStyle(activeSlide.backgroundImage, HOME_HERO_OVERLAY),
+            opacity: fade ? 1 : 0.92,
+            transition: "opacity 0.2s ease",
+          } as CSSProperties}
         >
-          {slides.map((slide, index) => {
-            const isActive = index === activeIndex
-            const bg = slide.backgroundImage?.trim()
-            return (
-              <div
-                key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-700 ${isActive && fade ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none"}`}
-                aria-hidden={!isActive}
-              >
-                {slide.backgroundVideo?.trim() ? (
-                  <video
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src={slide.backgroundVideo.trim()}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
-                ) : bg ? (
-                  <Image src={bg} alt="" fill className="object-cover" priority={index === 0} sizes="(max-width: 1440px) 100vw, 1440px" />
-                ) : (
-                  <div className="absolute inset-0 bg-home-secondary" />
-                )}
-                <div className="home-hero-overlay absolute inset-0" aria-hidden="true" />
-              </div>
-            )
-          })}
+          {activeSlide.backgroundVideo?.trim() ? (
+            <video
+              className="absolute inset-0 z-0 h-full w-full object-cover"
+              src={activeSlide.backgroundVideo.trim()}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : null}
 
-          {slides.length > 1 && (
-            <div className="hidden md:flex absolute left-5 md:left-6 top-1/2 -translate-y-1/2 z-[3] flex-col gap-3">
-              {slides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  onClick={() => goTo(index)}
-                  className="group flex items-center gap-2 text-left"
-                  aria-label={`Go to slide ${index + 1}`}
-                  aria-current={index === activeIndex ? "true" : undefined}
-                >
-                  <span
-                    className={`block w-0.5 transition-all duration-300 ${
-                      index === activeIndex ? "h-10 bg-home-primary" : "h-5 bg-white/40 group-hover:bg-white/70"
-                    }`}
-                  />
-                  <span
-                    className={`text-[10px] font-medium tracking-widest ${
-                      index === activeIndex ? "text-home-primary" : "text-white/50 group-hover:text-white/80"
-                    }`}
+          <div className="relative z-[2] flex h-full items-center">
+            {slides.length > 1 && (
+              <div className="hidden md:flex shrink-0 flex-col gap-3 pl-6">
+                {slides.map((slide, index) => (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    onClick={() => goTo(index)}
+                    className="home-hero-slide-btn group flex h-11 items-center gap-2 text-left"
+                    aria-label={`Go to slide ${index + 1}`}
+                    aria-current={index === activeIndex ? "true" : undefined}
                   >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+                    <span
+                      className={`block w-0.5 transition-all duration-300 ${
+                        index === activeIndex ? "h-10 bg-home-primary" : "h-5 bg-white/40 group-hover:bg-white/70"
+                      }`}
+                    />
+                    <span
+                      className={`text-sm font-medium tracking-widest ${
+                        index === activeIndex ? "text-home-primary" : "text-white/50 group-hover:text-white/80"
+                      }`}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-          <div className="relative z-[2] flex h-full items-center pl-6 md:pl-16 pr-6 md:pr-10">
-            <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
+            <div className="flex min-w-0 flex-1 items-center pl-6 md:pl-10 pr-6 md:pr-10">
+              <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
+            </div>
           </div>
 
           {data.showScrollIndicator && (
             <div className="home-hero-scroll-indicator absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-white">
               <ScrollMouseIcon />
-              <span className="text-[9px] uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
+              <span className="text-sm uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
             </div>
           )}
         </div>

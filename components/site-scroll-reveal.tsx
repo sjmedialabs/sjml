@@ -46,9 +46,8 @@ function attachSection(el: HTMLElement, stops: Array<() => void>) {
       return
     }
 
-    const offset = window.matchMedia("(max-width: 767px)").matches ? 16 : 28
     el.style.opacity = "0"
-    el.style.transform = `translate3d(0, ${offset}px, 0)`
+    el.style.transform = ""
 
     const stop = inView(
       el,
@@ -57,7 +56,7 @@ function attachSection(el: HTMLElement, stops: Array<() => void>) {
         el.setAttribute(ATTACHED, "animating")
         const controls = animate(
           el,
-          { opacity: 1, transform: "translate3d(0, 0, 0)" },
+          { opacity: 1 },
           { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
         )
         void controls.finished.then(() => {

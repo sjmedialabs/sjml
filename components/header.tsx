@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ContactPopup } from "@/components/contact-popup"
 import { normalizeHeaderContent } from "@/lib/header-content"
+import { useProvidedHeader } from "@/components/header-provider"
 
 interface HeaderData {
   logo?: string
@@ -62,11 +63,12 @@ export function Header({ data: propData }: HeaderProps = {}) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [contactPopupOpen, setContactPopupOpen] = useState(false)
-  const [headerData, setHeaderData] = useState<HeaderData | null>(propData || null)
+  const provided = useProvidedHeader()
+  const [headerData, setHeaderData] = useState<HeaderData | null>(propData || provided)
 
   useEffect(() => {
-    // Only fetch if data wasn't provided via props
-    if (!propData) {
+    if (propData || provided) return
+    // Only fetch if data wasn't provided via props or the server layout
       const fetchHeaderData = async () => {
         try {
           const res = await fetch("/api/content/header")
@@ -79,8 +81,7 @@ export function Header({ data: propData }: HeaderProps = {}) {
         }
       }
       fetchHeaderData()
-    }
-  }, [propData])
+  }, [propData, provided])
 
   const isNavLinkActive = (href: string) => {
     if (href === "/") return pathname === "/"
@@ -149,8 +150,8 @@ export function Header({ data: propData }: HeaderProps = {}) {
                   <span className="text-primary font-bold text-xl tracking-tight leading-none">SJML</span>
                   <span className="hidden sm:block w-px h-9 bg-black/15 shrink-0" aria-hidden="true" />
                   <div className="hidden sm:flex flex-col leading-tight">
-                    <span className="text-[9px] font-semibold tracking-[0.18em] text-[#000000] uppercase">Branding &</span>
-                    <span className="text-[9px] font-semibold tracking-[0.18em] text-[#000000] uppercase">Advertising</span>
+                    <span className="text-sm font-semibold tracking-[0.18em] text-[#000000] uppercase">Branding &</span>
+                    <span className="text-sm font-semibold tracking-[0.18em] text-[#000000] uppercase">Advertising</span>
                   </div>
                 </>
               )}
@@ -170,15 +171,14 @@ export function Header({ data: propData }: HeaderProps = {}) {
               <Button onClick={() => setContactPopupOpen(true)} className="uppercase tracking-wide gap-2">
                 {ctaText}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
+                  <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Button>
             </div>
 
             {/* Mobile actions */}
             <div className="flex lg:hidden items-center gap-2">
-              <button className="text-[#000000] transition-opacity hover:opacity-70" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>
+              <button className="home-menu-btn inline-flex h-11 w-11 items-center justify-center text-[#000000] transition-opacity hover:opacity-70" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>
                 {mobileMenuOpen ? <XIcon /> : <MenuIcon />}
               </button>
             </div>

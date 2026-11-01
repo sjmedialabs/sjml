@@ -26,17 +26,21 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     const db = client.db("sjmedialabs")
     const insight = await db.collection("insights").findOne({ slug, published: { $ne: false } })
     if (insight) {
-      const base = await generateSeoMetadata("Insights")
+      const base = await generateSeoMetadata("Insights", {
+        title: `${insight.title} | SJ Media Labs`,
+        description: (insight.excerpt as string) || `An insight from SJ Media Labs: ${insight.title}.`,
+        path: `/insights/${slug}`,
+      })
       return {
         ...base,
-        title: `${insight.title} | ${typeof base.title === "string" ? base.title.split("|").pop()?.trim() || "SJ Media Labs" : "SJ Media Labs"}`,
+        title: `${insight.title} | SJ Media Labs`,
         description: (insight.excerpt as string) || base.description,
       }
     }
   } catch {
     /* fall through */
   }
-  return generateSeoMetadata("Insights")
+  return generateSeoMetadata("Insights", { path: `/insights/${slug}` })
 }
 
 export default async function InsightDetailPage(props: { params: Promise<{ slug: string }> }) {

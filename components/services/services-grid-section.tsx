@@ -14,8 +14,7 @@ export interface ServiceCardItem {
 function ArrowIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }
@@ -63,12 +62,12 @@ export function ServicesGridSection({
               <div className="text-home-primary mb-4" style={{ width: typography.cardIconSize, height: typography.cardIconSize }}>
                 <ServiceCardIconDisplay icon={service.icon} index={index} />
               </div>
-              <h3
+              <h2
                 className="font-bold uppercase tracking-wide text-black mb-2"
                 style={{ fontSize: `${typography.cardTitleFontSize}px` }}
               >
                 {service.title}
-              </h3>
+              </h2>
               <p
                 className="text-black/65 leading-relaxed mb-4 flex-1"
                 style={{ fontSize: `${typography.cardDescriptionFontSize}px` }}

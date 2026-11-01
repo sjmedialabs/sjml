@@ -1,15 +1,16 @@
 /** Gold line-art icons for service overview cards — matches mockup. */
 
 import type { ReactNode } from "react"
+import { FlatSvg } from "@/components/flat-svg"
 import { createDefaultServiceDetailTemplate } from "@/lib/service-detail-template"
 
 const iconClass = "w-full h-full"
 
 function IconBase({ children }: { children: ReactNode }) {
   return (
-    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={iconClass} aria-hidden="true">
+    <FlatSvg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={iconClass} aria-hidden="true">
       {children}
-    </svg>
+    </FlatSvg>
   )
 }
 

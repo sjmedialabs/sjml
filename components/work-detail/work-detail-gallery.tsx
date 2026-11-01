@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import useEmblaCarousel from "embla-carousel-react"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ChevronLeft, ChevronRight } from "@/components/flat-lucide"
 import type { WorkDetailTemplate } from "@/lib/work-detail-template"
 
 export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }) {

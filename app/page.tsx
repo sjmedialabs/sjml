@@ -49,7 +49,7 @@ export default async function HomePage() {
   const home = normalizeHomeContent(content as unknown as Record<string, unknown>)
 
   return (
-    <main className="home-page min-h-screen pt-16">
+    <main className="home-page min-h-screen">
       <Header />
       <HeroSection data={home.hero} />
       <StatsSection data={home.stats} />

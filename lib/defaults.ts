@@ -180,6 +180,8 @@ export const defaultHomeContent = {
     companyLinks: [
       { name: "About Us", href: "/about" },
       { name: "Our Work", href: "/work" },
+      { name: "Insights", href: "/insights" },
+      { name: "Case Studies", href: "/case-studies" },
       { name: "Careers", href: "/careers" },
       { name: "Contact", href: "/contact" },
     ],
@@ -632,7 +634,7 @@ export const defaultClientsContent = {
 
 export const defaultHeaderContent = {
   pageKey: "header",
-  logo: "/logo.svg",
+  logo: "",
   logoText: "SJ MEDIA LABS",
   navItems: [
     { id: "0", label: "HOME", href: "/" },
@@ -641,6 +643,7 @@ export const defaultHeaderContent = {
     { id: "3", label: "WORK", href: "/work" },
     { id: "4", label: "INDUSTRIES", href: "/industries" },
     { id: "5", label: "INSIGHTS", href: "/insights" },
+    { id: "7", label: "CASE STUDIES", href: "/case-studies" },
     { id: "6", label: "CONTACT US", href: "/contact" },
   ],
   ctaButton: { text: "START A PROJECT", href: "/contact" },

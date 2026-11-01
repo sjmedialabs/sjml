@@ -1,13 +1,13 @@
 "use client"
 
-import { useRef, useState, useEffect, useCallback } from "react"
+import { useRef, useState, useEffect, useCallback, type ComponentType } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Megaphone, PenTool, Monitor, Code2, type LucideIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight, Megaphone, PenTool, Monitor, Code2, type IconProps } from "@/components/flat-lucide"
 import type { HomeServicesSection } from "@/lib/home-content"
 import { isValidWorkImage } from "@/lib/work-detail"
 
-const SERVICE_ICONS: LucideIcon[] = [PenTool, Megaphone, Monitor, Code2]
+const SERVICE_ICONS: ComponentType<IconProps>[] = [PenTool, Megaphone, Monitor, Code2]
 
 interface ServicesSectionProps {
   data: HomeServicesSection
@@ -36,13 +36,13 @@ export function ServicesSection({ data }: ServicesSectionProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
-  const labelSize = data.labelFontSize ?? 11
+  const labelSize = Math.max(14, data.labelFontSize ?? 14)
   const sectionTitleSize = data.sectionTitleFontSize ?? 38
-  const sectionDescriptionSize = data.sectionDescriptionFontSize ?? 15
+  const sectionDescriptionSize = (data.sectionDescriptionFontSize ?? 14) === 15 ? 14 : Math.max(14, data.sectionDescriptionFontSize ?? 14)
   const cardWidth = data.cardWidth ?? 190
   const cardHeight = data.cardHeight ?? 220
-  const cardTitleSize = data.cardTitleFontSize ?? 13
-  const cardDescriptionSize = data.cardDescriptionFontSize ?? 11
+  const cardTitleSize = Math.max(14, data.cardTitleFontSize ?? 16)
+  const cardDescriptionSize = Math.max(14, data.cardDescriptionFontSize ?? 14)
   const iconSize = Math.min(40, Math.round(cardHeight * 0.18))
 
   const updateScrollState = useCallback(() => {
@@ -83,7 +83,7 @@ export function ServicesSection({ data }: ServicesSectionProps) {
             )}
             <h2
               className="site-title font-bold text-black leading-[1.2] mb-5"
-              style={{ fontSize: `clamp(1.75rem, 4vw, ${sectionTitleSize}px)` }}
+              style={{ fontSize: `clamp(1.5rem, 3.2vw, ${Math.round(sectionTitleSize * 0.78)}px)` }}
             >
               {data.title}
             </h2>
@@ -97,18 +97,28 @@ export function ServicesSection({ data }: ServicesSectionProps) {
             )}
             <Link
               href={data.exploreLinkUrl || "/services"}
-              className="hidden md:inline-flex home-hero-cta-primary items-center gap-2 h-10 px-5 font-semibold text-xs uppercase tracking-wide shrink-0"
+              className="hidden md:inline-flex home-hero-cta-primary items-center gap-2 px-5 font-semibold text-sm uppercase tracking-wide shrink-0"
             >
               {data.exploreLinkText || "EXPLORE ALL SERVICES"}
               <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
             </Link>
           </div>
 
-          <div className="relative min-w-0 flex flex-col items-center md:block">
+          <div className="min-w-0 flex flex-col items-center md:flex-row md:items-center md:gap-3">
+            {showScrollButtons && canScrollLeft && (
+              <button
+                type="button"
+                onClick={() => scrollBy("left")}
+                className="home-services-scroll-btn hidden md:flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
+                aria-label="Scroll services left"
+              >
+                <ChevronLeft className="w-5 h-5" strokeWidth={2} />
+              </button>
+            )}
             <div
               ref={scrollRef}
               onScroll={updateScrollState}
-              className="flex flex-col md:flex-row w-full md:w-auto items-center md:items-stretch gap-5 md:overflow-x-auto pb-4 md:snap-x md:snap-mandatory scrollbar-hide scroll-smooth"
+              className="flex flex-col md:flex-row w-full min-w-0 md:w-auto items-center md:items-stretch gap-5 md:overflow-x-auto pb-4 md:snap-x md:snap-mandatory scrollbar-hide scroll-smooth"
             >
               {items.map((service, index) => (
                 <Link
@@ -116,7 +126,6 @@ export function ServicesSection({ data }: ServicesSectionProps) {
                   href={service.link || "/services"}
                   className="snap-start shrink-0 rounded-lg border border-black/[0.06] bg-white px-5 py-6 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex flex-col items-center text-center w-full max-w-[340px] md:w-auto"
                   style={{
-                    height: cardHeight,
                     minHeight: cardHeight,
                     ["--card-width" as any]: `${cardWidth}px`,
                   }}
@@ -131,7 +140,7 @@ export function ServicesSection({ data }: ServicesSectionProps) {
                     {service.title}
                   </h3>
                   <p
-                    className="site-paragraph leading-[1.5] text-[#757575] line-clamp-3 flex-1"
+                    className="site-paragraph leading-[1.5] text-[#757575] flex-1"
                     style={{ fontSize: `${cardDescriptionSize}px` }}
                   >
                     {service.description}
@@ -144,29 +153,18 @@ export function ServicesSection({ data }: ServicesSectionProps) {
             <div className="mt-6 md:hidden w-full flex justify-center">
               <Link
                 href={data.exploreLinkUrl || "/services"}
-                className="home-hero-cta-primary inline-flex items-center justify-center gap-2 h-10 px-6 font-semibold text-xs uppercase tracking-wide shrink-0"
+                className="home-hero-cta-primary md:hidden inline-flex items-center justify-center gap-2 px-6 font-semibold text-sm uppercase tracking-wide shrink-0"
               >
                 {data.exploreLinkText || "EXPLORE ALL SERVICES"}
                 <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
               </Link>
             </div>
 
-            {showScrollButtons && canScrollLeft && (
-              <button
-                type="button"
-                onClick={() => scrollBy("left")}
-                className="hidden md:flex absolute -left-1 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors z-10"
-                aria-label="Scroll services left"
-              >
-                <ChevronLeft className="w-5 h-5" strokeWidth={2} />
-              </button>
-            )}
-
             {showScrollButtons && canScrollRight && (
               <button
                 type="button"
                 onClick={() => scrollBy("right")}
-                className="hidden md:flex absolute -right-1 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors z-10"
+                className="home-services-scroll-btn hidden md:flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
                 aria-label="Scroll services right"
               >
                 <ChevronRight className="w-5 h-5" strokeWidth={2} />

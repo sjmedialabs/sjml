@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import useEmblaCarousel from "embla-carousel-react"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ChevronLeft, ChevronRight } from "@/components/flat-lucide"
 import type { WorkGalleryItem } from "@/lib/work-sections"
 
 interface ProjectGalleryProps {

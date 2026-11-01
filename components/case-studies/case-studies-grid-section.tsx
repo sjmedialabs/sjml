@@ -1,7 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Download } from "lucide-react"
+import { Download } from "@/components/flat-lucide"
+import { FlatSvg } from "@/components/flat-svg"
 import { CaseStudyDownloadModal } from "./case-study-download-modal"
 
 export interface CaseStudyCardItem {
@@ -23,10 +24,10 @@ export interface CaseStudyCardItem {
 
 function SearchIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <FlatSvg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <circle cx="11" cy="11" r="7" />
       <line x1="16.5" y1="16.5" x2="21" y2="21" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -126,9 +127,9 @@ export function CaseStudiesGridSection({
                 </div>
 
                 <div className="insight-card-body">
-                  <h3 className="insight-card-title text-base font-bold text-gray-900 group-hover:text-home-primary transition-colors">
+                  <h2 className="insight-card-title text-base font-bold text-gray-900 group-hover:text-home-primary transition-colors">
                     {study.title}
-                  </h3>
+                  </h2>
                   {study.description && (
                     <p className="insight-card-excerpt">
                       {study.description}

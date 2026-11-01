@@ -22,7 +22,7 @@ function isIndustriesLabel(label: string): boolean {
 
 /** Correct legacy nav entries where Industries pointed at case studies. */
 export function normalizeHeaderNavItems(items: HeaderNavItem[]): HeaderNavItem[] {
-  return items.map((item) => {
+  const mapped = items.map((item) => {
     if (isIndustriesLabel(item.label) || (item.href === "/case-studies" && /industr/i.test(item.label))) {
       return {
         ...item,
@@ -32,14 +32,26 @@ export function normalizeHeaderNavItems(items: HeaderNavItem[]): HeaderNavItem[]
     }
     return item
   })
+
+  if (!mapped.some((item) => item.href === "/careers")) {
+    const careers = { id: "careers", label: "Careers", href: "/careers" }
+    const contactIndex = mapped.findIndex((item) => item.href === "/contact")
+    if (contactIndex >= 0) mapped.splice(contactIndex, 0, careers)
+    else mapped.push(careers)
+  }
+
+  return mapped
 }
 
 export function normalizeHeaderContent(data: Record<string, unknown>): NormalizedHeaderContent {
   const defaults = defaultHeaderContent
   const rawItems = Array.isArray(data.navItems) ? (data.navItems as HeaderNavItem[]) : defaults.navItems
 
+  const rawLogo = typeof data.logo === "string" ? data.logo.trim() : ""
+  const logo = rawLogo && rawLogo !== "/logo.svg" ? rawLogo : ""
+
   return {
-    logo: (data.logo as string) ?? defaults.logo,
+    logo,
     logoText: (data.logoText as string) ?? defaults.logoText,
     navItems: normalizeHeaderNavItems(rawItems),
     ctaButton: {

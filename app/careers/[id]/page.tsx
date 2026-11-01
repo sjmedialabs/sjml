@@ -1,6 +1,6 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ArrowLeft, Briefcase, MapPin, Clock, DollarSign, CheckCircle } from "lucide-react"
+import { ArrowLeft, Briefcase, MapPin, Clock, DollarSign, CheckCircle } from "@/components/flat-lucide"
 import Link from "next/link"
 import { getPageContent, type CareersPageData } from "@/lib/models/content"
 import { JobApplicationForm } from "@/components/job-application-form"

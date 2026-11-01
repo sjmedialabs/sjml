@@ -5,8 +5,7 @@ import { DetailIconSidebarTarget } from "./service-detail-icons"
 function ArrowIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }
@@ -110,9 +109,9 @@ export function ServiceDetailBottomCta({
     <div className="service-bottom-cta bg-black/[0.03] border border-black/[0.06] rounded-xl p-6 md:py-7 md:px-8 flex flex-col md:flex-row items-center justify-between gap-5">
       <div className="text-center md:text-left">
         {data.heading && (
-          <p className="font-bold text-black mb-1 leading-snug" style={{ fontSize: `${typography.bottomCtaHeadingFontSize}px` }}>
+          <h3 className="font-bold text-black mb-1 leading-snug" style={{ fontSize: "14px" }}>
             {data.heading}
-          </p>
+          </h3>
         )}
         {data.text && (
           <p className="text-black/65 leading-relaxed" style={{ fontSize: `${typography.bottomCtaTextFontSize}px` }}>

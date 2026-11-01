@@ -1,4 +1,4 @@
-import { Sparkles, Clock, Layers, BarChart3, Target, Users, Search, Lightbulb, PenLine, MessageSquare, Check, Package } from "lucide-react"
+import { Sparkles, Clock, Layers, BarChart3, Target, Users, Search, Lightbulb, PenLine, MessageSquare, Check, Package } from "@/components/flat-lucide"
 
 const CARD_ICONS = [Sparkles, Clock, Layers, BarChart3, Target, Users]
 

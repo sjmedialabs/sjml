@@ -1,5 +1,5 @@
 import type { IndustriesPageHero, IndustriesPageTypography } from "@/lib/industries-page-content"
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export function IndustriesHeroSection({
   data,
@@ -9,8 +9,7 @@ export function IndustriesHeroSection({
   typography: IndustriesPageTypography
 }) {
   return (
-    <section className="about-hero bg-home-secondary">
-      <InnerPageHeroBackground image={data.image} />
+    <section className="about-hero bg-home-secondary" style={heroBackgroundStyle(data.image)}>
       <div className="site-container about-hero-inner">
         <div className="about-hero-grid">
           <div className="about-hero-content">
@@ -23,7 +22,7 @@ export function IndustriesHeroSection({
                 {data.label}
               </p>
             )}
-            <h1 className="font-bold leading-[1.12] tracking-tight mb-3" style={{ fontSize: `${typography.heroTitleFontSize}px` }}>
+            <h1 className="font-bold leading-normal tracking-tight mb-3" style={{ fontSize: `${typography.heroTitleFontSize}px` }}>
               <span className="text-white block">{data.titleLine1}</span>
               <span className="text-home-primary block">{data.titleHighlight}</span>
             </h1>

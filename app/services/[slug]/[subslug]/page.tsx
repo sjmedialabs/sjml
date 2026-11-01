@@ -22,11 +22,13 @@ export async function generateMetadata(props: {
     const sub = await db.collection("sub-services").findOne({ parentSlug, slug: subslug, isActive: true })
     if (sub) {
       const meta = normalizeSubServiceMeta(sub as Record<string, unknown>, String(sub.name ?? ""))
-      const base = await generateSeoMetadata("Services")
-      const siteName =
-        typeof base.title === "string" ? base.title.split("|").pop()?.trim() || "SJ Media Labs" : "SJ Media Labs"
-      const title = meta.metaTitle.includes("|") ? meta.metaTitle : `${meta.metaTitle} | ${siteName}`
-      const description = meta.metaDescription || base.description
+      const title = meta.metaTitle.includes("|") ? meta.metaTitle : `${meta.metaTitle} | SJ Media Labs`
+      const description = meta.metaDescription || `Learn about ${meta.metaTitle} from SJ Media Labs.`
+      const base = await generateSeoMetadata("Services", {
+        title,
+        description,
+        path: `/services/${parentSlug}/${subslug}`,
+      })
       const image = String(sub.bannerImage ?? "").trim() || undefined
       return {
         ...base,
@@ -49,7 +51,7 @@ export async function generateMetadata(props: {
   } catch {
     /* fall through */
   }
-  return generateSeoMetadata("Services")
+  return generateSeoMetadata("Services", { path: `/services/${parentSlug}/${subslug}` })
 }
 
 export default async function SubServiceDetailPage(props: {

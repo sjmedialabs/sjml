@@ -3,7 +3,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { getClientsPageData } from "@/lib/data/clients-page"
 import { ClientsList } from "@/components/clients-list"
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 import Link from "next/link"
 
 export async function generateMetadata() {
@@ -16,8 +16,7 @@ export const revalidate = 0
 function ArrowIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }
@@ -50,11 +49,10 @@ export default async function ClientsPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="about-hero relative overflow-hidden text-white flex items-center min-h-[380px] md:min-h-[440px]">
-        <InnerPageHeroBackground image={heroImage} />
+      <section className="about-hero relative text-white flex items-center min-h-[380px] md:min-h-[440px]" style={heroBackgroundStyle(heroImage)}>
         <div className="site-container about-hero-inner relative z-10 py-16 md:py-20">
           <div className="max-w-3xl">
-            <span className="site-subtitle text-home-primary text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 block">
+            <span className="site-subtitle text-home-primary text-sm uppercase tracking-[0.2em] font-semibold mb-3 block">
               OUR PARTNERSHIPS
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight text-white mb-4 leading-tight">

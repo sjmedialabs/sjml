@@ -5,6 +5,8 @@ import { clientPromise } from "@/lib/mongodb"
 import { normalizeServiceDetailTemplate } from "@/lib/service-detail-template"
 import { ServiceDetailLayout } from "@/components/services/service-detail-layout"
 import { sortByDisplayOrder } from "@/lib/service-order"
+import { generateSeoMetadata } from "@/lib/seo"
+import type { Metadata } from "next"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -18,6 +20,28 @@ export async function generateStaticParams() {
   } catch {
     return []
   }
+}
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await props.params
+  try {
+    const client = await clientPromise
+    const db = client.db("sjmedialabs")
+    const service = await db.collection("services").findOne({ slug }, { projection: { title: 1, description: 1 } })
+    if (service) {
+      const name = String(service.title || "Service").replace(/\s+/g, " ").trim()
+      const readable = name.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())
+      const plain = String(service.description || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
+      return generateSeoMetadata("Services", {
+        title: `${readable} | SJ Media Labs`,
+        description: plain || `Explore ${readable} services from SJ Media Labs.`,
+        path: `/services/${slug}`,
+      })
+    }
+  } catch {
+    /* fall through */
+  }
+  return generateSeoMetadata("Services", { path: `/services/${slug}` })
 }
 
 export default async function ServiceDetailPage(props: { params: Promise<{ slug: string }> }) {

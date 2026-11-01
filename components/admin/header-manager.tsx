@@ -22,7 +22,7 @@ interface HeaderData {
 }
 
 const defaultData: HeaderData = {
-  logo: "/logo.svg",
+  logo: "",
   logoText: "SJ MEDIA LABS",
   navItems: [
     { id: "0", label: "HOME", href: "/" },

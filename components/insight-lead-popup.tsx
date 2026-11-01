@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
-import { X } from "lucide-react"
+import { X } from "@/components/flat-lucide"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 

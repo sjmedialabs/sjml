@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Circle } from "lucide-react"
+import { Circle } from "@/components/flat-lucide"
 import { isValidWorkImage } from "@/lib/work-detail"
 
 interface WorkIconProps {

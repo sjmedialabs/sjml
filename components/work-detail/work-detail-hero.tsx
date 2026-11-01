@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Fragment } from "react"
 import type { WorkDetailTemplate } from "@/lib/work-detail-template"
 import { WorkMetaIcon } from "@/components/work/work-icons"
-import { InnerPageHeroBackground } from "@/components/inner-page-hero-background"
+import { heroBackgroundStyle } from "@/components/inner-page-hero-background"
 
 export function WorkDetailHero({
   title,
@@ -21,8 +21,7 @@ export function WorkDetailHero({
   ].filter(Boolean) as Array<{ icon: "calendar" | "diamond" | "location"; value: string }>
 
   return (
-    <section className="work-detail-hero">
-      <InnerPageHeroBackground image={heroImage} />
+    <section className="work-detail-hero" style={heroBackgroundStyle(heroImage)}>
       <div className="site-container work-detail-hero-inner">
         <div className="work-detail-hero-grid">
           <div className="work-detail-hero-panel">

@@ -8,22 +8,22 @@ import type {
   InsightsPageTypography,
 } from "@/lib/insights-page-content"
 import type { InsightGridItem } from "@/lib/insight-grid-item"
+import { FlatSvg } from "@/components/flat-svg"
 
 function ArrowIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
+      <path d="M5 12h14M12 5l7 7-7 7" />
     </svg>
   )
 }
 
 function SearchIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <FlatSvg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <circle cx="11" cy="11" r="7" />
       <line x1="16.5" y1="16.5" x2="21" y2="21" />
-    </svg>
+    </FlatSvg>
   )
 }
 
@@ -112,7 +112,7 @@ export function InsightsGridSection({
 
         <div className="insights-card-grid">
           {visible.map((post) => (
-            <Link key={post.id} href={`/insights/${post.slug}`} className="insight-card group">
+            <Link key={post.id} href={`/insights/${post.slug.trim().replace(/\.+$/, "")}`} className="insight-card group">
               <div className="insight-card-image-wrap">
                 {post.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -127,9 +127,9 @@ export function InsightsGridSection({
                 )}
               </div>
               <div className="insight-card-body">
-                <h3 className="insight-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
+                <h2 className="insight-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
                   {post.title}
-                </h3>
+                </h2>
                 {post.excerpt && (
                   <p className="insight-card-excerpt" style={{ fontSize: `${typography.cardExcerptFontSize}px` }}>
                     {post.excerpt}

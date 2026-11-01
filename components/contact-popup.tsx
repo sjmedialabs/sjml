@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { X } from "lucide-react"
+import { X } from "@/components/flat-lucide"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -143,7 +143,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-home-primary hover:bg-home-primary-hover text-black rounded-full py-6 text-base font-semibold"
+                className="home-hero-cta-primary w-full text-black text-base font-semibold"
               >
                 {isSubmitting ? "Sending..." : "Let's Get Started →"}
               </Button>
