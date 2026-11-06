@@ -58,24 +58,24 @@ export function IndustriesGridSection({
                   </div>
                 </div>
                 <div className="industry-card-body">
-                  <h3 className="font-bold text-black mb-2 text-center" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
+                  <span className="font-bold text-black mb-2 text-center block" style={{ fontSize: `${Math.max(14, typography.cardTitleFontSize)}px` }}>
                     {card.title}
-                  </h3>
+                  </span>
                   {card.description && (
-                    <p
-                      className="text-black/65 leading-relaxed text-center mb-4"
-                      style={{ fontSize: `${typography.cardDescriptionFontSize}px` }}
+                    <span
+                      className="text-black/65 leading-relaxed text-center mb-4 block"
+                      style={{ fontSize: `${Math.max(14, typography.cardDescriptionFontSize)}px` }}
                     >
                       {card.description}
-                    </p>
+                    </span>
                   )}
-                  <div
+                  <span
                     className="inline-flex items-center justify-center gap-1.5 w-full font-bold uppercase text-black/80 group-hover:text-home-primary transition-colors"
-                    style={{ fontSize: `${typography.cardLinkFontSize}px` }}
+                    style={{ fontSize: `${Math.max(14, typography.cardLinkFontSize)}px` }}
                   >
                     {card.linkText || "VIEW OUR WORK"}
                     <ArrowIcon />
-                  </div>
+                  </span>
                 </div>
               </Link>
             )

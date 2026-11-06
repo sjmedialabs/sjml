@@ -62,25 +62,25 @@ export function ServicesGridSection({
               <div className="text-home-primary mb-4" style={{ width: typography.cardIconSize, height: typography.cardIconSize }}>
                 <ServiceCardIconDisplay icon={service.icon} index={index} />
               </div>
-              <h2
+              <span
                 className="font-bold uppercase tracking-wide text-black mb-2"
-                style={{ fontSize: `${typography.cardTitleFontSize}px` }}
+                style={{ fontSize: `${Math.max(14, typography.cardTitleFontSize)}px` }}
               >
                 {service.title}
-              </h2>
-              <p
+              </span>
+              <span
                 className="text-black/65 leading-relaxed mb-4 flex-1"
-                style={{ fontSize: `${typography.cardDescriptionFontSize}px` }}
+                style={{ fontSize: `${Math.max(14, typography.cardDescriptionFontSize)}px` }}
               >
                 {service.description}
-              </p>
-              <div
+              </span>
+              <span
                 className="inline-flex items-center gap-1.5 font-bold uppercase text-home-primary group-hover:opacity-80 transition-opacity"
-                style={{ fontSize: `${typography.cardLinkFontSize}px` }}
+                style={{ fontSize: `${Math.max(14, typography.cardLinkFontSize)}px` }}
               >
                 {service.linkText || "EXPLORE SERVICES"}
                 <ArrowIcon />
-              </div>
+              </span>
             </Link>
           ))}
         </div>

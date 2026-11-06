@@ -127,13 +127,13 @@ export function CaseStudiesGridSection({
                 </div>
 
                 <div className="insight-card-body">
-                  <h2 className="insight-card-title text-base font-bold text-gray-900 group-hover:text-home-primary transition-colors">
+                  <span className="insight-card-title block text-base font-bold text-gray-900 group-hover:text-home-primary transition-colors">
                     {study.title}
-                  </h2>
+                  </span>
                   {study.description && (
-                    <p className="insight-card-excerpt">
+                    <span className="insight-card-excerpt block">
                       {study.description}
-                    </p>
+                    </span>
                   )}
                 </div>
               </div>

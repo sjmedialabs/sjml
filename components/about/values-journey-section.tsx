@@ -19,33 +19,33 @@ export function ValuesJourneySection({
         <div className="about-values-journey-grid">
           <div className="about-values-column">
             <SectionLabel fontSize={vType.sectionLabelFontSize}>{values.label}</SectionLabel>
-            <ul className="about-values-list">
+            <div className="about-values-list">
               {values.items.map((item) => (
-                <li key={item.id} className="about-values-item">
+                <div key={item.id} className="about-values-item">
                   <AboutValueIcon
                     icon={item.icon}
                     circleSize={vType.iconCircleSize}
                     glyphSize={vType.iconGlyphSize}
                   />
                   <div className="min-w-0">
-                    <h3
-                      className="about-value-title font-bold uppercase tracking-wide text-black"
-                      style={{ fontSize: `${vType.itemTitleFontSize}px` }}
+                    <span
+                      className="about-value-title font-bold uppercase tracking-wide text-black block"
+                      style={{ fontSize: `${Math.max(14, vType.itemTitleFontSize)}px` }}
                     >
                       {item.title}
-                    </h3>
+                    </span>
                     {item.description && (
-                      <p
-                        className="about-value-description leading-relaxed text-black/75"
-                        style={{ fontSize: `${vType.itemDescriptionFontSize}px` }}
+                      <span
+                        className="about-value-description leading-relaxed text-black/75 block"
+                        style={{ fontSize: `${Math.max(14, vType.itemDescriptionFontSize)}px` }}
                       >
                         {item.description}
-                      </p>
+                      </span>
                     )}
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="about-journey-column">

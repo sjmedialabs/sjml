@@ -82,46 +82,14 @@ export function Footer({ data: propData }: FooterProps = {}) {
 
     async function loadFooter() {
       try {
-        const [footerRes, settingsRes, servicesRes] = await Promise.all([
-          propData ? Promise.resolve(null) : fetch("/api/content/footer"),
-          fetch("/api/content/settings").catch(() => null),
-          fetch("/api/services?all=true").catch(() => null),
-        ])
-
+        // Footer CMS is authoritative — do not overlay General Settings or services
+        // over saved (including intentionally empty) footer fields.
         let merged = normalizeFooterContent(propData)
 
-        if (!propData && footerRes?.ok) {
-          merged = normalizeFooterContent(await footerRes.json())
-        }
-
-        if (settingsRes?.ok) {
-          const settings = await settingsRes.json()
-          merged = normalizeFooterContent({
-            ...merged,
-            logo: merged.logo || settings.footerLogo,
-            phone: merged.phone || settings.contactPhone || settings.phone,
-            email: merged.email || settings.contactEmail || settings.email,
-            address: merged.address || settings.address,
-            socialLinks: {
-              facebook: merged.socialLinks.facebook || settings.socialMedia?.facebook,
-              instagram: merged.socialLinks.instagram || settings.socialMedia?.instagram,
-              linkedin: merged.socialLinks.linkedin || settings.socialMedia?.linkedin,
-              twitter: merged.socialLinks.twitter || settings.socialMedia?.twitter,
-              youtube: merged.socialLinks.youtube || settings.socialMedia?.youtube,
-            },
-          })
-        }
-
-        if (servicesRes?.ok) {
-          const services = await servicesRes.json()
-          if (Array.isArray(services) && services.length > 0 && merged.serviceLinks.length === 0) {
-            merged = {
-              ...merged,
-              serviceLinks: services.map((s: { title: string; slug: string }) => ({
-                name: s.title,
-                href: `/services/${s.slug}`,
-              })),
-            }
+        if (!propData) {
+          const footerRes = await fetch("/api/content/footer")
+          if (footerRes.ok) {
+            merged = normalizeFooterContent(await footerRes.json())
           }
         }
 
@@ -137,10 +105,7 @@ export function Footer({ data: propData }: FooterProps = {}) {
     }
   }, [propData])
 
-  const { serviceLinks, socialLinks, siteName, siteTagline } = footerData
-  const companyLinks = footerData.companyLinks.some((link) => link.href === "/careers")
-    ? footerData.companyLinks
-    : [...footerData.companyLinks, { name: "Careers", href: "/careers" }]
+  const { serviceLinks, socialLinks, siteName, siteTagline, companyLinks } = footerData
 
   return (
     <footer className="home-footer bg-home-primary text-black">
@@ -168,26 +133,26 @@ export function Footer({ data: propData }: FooterProps = {}) {
             )}
             <div className="space-y-2.5 mb-5">
               {footerData.address && (
-                <p className="site-paragraph flex items-start gap-2 text-black/80">
+                <div className="site-paragraph flex items-start gap-2 text-black/80">
                   <MapPinIcon className="mt-0.5 shrink-0" />
                   <span className="whitespace-pre-line">{footerData.address}</span>
-                </p>
+                </div>
               )}
               {footerData.phone && (
-                <p className="site-paragraph flex items-center gap-2 text-black/80">
+                <div className="site-paragraph flex items-center gap-2 text-black/80">
                   <PhoneIcon className="shrink-0" />
                   <a href={`tel:${footerData.phone.replace(/\s/g, "")}`} className="hover:opacity-70">
                     {footerData.phone}
                   </a>
-                </p>
+                </div>
               )}
               {footerData.email && (
-                <p className="site-paragraph flex items-center gap-2 text-black/80">
+                <div className="site-paragraph flex items-center gap-2 text-black/80">
                   <MailIcon className="shrink-0" />
                   <a href={`mailto:${footerData.email}`} className="hover:opacity-70">
                     {footerData.email}
                   </a>
-                </p>
+                </div>
               )}
             </div>
             <SocialLinks links={socialLinks} />
@@ -196,56 +161,44 @@ export function Footer({ data: propData }: FooterProps = {}) {
           {/* Company */}
           <div>
             <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Company</p>
-            <ul className="space-y-2">
+            <nav className="flex flex-col gap-2" aria-label="Company">
               {companyLinks.map((link) => (
-                <li key={`${link.href}-${link.name}`}>
-                  <Link href={link.href} className="site-paragraph text-black/80 hover:text-black transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
+                <Link key={`${link.href}-${link.name}`} href={link.href} className="site-paragraph text-black/80 hover:text-black transition-colors">
+                  {link.name}
+                </Link>
               ))}
-            </ul>
+            </nav>
           </div>
 
           {/* Services */}
           <div>
             <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Services</p>
-            <ul className="space-y-2">
+            <nav className="flex flex-col gap-2" aria-label="Services">
               {serviceLinks.map((link) => (
-                <li key={`${link.href}-${link.name}`}>
-                  <Link href={link.href} className="site-paragraph text-black/80 hover:text-black transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
+                <Link key={`${link.href}-${link.name}`} href={link.href} className="site-paragraph text-black/80 hover:text-black transition-colors">
+                  {link.name}
+                </Link>
               ))}
-            </ul>
+            </nav>
           </div>
 
           {/* Quick links */}
           <div>
             <p className="site-subtitle text-sm font-bold uppercase tracking-wider mb-4">Legal</p>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/privacy" className="site-paragraph text-black/80 hover:text-black transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="site-paragraph text-black/80 hover:text-black transition-colors">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="/cookies" className="site-paragraph text-black/80 hover:text-black transition-colors">
-                  Cookie Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="site-paragraph text-black/80 hover:text-black transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
+            <nav className="flex flex-col gap-2" aria-label="Legal">
+              <Link href="/privacy" className="site-paragraph text-black/80 hover:text-black transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="site-paragraph text-black/80 hover:text-black transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/cookies" className="site-paragraph text-black/80 hover:text-black transition-colors">
+                Cookie Policy
+              </Link>
+              <Link href="/contact" className="site-paragraph text-black/80 hover:text-black transition-colors">
+                Contact Us
+              </Link>
+            </nav>
           </div>
         </div>
 

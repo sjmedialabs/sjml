@@ -19,7 +19,7 @@ export function WorkCtaSection({
   return (
     <section className="work-cta-banner bg-home-secondary py-8 md:py-10">
       <div className="site-container flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-white font-medium text-center md:text-left" style={{ fontSize: `${typography.ctaTextFontSize}px` }}>
+        <p className="text-white font-medium text-center md:text-left" style={{ fontSize: "14px" }}>
           {data.textLine1}{" "}
           <span className="text-home-primary">{data.textHighlight}</span>
         </p>

@@ -127,15 +127,15 @@ export function InsightsGridSection({
                 )}
               </div>
               <div className="insight-card-body">
-                <h2 className="insight-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
+                <span className="insight-card-title block" style={{ fontSize: `${Math.max(14, typography.cardTitleFontSize)}px` }}>
                   {post.title}
-                </h2>
+                </span>
                 {post.excerpt && (
-                  <p className="insight-card-excerpt" style={{ fontSize: `${typography.cardExcerptFontSize}px` }}>
+                  <span className="insight-card-excerpt block" style={{ fontSize: `${Math.max(14, typography.cardExcerptFontSize)}px` }}>
                     {post.excerpt}
-                  </p>
+                  </span>
                 )}
-                <div className="insight-card-footer" style={{ fontSize: `${typography.cardMetaFontSize}px` }}>
+                <div className="insight-card-footer" style={{ fontSize: `${Math.max(14, typography.cardMetaFontSize)}px` }}>
                   <span>{post.date}</span>
                   <span aria-hidden="true">•</span>
                   <span>{post.readTime}</span>

@@ -212,17 +212,17 @@ export function WorkGridSection({
               </div>
               <div className="work-card-body">
                 {work.categoryTags && (
-                  <p className="work-card-category" style={{ fontSize: `${typography.cardCategoryFontSize}px` }}>
+                  <span className="work-card-category block" style={{ fontSize: `${Math.max(14, typography.cardCategoryFontSize)}px` }}>
                     {work.categoryTags}
-                  </p>
+                  </span>
                 )}
-                <h2 className="work-card-title" style={{ fontSize: `${typography.cardTitleFontSize}px` }}>
+                <span className="work-card-title block" style={{ fontSize: `${Math.max(14, typography.cardTitleFontSize)}px` }}>
                   {work.title}
-                </h2>
+                </span>
                 {work.cardSubtitle && (
-                  <p className="work-card-subtitle" style={{ fontSize: `${typography.cardSubtitleFontSize}px` }}>
+                  <span className="work-card-subtitle block" style={{ fontSize: `${Math.max(14, typography.cardSubtitleFontSize)}px` }}>
                     {work.cardSubtitle}
-                  </p>
+                  </span>
                 )}
               </div>
             </Link>

@@ -1,8 +1,9 @@
 "use client"
 
-import { useRef, useState, useEffect, useCallback, type ComponentType } from "react"
+import { useRef, useState, useEffect, useCallback, type ComponentType, type KeyboardEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ChevronLeft, ChevronRight, Megaphone, PenTool, Monitor, Code2, type IconProps } from "@/components/flat-lucide"
 import type { HomeServicesSection } from "@/lib/home-content"
 import { isValidWorkImage } from "@/lib/work-detail"
@@ -31,10 +32,12 @@ function ServiceIcon({ icon, index, size }: { icon: string; index: number; size:
 }
 
 export function ServicesSection({ data }: ServicesSectionProps) {
+  const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const items = data.items.filter((i) => i.enabled && i.title)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
+  const [isDesktopCarousel, setIsDesktopCarousel] = useState(false)
 
   const labelSize = Math.max(14, data.labelFontSize ?? 14)
   const sectionTitleSize = data.sectionTitleFontSize ?? 38
@@ -57,6 +60,14 @@ export function ServicesSection({ data }: ServicesSectionProps) {
     window.addEventListener("resize", updateScrollState)
     return () => window.removeEventListener("resize", updateScrollState)
   }, [updateScrollState, items.length, cardWidth])
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)")
+    const sync = () => setIsDesktopCarousel(mq.matches)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
 
   if (!data.enabled || items.length === 0) return null
 
@@ -95,21 +106,23 @@ export function ServicesSection({ data }: ServicesSectionProps) {
                 {data.description}
               </p>
             )}
-            <Link
-              href={data.exploreLinkUrl || "/services"}
-              className="hidden md:inline-flex home-hero-cta-primary items-center gap-2 px-5 font-semibold text-sm uppercase tracking-wide shrink-0"
-            >
-              {data.exploreLinkText || "EXPLORE ALL SERVICES"}
-              <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-            </Link>
+            {isDesktopCarousel && (
+              <Link
+                href={data.exploreLinkUrl || "/services"}
+                className="inline-flex home-hero-cta-primary items-center gap-2 px-5 font-semibold text-sm uppercase tracking-wide shrink-0"
+              >
+                {data.exploreLinkText || "EXPLORE ALL SERVICES"}
+                <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              </Link>
+            )}
           </div>
 
           <div className="min-w-0 flex flex-col items-center md:flex-row md:items-center md:gap-3">
-            {showScrollButtons && canScrollLeft && (
+            {isDesktopCarousel && showScrollButtons && canScrollLeft && (
               <button
                 type="button"
                 onClick={() => scrollBy("left")}
-                className="home-services-scroll-btn hidden md:flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
+                className="home-services-scroll-control flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
                 aria-label="Scroll services left"
               >
                 <ChevronLeft className="w-5 h-5" strokeWidth={2} />
@@ -120,51 +133,68 @@ export function ServicesSection({ data }: ServicesSectionProps) {
               onScroll={updateScrollState}
               className="flex flex-col md:flex-row w-full min-w-0 md:w-auto items-center md:items-stretch gap-5 md:overflow-x-auto pb-4 md:snap-x md:snap-mandatory scrollbar-hide scroll-smooth"
             >
-              {items.map((service, index) => (
-                <Link
-                  key={service.id}
-                  href={service.link || "/services"}
-                  className="snap-start shrink-0 rounded-lg border border-black/[0.06] bg-white px-5 py-6 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex flex-col items-center text-center w-full max-w-[340px] md:w-auto"
-                  style={{
-                    minHeight: cardHeight,
-                    ["--card-width" as any]: `${cardWidth}px`,
-                  }}
-                >
-                  <div className="mb-3 flex items-center justify-center shrink-0">
-                    <ServiceIcon icon={service.icon} index={index} size={iconSize} />
+              {items.map((service, index) => {
+                const href = service.link || "/services"
+                const open = () => router.push(href)
+                const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault()
+                    open()
+                  }
+                }
+                return (
+                  <div
+                    key={service.id}
+                    role="link"
+                    tabIndex={0}
+                    onClick={open}
+                    onKeyDown={onKeyDown}
+                    className="home-service-card snap-start shrink-0 rounded-lg border border-black/[0.06] bg-white px-5 py-6 shadow-[0_4px_24px_rgba(0,0,0,0.07)] flex flex-col items-center text-center w-full max-w-[340px] md:w-auto cursor-pointer"
+                    style={{
+                      minHeight: cardHeight,
+                      ["--card-width" as any]: `${cardWidth}px`,
+                    }}
+                  >
+                    <a href={href} className="sr-only">
+                      {service.title}
+                    </a>
+                    <div className="mb-3 flex items-center justify-center shrink-0">
+                      <ServiceIcon icon={service.icon} index={index} size={iconSize} />
+                    </div>
+                    <span
+                      className="site-subtitle font-bold uppercase tracking-wide text-black mb-2 shrink-0"
+                      style={{ fontSize: `${cardTitleSize}px` }}
+                    >
+                      {service.title}
+                    </span>
+                    <span
+                      className="site-paragraph leading-[1.5] text-[#757575] flex-1"
+                      style={{ fontSize: `${cardDescriptionSize}px` }}
+                    >
+                      {service.description}
+                    </span>
                   </div>
-                  <h3
-                    className="site-subtitle font-bold uppercase tracking-wide text-black mb-2 shrink-0"
-                    style={{ fontSize: `${cardTitleSize}px` }}
-                  >
-                    {service.title}
-                  </h3>
-                  <p
-                    className="site-paragraph leading-[1.5] text-[#757575] flex-1"
-                    style={{ fontSize: `${cardDescriptionSize}px` }}
-                  >
-                    {service.description}
-                  </p>
+                )
+              })}
+            </div>
+
+            {!isDesktopCarousel && (
+              <div className="mt-6 w-full flex justify-center">
+                <Link
+                  href={data.exploreLinkUrl || "/services"}
+                  className="home-hero-cta-primary inline-flex items-center justify-center gap-2 px-6 font-semibold text-sm uppercase tracking-wide shrink-0"
+                >
+                  {data.exploreLinkText || "EXPLORE ALL SERVICES"}
+                  <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
                 </Link>
-              ))}
-            </div>
+              </div>
+            )}
 
-            {/* Explore button visible at bottom only on mobile */}
-            <div className="mt-6 md:hidden w-full flex justify-center">
-              <Link
-                href={data.exploreLinkUrl || "/services"}
-                className="home-hero-cta-primary md:hidden inline-flex items-center justify-center gap-2 px-6 font-semibold text-sm uppercase tracking-wide shrink-0"
-              >
-                {data.exploreLinkText || "EXPLORE ALL SERVICES"}
-                <ChevronRight className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-              </Link>
-            </div>
-
-            {showScrollButtons && canScrollRight && (
+            {isDesktopCarousel && showScrollButtons && canScrollRight && (
               <button
                 type="button"
                 onClick={() => scrollBy("right")}
-                className="home-services-scroll-btn hidden md:flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
+                className="home-services-scroll-control flex w-11 h-11 shrink-0 rounded-full bg-home-secondary text-white items-center justify-center shadow-lg hover:bg-black transition-colors"
                 aria-label="Scroll services right"
               >
                 <ChevronRight className="w-5 h-5" strokeWidth={2} />

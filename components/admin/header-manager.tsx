@@ -40,6 +40,7 @@ const defaultData: HeaderData = {
 
 export function HeaderManager() {
   const [data, setData] = useState<HeaderData>(defaultData)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -56,11 +57,14 @@ export function HeaderManager() {
       }
     } catch (error) {
       console.error("Failed to fetch header data")
+    } finally {
+      setLoading(false)
     }
   }
 
   const saveData = async () => {
     setSaving(true)
+    setMessage("")
     try {
       const token = localStorage.getItem("adminToken")
       const res = await fetch("/api/content/header", {
@@ -72,11 +76,15 @@ export function HeaderManager() {
         body: JSON.stringify(data),
       })
       if (res.ok) {
+        const saved = await res.json()
+        setData(normalizeHeaderContent(saved))
         setMessage("Header saved successfully!")
-        setTimeout(() => setMessage(""), 3000)
+      } else {
+        const err = await res.json().catch(() => null)
+        setMessage(err?.error ? `Failed to save: ${err.error}` : "Failed to save header")
       }
     } catch {
-      setMessage("Failed to save")
+      setMessage("Failed to save header")
     }
     setSaving(false)
   }
@@ -97,6 +105,10 @@ export function HeaderManager() {
       ...data,
       navItems: data.navItems.map((item) => (item.id === id ? { ...item, ...updates } : item)),
     })
+  }
+
+  if (loading) {
+    return <div className="p-4 admin-text-secondary">Loading header data...</div>
   }
 
   return (

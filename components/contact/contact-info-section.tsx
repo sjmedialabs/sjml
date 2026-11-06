@@ -75,7 +75,7 @@ export function ContactInfoSection({
         {data.heading}
       </h2>
 
-      <ul className="contact-info-list">
+      <div className="contact-info-list">
         {data.items.map((item) => {
           const Icon = ICONS[item.icon]
           const content = (
@@ -83,13 +83,13 @@ export function ContactInfoSection({
               <span className="contact-info-icon" aria-hidden="true">
                 <Icon />
               </span>
-              <span className="contact-info-value" style={{ fontSize: `${typography.infoValueFontSize}px` }}>
+              <span className="contact-info-value" style={{ fontSize: `${Math.max(14, typography.infoValueFontSize)}px` }}>
                 {item.value}
               </span>
             </>
           )
           return (
-            <li key={item.id} className="contact-info-item">
+            <div key={item.id} className="contact-info-item">
               {item.href ? (
                 <a href={item.href} className="contact-info-link">
                   {content}
@@ -97,17 +97,17 @@ export function ContactInfoSection({
               ) : (
                 content
               )}
-            </li>
+            </div>
           )
         })}
-      </ul>
+      </div>
 
       <div className="contact-email-callout">
         <span className="contact-email-callout-icon" aria-hidden="true">
           <PlaneIcon />
         </span>
         <div className="min-w-0">
-          <p className="contact-email-callout-text" style={{ fontSize: `${typography.infoValueFontSize}px` }}>
+          <div className="contact-email-callout-text" style={{ fontSize: `${Math.max(14, typography.infoValueFontSize)}px` }}>
             {data.emailCalloutText}{" "}
             <a href={`mailto:${data.emailCalloutEmail}`} className="contact-email-callout-link">
               {data.emailCalloutEmail}
@@ -115,7 +115,7 @@ export function ContactInfoSection({
             <span className="contact-email-callout-arrow" aria-hidden="true">
               <ArrowIcon />
             </span>
-          </p>
+          </div>
         </div>
       </div>
     </div>

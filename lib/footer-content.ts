@@ -44,27 +44,47 @@ export function createDefaultFooter(): FooterContent {
   }
 }
 
+function pickString(value: unknown, fallback: string): string {
+  if (typeof value === "string") return value.trim()
+  if (value == null) return fallback
+  return String(value).trim()
+}
+
+function pickLinks(value: unknown, fallback: FooterLink[]): FooterLink[] {
+  if (!Array.isArray(value)) return fallback
+  return value
+    .filter((link): link is FooterLink => Boolean(link && typeof link === "object"))
+    .map((link) => ({
+      name: typeof link.name === "string" ? link.name : "",
+      href: typeof link.href === "string" ? link.href : "/",
+    }))
+    .filter((link) => link.name.trim() !== "" || link.href.trim() !== "")
+}
+
 export function normalizeFooterContent(raw: unknown): FooterContent {
   const defaults = createDefaultFooter()
-  const data = (raw ?? {}) as Partial<FooterContent>
+  // Treat missing document as defaults; treat present document (even empty fields) as intentional.
+  if (raw == null || typeof raw !== "object") {
+    return defaults
+  }
+
+  const data = raw as Partial<FooterContent> & Record<string, unknown>
+  const hasOwn = (key: string) => Object.prototype.hasOwnProperty.call(data, key)
 
   return {
-    logo: data.logo?.trim() || defaults.logo,
-    siteName: data.siteName?.trim() || defaults.siteName,
-    siteTagline: data.siteTagline?.trim() || defaults.siteTagline,
-    address: data.address?.trim() || defaults.address,
-    phone: data.phone?.trim() || defaults.phone,
-    email: data.email?.trim() || defaults.email,
-    copyright: data.copyright?.trim() || defaults.copyright,
-    newsletterText: data.newsletterText?.trim() || defaults.newsletterText,
-    companyLinks:
-      Array.isArray(data.companyLinks) && data.companyLinks.length > 0
-        ? data.companyLinks.filter((l) => l.name && l.href)
-        : defaults.companyLinks,
-    serviceLinks:
-      Array.isArray(data.serviceLinks) && data.serviceLinks.length > 0
-        ? data.serviceLinks.filter((l) => l.name && l.href)
-        : defaults.serviceLinks,
-    socialLinks: { ...defaults.socialLinks, ...(data.socialLinks ?? {}) },
+    logo: hasOwn("logo") ? pickString(data.logo, "") : defaults.logo,
+    siteName: hasOwn("siteName") ? pickString(data.siteName, "") : defaults.siteName,
+    siteTagline: hasOwn("siteTagline") ? pickString(data.siteTagline, "") : defaults.siteTagline,
+    address: hasOwn("address") ? pickString(data.address, "") : defaults.address,
+    phone: hasOwn("phone") ? pickString(data.phone, "") : defaults.phone,
+    email: hasOwn("email") ? pickString(data.email, "") : defaults.email,
+    copyright: hasOwn("copyright") ? pickString(data.copyright, "") : defaults.copyright,
+    newsletterText: hasOwn("newsletterText") ? pickString(data.newsletterText, "") : defaults.newsletterText,
+    companyLinks: hasOwn("companyLinks") ? pickLinks(data.companyLinks, []) : defaults.companyLinks,
+    serviceLinks: hasOwn("serviceLinks") ? pickLinks(data.serviceLinks, []) : defaults.serviceLinks,
+    socialLinks: {
+      ...defaults.socialLinks,
+      ...(data.socialLinks && typeof data.socialLinks === "object" ? data.socialLinks : {}),
+    },
   }
 }

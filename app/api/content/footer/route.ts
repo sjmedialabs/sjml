@@ -28,12 +28,13 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 })
     }
     const data = await request.json()
-    const updated = await updateHomeContent("footer", data)
+    const normalized = normalizeFooterContent(data)
+    const updated = await updateHomeContent("footer", normalized)
     
     // Revalidate all pages since footer is on every page
     revalidatePath("/", "layout")
     
-    return NextResponse.json(updated?.footer)
+    return NextResponse.json(normalizeFooterContent(updated?.footer))
   } catch (error) {
     console.error("Update footer error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

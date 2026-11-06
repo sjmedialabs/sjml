@@ -13,14 +13,11 @@ export function AboutHeroSection({ data }: { data: AboutHero }) {
               <span className="text-home-primary">{data.titleHighlight}</span>
             </h1>
             {(data.taglineLine1 || data.taglineLine2) && (
-              <div className="mb-2">
-                {data.taglineLine1 && (
-                  <p className="site-subtitle text-white leading-snug">{data.taglineLine1}</p>
-                )}
-                {data.taglineLine2 && (
-                  <p className="site-subtitle text-home-primary leading-snug">{data.taglineLine2}</p>
-                )}
-              </div>
+              <p className="site-subtitle leading-snug mb-2">
+                {data.taglineLine1 && <span className="text-white">{data.taglineLine1}</span>}
+                {data.taglineLine1 && data.taglineLine2 ? <br /> : null}
+                {data.taglineLine2 && <span className="text-home-primary">{data.taglineLine2}</span>}
+              </p>
             )}
             {data.description && (
               <p className="site-paragraph text-white/85 leading-relaxed max-w-lg">{data.description}</p>

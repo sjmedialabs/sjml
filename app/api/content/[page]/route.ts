@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { getPageContent, updatePageContent } from "@/lib/models/content"
-import { normalizeHeaderContent } from "@/lib/header-content"
+import { normalizeHeaderContent, sanitizeHeaderForWrite } from "@/lib/header-content"
 
 const validPages = [
   "home",
@@ -91,7 +91,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Invalid page" }, { status: 400 })
     }
 
-    const updateData = page === "header" ? normalizeHeaderContent(body as Record<string, unknown>) : body
+    const updateData = page === "header" ? sanitizeHeaderForWrite(body as Record<string, unknown>) : body
     const updated = await updatePageContent(page, updateData)
 
     // Revalidate the affected page paths

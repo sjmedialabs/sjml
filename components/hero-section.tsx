@@ -116,6 +116,15 @@ export function HeroSection({ data }: HeroSectionProps) {
     return () => clearInterval(timer)
   }, [activeIndex, slides.length, goTo])
 
+  const [showSlideControls, setShowSlideControls] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)")
+    const sync = () => setShowSlideControls(mq.matches)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
+
   if (!data.enabled || slides.length === 0) return null
 
   const activeSlide = slides[activeIndex] ?? slides[0]
@@ -129,7 +138,7 @@ export function HeroSection({ data }: HeroSectionProps) {
   }
 
   return (
-    <section className="home-hero-section bg-white">
+    <section className="home-hero-section">
         <div
           className="home-hero-carousel relative isolate w-full mx-auto bg-home-secondary"
           style={{
@@ -151,41 +160,43 @@ export function HeroSection({ data }: HeroSectionProps) {
           ) : null}
 
           <div className="relative z-[2] flex h-full items-center">
-            {slides.length > 1 && (
-              <div className="hidden md:flex shrink-0 flex-col gap-3 pl-6">
-                {slides.map((slide, index) => (
-                  <button
-                    key={slide.id}
-                    type="button"
-                    onClick={() => goTo(index)}
-                    className="home-hero-slide-btn group flex h-11 items-center gap-2 text-left"
-                    aria-label={`Go to slide ${index + 1}`}
-                    aria-current={index === activeIndex ? "true" : undefined}
-                  >
-                    <span
-                      className={`block w-0.5 transition-all duration-300 ${
-                        index === activeIndex ? "h-10 bg-home-primary" : "h-5 bg-white/40 group-hover:bg-white/70"
-                      }`}
-                    />
-                    <span
-                      className={`text-sm font-medium tracking-widest ${
-                        index === activeIndex ? "text-home-primary" : "text-white/50 group-hover:text-white/80"
-                      }`}
+            <div className="site-container flex w-full items-center gap-4 md:gap-6">
+              {slides.length > 1 && showSlideControls && (
+                <div className="flex shrink-0 flex-col gap-3">
+                  {slides.map((slide, index) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={() => goTo(index)}
+                      className="home-hero-slide-control group flex h-11 items-center gap-2 text-left"
+                      aria-label={`Go to slide ${index + 1}`}
+                      aria-current={index === activeIndex ? "true" : undefined}
                     >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
+                      <span
+                        className={`block w-0.5 transition-all duration-300 ${
+                          index === activeIndex ? "h-10 bg-home-primary" : "h-5 bg-white/40 group-hover:bg-white/70"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-medium tracking-widest ${
+                          index === activeIndex ? "text-home-primary" : "text-white/50 group-hover:text-white/80"
+                        }`}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            <div className="flex min-w-0 flex-1 items-center pl-6 md:pl-10 pr-6 md:pr-10">
-              <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
+              <div className="flex min-w-0 flex-1 items-center">
+                <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
+              </div>
             </div>
           </div>
 
           {data.showScrollIndicator && (
-            <div className="home-hero-scroll-indicator absolute bottom-5 right-5 md:right-6 z-[3] flex flex-col items-center gap-1.5 text-white">
+            <div className="home-hero-scroll-indicator absolute bottom-5 right-[max(1.25rem,calc((100vw-85vw)/2+1.25rem))] z-[3] flex flex-col items-center gap-1.5 text-white">
               <ScrollMouseIcon />
               <span className="text-sm uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
             </div>

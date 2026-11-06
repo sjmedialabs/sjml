@@ -20,9 +20,9 @@ function isIndustriesLabel(label: string): boolean {
   return label.trim().toUpperCase().replace(/\s+/g, " ") === "INDUSTRIES"
 }
 
-/** Correct legacy nav entries where Industries pointed at case studies. */
+/** Correct legacy nav entries where Industries pointed at case studies. Does not invent new links. */
 export function normalizeHeaderNavItems(items: HeaderNavItem[]): HeaderNavItem[] {
-  const mapped = items.map((item) => {
+  return items.map((item) => {
     if (isIndustriesLabel(item.label) || (item.href === "/case-studies" && /industr/i.test(item.label))) {
       return {
         ...item,
@@ -32,15 +32,48 @@ export function normalizeHeaderNavItems(items: HeaderNavItem[]): HeaderNavItem[]
     }
     return item
   })
+}
 
-  if (!mapped.some((item) => item.href === "/careers")) {
-    const careers = { id: "careers", label: "Careers", href: "/careers" }
-    const contactIndex = mapped.findIndex((item) => item.href === "/contact")
-    if (contactIndex >= 0) mapped.splice(contactIndex, 0, careers)
-    else mapped.push(careers)
+function asNavItems(raw: unknown, fallback: HeaderNavItem[]): HeaderNavItem[] {
+  if (!Array.isArray(raw)) return fallback
+  return raw
+    .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"))
+    .map((item, index) => ({
+      id: typeof item.id === "string" && item.id ? item.id : String(index),
+      label: typeof item.label === "string" ? item.label : "",
+      href: typeof item.href === "string" ? item.href : "/",
+      children: Array.isArray(item.children)
+        ? item.children
+            .filter((child): child is Record<string, unknown> => Boolean(child && typeof child === "object"))
+            .map((child) => ({
+              label: typeof child.label === "string" ? child.label : "",
+              href: typeof child.href === "string" ? child.href : "/",
+            }))
+        : undefined,
+    }))
+}
+
+/** Persist admin payload without inventing nav items. */
+export function sanitizeHeaderForWrite(data: Record<string, unknown>): NormalizedHeaderContent {
+  const defaults = defaultHeaderContent
+  const rawLogo = typeof data.logo === "string" ? data.logo.trim() : ""
+  const logo = rawLogo && rawLogo !== "/logo.svg" ? rawLogo : ""
+  const cta = (data.ctaButton && typeof data.ctaButton === "object" ? data.ctaButton : {}) as {
+    text?: string
+    href?: string
   }
 
-  return mapped
+  return {
+    logo,
+    logoText: typeof data.logoText === "string" ? data.logoText : defaults.logoText,
+    navItems: asNavItems(data.navItems, defaults.navItems),
+    ctaButton: {
+      text: typeof cta.text === "string" ? cta.text : defaults.ctaButton.text,
+      href: typeof cta.href === "string" ? cta.href : defaults.ctaButton.href,
+    },
+    showTopBar: Boolean(data.showTopBar),
+    topBarText: typeof data.topBarText === "string" ? data.topBarText : "",
+  }
 }
 
 export function normalizeHeaderContent(data: Record<string, unknown>): NormalizedHeaderContent {
@@ -53,7 +86,7 @@ export function normalizeHeaderContent(data: Record<string, unknown>): Normalize
   return {
     logo,
     logoText: (data.logoText as string) ?? defaults.logoText,
-    navItems: normalizeHeaderNavItems(rawItems),
+    navItems: normalizeHeaderNavItems(asNavItems(rawItems, defaults.navItems)),
     ctaButton: {
       text: ((data.ctaButton as { text?: string })?.text) ?? defaults.ctaButton.text,
       href: ((data.ctaButton as { href?: string })?.href) ?? defaults.ctaButton.href,

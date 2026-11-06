@@ -39,29 +39,26 @@ export function ServiceDetailSidebar({
       </p>
 
       {navItems.length > 0 && (
-        <nav className="service-detail-nav mb-8" aria-label="Service navigation">
-          <ul className="space-y-0">
-            {navItems.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  href={item.href}
-                  className={`service-detail-nav-link flex items-center gap-2.5 py-2.5 px-3 text-sm transition-colors ${
-                    item.active
-                      ? "is-active bg-black/[0.04] text-black font-semibold"
-                      : "text-black/70 hover:text-black hover:bg-black/[0.02]"
-                  }`}
-                >
-                  <span
-                    className={`service-detail-nav-bullet shrink-0 rounded-full ${
-                      item.active ? "bg-home-primary" : "bg-transparent"
-                    }`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav className="service-detail-nav mb-8 flex flex-col gap-1" aria-label="Service navigation">
+          {navItems.map((item) => (
+            <Link
+              key={item.slug}
+              href={item.href}
+              className={`service-detail-nav-link flex items-center gap-2.5 py-2 px-3 text-sm transition-colors ${
+                item.active
+                  ? "is-active bg-black/[0.04] text-black font-semibold"
+                  : "text-black/70 hover:text-black hover:bg-black/[0.02]"
+              }`}
+            >
+              <span
+                className={`service-detail-nav-bullet shrink-0 rounded-full ${
+                  item.active ? "bg-home-primary" : "bg-transparent"
+                }`}
+                aria-hidden="true"
+              />
+              {item.name}
+            </Link>
+          ))}
         </nav>
       )}
 
@@ -79,7 +76,7 @@ export function ServiceDetailSidebar({
             </p>
           )}
           {sidebarCta.text && (
-            <p className="text-black/65 mb-4 leading-relaxed" style={{ fontSize: `${typography.sidebarCtaTextFontSize}px` }}>
+            <p className="text-black/65 mb-4 leading-relaxed" style={{ fontSize: "14px" }}>
               {sidebarCta.text}
             </p>
           )}
@@ -114,7 +111,7 @@ export function ServiceDetailBottomCta({
           </h3>
         )}
         {data.text && (
-          <p className="text-black/65 leading-relaxed" style={{ fontSize: `${typography.bottomCtaTextFontSize}px` }}>
+          <p className="text-black/65 leading-relaxed" style={{ fontSize: "14px" }}>
             {data.text}
           </p>
         )}

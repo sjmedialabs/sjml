@@ -49,9 +49,12 @@ export function FooterManager() {
       })
 
       if (res.ok) {
+        const saved = await res.json()
+        setFooterData(normalizeFooterContent(saved))
         setMessage("Footer saved successfully!")
       } else {
-        setMessage("Failed to save footer")
+        const err = await res.json().catch(() => null)
+        setMessage(err?.error ? `Failed to save: ${err.error}` : "Failed to save footer")
       }
     } catch (error) {
       console.error("Save error:", error)
