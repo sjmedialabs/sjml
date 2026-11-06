@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCollection } from "@/lib/mongodb"
 import { sendDigitalMarketingFormEmail } from "@/lib/email"
+import { addLead } from "@/lib/models/lead"
+import { getLeadSourcePage } from "@/lib/lead-source-page"
 
 export const dynamic = "force-dynamic"
 
@@ -49,6 +51,18 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Phone number must have at least 10 digits" }, { status: 400 })
       }
     }
+
+    await addLead({
+      name: body.contactPerson.trim(),
+      email: body.email.trim(),
+      phone: body.phone.trim(),
+      company: body.companyName.trim(),
+      subject: "Digital marketing enquiry",
+      message: typeof body.message === "string" ? body.message : "",
+      source: "website",
+      page: getLeadSourcePage(request),
+      status: "new",
+    })
 
     // Remove internal fields before storing
     const { _honeypot, _loadedAt, ...formData } = body

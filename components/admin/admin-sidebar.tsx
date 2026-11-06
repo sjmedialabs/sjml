@@ -16,7 +16,6 @@ const menuCategories = [
     label: "Pages",
     items: [
       { id: "home", label: "Home Page", icon: "Home" },
-      { id: "landing-pages", label: "Landing Pages", icon: "Globe" },
       { id: "about", label: "About Page", icon: "Users" },
       { id: "work", label: "Work Page", icon: "FolderOpen" },
       { id: "services", label: "Services Page", icon: "Layers" },
@@ -27,6 +26,7 @@ const menuCategories = [
       { id: "testimonials", label: "Testimonials", icon: "MessageCircle" },
       { id: "careers", label: "Careers", icon: "Briefcase" },
       { id: "contact", label: "Contact Page", icon: "Mail" },
+      { id: "landing-pages", label: "Landing Page", icon: "Globe" },
     ],
   },
   {

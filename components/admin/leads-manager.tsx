@@ -18,6 +18,7 @@ interface Lead {
   subject?: string
   message: string
   source: string
+  page?: string
   status: "new" | "contacted" | "qualified" | "converted" | "lost"
   createdAt: string
   notes?: string
@@ -185,7 +186,7 @@ export function LeadsManager() {
         const allLeads = data.leads || data
 
         const csv = [
-          ["Name", "Email", "Phone", "Subject", "Source", "Platform", "Campaign", "Status", "Date"].join(","),
+          ["Name", "Email", "Phone", "Subject", "Source", "Page", "Platform", "Campaign", "Status", "Date"].join(","),
           ...allLeads.map((lead: Lead) =>
             [
               lead.name,
@@ -193,6 +194,7 @@ export function LeadsManager() {
               lead.phone || "",
               lead.subject || "",
               lead.source,
+              lead.page || "",
               lead.platform || "",
               lead.campaign || "",
               lead.status,
@@ -218,7 +220,8 @@ export function LeadsManager() {
     (l) =>
       l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       l.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.phone?.toLowerCase().includes(searchTerm.toLowerCase()),
+      l.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      l.page?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const statusColors: Record<Lead["status"], string> = {
@@ -387,6 +390,7 @@ export function LeadsManager() {
               <th className="text-left p-4 admin-text-secondary font-medium">Email</th>
               <th className="text-left p-4 admin-text-secondary font-medium">Phone</th>
               <th className="text-left p-4 admin-text-secondary font-medium">Source</th>
+              <th className="text-left p-4 admin-text-secondary font-medium">Page</th>
               <th className="text-left p-4 admin-text-secondary font-medium">Status</th>
               <th className="text-left p-4 admin-text-secondary font-medium">Date</th>
               <th className="text-right p-4 admin-text-secondary font-medium">Actions</th>
@@ -395,13 +399,13 @@ export function LeadsManager() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center">
+                <td colSpan={8} className="p-8 text-center">
                   <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                 </td>
               </tr>
             ) : filteredLeads.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center admin-text-muted">
+                <td colSpan={8} className="p-8 text-center admin-text-muted">
                   No leads found
                 </td>
               </tr>
@@ -424,6 +428,9 @@ export function LeadsManager() {
                     >
                       {formatSource(lead.source)}
                     </span>
+                  </td>
+                  <td className="p-4 admin-text-secondary text-sm">
+                    {lead.page || "Not recorded"}
                   </td>
                   <td className="p-4">
                     <Select value={lead.status} onValueChange={(value) => updateLeadStatus(lead.id, value as Lead["status"])}>
@@ -514,6 +521,12 @@ export function LeadsManager() {
 
               {/* Contact Info */}
               <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 p-4 admin-bg-tertiary rounded-lg">
+                  <div className="text-xs admin-text-muted mb-1">Enquiry page</div>
+                  <div className="admin-text-primary break-all">
+                    {selectedLead.page || "Not recorded"}
+                  </div>
+                </div>
                 <div className="p-4 admin-bg-tertiary rounded-lg">
                   <div className="text-xs admin-text-muted mb-1">Email</div>
                   <a href={`mailto:${selectedLead.email}`} className="admin-text-primary hover:text-primary">
