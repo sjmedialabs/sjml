@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import AdminSidebar from "@/components/admin/admin-sidebar"
 import { DashboardOverview } from "@/components/admin/dashboard-overview"
-import { LandingPagesManager } from "@/components/admin/landing-pages-manager"
 
 // Loading fallback for dynamic components
 const LoadingManager = () => (
@@ -60,8 +59,6 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
         return <DashboardOverview />
       case "home":
         return <HomePageManager />
-      case "landing-pages":
-        return <LandingPagesManager />
       case "about":
         return <AboutPageManager />
       case "work":

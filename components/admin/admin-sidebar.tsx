@@ -26,7 +26,6 @@ const menuCategories = [
       { id: "testimonials", label: "Testimonials", icon: "MessageCircle" },
       { id: "careers", label: "Careers", icon: "Briefcase" },
       { id: "contact", label: "Contact Page", icon: "Mail" },
-      { id: "landing-pages", label: "Landing Page", icon: "Globe" },
     ],
   },
   {
