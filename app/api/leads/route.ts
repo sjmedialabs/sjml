@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/jwt"
 import { getLeads, addLead } from "@/lib/models/lead"
-import { getLeadSourcePage } from "@/lib/lead-source-page"
 
 export const dynamic = "force-dynamic"
 
@@ -78,11 +77,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
-    const submittedPage =
-      typeof body.page === "string" && body.page.trim()
-        ? body.page.trim().slice(0, 500)
-        : getLeadSourcePage(request)
-
     const newLead = await addLead({
       name: body.name || "",
       email: body.email,
@@ -93,7 +87,6 @@ export async function POST(request: NextRequest) {
       service: body.service,
       budget: body.budget,
       source: body.source || "website",
-      page: submittedPage,
       status: "new",
     })
 
