@@ -16,7 +16,6 @@ const menuCategories = [
     label: "Pages",
     items: [
       { id: "home", label: "Home Page", icon: "Home" },
-      { id: "landing-pages", label: "Landing Pages", icon: "Globe" },
       { id: "about", label: "About Page", icon: "Users" },
       { id: "work", label: "Work Page", icon: "FolderOpen" },
       { id: "services", label: "Services Page", icon: "Layers" },
