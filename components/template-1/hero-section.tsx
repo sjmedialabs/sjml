@@ -166,7 +166,7 @@ export function Template1HeroSection({
         className={`w-full bg-[#FCC50E] text-[#161617] py-12 ${className}`}
       >
         <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-          <div className="grid grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-12 lg:gap-10 xl:gap-14 2xl:gap-16">
+          <div className="grid grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-12 lg:items-stretch -translate-y-7 lg:gap-10 xl:gap-14 2xl:gap-16">
             {/* Left Hero Copy */}
             <div className="lg:col-span-7 flex flex-col justify-between pt-2">
               <div>
@@ -204,21 +204,58 @@ export function Template1HeroSection({
                 </div>
               </div>
 
-              {/* Trust Line */}
-              {content.trustText && (
-                <div className="mt-7 sm:mt-8 max-w-[360px] md:max-w-full xl:max-w-[400px]">
-                  <p className="text-[11.5px] sm:text-[12px] xl:text-[13px] font-medium text-[#161617]/80">
-                    {content.trustText}
-                  </p>
-                </div>
-              )}
+              <div className="mt-7 sm:mt-8 flex items-end justify-between gap-4">
+                {/* Trust Line */}
+                {content.trustText && (
+                  <div className="max-w-[360px] md:max-w-full xl:max-w-[400px]">
+                    <p className="text-[11.5px] sm:text-[12px] xl:text-[13px] font-medium text-[#161617]/80">
+                      {content.trustText}
+                    </p>
+                  </div>
+                )}
+                {content.showScrollIndicator && (
+                  <div className="ml-auto flex shrink-0 -translate-y-4 flex-col items-center gap-1 font-bold text-black">
+                    <svg
+                      aria-hidden="true"
+                      className="animate-bounce"
+                      fill="none"
+                      height="32"
+                      viewBox="0 0 24 36"
+                      width="22"
+                    >
+                      <rect
+                        height="26"
+                        rx="8"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        width="16"
+                        x="4"
+                        y="2"
+                      />
+                      <line
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeWidth="1.5"
+                        x1="12"
+                        x2="12"
+                        y1="8"
+                        y2="14"
+                      />
+                    </svg>
+                    <span className="text-sm font-bold uppercase tracking-widest">
+                      Scroll Down
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right Form Card: Edge to edge on mobile & tablet, constrained to 5 cols on lg+ */}
-            <div
-              id="consultation-form"
-              className="lg:col-span-5 w-full max-w-full sm:max-w-none md:max-w-none lg:max-w-[440px] xl:max-w-[480px] 2xl:max-w-[500px] lg:ml-auto rounded-[8px] bg-white p-5 sm:p-7 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.08)]"
-            >
+            <div className="lg:col-span-5 w-full max-w-full sm:max-w-none md:max-w-none lg:max-w-[440px] xl:max-w-[480px] 2xl:max-w-[500px] lg:ml-auto">
+              <div
+                id="consultation-form"
+                className="w-full rounded-[8px] bg-white p-5 sm:p-7 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.08)]"
+              >
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-1.5">
                 {content.formOverline}
               </p>
@@ -390,7 +427,8 @@ export function Template1HeroSection({
                     </Link>
                   </p>
                 </form>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

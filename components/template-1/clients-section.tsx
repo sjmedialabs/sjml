@@ -1,4 +1,6 @@
-import React from "react"
+"use client"
+
+import { useState } from "react"
 import Image from "next/image"
 import {
   type Template1ClientsData,
@@ -13,59 +15,28 @@ export interface Template1ClientsSectionProps {
   className?: string
 }
 
-function ClientLogoFallback({ client }: { client: Template1ClientItem }) {
-  if (client.variant === "badge-navy") {
-    return (
-      <div className="flex h-10 sm:h-12 w-20 sm:w-24 flex-col items-center justify-center rounded-[2px] bg-[#1D2545] px-2 text-center shadow-xs">
-        <span className="text-[7px] sm:text-[7.5px] font-bold tracking-[0.08em] text-[#FCC50E]">
-          {client.name}
-        </span>
-        {client.subtext && (
-          <span className="mt-0.5 text-[5px] sm:text-[5.5px] tracking-[0.06em] text-white/80">
-            {client.subtext}
-          </span>
-        )}
-      </div>
-    )
-  }
+function ClientLogo({ client }: { client: Template1ClientItem }) {
+  const [failedLogoUrl, setFailedLogoUrl] = useState<string | null>(null)
+  const logoUrl = client.logoUrl?.trim()
 
-  if (client.variant === "badge-light") {
+  if (!logoUrl || failedLogoUrl === logoUrl) {
     return (
-      <div className="flex h-10 sm:h-12 w-20 sm:w-24 flex-col items-center justify-center rounded-[2px] bg-white px-2 text-center shadow-xs border border-black/5">
-        <span className="h-2 sm:h-2.5 w-2 sm:w-2.5 rotate-45 bg-[#E63946]/85 mb-1" />
-        <span className="text-[6px] sm:text-[6.5px] font-bold tracking-[0.08em] text-[#161617]/80">
-          {client.name}
-        </span>
-      </div>
-    )
-  }
-
-  if (client.variant === "badge-gar") {
-    return (
-      <div className="flex h-10 sm:h-12 w-18 sm:w-20 flex-col items-center justify-center rounded-[2px] bg-white px-2 text-center shadow-xs border border-black/5">
-        <div className="flex items-end gap-0.5 mb-0.5">
-          <span className="h-2 sm:h-2.5 w-1 bg-[#1D3557]" />
-          <span className="h-3 sm:h-3.5 w-1 bg-[#457B9D]" />
-          <span className="h-1.5 sm:h-2 w-1 bg-[#1D3557]" />
-        </div>
-        <span className="text-[9px] sm:text-[10px] font-extrabold tracking-[0.06em] text-[#1D3557] leading-none">
-          {client.name}
-        </span>
-      </div>
+      <span className="text-center text-sm font-semibold text-[#161617]">
+        {client.name}
+      </span>
     )
   }
 
   return (
-    <div className="flex flex-col items-start">
-      <span className="text-[17px] sm:text-[20px] md:text-[22px] font-semibold tracking-[-0.03em] text-[#161617] leading-none">
-        {client.name}
-      </span>
-      {client.subtext && (
-        <span className="mt-0.5 sm:mt-1 text-[6.5px] sm:text-[7px] font-semibold uppercase tracking-[0.28em] text-[#161617]/55 pl-0.5">
-          {client.subtext}
-        </span>
-      )}
-    </div>
+    <Image
+      src={logoUrl}
+      alt={client.name}
+      width={160}
+      height={56}
+      className="max-h-9 sm:max-h-11 md:max-h-12 w-auto object-contain select-none"
+      draggable={false}
+      onError={() => setFailedLogoUrl(logoUrl)}
+    />
   )
 }
 
@@ -130,18 +101,7 @@ export function Template1ClientsSection({
                   key={`${client.id}-${index}`}
                   className="flex shrink-0 items-center justify-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12"
                 >
-                  {client.logoUrl ? (
-                    <Image
-                      src={client.logoUrl}
-                      alt={client.name}
-                      width={160}
-                      height={56}
-                      className="max-h-9 sm:max-h-11 md:max-h-12 w-auto object-contain select-none"
-                      draggable={false}
-                    />
-                  ) : (
-                    <ClientLogoFallback client={client} />
-                  )}
+                  <ClientLogo client={client} />
                 </div>
               ))}
             </div>
@@ -153,17 +113,7 @@ export function Template1ClientsSection({
                 key={client.id}
                 className="flex items-center justify-center"
               >
-                {client.logoUrl ? (
-                  <Image
-                    src={client.logoUrl}
-                    alt={client.name}
-                    width={160}
-                    height={56}
-                    className="max-h-9 sm:max-h-11 md:max-h-12 w-auto object-contain"
-                  />
-                ) : (
-                  <ClientLogoFallback client={client} />
-                )}
+                <ClientLogo client={client} />
               </div>
             ))}
           </div>

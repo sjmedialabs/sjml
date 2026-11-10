@@ -26,6 +26,7 @@ export function Template1ExperienceSection({
 
   return (
     <section
+      id="experience"
       className={`w-full bg-[#F7F6F2] text-[#161617] py-12 ${className}`}
     >
       <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
