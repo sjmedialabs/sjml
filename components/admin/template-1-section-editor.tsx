@@ -60,6 +60,12 @@ const lockedHeroFormFieldKeys = new Set([
   "privacyLinkHref",
 ])
 
+const hiddenHeaderFooterFieldKeys = new Set([
+  "logoText",
+  "taglineLine1",
+  "taglineLine2",
+])
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
@@ -236,8 +242,8 @@ function SectionFields({
             ? "Form Submit Button Text"
             : fieldName.replace(/Label$/, "").replace(/Placeholder$/, "")
         : fieldName
-    const label = displayFieldName.endsWith("Href")
-      ? `${formatLabel(displayFieldName.slice(0, -"Href".length))} Redirection URL`
+    const label = /href$/i.test(displayFieldName)
+      ? `${formatLabel(displayFieldName.replace(/href$/i, ""))} Redirection URL`.trim()
       : formatLabel(displayFieldName)
     if (isImageField) {
       return (
@@ -431,6 +437,11 @@ function SectionFields({
               key.toLowerCase() !== "id" &&
               !(
                 path.length === 1 &&
+                (path[0] === "header" || path[0] === "footer") &&
+                hiddenHeaderFooterFieldKeys.has(key)
+              ) &&
+              !(
+                path.length === 1 &&
                 path[0] === "hero" &&
                 lockedHeroFormFieldKeys.has(key)
               ),
@@ -481,6 +492,7 @@ export function Template1SectionEditor({
     { key: "seo", label: "SEO" },
   ]
   const activeLabel = tabs.find((tab) => tab.key === activeSection)?.label ?? "SEO"
+  const showScrollIndicator = data.hero.showScrollIndicator !== false
 
   return (
     <div>
@@ -578,6 +590,43 @@ export function Template1SectionEditor({
               <p className="text-amber-850 mt-1">
                 The Footer <strong>Logo</strong> and contact details (<strong>Phone</strong>, <strong>Email</strong>, <strong>Address</strong>, and <strong>Copyright</strong>) are automatically fetched from the main site&apos;s <strong>Footer Settings</strong>. Any values configured below serve as page-specific overrides.
               </p>
+            </div>
+          </div>
+        )}
+
+        {activeSection === "hero" && (
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-md border border-[#e5e7eb] p-4">
+            <div>
+              <p className="font-medium text-[#161617]">Scroll indicator</p>
+              <p className="text-sm text-[#525252]">
+                Show or hide the scroll cue in the hero section.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-[#525252]">
+                {showScrollIndicator ? "Enabled" : "Disabled"}
+              </span>
+              <button
+                aria-checked={showScrollIndicator}
+                aria-label={`${showScrollIndicator ? "Disable" : "Enable"} scroll indicator`}
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                  showScrollIndicator ? "bg-[#16a34a]" : "bg-[#9ca3af]"
+                }`}
+                onClick={() => {
+                  updateField(["hero", "showScrollIndicator"], !showScrollIndicator)
+                  onAction(
+                    `Scroll indicator ${showScrollIndicator ? "disabled" : "enabled"}`,
+                  )
+                }}
+                role="switch"
+                type="button"
+              >
+                <span
+                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                    showScrollIndicator ? "translate-x-[22px]" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
             </div>
           </div>
         )}

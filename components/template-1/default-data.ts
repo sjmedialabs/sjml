@@ -33,6 +33,7 @@ export interface Template1LeadFormValues {
 }
 
 export interface Template1HeroData {
+  showScrollIndicator?: boolean
   badgeText?: string
   headline?: string
   description?: string
@@ -56,6 +57,7 @@ export interface Template1HeroData {
 }
 
 export const defaultTemplate1HeroData: Required<Template1HeroData> = {
+  showScrollIndicator: true,
   badgeText: "DIGITAL MARKETING AGENCY • HYDERABAD",
   headline: "Digital Marketing\nThat Turns Attention\nInto Business\nGrowth.",
   description:
