@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { ChangeEvent } from "react"
 import { Upload, X } from "lucide-react"
 import { uploadImageAction } from "@/app/actions/upload"
@@ -17,6 +17,7 @@ interface Template1SectionEditorProps {
   onEnabledSectionsChange: (enabledSections: Template1SectionVisibility) => void
   seoData: LandingPageSeo
   onSeoChange: (data: LandingPageSeo) => void
+  onAction: (message: string) => void
 }
 
 const sectionLabels: Record<keyof Template1PageData, string> = {
@@ -41,6 +42,22 @@ const twoColumnSections = new Set([
   "process",
   "clients",
   "faq",
+])
+
+const lockedHeroFormFieldKeys = new Set([
+  "formOverline",
+  "fullNameLabel",
+  "fullNamePlaceholder",
+  "emailLabel",
+  "emailPlaceholder",
+  "phoneLabel",
+  "phonePlaceholder",
+  "messageLabel",
+  "messagePlaceholder",
+  "trustText",
+  "privacyText",
+  "privacyLinkText",
+  "privacyLinkHref",
 ])
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -81,10 +98,12 @@ function SimpleImageUpload({
   label,
   value,
   onChange,
+  onAction,
 }: {
   label: string
   value: string
   onChange: (value: string) => void
+  onAction: (message: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -96,11 +115,15 @@ function SimpleImageUpload({
     if (!file) return
 
     if (!file.type.startsWith("image/")) {
-      setErrorMessage("Choose an image file.")
+      const message = "Choose an image file."
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
       return
     }
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMessage("Image must be smaller than 10MB.")
+      const message = "Image must be smaller than 10MB."
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
       return
     }
 
@@ -115,8 +138,11 @@ function SimpleImageUpload({
         throw new Error(result.error ?? "Image upload failed.")
       }
       onChange(result.url)
+      onAction("Image uploaded successfully")
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Image upload failed.")
+      const message = error instanceof Error ? error.message : "Image upload failed."
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
     } finally {
       setIsUploading(false)
     }
@@ -155,7 +181,10 @@ function SimpleImageUpload({
             <button
               aria-label={`Remove ${label}`}
               className="rounded p-1 text-[#526783] hover:bg-[#eef3f8]"
-              onClick={() => onChange("")}
+              onClick={() => {
+                onChange("")
+                onAction(`${label} removed`)
+              }}
               type="button"
             >
               <X aria-hidden="true" size={16} />
@@ -176,19 +205,36 @@ function SectionFields({
   value,
   path,
   onChange,
+  onAction,
 }: {
   value: unknown
   path: string[]
   onChange: (path: string[], value: unknown) => void
+  onAction: (message: string) => void
 }) {
+  const newlyAddedItemRef = useRef<HTMLFieldSetElement | null>(null)
+  const pendingScrollIndex = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (pendingScrollIndex.current === null || !newlyAddedItemRef.current) return
+
+    newlyAddedItemRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
+    newlyAddedItemRef.current
+      .querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea")
+      ?.focus({ preventScroll: true })
+    pendingScrollIndex.current = null
+  }, [value])
+
   if (typeof value === "string") {
     const fieldName = path[path.length - 1] ?? ""
     const isImageField = /(?:image|logo|photo|icon)(?:url)?$/i.test(fieldName)
     const displayFieldName =
       path[0] === "hero" && path.length === 2
         ? fieldName === "formTitle"
-          ? "title"
-          : fieldName.replace(/Label$/, "").replace(/Placeholder$/, "")
+          ? "Form Title"
+          : fieldName === "submitButtonText"
+            ? "Form Submit Button Text"
+            : fieldName.replace(/Label$/, "").replace(/Placeholder$/, "")
         : fieldName
     const label = displayFieldName.endsWith("Href")
       ? `${formatLabel(displayFieldName.slice(0, -"Href".length))} Redirection URL`
@@ -198,6 +244,7 @@ function SectionFields({
         <SimpleImageUpload
           label={label}
           onChange={(url) => onChange(path, url)}
+          onAction={onAction}
           value={value}
         />
       )
@@ -249,14 +296,16 @@ function SectionFields({
           {(isClientsList || isFaqList) && (
             <button
               className="rounded border border-[#d1d5db] px-3 py-2 text-sm font-medium text-[#526783] hover:bg-[#f5f7fa]"
-              onClick={() =>
+              onClick={() => {
+                pendingScrollIndex.current = value.length
                 onChange(path, [
                   ...value,
                   isClientsList
                     ? { id: `client-${crypto.randomUUID()}`, name: "", logoUrl: "" }
                     : { id: `faq-${crypto.randomUUID()}`, question: "", answer: "" },
                 ])
-              }
+                onAction(isClientsList ? "Client added" : "FAQ added")
+              }}
               type="button"
             >
               {isClientsList ? "Add client" : "Add FAQ"}
@@ -267,6 +316,11 @@ function SectionFields({
           <fieldset
             className="block min-w-0 rounded border border-[#e5e7eb] p-4 break-inside-avoid"
             key={index}
+            ref={(element) => {
+              if (index === pendingScrollIndex.current) {
+                newlyAddedItemRef.current = element
+              }
+            }}
           >
             <legend className="px-1 text-xs font-medium text-[#71839e]">
               {isClientsList
@@ -292,17 +346,19 @@ function SectionFields({
                   onChange={(url) =>
                     onChange([...path, String(index), "logoUrl"], url)
                   }
+                  onAction={onAction}
                   value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
                 />
                 <div className="sm:col-span-2">
                   <button
                     className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                    onClick={() =>
+                    onClick={() => {
                       onChange(
                         path,
                         value.filter((_, clientIndex) => clientIndex !== index),
                       )
-                    }
+                      onAction("Client deleted")
+                    }}
                     type="button"
                   >
                     Delete client
@@ -334,12 +390,13 @@ function SectionFields({
                 </label>
                 <button
                   className="justify-self-start rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                  onClick={() =>
+                  onClick={() => {
                     onChange(
                       path,
                       value.filter((_, faqIndex) => faqIndex !== index),
                     )
-                  }
+                    onAction("FAQ deleted")
+                  }}
                   type="button"
                 >
                   Delete FAQ
@@ -348,6 +405,7 @@ function SectionFields({
             ) : (
               <SectionFields
                 onChange={onChange}
+                onAction={onAction}
                 path={[...path, String(index)]}
                 value={item}
               />
@@ -368,11 +426,20 @@ function SectionFields({
         }`}
       >
         {Object.entries(value)
-          .filter(([key]) => key.toLowerCase() !== "id")
+          .filter(
+            ([key]) =>
+              key.toLowerCase() !== "id" &&
+              !(
+                path.length === 1 &&
+                path[0] === "hero" &&
+                lockedHeroFormFieldKeys.has(key)
+              ),
+          )
           .map(([key, child]) => (
             <SectionFields
               key={[...path, key].join(".")}
               onChange={onChange}
+              onAction={onAction}
               path={[...path, key]}
               value={child}
             />
@@ -391,6 +458,7 @@ export function Template1SectionEditor({
   onEnabledSectionsChange,
   seoData,
   onSeoChange,
+  onAction,
 }: Template1SectionEditorProps) {
   const [activeSection, setActiveSection] = useState<keyof Template1PageData | "seo">("hero")
 
@@ -445,19 +513,18 @@ export function Template1SectionEditor({
       </nav>
       <section
         aria-labelledby={`page-editor-tab-${activeSection}`}
-        className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 sm:p-5"
+        className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white px-4 pb-4 !pt-3 sm:px-5 sm:pb-5"
         id="page-editor-panel"
         role="tabpanel"
       >
-        <h3
-          className="mb-4 text-base font-semibold text-[#161617]"
-          id="page-editor-heading"
-        >
-          {activeLabel}
-        </h3>
-        {activeSection !== "seo" && (
-          <div className="mb-5 flex items-center justify-between gap-4 rounded border border-[#e5e7eb] bg-[#f9fafb] px-4 py-3">
-            <span className="text-sm font-medium text-[#333]">{activeLabel} section</span>
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h3
+            className="!text-[30px] font-bold text-[#161617]"
+            id="page-editor-heading"
+          >
+            {activeLabel}
+          </h3>
+          {activeSection !== "seo" && (
             <div className="flex items-center gap-3">
               <span className="text-sm text-[#525252]">
                 {enabledSections[activeSection] ? "Enabled" : "Disabled"}
@@ -468,12 +535,15 @@ export function Template1SectionEditor({
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
                   enabledSections[activeSection] ? "bg-[#16a34a]" : "bg-[#9ca3af]"
                 }`}
-                onClick={() =>
+                onClick={() => {
                   onEnabledSectionsChange({
                     ...enabledSections,
                     [activeSection]: !enabledSections[activeSection],
                   })
-                }
+                  onAction(
+                    `${activeLabel} section ${enabledSections[activeSection] ? "disabled" : "enabled"}`,
+                  )
+                }}
                 role="switch"
                 type="button"
               >
@@ -484,8 +554,8 @@ export function Template1SectionEditor({
                 />
               </button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Landing Page Notices for Header & Footer */}
         {activeSection === "header" && (
@@ -566,6 +636,7 @@ export function Template1SectionEditor({
         ) : (
           <SectionFields
             onChange={updateField}
+            onAction={onAction}
             path={[activeSection]}
             value={data[activeSection]}
           />

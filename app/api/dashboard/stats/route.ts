@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
     // Get real stats from database
     const [
       totalPages,
+      landingPagesCount,
       caseStudiesCount,
       servicesCount,
       insightsCount,
@@ -33,6 +34,8 @@ export async function GET(req: NextRequest) {
     ] = await Promise.all([
       // Count content pages
       db.collection("content").countDocuments(),
+      // Count landing pages, excluding the built-in template record
+      db.collection("landingPages").countDocuments({ slug: { $ne: "template-1" } }),
       // Count case studies
       db.collection("case-studies").countDocuments(),
       // Count services
@@ -90,6 +93,10 @@ export async function GET(req: NextRequest) {
       totalPages: {
         value: totalPages.toString(),
         change: "+0 this month",
+      },
+      landingPages: {
+        value: landingPagesCount.toString(),
+        change: `${landingPagesCount} total`,
       },
       caseStudies: {
         value: caseStudiesCount.toString(),

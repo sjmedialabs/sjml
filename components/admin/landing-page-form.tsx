@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Eye } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { CheckCircle2, Eye, LoaderCircle } from "lucide-react"
 import {
   defaultTemplate1PageData,
   defaultTemplate1SectionVisibility,
@@ -39,6 +39,7 @@ interface LandingPageFormProps {
     seoData?: LandingPageSeo
   }
   onCancel: () => void
+  onAction: (message: string) => void
   onSaved: (page: {
     title: string
     route: string
@@ -54,7 +55,7 @@ interface LandingPageFormProps {
   }) => void
 }
 
-export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProps) {
+export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPageFormProps) {
   const [template, setTemplate] = useState(page?.template ?? templateOptions[0])
   const [title, setTitle] = useState(page?.title ?? "")
   const [slug, setSlug] = useState(page?.slug ?? "")
@@ -72,12 +73,37 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
     ...defaultLandingPageSeo,
     ...page?.seoData,
   })
+  const initialValues = useRef({
+    template,
+    title,
+    slug,
+    navigation,
+    sectionData,
+    enabledSections,
+    seoData,
+  })
+  const hasChanges =
+    JSON.stringify({
+      template,
+      title,
+      slug,
+      navigation,
+      sectionData,
+      enabledSections,
+      seoData,
+    }) !== JSON.stringify(initialValues.current)
   const [isSaving, setIsSaving] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
+  useEffect(() => {
+    if (hasChanges) setIsSaved(false)
+  }, [hasChanges])
+
   async function createPage() {
-    if (isSaving) return
+    if (isSaving || (page && !hasChanges)) return
     setIsSaving(true)
+    setIsSaved(false)
     setErrorMessage("")
 
     try {
@@ -142,6 +168,18 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
         throw new Error("The server returned an invalid page")
       }
 
+      initialValues.current = {
+        template,
+        title,
+        slug,
+        navigation,
+        sectionData,
+        enabledSections,
+        seoData,
+      }
+      setIsSaved(true)
+      onAction(page ? "Landing page saved successfully" : "Landing page created successfully")
+
       onSaved({
         title: result.title,
         route: result.route,
@@ -156,7 +194,9 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
         seoData,
       })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to create page")
+      const message = error instanceof Error ? error.message : "Failed to create page"
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
     } finally {
       setIsSaving(false)
     }
@@ -225,7 +265,10 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
               <button
                 aria-label={`Preview ${option}`}
                 className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded border border-[#d1d5db] bg-white text-[#525252] transition-colors hover:border-[#FCC50E] hover:text-[#161617] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCC50E]"
-                onClick={() => window.open("/template-1", "_blank", "noopener,noreferrer")}
+                onClick={() => {
+                  window.open("/template-1", "_blank", "noopener,noreferrer")
+                  onAction("Opening template preview")
+                }}
                 title={`Preview ${option}`}
                 type="button"
               >
@@ -251,14 +294,34 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
               : "Enter the basic details to create a page. You can edit its sections afterward."}
           </p>
         </div>
-        <button
-          className="rounded bg-[#FCC50E] px-5 py-2.5 text-sm font-semibold text-[#161617] hover:bg-[#eab800] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isSaving}
-          form="landing-page-form"
-          type="submit"
-        >
-          {isSaving ? (page ? "Saving..." : "Creating...") : page ? "Save changes" : "Create page"}
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            className="rounded bg-[#FCC50E] px-5 py-2.5 text-sm font-semibold text-[#161617] hover:bg-[#eab800] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isSaving || (Boolean(page) && !hasChanges)}
+            form="landing-page-form"
+            type="submit"
+          >
+            {isSaving ? (page ? "Saving..." : "Creating...") : page ? "Save changes" : "Create page"}
+          </button>
+          {(isSaving || isSaved) && (
+            <div
+              aria-live="polite"
+              className={`flex items-center gap-2 text-sm ${isSaved ? "text-emerald-700" : "text-[#525252]"}`}
+              role="status"
+            >
+              {isSaving ? (
+                <LoaderCircle aria-hidden="true" className="animate-spin" size={16} />
+              ) : (
+                <CheckCircle2 aria-hidden="true" size={16} />
+              )}
+              {isSaving
+                ? page
+                  ? "Saving changes..."
+                  : "Creating page..."
+                : "Saved successfully"}
+            </div>
+          )}
+        </div>
       </header>
 
       <form
@@ -266,6 +329,7 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
         className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-5 sm:p-7"
         onSubmit={(event) => {
           event.preventDefault()
+          if (page && !hasChanges) return
           void createPage()
         }}
       >
@@ -277,6 +341,7 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
             onEnabledSectionsChange={setEnabledSections}
             seoData={seoData}
             onSeoChange={setSeoData}
+            onAction={onAction}
           />
         ) : page ? (
           <section className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#525252] sm:p-5">
@@ -304,7 +369,10 @@ export function LandingPageForm({ page, onCancel, onSaved }: LandingPageFormProp
           <div className="flex gap-3">
             <button
               className="rounded border border-[#d1d5db] px-4 py-2.5 text-sm font-semibold text-[#525252] hover:bg-[#f5f5f5]"
-              onClick={onCancel}
+              onClick={() => {
+                onAction("Page editing cancelled")
+                onCancel()
+              }}
               type="button"
             >
               Cancel

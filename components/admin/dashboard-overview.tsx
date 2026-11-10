@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { FileText, Users, Eye, TrendingUp, BarChart3, MessageSquare, Briefcase } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { FileText, Users, Eye, TrendingUp, BarChart3, MessageSquare, Briefcase, Globe } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface DashboardStats {
   totalPages: { value: string; change: string }
+  landingPages: { value: string; change: string }
   caseStudies: { value: string; change: string }
   services: { value: string; change: string }
   leads: { value: string; change: string }
@@ -22,6 +24,7 @@ interface Activity {
 
 const statIcons = {
   totalPages: FileText,
+  landingPages: Globe,
   caseStudies: Briefcase,
   services: BarChart3,
   leads: Users,
@@ -32,6 +35,7 @@ const statIcons = {
 
 const statLabels = {
   totalPages: "Total Pages",
+  landingPages: "Landing Pages",
   caseStudies: "Case Studies",
   services: "Services",
   leads: "Total Leads",
@@ -41,6 +45,7 @@ const statLabels = {
 }
 
 export function DashboardOverview() {
+  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentActivity, setRecentActivity] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
@@ -174,8 +179,8 @@ export function DashboardOverview() {
         {Object.entries(stats).map(([key, stat]) => {
           const Icon = statIcons[key as keyof typeof statIcons]
           const label = statLabels[key as keyof typeof statLabels]
-          return (
-            <Card key={key} className="admin-card">
+          const card = (
+            <Card className="admin-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium admin-text-secondary">{label}</CardTitle>
                 <Icon className="w-4 h-4 text-primary" />
@@ -185,6 +190,24 @@ export function DashboardOverview() {
                 <p className="text-xs admin-text-muted mt-1">{stat.change}</p>
               </CardContent>
             </Card>
+          )
+
+          if (key === "landingPages") {
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => router.push("/admin/dashboard?section=landing-pages")}
+                className="text-left rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Manage landing pages"
+              >
+                {card}
+              </button>
+            )
+          }
+
+          return (
+            <div key={key}>{card}</div>
           )
         })}
       </div>
