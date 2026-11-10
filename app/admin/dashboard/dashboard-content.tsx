@@ -15,6 +15,7 @@ const LoadingManager = () => (
 
 // Dynamic imports to reduce initial bundle size (Hybrid Client Rendering)
 const HomePageManager = dynamic(() => import("@/components/admin/home-page-manager").then(mod => mod.HomePageManager), { loading: LoadingManager })
+const LandingPagesManager = dynamic(() => import("@/components/admin/landing-pages-manager").then(mod => mod.LandingPagesManager), { loading: LoadingManager })
 const AboutPageManager = dynamic(() => import("@/components/admin/about-page-manager").then(mod => mod.AboutPageManager), { loading: LoadingManager })
 const WorkPageManager = dynamic(() => import("@/components/admin/work-page-manager").then(mod => mod.WorkPageManager), { loading: LoadingManager })
 const ServicesPageManager = dynamic(() => import("@/components/admin/services-page-manager").then(mod => mod.ServicesPageManager), { loading: LoadingManager })
@@ -59,6 +60,8 @@ export default function AdminDashboardContent({ initialSection = "overview" }: A
         return <DashboardOverview />
       case "home":
         return <HomePageManager />
+      case "landing-pages":
+        return <LandingPagesManager />
       case "about":
         return <AboutPageManager />
       case "work":

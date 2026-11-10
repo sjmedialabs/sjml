@@ -229,7 +229,7 @@ export function LandingPagesManager() {
             <Search size={16} />
             <input
               aria-label="Filter pages"
-              className="w-full bg-transparent text-sm text-[#172b4d] outline-none placeholder:text-[#91a2ba]"
+              className="w-full bg-transparent px-2 text-sm text-[#172b4d] outline-none placeholder:text-[#91a2ba]"
               onChange={(event) => setFilter(event.target.value)}
               placeholder="Filter pages..."
               value={filter}
