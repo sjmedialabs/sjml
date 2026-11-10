@@ -636,6 +636,7 @@ export const defaultHeaderContent = {
   pageKey: "header",
   logo: "",
   logoText: "SJ MEDIA LABS",
+  phone: "",
   navItems: [
     { id: "0", label: "HOME", href: "/" },
     { id: "1", label: "ABOUT US", href: "/about" },
@@ -696,3 +697,4 @@ export function getDefaultPageContent(page: string) {
   }
   return defaults[page] || {}
 }
+

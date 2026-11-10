@@ -93,6 +93,14 @@ export function Template1ConsultationModal({
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   useEffect(() => {
+    if (!isSubmitted) return
+    const timer = setTimeout(() => {
+      handleClose()
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [isSubmitted])
+
+  useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -150,8 +158,7 @@ export function Template1ConsultationModal({
       fullName: true,
       businessEmail: true,
       phoneNumber: true,
-      message: true,
-    })
+      })
 
     if (Object.keys(validationErrors).length > 0) {
       return
@@ -254,7 +261,7 @@ export function Template1ConsultationModal({
             {/* Full Name */}
             <div>
               <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.fullNameLabel}
+                {content.fullNameLabel} *
               </label>
               <input
                 type="text"
@@ -282,7 +289,7 @@ export function Template1ConsultationModal({
             {/* Business Email */}
             <div>
               <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.emailLabel}
+                {content.emailLabel} *
               </label>
               <input
                 type="email"
@@ -311,7 +318,7 @@ export function Template1ConsultationModal({
             {/* Phone Number */}
             <div>
               <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.phoneLabel}
+                {content.phoneLabel} *
               </label>
               <input
                 type="tel"
@@ -346,7 +353,6 @@ export function Template1ConsultationModal({
               </label>
               <textarea
                 rows={3}
-                required
                 value={formValues.message}
                 onChange={(e) =>
                   handleFieldChange("message", e.target.value)
@@ -367,28 +373,17 @@ export function Template1ConsultationModal({
               )}
             </div>
 
-            {/* Submit & Cancel Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex w-full sm:flex-1 items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] disabled:opacity-60"
-              >
-                <span className="text-[#FCC50E]">
-                  {isSubmitting ? "Submitting..." : content.submitButtonText}
-                </span>
-                <ArrowUpRightIcon className="text-[#FCC50E]" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={isSubmitting}
-                className="flex w-full sm:w-auto items-center justify-center rounded-[4px] border border-black/15 bg-white px-5 py-3 text-[13px] font-medium text-[#161617] transition-colors hover:bg-black/5 disabled:opacity-60"
-              >
-                {cancelButtonText}
-              </button>
-            </div>
+            {/* Submit CTA */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3.5 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] disabled:opacity-60"
+            >
+              <span className="text-[#FCC50E]">
+                {isSubmitting ? "Submitting..." : content.submitButtonText}
+              </span>
+              <ArrowUpRightIcon className="text-[#FCC50E]" />
+            </button>
 
             {/* Privacy Footnote */}
             <p className="pt-1 text-center text-[10.5px] leading-[1.45] text-[#161617]/55">

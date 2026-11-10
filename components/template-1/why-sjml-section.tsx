@@ -79,7 +79,7 @@ export function Template1WhySjmlSection({
                   {content.overline}
                 </p>
               )}
-              <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-6">
+              <h2 className="text-[30px] sm:text-[38px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-6">
                 {headlineLines.map((line, index) => (
                   <span key={index} className="block">
                     {line}
@@ -88,8 +88,8 @@ export function Template1WhySjmlSection({
               </h2>
 
               {content.image && (
-                <div className="bg-[#EAE8E1] p-4 rounded-[4px] mb-3">
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-white">
+                <div className=" p-4 rounded-[4px] mb-3">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px]">
                     <Image
                       src={content.image}
                       alt={content.imageAlt}

@@ -78,7 +78,7 @@ export function Template1CtaSection({
           )}
 
           {/* Headline */}
-          <h2 className="text-[38px] sm:text-[48px] lg:text-[54px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]">
+          <h2 className="text-[38px] sm:text-[48px] lg:text-[58px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]">
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}

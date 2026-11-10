@@ -402,12 +402,14 @@ export function Template1SectionEditor({
     key: keyof Template1PageData | "seo"
     label: string
   }> = [
+    { key: "header", label: "Header" },
     ...Object.entries(sectionLabels)
       .filter(([key]) => key !== "header" && key !== "footer")
       .map(([key, label]) => ({
         key: key as keyof Template1PageData,
         label,
       })),
+    { key: "footer", label: "Footer" },
     { key: "seo", label: "SEO" },
   ]
   const activeLabel = tabs.find((tab) => tab.key === activeSection)?.label ?? "SEO"
@@ -484,6 +486,32 @@ export function Template1SectionEditor({
             </div>
           </div>
         )}
+
+        {/* Landing Page Notices for Header & Footer */}
+        {activeSection === "header" && (
+          <div className="mb-5 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 flex items-start gap-3">
+            <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
+            <div className="text-sm">
+              <p className="font-semibold text-amber-950">Header Contact & Logo Notice</p>
+              <p className="text-amber-850 mt-1">
+                The Header <strong>Logo</strong>, <strong>Contact Phone</strong>, and <strong>CTA button</strong> are automatically fetched from the main site&apos;s <strong>Header Settings</strong> and <strong>Footer Settings</strong>. Any values configured below serve as page-specific overrides.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeSection === "footer" && (
+          <div className="mb-5 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 flex items-start gap-3">
+            <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
+            <div className="text-sm">
+              <p className="font-semibold text-amber-950">Footer Contact & Logo Notice</p>
+              <p className="text-amber-850 mt-1">
+                The Footer <strong>Logo</strong> and contact details (<strong>Phone</strong>, <strong>Email</strong>, <strong>Address</strong>, and <strong>Copyright</strong>) are automatically fetched from the main site&apos;s <strong>Footer Settings</strong>. Any values configured below serve as page-specific overrides.
+              </p>
+            </div>
+          </div>
+        )}
+
         {activeSection === "seo" ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">

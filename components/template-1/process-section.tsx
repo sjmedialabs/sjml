@@ -36,7 +36,7 @@ export function Template1ProcessSection({
               {content.overline}
             </p>
           )}
-          <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-white">
+          <h2 className="text-[30px] sm:text-[38px] font-semibold leading-[1.15] tracking-[-0.02em] text-white">
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}

@@ -79,6 +79,15 @@ export function Template1ClientsSection({
     clients: data?.clients ?? defaultTemplate1ClientsData.clients,
   }
 
+  const isMarquee = content.clients.length > 4
+
+  // For automatic horizontal scrolling when > 4 brands:
+  // Ensure enough items in each half of the marquee track to fill wide viewports seamlessly
+  const repeatCount = Math.max(1, Math.ceil(8 / Math.max(1, content.clients.length)))
+  const halfList = Array.from({ length: repeatCount }, () => content.clients).flat()
+  const marqueeItems = [...halfList, ...halfList]
+  const durationSeconds = Math.max(20, halfList.length * 3.5)
+
   return (
     <section
       className={`w-full bg-[#F7F6F2] text-[#161617] py-12 ${className}`}
@@ -107,27 +116,56 @@ export function Template1ClientsSection({
           </div>
         </div>
 
-        {/* Bottom Client Logos Row */}
-        <div className="pt-8 grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8 items-center">
-          {content.clients.map((client) => (
+        {/* Bottom Client Logos Row: static 4-column grid if <= 4, automatic marquee if > 4 */}
+        {isMarquee ? (
+          <div className="pt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]">
             <div
-              key={client.id}
-              className="flex items-center justify-start sm:justify-center first:justify-start"
+              className="flex w-max items-center animate-marquee hover:[animation-play-state:paused]"
+              style={{ animationDuration: `${durationSeconds}s` }}
             >
-              {client.logoUrl ? (
-                <Image
-                  src={client.logoUrl}
-                  alt={client.name}
-                  width={150}
-                  height={52}
-                  className="max-h-12 w-auto object-contain"
-                />
-              ) : (
-                <ClientLogoFallback client={client} />
-              )}
+              {marqueeItems.map((client, index) => (
+                <div
+                  key={`${client.id}-${index}`}
+                  className="flex shrink-0 items-center justify-center px-6 sm:px-10 md:px-12"
+                >
+                  {client.logoUrl ? (
+                    <Image
+                      src={client.logoUrl}
+                      alt={client.name}
+                      width={150}
+                      height={52}
+                      className="max-h-12 w-auto object-contain select-none"
+                      draggable={false}
+                    />
+                  ) : (
+                    <ClientLogoFallback client={client} />
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="pt-8 grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8 items-center">
+            {content.clients.map((client) => (
+              <div
+                key={client.id}
+                className="flex items-center justify-start sm:justify-center first:justify-start"
+              >
+                {client.logoUrl ? (
+                  <Image
+                    src={client.logoUrl}
+                    alt={client.name}
+                    width={150}
+                    height={52}
+                    className="max-h-12 w-auto object-contain"
+                  />
+                ) : (
+                  <ClientLogoFallback client={client} />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

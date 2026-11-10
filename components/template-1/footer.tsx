@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useProvidedHeader } from "@/components/header-provider"
-import { normalizeHeaderContent } from "@/lib/header-content"
+import { normalizeHeaderContent, type NormalizedHeaderContent } from "@/lib/header-content"
 import { normalizeFooterContent, type FooterContent } from "@/lib/footer-content"
 import {
   type Template1FooterData,
@@ -17,33 +17,49 @@ export type { Template1FooterData, Template1FooterLink }
 export interface Template1FooterProps {
   data?: Template1FooterData
   cmsFooter?: unknown
+  cmsHeader?: NormalizedHeaderContent | null
   className?: string
 }
 
 export function Template1Footer({
   data,
   cmsFooter: initialCmsFooter,
+  cmsHeader: cmsHeaderProp,
   className = "",
 }: Template1FooterProps) {
   const providedHeader = useProvidedHeader()
-  const [cmsHeader, setCmsHeader] = useState(providedHeader)
+  const [cmsHeaderState, setCmsHeaderState] = useState<NormalizedHeaderContent | null>(
+    cmsHeaderProp ?? providedHeader ?? null
+  )
   const [cmsFooterData, setCmsFooterData] = useState<FooterContent | null>(() =>
     initialCmsFooter ? normalizeFooterContent(initialCmsFooter) : null
   )
+
+  useEffect(() => {
+    if (cmsHeaderProp) {
+      setCmsHeaderState(cmsHeaderProp)
+    } else if (providedHeader) {
+      setCmsHeaderState(providedHeader)
+    }
+  }, [cmsHeaderProp, providedHeader])
+
+  useEffect(() => {
+    if (initialCmsFooter) {
+      setCmsFooterData(normalizeFooterContent(initialCmsFooter))
+    }
+  }, [initialCmsFooter])
 
   useEffect(() => {
     let cancelled = false
 
     async function loadCmsData() {
       try {
-        if (!providedHeader) {
+        if (!cmsHeaderProp && !providedHeader) {
           const headerRes = await fetch("/api/content/header")
           if (headerRes.ok && !cancelled) {
             const rawHeader = await headerRes.json()
-            setCmsHeader(normalizeHeaderContent(rawHeader))
+            setCmsHeaderState(normalizeHeaderContent(rawHeader))
           }
-        } else {
-          setCmsHeader(providedHeader)
         }
 
         if (initialCmsFooter) {
@@ -64,58 +80,81 @@ export function Template1Footer({
     return () => {
       cancelled = true
     }
-  }, [initialCmsFooter, providedHeader])
+  }, [initialCmsFooter, cmsHeaderProp, providedHeader])
 
+  const activeHeader = cmsHeaderProp || cmsHeaderState || providedHeader
+
+  // Fetch the logo for header and footer of this template from the website's header
+  const resolvedLogoUrl =
+    (data?.logoUrl && data.logoUrl.trim()) ||
+    (activeHeader?.logo && typeof activeHeader.logo === "string" && activeHeader.logo.trim()) ||
+    (cmsFooterData?.logo && cmsFooterData.logo.trim()) ||
+    ""
+
+  const rawLogoText =
+    (data?.logoText && data.logoText.trim()) ||
+    (activeHeader?.logoText && activeHeader.logoText.trim()) ||
+    (cmsFooterData?.siteName && cmsFooterData.siteName.trim()) ||
+    defaultTemplate1FooterData.logoText
+
+  const isSjmlBrand = !rawLogoText || rawLogoText === "SJML" || rawLogoText === "SJ MEDIA LABS"
+
+  // Contact details resolution: check footer CMS, header CMS, and fallback
   const resolvedPhone =
-    data?.phoneText ??
-    (cmsFooterData?.phone?.trim() || defaultTemplate1FooterData.phoneText)
+    (data?.phoneText && data.phoneText.trim()) ||
+    (cmsFooterData?.phone && cmsFooterData.phone.trim()) ||
+    (activeHeader?.phone && activeHeader.phone.trim()) ||
+    defaultTemplate1FooterData.phoneText
+
   const resolvedPhoneHref =
-    data?.phoneHref ??
+    (data?.phoneHref && data.phoneHref.trim()) ||
     (resolvedPhone
       ? `tel:${resolvedPhone.replace(/\s+/g, "")}`
       : defaultTemplate1FooterData.phoneHref)
 
   const resolvedEmail =
-    data?.emailText ??
-    (cmsFooterData?.email?.trim() || defaultTemplate1FooterData.emailText)
+    (data?.emailText && data.emailText.trim()) ||
+    (cmsFooterData?.email && cmsFooterData.email.trim()) ||
+    defaultTemplate1FooterData.emailText
+
   const resolvedEmailHref =
-    data?.emailHref ??
+    (data?.emailHref && data.emailHref.trim()) ||
     (resolvedEmail
       ? `mailto:${resolvedEmail}`
       : defaultTemplate1FooterData.emailHref)
 
+  const resolvedAddress =
+    (data?.addressText && data.addressText.trim()) ||
+    (cmsFooterData?.address && cmsFooterData.address.trim()) ||
+    defaultTemplate1FooterData.addressText
+
+  const resolvedCopyright =
+    (data?.copyrightText && data.copyrightText.trim()) ||
+    (cmsFooterData?.copyright && cmsFooterData.copyright.trim()) ||
+    defaultTemplate1FooterData.copyrightText
+
+  const resolvedBrandMotto =
+    (data?.brandMotto && data.brandMotto.trim()) ||
+    (cmsFooterData?.siteTagline && cmsFooterData.siteTagline.trim()) ||
+    defaultTemplate1FooterData.brandMotto
+
   const content: Required<Template1FooterData> = {
     ...defaultTemplate1FooterData,
-    logoUrl:
-      data?.logoUrl ??
-      (cmsHeader?.logo?.trim() || defaultTemplate1FooterData.logoUrl),
-    logoText:
-      data?.logoText ??
-      (cmsHeader?.logoText?.trim() ||
-        cmsFooterData?.siteName?.trim() ||
-        defaultTemplate1FooterData.logoText),
+    logoUrl: resolvedLogoUrl,
+    logoText: rawLogoText,
     taglineLine1:
       data?.taglineLine1 ?? defaultTemplate1FooterData.taglineLine1,
     taglineLine2:
       data?.taglineLine2 ?? defaultTemplate1FooterData.taglineLine2,
     logoHref: data?.logoHref ?? defaultTemplate1FooterData.logoHref,
-    brandMotto:
-      data?.brandMotto ??
-      (cmsFooterData?.siteTagline?.trim() ||
-        defaultTemplate1FooterData.brandMotto),
+    brandMotto: resolvedBrandMotto,
     phoneText: resolvedPhone,
     phoneHref: resolvedPhoneHref,
     emailText: resolvedEmail,
     emailHref: resolvedEmailHref,
-    addressText:
-      data?.addressText ??
-      (cmsFooterData?.address?.trim() ||
-        defaultTemplate1FooterData.addressText),
+    addressText: resolvedAddress,
     legalLinks: data?.legalLinks ?? defaultTemplate1FooterData.legalLinks,
-    copyrightText:
-      data?.copyrightText ??
-      (cmsFooterData?.copyright?.trim() ||
-        defaultTemplate1FooterData.copyrightText),
+    copyrightText: resolvedCopyright,
   }
 
   return (
@@ -129,28 +168,34 @@ export function Template1Footer({
           <div className="md:col-span-5">
             <Link
               href={content.logoHref}
-              className="inline-flex items-center gap-3 focus:outline-none"
+              className="site-header-logo inline-flex items-center gap-2 focus:outline-none"
+              aria-label="SJML Home"
             >
-              {content.logoUrl ? (
+              {resolvedLogoUrl ? (
                 <Image
-                  src={content.logoUrl}
-                  alt={content.logoText}
+                  src={resolvedLogoUrl}
+                  alt={rawLogoText || "SJ Media Labs"}
                   width={180}
                   height={48}
-                  className="h-10 w-auto object-contain"
+                  className="site-header-logo-img h-auto w-auto max-h-12 object-contain"
+                  unoptimized={resolvedLogoUrl.startsWith("data:") || resolvedLogoUrl.endsWith(".svg") || resolvedLogoUrl.startsWith("http")}
                 />
               ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-[30px] sm:text-[34px] font-black tracking-tight leading-none text-[#FCC50E]">
-                    {content.logoText}
+                <div className="flex items-center gap-2">
+                  <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none">
+                    {isSjmlBrand ? "SJML" : rawLogoText}
                   </span>
                   <span
-                    className="h-7 w-px bg-black/20 shrink-0"
+                    className="site-header-logo-rule hidden sm:block w-px bg-black/15 shrink-0"
                     aria-hidden="true"
                   />
-                  <div className="flex flex-col text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.06em] leading-[1.15] text-[#161617]">
-                    <span>{content.taglineLine1}</span>
-                    <span>{content.taglineLine2}</span>
+                  <div className="site-header-logo-tagline hidden sm:flex flex-col leading-tight">
+                    <span className="font-semibold text-[#000000] uppercase">
+                      {content.taglineLine1 || "Branding &"}
+                    </span>
+                    <span className="font-semibold text-[#000000] uppercase">
+                      {content.taglineLine2 || "Advertising"}
+                    </span>
                   </div>
                 </div>
               )}

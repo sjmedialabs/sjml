@@ -77,7 +77,7 @@ export function Template1ServicesSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-3">
+            <h2 className="text-[30px] sm:text-[38px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-3">
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}

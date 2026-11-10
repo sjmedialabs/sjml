@@ -10,6 +10,7 @@ export interface HeaderNavItem {
 export interface NormalizedHeaderContent {
   logo: string
   logoText: string
+  phone?: string
   navItems: HeaderNavItem[]
   ctaButton: { text: string; href: string }
   showTopBar: boolean
@@ -58,6 +59,7 @@ export function sanitizeHeaderForWrite(data: Record<string, unknown>): Normalize
   const defaults = defaultHeaderContent
   const rawLogo = typeof data.logo === "string" ? data.logo.trim() : ""
   const logo = rawLogo && rawLogo !== "/logo.svg" ? rawLogo : ""
+  const rawPhone = typeof data.phone === "string" ? data.phone.trim() : ""
   const cta = (data.ctaButton && typeof data.ctaButton === "object" ? data.ctaButton : {}) as {
     text?: string
     href?: string
@@ -66,6 +68,7 @@ export function sanitizeHeaderForWrite(data: Record<string, unknown>): Normalize
   return {
     logo,
     logoText: typeof data.logoText === "string" ? data.logoText : defaults.logoText,
+    phone: rawPhone,
     navItems: asNavItems(data.navItems, defaults.navItems),
     ctaButton: {
       text: typeof cta.text === "string" ? cta.text : defaults.ctaButton.text,
@@ -82,10 +85,12 @@ export function normalizeHeaderContent(data: Record<string, unknown>): Normalize
 
   const rawLogo = typeof data.logo === "string" ? data.logo.trim() : ""
   const logo = rawLogo && rawLogo !== "/logo.svg" ? rawLogo : ""
+  const rawPhone = typeof data.phone === "string" ? data.phone.trim() : ""
 
   return {
     logo,
     logoText: (data.logoText as string) ?? defaults.logoText,
+    phone: rawPhone,
     navItems: normalizeHeaderNavItems(asNavItems(rawItems, defaults.navItems)),
     ctaButton: {
       text: ((data.ctaButton as { text?: string })?.text) ?? defaults.ctaButton.text,

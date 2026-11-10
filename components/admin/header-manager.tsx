@@ -15,6 +15,7 @@ interface NavItem {
 interface HeaderData {
   logo: string
   logoText: string
+  phone?: string
   navItems: NavItem[]
   ctaButton: { text: string; href: string }
   showTopBar: boolean
@@ -24,6 +25,7 @@ interface HeaderData {
 const defaultData: HeaderData = {
   logo: "",
   logoText: "SJ MEDIA LABS",
+  phone: "",
   navItems: [
     { id: "0", label: "HOME", href: "/" },
     { id: "1", label: "ABOUT US", href: "/about" },
@@ -113,16 +115,30 @@ export function HeaderManager() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Header / Navigation</h1>
         <p className="admin-text-secondary">Manage your site header and navigation menu</p>
+      </div>
+
+      {/* Landing Page Notice */}
+      <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 mb-6 flex items-start gap-3">
+        <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
+        <div className="text-sm">
+          <p className="font-semibold text-amber-950">Landing Page Notice</p>
+          <p className="text-amber-850 mt-1">
+            The <strong>Logo</strong>, <strong>Contact Phone</strong>, and <strong>CTA Button</strong> configured here are also automatically fetched and visible in the <strong>landing page header</strong>. (If phone is left blank, it automatically syncs from Footer Settings).
+          </p>
+        </div>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
       {/* Logo Section */}
       <div className="admin-card border admin-border rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold admin-text-primary mb-4">Logo</h2>
+        <h2 className="text-lg font-semibold admin-text-primary mb-2">Logo</h2>
+        <p className="text-xs text-amber-700 mb-4">
+          Note: This logo is also visible in the landing page header and footer.
+        </p>
         <div className="space-y-4">
           <ImageUpload preset="logo" label="Logo Image" value={data.logo} onChange={(url) => setData({ ...data, logo: url })} />
           <div>
@@ -131,9 +147,27 @@ export function HeaderManager() {
               type="text"
               value={data.logoText}
               onChange={(e) => setData({ ...data, logoText: e.target.value })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
+        </div>
+      </div>
+
+      {/* Contact Phone Section */}
+      <div className="admin-card border admin-border rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold admin-text-primary mb-2">Contact Phone</h2>
+        <p className="text-xs text-amber-700 mb-4">
+          Note: This phone number is visible in the landing page header. If left empty, it automatically syncs from the phone number in Footer Settings.
+        </p>
+        <div>
+          <label className="block text-sm admin-text-secondary mb-2">Header Phone Number</label>
+          <input
+            type="text"
+            value={data.phone || ""}
+            onChange={(e) => setData({ ...data, phone: e.target.value })}
+            placeholder="+91 40 40268570"
+            className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
+          />
         </div>
       </div>
 
@@ -158,7 +192,7 @@ export function HeaderManager() {
                 value={data.topBarText}
                 onChange={(e) => setData({ ...data, topBarText: e.target.value })}
                 placeholder="e.g. 🎉 New service launched! Check it out →"
-                className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
           )}
@@ -204,7 +238,10 @@ export function HeaderManager() {
 
       {/* CTA Button */}
       <div className="admin-card border admin-border rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold admin-text-primary mb-4">CTA Button</h2>
+        <h2 className="text-lg font-semibold admin-text-primary mb-2">CTA Button</h2>
+        <p className="text-xs text-amber-700 mb-4">
+          Note: This CTA button text and link are also visible in the landing page header.
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm admin-text-secondary mb-2">Button Text</label>
@@ -212,7 +249,7 @@ export function HeaderManager() {
               type="text"
               value={data.ctaButton.text}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, text: e.target.value } })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -221,7 +258,7 @@ export function HeaderManager() {
               type="text"
               value={data.ctaButton.href}
               onChange={(e) => setData({ ...data, ctaButton: { ...data.ctaButton, href: e.target.value } })}
-              className="w-full px-4 py-3 admin-input rounded-lg  focus:outline-none focus:border-primary"
+              className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
         </div>

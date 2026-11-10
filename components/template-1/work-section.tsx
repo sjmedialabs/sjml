@@ -88,7 +88,7 @@ export function Template1WorkSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617]">
+            <h2 className="text-[30px] sm:text-[38px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617]">
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}
@@ -98,7 +98,7 @@ export function Template1WorkSection({
           </div>
 
           {/* Featured Project Row */}
-          <div className="border-t border-black/12 pt-8 pb-8">
+          <div className=" pt-8 pb-8">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 items-start">
               {/* Featured Image Box */}
               <div className="lg:col-span-7 bg-[#F3F2EE] p-5 sm:p-8 rounded-[4px]">
@@ -172,7 +172,7 @@ export function Template1WorkSection({
 
           {/* Secondary Projects Grid */}
           {content.projects.length > 0 && (
-            <div className="border-t border-black/12 pt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+            <div className=" pt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
               {content.projects.map((project) => (
                 <div key={project.id} className="flex flex-col">
                   <div className="bg-[#F3F2EE] p-4 sm:p-6 rounded-[4px] mb-4">

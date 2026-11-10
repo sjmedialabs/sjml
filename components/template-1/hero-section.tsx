@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   type Template1HeroData,
@@ -70,6 +70,14 @@ export function Template1HeroSection({
   >({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  useEffect(() => {
+    if (!isSubmitted) return
+    const timer = setTimeout(() => {
+      setIsSubmitted(false)
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [isSubmitted])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleFieldChange = (
@@ -102,8 +110,7 @@ export function Template1HeroSection({
       fullName: true,
       businessEmail: true,
       phoneNumber: true,
-      message: true,
-    })
+      })
 
     if (Object.keys(validationErrors).length > 0) {
       return
@@ -210,12 +217,12 @@ export function Template1HeroSection({
             {/* Right Form Card */}
             <div
               id="consultation-form"
-              className="lg:col-span-5 w-full max-w-[440px] lg:ml-auto rounded-[8px] bg-white p-6 sm:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.08)]"
+              className="lg:col-span-5 w-full max-w-[440px] lg:ml-auto rounded-[8px] bg-white p-6 sm:p-7 shadow-[0_12px_32px_rgba(0,0,0,0.08)]"
             >
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-1.5">
                 {content.formOverline}
               </p>
-              <h2 className="text-[20px] sm:text-[22px] font-semibold tracking-[-0.01em] text-[#161617] mb-6">
+              <h2 className="text-[20px] sm:text-[22px] font-semibold tracking-[-0.01em] text-[#161617] mb-3">
                 {content.formTitle}
               </h2>
 
@@ -236,11 +243,11 @@ export function Template1HeroSection({
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                <form onSubmit={handleSubmit} noValidate className="space-y-3">
                   {/* Full Name */}
                   <div>
-                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                      {content.fullNameLabel}
+                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1">
+                      {content.fullNameLabel} *
                     </label>
                     <input
                       type="text"
@@ -252,7 +259,7 @@ export function Template1HeroSection({
                       onBlur={() => handleFieldBlur("fullName")}
                       aria-invalid={Boolean(errors.fullName)}
                       placeholder={content.fullNamePlaceholder}
-                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
                         errors.fullName
                           ? "border-[#D92D20] focus:border-[#D92D20]"
                           : "border-black/12 focus:border-[#161617]"
@@ -267,8 +274,8 @@ export function Template1HeroSection({
 
                   {/* Business Email */}
                   <div>
-                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                      {content.emailLabel}
+                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1">
+                      {content.emailLabel} *
                     </label>
                     <input
                       type="email"
@@ -281,7 +288,7 @@ export function Template1HeroSection({
                       onBlur={() => handleFieldBlur("businessEmail")}
                       aria-invalid={Boolean(errors.businessEmail)}
                       placeholder={content.emailPlaceholder}
-                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
                         errors.businessEmail
                           ? "border-[#D92D20] focus:border-[#D92D20]"
                           : "border-black/12 focus:border-[#161617]"
@@ -296,8 +303,8 @@ export function Template1HeroSection({
 
                   {/* Phone Number */}
                   <div>
-                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                      {content.phoneLabel}
+                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1">
+                      {content.phoneLabel} *
                     </label>
                     <input
                       type="tel"
@@ -312,7 +319,7 @@ export function Template1HeroSection({
                       onBlur={() => handleFieldBlur("phoneNumber")}
                       aria-invalid={Boolean(errors.phoneNumber)}
                       placeholder={content.phonePlaceholder}
-                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                      className={`w-full rounded-[4px] border bg-white px-3.5 py-2 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
                         errors.phoneNumber
                           ? "border-[#D92D20] focus:border-[#D92D20]"
                           : "border-black/12 focus:border-[#161617]"
@@ -327,7 +334,7 @@ export function Template1HeroSection({
 
                   {/* Message */}
                   <div>
-                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
+                    <label className="block text-[11px] font-medium text-[#161617]/80 mb-1">
                       {content.messageLabel}
                     </label>
                     <textarea
@@ -340,7 +347,7 @@ export function Template1HeroSection({
                       onBlur={() => handleFieldBlur("message")}
                       aria-invalid={Boolean(errors.message)}
                       placeholder={content.messagePlaceholder}
-                      className={`w-full resize-none rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                      className={`w-full resize-none rounded-[4px] border bg-white px-3.5 py-2 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
                         errors.message
                           ? "border-[#D92D20] focus:border-[#D92D20]"
                           : "border-black/12 focus:border-[#161617]"
