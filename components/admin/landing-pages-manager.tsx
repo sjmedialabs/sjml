@@ -8,6 +8,7 @@ import type {
   Template1SectionVisibility,
 } from "@/components/template-1/default-data"
 import type { LandingPageSeo } from "@/lib/landing-pages"
+import { AdminToast } from "./admin-toast"
 import { LandingPageForm } from "./landing-page-form"
 
 interface LandingPage {
@@ -60,6 +61,7 @@ export function LandingPagesManager() {
   const [pagesError, setPagesError] = useState("")
   const [updatingSlug, setUpdatingSlug] = useState("")
   const [actionError, setActionError] = useState("")
+  const [actionMessage, setActionMessage] = useState("")
   const isCreatingPage = editorMode === "create"
   const editingPage = editSlug
     ? landingPages.find((page) => page.slug === editSlug) ?? null
@@ -167,8 +169,11 @@ export function LandingPagesManager() {
             : currentPage,
         ),
       )
+      setActionMessage(`Landing page ${nextStatus.toLowerCase()}`)
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : "Failed to update page status")
+      const message = error instanceof Error ? error.message : "Failed to update page status"
+      setActionError(message)
+      setActionMessage(`❌ ${message}`)
     } finally {
       setUpdatingSlug("")
     }
@@ -184,27 +189,33 @@ export function LandingPagesManager() {
     }
 
     return (
-      <LandingPageForm
-        key={editingPage?.slug ?? "new-page"}
-        page={editingPage ?? undefined}
-        onCancel={() => {
-          updateEditorUrl()
-        }}
-        onSaved={(page) => {
-          setLandingPages((currentPages) =>
-            editingPage
-              ? currentPages.map((currentPage) =>
-                  currentPage.slug === editingPage.slug ? page : currentPage,
-                )
-              : [page, ...currentPages],
-          )
-          updateEditorUrl()
-        }}
-      />
+      <>
+        <AdminToast message={actionMessage} onClose={() => setActionMessage("")} duration={3000} />
+        <LandingPageForm
+          key={editingPage?.slug ?? "new-page"}
+          page={editingPage ?? undefined}
+          onAction={setActionMessage}
+          onCancel={() => {
+            updateEditorUrl()
+          }}
+          onSaved={(page) => {
+            setLandingPages((currentPages) =>
+              editingPage
+                ? currentPages.map((currentPage) =>
+                    currentPage.slug === editingPage.slug ? page : currentPage,
+                  )
+                : [page, ...currentPages],
+            )
+            if (!editingPage) updateEditorUrl()
+          }}
+        />
+      </>
     )
   }
 
   return (
+    <>
+    <AdminToast message={actionMessage} onClose={() => setActionMessage("")} duration={3000} />
     <section className="min-h-[calc(100vh-4rem)] bg-[#f5f7fa] -m-8 p-5 text-[#172b4d]">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -214,7 +225,10 @@ export function LandingPagesManager() {
           </p>
         </div>
         <button
-          onClick={() => updateEditorUrl("create")}
+          onClick={() => {
+            setActionMessage("New landing page form opened")
+            updateEditorUrl("create")
+          }}
           type="button"
           className="inline-flex items-center gap-2 rounded-lg bg-[#FCC50E] px-4 py-2 text-sm font-semibold text-black transition-colors "
         >
@@ -303,7 +317,7 @@ export function LandingPagesManager() {
                     </td>
                     <td className="px-4 py-4 text-[#91a2ba]">—</td>
                     <td className="px-4 py-4 text-center">{page.sections}</td>
-                    <td className="px-4 py-4 text-[#91a2ba]">{page.updated}</td>
+                    <td className="px-4 py-4 text-[#91a2ba]">{page.updated.split("T")[0]}</td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex flex-wrap justify-end gap-2">
                         <a
@@ -319,7 +333,10 @@ export function LandingPagesManager() {
                         <button
                           aria-label={`Edit ${page.title}`}
                           className="inline-flex items-center gap-1 rounded border border-[#d1d5db] px-2.5 py-1.5 text-xs font-semibold text-[#526783] hover:bg-[#f5f7fa]"
-                          onClick={() => updateEditorUrl("edit", page.slug)}
+                          onClick={() => {
+                            setActionMessage(`${page.title} editor opened`)
+                            updateEditorUrl("edit", page.slug)
+                          }}
                           type="button"
                         >
                           <Pencil size={14} />
@@ -369,5 +386,6 @@ export function LandingPagesManager() {
         </div>
       </div>
     </section>
+    </>
   )
 }
