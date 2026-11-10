@@ -161,11 +161,11 @@ export function Template1Footer({
     <footer
       className={`w-full bg-white text-[#161617] py-12 border-t border-black/10 ${className}`}
     >
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
         {/* Top 3-Column Grid */}
-        <div className="grid grid-cols-1 gap-8 pb-8 border-b border-black/10 md:grid-cols-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 md:gap-8 lg:gap-10 pb-8 sm:pb-10 border-b border-black/10">
           {/* Column 1: Brand & Motto */}
-          <div className="md:col-span-5">
+          <div className="sm:col-span-2 md:col-span-5">
             <Link
               href={content.logoHref}
               className="site-header-logo inline-flex items-center gap-2 focus:outline-none"
@@ -177,19 +177,19 @@ export function Template1Footer({
                   alt={rawLogoText || "SJ Media Labs"}
                   width={180}
                   height={48}
-                  className="site-header-logo-img h-auto w-auto max-h-12 object-contain"
+                  className="site-header-logo-img h-auto w-auto max-h-8 sm:max-h-10 md:max-h-11 lg:max-h-12 max-w-[160px] sm:max-w-[200px] md:max-w-none object-contain"
                   unoptimized={resolvedLogoUrl.startsWith("data:") || resolvedLogoUrl.endsWith(".svg") || resolvedLogoUrl.startsWith("http")}
                 />
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none">
+                  <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none text-xl sm:text-2xl">
                     {isSjmlBrand ? "SJML" : rawLogoText}
                   </span>
                   <span
-                    className="site-header-logo-rule hidden sm:block w-px bg-black/15 shrink-0"
+                    className="site-header-logo-rule hidden sm:block w-px h-6 bg-black/15 shrink-0"
                     aria-hidden="true"
                   />
-                  <div className="site-header-logo-tagline hidden sm:flex flex-col leading-tight">
+                  <div className="site-header-logo-tagline hidden sm:flex flex-col text-[10px] leading-tight">
                     <span className="font-semibold text-[#000000] uppercase">
                       {content.taglineLine1 || "Branding &"}
                     </span>
@@ -202,14 +202,14 @@ export function Template1Footer({
             </Link>
 
             {content.brandMotto && (
-              <p className="mt-3 text-[12px] text-[#161617]/55">
+              <p className="mt-3 text-[11.5px] sm:text-[12px] md:text-[12.5px] text-[#161617]/55 max-w-[340px]">
                 {content.brandMotto}
               </p>
             )}
           </div>
 
           {/* Column 2: Contact Info */}
-          <div className="md:col-span-4 flex flex-col space-y-1.5 text-[13px]">
+          <div className="sm:col-span-1 md:col-span-4 flex flex-col space-y-1.5 sm:space-y-2 text-[12.5px] sm:text-[13px] md:text-[13.5px]">
             {content.phoneText && (
               <a
                 href={content.phoneHref}
@@ -227,14 +227,14 @@ export function Template1Footer({
               </a>
             )}
             {content.addressText && (
-              <p className="text-[#161617]/55 whitespace-pre-line">
+              <p className="text-[#161617]/55 whitespace-pre-line leading-relaxed">
                 {content.addressText}
               </p>
             )}
           </div>
 
           {/* Column 3: Legal Links */}
-          <div className="md:col-span-3 flex flex-col space-y-1.5 text-[12.5px]">
+          <div className="sm:col-span-1 md:col-span-3 flex flex-col space-y-1.5 sm:space-y-2 text-[12px] sm:text-[12.5px] md:text-[13px]">
             {content.legalLinks.map((link) => (
               <Link
                 key={`${link.href}-${link.label}`}
@@ -249,8 +249,8 @@ export function Template1Footer({
 
         {/* Bottom Copyright */}
         {content.copyrightText && (
-          <div className="pt-6">
-            <p className="text-[11.5px] text-[#161617]/45">
+          <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-[11px] sm:text-[11.5px] text-[#161617]/45">
               {content.copyrightText}
             </p>
           </div>

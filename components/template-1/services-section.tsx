@@ -69,15 +69,15 @@ export function Template1ServicesSection({
       <section
         className={`w-full bg-[#F7F6F2] text-[#161617] py-12 ${className}`}
       >
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
           {/* Section Header */}
-          <div className="mb-8">
+          <div className="mb-8 sm:mb-10 md:mb-12">
             {content.overline && (
-              <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2.5">
+              <p className="text-[10px] sm:text-[10.5px] md:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2 sm:mb-2.5">
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[30px] sm:text-[38px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-3">
+            <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] 2xl:text-[54px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-2.5 sm:mb-3">
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}
@@ -85,7 +85,7 @@ export function Template1ServicesSection({
               ))}
             </h2>
             {content.subtitle && (
-              <p className="text-[13.5px] sm:text-[14px] text-[#161617]/65">
+              <p className="text-[13px] sm:text-[14px] md:text-[15px] lg:text-[15.5px] text-[#161617]/65 max-w-[680px]">
                 {content.subtitle}
               </p>
             )}
@@ -98,18 +98,18 @@ export function Template1ServicesSection({
               return (
                 <div
                   key={service.id}
-                  className="grid grid-cols-1 gap-4 py-6 sm:py-7 lg:grid-cols-12 lg:gap-8 items-start"
+                  className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 md:gap-6 lg:gap-8 py-5 sm:py-6 md:py-7 lg:py-8 items-start"
                 >
                   {/* Number */}
-                  <div className="lg:col-span-1">
-                    <span className="text-[20px] sm:text-[40px] font-medium leading-none text-[#161617]/40">
+                  <div className="md:col-span-1">
+                    <span className="text-[22px] sm:text-[28px] md:text-[34px] lg:text-[40px] font-medium leading-none text-[#161617]/40">
                       {service.number}
                     </span>
                   </div>
 
                   {/* Title & Tags */}
-                  <div className="lg:col-span-5">
-                    <h3 className="text-[19px] sm:text-[21px] font-semibold leading-[1.2] tracking-[-0.01em] text-[#161617]">
+                  <div className="md:col-span-5 lg:col-span-5">
+                    <h3 className="text-[18px] sm:text-[20px] md:text-[21px] lg:text-[22px] xl:text-[24px] font-semibold leading-[1.2] tracking-[-0.01em] text-[#161617]">
                       {titleLines.map((line, index) => (
                         <span key={index} className="block">
                           {line}
@@ -117,15 +117,15 @@ export function Template1ServicesSection({
                       ))}
                     </h3>
                     {service.tags && (
-                      <p className="mt-2.5 text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] text-[#161617]/45">
+                      <p className="mt-2 sm:mt-2.5 text-[9.5px] sm:text-[10px] md:text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#161617]/45">
                         {service.tags}
                       </p>
                     )}
                   </div>
 
                   {/* Description */}
-                  <div className="lg:col-span-6">
-                    <p className="text-[13.5px] sm:text-[14px] leading-[1.6] text-[#161617]/70 max-w-[480px]">
+                  <div className="md:col-span-6 lg:col-span-6">
+                    <p className="text-[13px] sm:text-[13.5px] md:text-[14px] lg:text-[14.5px] leading-[1.6] text-[#161617]/70 max-w-[520px]">
                       {service.description}
                     </p>
                   </div>
@@ -136,11 +136,11 @@ export function Template1ServicesSection({
 
           {/* Bottom CTA Button */}
           {content.ctaText && (
-            <div className="mt-8">
+            <div className="mt-8 sm:mt-10 md:mt-12 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleCtaButtonClick}
-                className="inline-flex items-center gap-3 rounded-[4px] bg-[#161617] px-5 py-3 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
               >
                 <span className="text-[#FCC50E]">{content.ctaText}</span>
                 <ArrowUpRightIcon className="text-[#FCC50E]" />

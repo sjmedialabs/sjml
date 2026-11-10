@@ -174,12 +174,17 @@ export function Template1Header({
     setIsModalOpen(true)
   }
 
+  const mobileCtaText =
+    content.ctaText === "Book a Consultation"
+      ? "Book Now"
+      : content.ctaText
+
   return (
     <>
       <header
         className={`sticky top-0 z-50 w-full bg-white border-b border-black/10 text-[#161617] ${className}`}
       >
-        <div className="mx-auto flex h-20 max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 sm:h-18 md:h-20 max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
           {/* Brand Logo - fetched from website's header */}
           <Link
             href={content.logoHref}
@@ -190,22 +195,22 @@ export function Template1Header({
               <Image
                 src={resolvedLogoUrl}
                 alt={rawLogoText || "SJ Media Labs"}
-                width={200}
-                height={64}
-                className="site-header-logo-img h-auto w-auto object-contain"
+                width={180}
+                height={56}
+                className="site-header-logo-img !h-7 sm:!h-9 md:!h-10 lg:!h-12 !w-auto !max-w-[130px] sm:!max-w-[180px] md:!max-w-none object-contain"
                 priority
                 unoptimized={resolvedLogoUrl.startsWith("data:") || resolvedLogoUrl.endsWith(".svg") || resolvedLogoUrl.startsWith("http")}
               />
             ) : (
-              <>
-                <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none">
+              <div className="flex items-center gap-2">
+                <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none text-lg sm:text-xl md:text-2xl">
                   {isSjmlBrand ? "SJML" : rawLogoText}
                 </span>
                 <span
-                  className="site-header-logo-rule hidden sm:block w-px bg-black/15 shrink-0"
+                  className="site-header-logo-rule hidden sm:block w-px h-5 sm:h-6 bg-black/15 shrink-0"
                   aria-hidden="true"
                 />
-                <div className="site-header-logo-tagline hidden sm:flex flex-col leading-tight">
+                <div className="site-header-logo-tagline hidden sm:flex flex-col text-[9px] sm:text-[10px] leading-tight">
                   <span className="font-semibold text-[#000000] uppercase">
                     {content.taglineLine1 || "Branding &"}
                   </span>
@@ -213,16 +218,16 @@ export function Template1Header({
                     {content.taglineLine2 || "Advertising"}
                   </span>
                 </div>
-              </>
+              </div>
             )}
           </Link>
 
           {/* Right Actions: Phone & CTA Button */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2.5 sm:gap-4 md:gap-6 shrink-0">
             {content.phoneText && (
               <a
                 href={content.phoneHref}
-                className="hidden sm:inline-block text-xs sm:text-[13px] font-medium text-[#161617]/80 hover:text-[#161617] transition-colors"
+                className="hidden md:inline-block text-xs sm:text-[13px] xl:text-[14px] font-medium text-[#161617]/80 hover:text-[#161617] transition-colors whitespace-nowrap"
               >
                 {content.phoneText}
               </a>
@@ -231,10 +236,15 @@ export function Template1Header({
             <button
               type="button"
               onClick={handleCtaButtonClick}
-              className="inline-flex items-center gap-2.5 rounded-[4px] bg-[#161617] px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-[4px] bg-[#161617] px-3.5 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 text-[11.5px] sm:text-[12.5px] md:text-[13px] xl:text-[14px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] shrink-0"
             >
-              <span className="text-[#FCC50E]">{content.ctaText}</span>
-              <ArrowUpRightIcon className="text-[#FCC50E]" />
+              <span className="sm:hidden text-[#FCC50E] whitespace-nowrap">
+                {mobileCtaText}
+              </span>
+              <span className="hidden sm:inline text-[#FCC50E] whitespace-nowrap">
+                {content.ctaText}
+              </span>
+              <ArrowUpRightIcon className="text-[#FCC50E] shrink-0" />
             </button>
           </div>
         </div>
