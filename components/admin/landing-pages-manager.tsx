@@ -317,7 +317,7 @@ export function LandingPagesManager() {
                     </td>
                     <td className="px-4 py-4 text-[#91a2ba]">—</td>
                     <td className="px-4 py-4 text-center">{page.sections}</td>
-                    <td className="px-4 py-4 text-[#91a2ba]">{page.updated}</td>
+                    <td className="px-4 py-4 text-[#91a2ba]">{page.updated.split("T")[0]}</td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex flex-wrap justify-end gap-2">
                         <a
