@@ -38,8 +38,17 @@ export async function generateMetadata({
   searchParams: Promise<{ preview?: string }>
 }): Promise<Metadata> {
   const [{ slug }, query] = await Promise.all([params, searchParams])
-  const page = await getLandingPage(slug, query.preview === "1")
-  if (!page) return { title: "Page not found" }
+  const isPreview = query.preview === "1"
+  const page = await getLandingPage(slug, isPreview)
+  if (!page) {
+    if (slug === "template-1" && isPreview) {
+      return {
+        title: "Template 1 Preview | SJ Media Labs",
+        description: "UI Template 1 section-by-section preview",
+      }
+    }
+    return { title: "Page not found" }
+  }
 
   const seoTitle = page.seoData?.title.trim() || page.title
   const description = page.seoData?.description.trim()
@@ -70,8 +79,14 @@ export default async function LandingPageRoute({
   searchParams: Promise<{ preview?: string }>
 }) {
   const [{ slug }, query] = await Promise.all([params, searchParams])
-  const page = await getLandingPage(slug, query.preview === "1")
-  if (!page) notFound()
+  const isPreview = query.preview === "1"
+  const page = await getLandingPage(slug, isPreview)
+  if (!page) {
+    if (slug === "template-1" && isPreview) {
+      return <Template1Page />
+    }
+    notFound()
+  }
 
   return (
     <Template1Page

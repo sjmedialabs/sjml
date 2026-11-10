@@ -70,16 +70,16 @@ export function Template1WhySjmlSection({
       <section
         className={`w-full bg-[#F7F6F2] text-[#161617] py-12 ${className}`}
       >
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 items-start">
+        <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-10 lg:gap-12 xl:gap-16 items-start">
             {/* Left Column: Heading, Image, Caption, CTA */}
-            <div className="lg:col-span-5">
+            <div className="md:col-span-5 lg:col-span-5">
               {content.overline && (
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2.5">
+                <p className="text-[10px] sm:text-[10.5px] md:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2 sm:mb-2.5">
                   {content.overline}
                 </p>
               )}
-              <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-6">
+              <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-5 sm:mb-6">
                 {headlineLines.map((line, index) => (
                   <span key={index} className="block">
                     {line}
@@ -88,8 +88,8 @@ export function Template1WhySjmlSection({
               </h2>
 
               {content.image && (
-                <div className="bg-[#EAE8E1] p-4 rounded-[4px] mb-3">
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-white">
+                <div className="p-3 sm:p-4 rounded-[4px] mb-2 sm:mb-3">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px]">
                     <Image
                       src={content.image}
                       alt={content.imageAlt}
@@ -101,17 +101,17 @@ export function Template1WhySjmlSection({
               )}
 
               {content.imageCaption && (
-                <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[#161617]/45 mb-6">
+                <p className="text-[9px] sm:text-[9.5px] md:text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/45 mb-5 sm:mb-6">
                   {content.imageCaption}
                 </p>
               )}
 
               {content.ctaText && (
-                <div>
+                <div className="w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={handleCtaButtonClick}
-                    className="inline-flex items-center gap-3 rounded-[4px] bg-[#161617] px-5 py-3 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                    className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
                   >
                     <span className="text-[#FCC50E]">{content.ctaText}</span>
                     <ArrowUpRightIcon className="text-[#FCC50E]" />
@@ -121,16 +121,16 @@ export function Template1WhySjmlSection({
             </div>
 
             {/* Right Column: Numbered Points */}
-            <div className="lg:col-span-7 divide-y divide-black/12 border-t border-black/12 lg:mt-6">
+            <div className="md:col-span-7 lg:col-span-7 divide-y divide-black/12 border-t border-black/12 md:mt-2 lg:mt-4">
               {content.points.map((point) => (
-                <div key={point.id} className="py-6 first:pt-5 last:pb-2">
-                  <span className="block text-[10px] font-semibold tracking-[0.12em] text-[#161617]/40 mb-1.5">
+                <div key={point.id} className="py-5 sm:py-6 first:pt-4 sm:first:pt-5 last:pb-2">
+                  <span className="block text-[9.5px] sm:text-[10px] font-semibold tracking-[0.12em] text-[#161617]/40 mb-1 sm:mb-1.5">
                     {point.number}
                   </span>
-                  <h3 className="text-[17px] sm:text-[18px] font-semibold text-[#161617] mb-1.5">
+                  <h3 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-semibold text-[#161617] mb-1 sm:mb-1.5">
                     {point.title}
                   </h3>
-                  <p className="text-[13.5px] leading-[1.55] text-[#161617]/65">
+                  <p className="text-[13px] sm:text-[13.5px] md:text-[14px] leading-[1.55] text-[#161617]/65">
                     {point.description}
                   </p>
                 </div>

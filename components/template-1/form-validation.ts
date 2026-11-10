@@ -41,7 +41,7 @@ export function validateLeadFormField(
       return undefined
     }
     case "message": {
-      if (!trimmed) return "Message is required."
+      // Optional field
       return undefined
     }
     default:

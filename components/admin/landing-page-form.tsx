@@ -266,7 +266,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
                 aria-label={`Preview ${option}`}
                 className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded border border-[#d1d5db] bg-white text-[#525252] transition-colors hover:border-[#FCC50E] hover:text-[#161617] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCC50E]"
                 onClick={() => {
-                  window.open("/template-1", "_blank", "noopener,noreferrer")
+                  window.open("/template-1?preview=1", "_blank", "noopener,noreferrer")
                   onAction("Opening template preview")
                 }}
                 title={`Preview ${option}`}

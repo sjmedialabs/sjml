@@ -127,6 +127,9 @@ export function FooterManager() {
 
       <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
         <h3 className="font-semibold admin-text-primary">Logo & brand</h3>
+        <p className="text-xs text-amber-700">
+          Note: This footer logo and company tagline are also visible in the landing page footer.
+        </p>
         <ImageUpload
           preset="logo"
           label="Footer logo"
@@ -155,8 +158,21 @@ export function FooterManager() {
 
       <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
         <h3 className="font-semibold admin-text-primary">Contact</h3>
+
+        {/* Landing Page Notice */}
+        <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 flex items-start gap-3">
+          <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
+          <div className="text-sm">
+            <p className="font-semibold text-amber-950">Landing Page Notice</p>
+            <p className="text-amber-850 mt-1">
+              These contact fields (<strong>Phone</strong>, <strong>Email</strong>, <strong>Address</strong>, and <strong>Copyright</strong>) are automatically fetched and visible in the <strong>landing page footer</strong> respectively (and the <strong>Phone</strong> number is also synced to the <strong>landing page header</strong>).
+            </p>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="address">Address</Label>
+          <p className="text-xs text-amber-700">Visible in website footer and landing page footer.</p>
           <Textarea
             id="address"
             value={footerData.address ?? ""}
@@ -167,6 +183,7 @@ export function FooterManager() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="phone">Phone</Label>
+            <p className="text-xs text-amber-700">Visible in website footer and landing page header & footer.</p>
             <Input
               id="phone"
               value={footerData.phone ?? ""}
@@ -175,6 +192,7 @@ export function FooterManager() {
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
+            <p className="text-xs text-amber-700">Visible in website footer and landing page footer.</p>
             <Input
               id="email"
               type="email"
@@ -185,6 +203,7 @@ export function FooterManager() {
         </div>
         <div>
           <Label htmlFor="copyright">Copyright</Label>
+          <p className="text-xs text-amber-700">Visible in website footer and landing page footer.</p>
           <Input
             id="copyright"
             value={footerData.copyright ?? ""}

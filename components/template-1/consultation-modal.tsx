@@ -71,7 +71,7 @@ export function Template1ConsultationModal({
   isOpen,
   onClose,
   data,
-  cancelButtonText = "Cancel",
+  cancelButtonText: _cancelButtonText,
   onFormSubmit,
 }: Template1ConsultationModalProps) {
   const content = {
@@ -91,6 +91,14 @@ export function Template1ConsultationModal({
   >({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  useEffect(() => {
+    if (!isSubmitted) return
+    const timer = setTimeout(() => {
+      handleClose()
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [isSubmitted])
 
   useEffect(() => {
     if (!isOpen) return
@@ -150,7 +158,6 @@ export function Template1ConsultationModal({
       fullName: true,
       businessEmail: true,
       phoneNumber: true,
-      message: true,
     })
 
     if (Object.keys(validationErrors).length > 0) {
@@ -193,14 +200,14 @@ export function Template1ConsultationModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-4 md:p-6 backdrop-blur-[2px] animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="template1-modal-title"
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-[440px] max-h-[92vh] overflow-y-auto rounded-[8px] bg-white p-6 sm:p-8 text-[#161617] shadow-[0_20px_50px_rgba(0,0,0,0.28)]"
+        className="relative w-full max-w-[440px] sm:max-w-[460px] md:max-w-[480px] max-h-[92vh] overflow-y-auto rounded-[8px] bg-white p-5 sm:p-7 md:p-8 text-[#161617] shadow-[0_20px_50px_rgba(0,0,0,0.28)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top-Right Cross Button */}
@@ -208,35 +215,35 @@ export function Template1ConsultationModal({
           type="button"
           onClick={handleClose}
           aria-label="Close modal"
-          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-[4px] text-[#161617]/55 transition-colors hover:bg-black/5 hover:text-[#161617]"
+          className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 inline-flex h-8 w-8 items-center justify-center rounded-[4px] text-[#161617]/55 transition-colors hover:bg-black/5 hover:text-[#161617]"
         >
           <CloseCrossIcon />
         </button>
 
         {/* Header */}
-        <p className="pr-8 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-1.5">
+        <p className="pr-8 text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-1 sm:mb-1.5">
           {content.formOverline}
         </p>
         <h2
           id="template1-modal-title"
-          className="pr-8 text-[20px] sm:text-[22px] font-semibold tracking-[-0.01em] text-[#161617] mb-6"
+          className="pr-8 text-[19px] sm:text-[21px] md:text-[22px] font-semibold tracking-[-0.01em] text-[#161617] mb-5 sm:mb-6"
         >
           {content.formTitle}
         </h2>
 
         {isSubmitted ? (
-          <div className="rounded-[6px] border border-black/10 bg-[#F7F6F2] p-6 text-center">
-            <p className="text-[16px] font-semibold text-[#161617] mb-1">
+          <div className="rounded-[6px] border border-black/10 bg-[#F7F6F2] p-5 sm:p-6 text-center">
+            <p className="text-[15px] sm:text-[16px] font-semibold text-[#161617] mb-1">
               Thank you for reaching out!
             </p>
-            <p className="text-[13px] text-[#161617]/70 mb-5">
+            <p className="text-[12.5px] sm:text-[13px] text-[#161617]/70 mb-4 sm:mb-5">
               Our team will get back to you shortly to discuss your growth goals.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsSubmitted(false)}
-                className="rounded-[4px] border border-black/15 bg-white px-4 py-2 text-[12px] font-medium text-[#161617] hover:bg-black/5 transition-colors"
+                className="rounded-[4px] border border-black/15 bg-white px-3.5 sm:px-4 py-2 text-[12px] font-medium text-[#161617] hover:bg-black/5 transition-colors"
               >
                 Submit another enquiry
               </button>
@@ -250,11 +257,11 @@ export function Template1ConsultationModal({
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-3.5 sm:space-y-4">
             {/* Full Name */}
-            <div>
-              <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.fullNameLabel}
+            <div className="group">
+              <label className="block text-[11px] sm:text-[11.5px] font-medium text-[#161617]/80 group-focus-within:text-[#161617] group-focus-within:font-semibold mb-1 sm:mb-1.5 transition-colors">
+                {content.fullNameLabel} <span className="text-[#D92D20]">*</span>
               </label>
               <input
                 type="text"
@@ -266,10 +273,12 @@ export function Template1ConsultationModal({
                 onBlur={() => handleFieldBlur("fullName")}
                 aria-invalid={Boolean(errors.fullName)}
                 placeholder={content.fullNamePlaceholder}
-                className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                className={`w-full rounded-[4px] border px-3.5 py-2.5 sm:py-3 text-[13px] sm:text-[14px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-all duration-150 ${
                   errors.fullName
-                    ? "border-[#D92D20] focus:border-[#D92D20]"
-                    : "border-black/12 focus:border-[#161617]"
+                    ? "border-[#D92D20] bg-white focus:border-[#D92D20] focus:ring-2 focus:ring-[#D92D20]/25"
+                    : formValues.fullName.trim().length > 0
+                    ? "border-[#161617]/40 bg-[#FFFDF7] focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
+                    : "border-black/12 bg-white focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
                 }`}
               />
               {errors.fullName && (
@@ -280,9 +289,9 @@ export function Template1ConsultationModal({
             </div>
 
             {/* Business Email */}
-            <div>
-              <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.emailLabel}
+            <div className="group">
+              <label className="block text-[11px] sm:text-[11.5px] font-medium text-[#161617]/80 group-focus-within:text-[#161617] group-focus-within:font-semibold mb-1 sm:mb-1.5 transition-colors">
+                {content.emailLabel} <span className="text-[#D92D20]">*</span>
               </label>
               <input
                 type="email"
@@ -295,10 +304,12 @@ export function Template1ConsultationModal({
                 onBlur={() => handleFieldBlur("businessEmail")}
                 aria-invalid={Boolean(errors.businessEmail)}
                 placeholder={content.emailPlaceholder}
-                className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                className={`w-full rounded-[4px] border px-3.5 py-2.5 sm:py-3 text-[13px] sm:text-[14px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-all duration-150 ${
                   errors.businessEmail
-                    ? "border-[#D92D20] focus:border-[#D92D20]"
-                    : "border-black/12 focus:border-[#161617]"
+                    ? "border-[#D92D20] bg-white focus:border-[#D92D20] focus:ring-2 focus:ring-[#D92D20]/25"
+                    : formValues.businessEmail.trim().length > 0
+                    ? "border-[#161617]/40 bg-[#FFFDF7] focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
+                    : "border-black/12 bg-white focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
                 }`}
               />
               {errors.businessEmail && (
@@ -309,9 +320,9 @@ export function Template1ConsultationModal({
             </div>
 
             {/* Phone Number */}
-            <div>
-              <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
-                {content.phoneLabel}
+            <div className="group">
+              <label className="block text-[11px] sm:text-[11.5px] font-medium text-[#161617]/80 group-focus-within:text-[#161617] group-focus-within:font-semibold mb-1 sm:mb-1.5 transition-colors">
+                {content.phoneLabel} <span className="text-[#D92D20]">*</span>
               </label>
               <input
                 type="tel"
@@ -326,10 +337,12 @@ export function Template1ConsultationModal({
                 onBlur={() => handleFieldBlur("phoneNumber")}
                 aria-invalid={Boolean(errors.phoneNumber)}
                 placeholder={content.phonePlaceholder}
-                className={`w-full rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                className={`w-full rounded-[4px] border px-3.5 py-2.5 sm:py-3 text-[13px] sm:text-[14px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-all duration-150 ${
                   errors.phoneNumber
-                    ? "border-[#D92D20] focus:border-[#D92D20]"
-                    : "border-black/12 focus:border-[#161617]"
+                    ? "border-[#D92D20] bg-white focus:border-[#D92D20] focus:ring-2 focus:ring-[#D92D20]/25"
+                    : formValues.phoneNumber.trim().length > 0
+                    ? "border-[#161617]/40 bg-[#FFFDF7] focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
+                    : "border-black/12 bg-white focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
                 }`}
               />
               {errors.phoneNumber && (
@@ -340,13 +353,12 @@ export function Template1ConsultationModal({
             </div>
 
             {/* Message */}
-            <div>
-              <label className="block text-[11px] font-medium text-[#161617]/80 mb-1.5">
+            <div className="group">
+              <label className="block text-[11px] sm:text-[11.5px] font-medium text-[#161617]/80 group-focus-within:text-[#161617] group-focus-within:font-semibold mb-1 sm:mb-1.5 transition-colors">
                 {content.messageLabel}
               </label>
               <textarea
                 rows={3}
-                required
                 value={formValues.message}
                 onChange={(e) =>
                   handleFieldChange("message", e.target.value)
@@ -354,10 +366,12 @@ export function Template1ConsultationModal({
                 onBlur={() => handleFieldBlur("message")}
                 aria-invalid={Boolean(errors.message)}
                 placeholder={content.messagePlaceholder}
-                className={`w-full resize-none rounded-[4px] border bg-white px-3.5 py-2.5 text-[13px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-colors ${
+                className={`w-full resize-none rounded-[4px] border px-3.5 py-2.5 sm:py-3 text-[13px] sm:text-[14px] text-[#161617] placeholder:text-[#161617]/35 focus:outline-none transition-all duration-150 ${
                   errors.message
-                    ? "border-[#D92D20] focus:border-[#D92D20]"
-                    : "border-black/12 focus:border-[#161617]"
+                    ? "border-[#D92D20] bg-white focus:border-[#D92D20] focus:ring-2 focus:ring-[#D92D20]/25"
+                    : formValues.message.trim().length > 0
+                    ? "border-[#161617]/40 bg-[#FFFDF7] focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
+                    : "border-black/12 bg-white focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
                 }`}
               />
               {errors.message && (
@@ -367,31 +381,20 @@ export function Template1ConsultationModal({
               )}
             </div>
 
-            {/* Submit & Cancel Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex w-full sm:flex-1 items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] disabled:opacity-60"
-              >
-                <span className="text-[#FCC50E]">
-                  {isSubmitting ? "Submitting..." : content.submitButtonText}
-                </span>
-                <ArrowUpRightIcon className="text-[#FCC50E]" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={isSubmitting}
-                className="flex w-full sm:w-auto items-center justify-center rounded-[4px] border border-black/15 bg-white px-5 py-3 text-[13px] font-medium text-[#161617] transition-colors hover:bg-black/5 disabled:opacity-60"
-              >
-                {cancelButtonText}
-              </button>
-            </div>
+            {/* Submit CTA */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3 sm:py-3.5 text-[13px] sm:text-[14px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] disabled:opacity-60 cursor-pointer"
+            >
+              <span className="text-[#FCC50E]">
+                {isSubmitting ? "Submitting..." : content.submitButtonText}
+              </span>
+              <ArrowUpRightIcon className="text-[#FCC50E]" />
+            </button>
 
             {/* Privacy Footnote */}
-            <p className="pt-1 text-center text-[10.5px] leading-[1.45] text-[#161617]/55">
+            <p className="pt-1 text-center text-[10px] sm:text-[10.5px] leading-[1.45] text-[#161617]/55">
               {content.privacyText}{" "}
               <Link
                 href={content.privacyLinkHref}

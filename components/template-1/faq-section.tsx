@@ -81,16 +81,16 @@ export function Template1FaqSection({
   return (
     <>
       <section className={`w-full bg-white text-[#161617] py-12 ${className}`}>
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 items-start">
+        <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-10 lg:gap-12 xl:gap-16 items-start">
             {/* Left Column */}
-            <div className="lg:col-span-5">
+            <div className="md:col-span-5 lg:col-span-5">
               {content.overline && (
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2.5">
+                <p className="text-[10px] sm:text-[10.5px] md:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-2 sm:mb-2.5">
                   {content.overline}
                 </p>
               )}
-              <h2 className="text-[30px] sm:text-[36px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617] mb-4">
+              <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-3 sm:mb-4">
                 {headlineLines.map((line, index) => (
                   <span key={index} className="block">
                     {line}
@@ -98,7 +98,7 @@ export function Template1FaqSection({
                 ))}
               </h2>
               {content.subtitle && (
-                <p className="text-[13.5px] leading-[1.6] text-[#161617]/65 mb-6">
+                <p className="text-[13px] sm:text-[13.5px] md:text-[14px] lg:text-[15px] leading-[1.6] text-[#161617]/65 mb-5 sm:mb-6">
                   {subtitleLines.map((line, index) => (
                     <span key={index} className="block">
                       {line}
@@ -108,11 +108,11 @@ export function Template1FaqSection({
               )}
 
               {content.ctaText && (
-                <div>
+                <div className="w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={handleCtaButtonClick}
-                    className="inline-flex items-center gap-3 rounded-[4px] bg-[#161617] px-5 py-3 text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                    className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
                   >
                     <span className="text-[#FCC50E]">{content.ctaText}</span>
                     <ArrowUpRightIcon className="text-[#FCC50E]" />
@@ -122,7 +122,7 @@ export function Template1FaqSection({
             </div>
 
             {/* Right Column: Accordion */}
-            <div className="lg:col-span-7 divide-y divide-black/12 border-t border-b border-black/12">
+            <div className="md:col-span-7 lg:col-span-7 divide-y divide-black/12 border-t border-b border-black/12 md:mt-2 lg:mt-4">
               {content.faqs.map((faq) => {
                 const isOpen = openId === faq.id
                 return (
@@ -133,16 +133,16 @@ export function Template1FaqSection({
                       aria-expanded={isOpen}
                       className="flex w-full items-center justify-between gap-4 text-left focus:outline-none group"
                     >
-                      <span className="text-[14px] sm:text-[15px] font-semibold text-[#161617] group-hover:text-[#161617]/80 transition-colors">
+                      <span className="text-[14px] sm:text-[14.5px] md:text-[15px] lg:text-[16px] font-semibold text-[#161617] group-hover:text-[#161617]/80 transition-colors">
                         {faq.question}
                       </span>
-                      <span className="text-[18px] font-normal leading-none text-[#161617]/60 shrink-0 select-none">
+                      <span className="text-[18px] sm:text-[20px] font-normal leading-none text-[#161617]/60 shrink-0 select-none">
                         {isOpen ? "−" : "+"}
                       </span>
                     </button>
                     {isOpen && (
-                      <div className="mt-2.5 pr-6">
-                        <p className="text-[13px] leading-[1.6] text-[#161617]/65">
+                      <div className="mt-2.5 sm:mt-3 pr-6 sm:pr-8 animate-in fade-in duration-150">
+                        <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] lg:text-[14px] leading-[1.6] text-[#161617]/70 whitespace-pre-line">
                           {faq.answer}
                         </p>
                       </div>

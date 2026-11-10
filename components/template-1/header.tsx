@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useProvidedHeader } from "@/components/header-provider"
-import { normalizeHeaderContent } from "@/lib/header-content"
-import { normalizeFooterContent } from "@/lib/footer-content"
+import { normalizeHeaderContent, type NormalizedHeaderContent } from "@/lib/header-content"
+import { normalizeFooterContent, type FooterContent } from "@/lib/footer-content"
 import {
   type Template1HeaderData,
   type Template1LeadFormValues,
@@ -17,6 +17,8 @@ export type { Template1HeaderData }
 
 export interface Template1HeaderProps {
   data?: Template1HeaderData
+  cmsHeader?: NormalizedHeaderContent | null
+  cmsFooter?: unknown
   onCtaClick?: () => void
   onModalSubmit?: (values: Template1LeadFormValues) => Promise<void> | void
   className?: string
@@ -46,14 +48,39 @@ function ArrowUpRightIcon({ className }: { className?: string }) {
 
 export function Template1Header({
   data,
+  cmsHeader: cmsHeaderProp,
+  cmsFooter: initialCmsFooter,
   onCtaClick,
   onModalSubmit,
   className = "",
 }: Template1HeaderProps) {
   const providedHeader = useProvidedHeader()
-  const [cmsHeader, setCmsHeader] = useState(providedHeader)
-  const [cmsPhone, setCmsPhone] = useState<string>("")
+  const [cmsHeaderState, setCmsHeaderState] = useState<NormalizedHeaderContent | null>(
+    cmsHeaderProp ?? providedHeader ?? null
+  )
+  const [cmsFooterData, setCmsFooterData] = useState<FooterContent | null>(() =>
+    initialCmsFooter ? normalizeFooterContent(initialCmsFooter) : null
+  )
+  const [cmsPhone, setCmsPhone] = useState<string>(() =>
+    initialCmsFooter ? normalizeFooterContent(initialCmsFooter).phone?.trim() || "" : ""
+  )
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (cmsHeaderProp) {
+      setCmsHeaderState(cmsHeaderProp)
+    } else if (providedHeader) {
+      setCmsHeaderState(providedHeader)
+    }
+  }, [cmsHeaderProp, providedHeader])
+
+  useEffect(() => {
+    if (initialCmsFooter) {
+      const normalized = normalizeFooterContent(initialCmsFooter)
+      setCmsFooterData(normalized)
+      if (normalized.phone?.trim()) setCmsPhone(normalized.phone.trim())
+    }
+  }, [initialCmsFooter])
 
   useEffect(() => {
     let cancelled = false
@@ -61,18 +88,19 @@ export function Template1Header({
     async function loadCmsHeaderAndPhone() {
       try {
         const [headerRes, footerRes] = await Promise.all([
-          !providedHeader ? fetch("/api/content/header") : Promise.resolve(null),
-          fetch("/api/content/footer"),
+          !cmsHeaderProp && !providedHeader ? fetch("/api/content/header") : Promise.resolve(null),
+          !initialCmsFooter ? fetch("/api/content/footer") : Promise.resolve(null),
         ])
 
         if (!cancelled && headerRes && headerRes.ok) {
           const rawHeader = await headerRes.json()
-          setCmsHeader(normalizeHeaderContent(rawHeader))
+          setCmsHeaderState(normalizeHeaderContent(rawHeader))
         }
 
         if (!cancelled && footerRes && footerRes.ok) {
           const rawFooter = await footerRes.json()
           const normalizedFooter = normalizeFooterContent(rawFooter)
+          setCmsFooterData(normalizedFooter)
           if (normalizedFooter.phone?.trim()) {
             setCmsPhone(normalizedFooter.phone.trim())
           }
@@ -86,21 +114,41 @@ export function Template1Header({
     return () => {
       cancelled = true
     }
-  }, [providedHeader])
+  }, [cmsHeaderProp, initialCmsFooter, providedHeader])
 
+  const activeHeader = cmsHeaderProp || cmsHeaderState || providedHeader
+
+  // Resolve logo URL - prefer data if explicitly set (and non-empty), otherwise CMS header's logo
+  const resolvedLogoUrl =
+    (data?.logoUrl && data.logoUrl.trim()) ||
+    (activeHeader?.logo && typeof activeHeader.logo === "string" && activeHeader.logo.trim()) ||
+    ""
+
+  const rawLogoText =
+    (data?.logoText && data.logoText.trim()) ||
+    (activeHeader?.logoText && activeHeader.logoText.trim()) ||
+    defaultTemplate1HeaderData.logoText
+
+  const isSjmlBrand = !rawLogoText || rawLogoText === "SJML" || rawLogoText === "SJ MEDIA LABS"
+
+  // Contact details resolution: check header phone first, then footer phone, then fallback
   const resolvedPhone =
-    data?.phoneText ?? (cmsPhone || defaultTemplate1HeaderData.phoneText)
+    (data?.phoneText && data.phoneText.trim()) ||
+    (activeHeader?.phone && activeHeader.phone.trim()) ||
+    (cmsPhone && cmsPhone.trim()) ||
+    (cmsFooterData?.phone && cmsFooterData.phone.trim()) ||
+    defaultTemplate1HeaderData.phoneText
+
   const resolvedPhoneHref =
-    data?.phoneHref ??
-    (cmsPhone
-      ? `tel:${cmsPhone.replace(/\s+/g, "")}`
+    (data?.phoneHref && data.phoneHref.trim()) ||
+    (resolvedPhone
+      ? `tel:${resolvedPhone.replace(/\s+/g, "")}`
       : defaultTemplate1HeaderData.phoneHref)
 
   const content: Required<Template1HeaderData> = {
     ...defaultTemplate1HeaderData,
-    logoUrl: data?.logoUrl ?? cmsHeader?.logo ?? defaultTemplate1HeaderData.logoUrl,
-    logoText:
-      data?.logoText ?? cmsHeader?.logoText ?? defaultTemplate1HeaderData.logoText,
+    logoUrl: resolvedLogoUrl,
+    logoText: rawLogoText,
     taglineLine1:
       data?.taglineLine1 ?? defaultTemplate1HeaderData.taglineLine1,
     taglineLine2:
@@ -110,11 +158,11 @@ export function Template1Header({
     phoneHref: resolvedPhoneHref,
     ctaText:
       data?.ctaText ??
-      cmsHeader?.ctaButton?.text ??
+      activeHeader?.ctaButton?.text ??
       defaultTemplate1HeaderData.ctaText,
     ctaHref:
       data?.ctaHref ??
-      cmsHeader?.ctaButton?.href ??
+      activeHeader?.ctaButton?.href ??
       defaultTemplate1HeaderData.ctaHref,
   }
 
@@ -126,49 +174,60 @@ export function Template1Header({
     setIsModalOpen(true)
   }
 
+  const mobileCtaText =
+    content.ctaText === "Book a Consultation"
+      ? "Book Now"
+      : content.ctaText
+
   return (
     <>
       <header
         className={`sticky top-0 z-50 w-full bg-white border-b border-black/10 text-[#161617] ${className}`}
       >
-        <div className="mx-auto flex h-20 max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Brand Logo */}
+        <div className="mx-auto flex h-16 sm:h-18 md:h-20 max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+          {/* Brand Logo - fetched from website's header */}
           <Link
             href={content.logoHref}
-            className="inline-flex items-center gap-3 shrink-0 focus:outline-none"
+            className="site-header-logo flex items-center gap-2 shrink-0 min-w-0 focus:outline-none"
+            aria-label="SJML Home"
           >
-            {content.logoUrl ? (
+            {resolvedLogoUrl ? (
               <Image
-                src={content.logoUrl}
-                alt={content.logoText}
+                src={resolvedLogoUrl}
+                alt={rawLogoText || "SJ Media Labs"}
                 width={180}
-                height={48}
-                className="h-10 w-auto object-contain"
+                height={56}
+                className="site-header-logo-img !h-7 sm:!h-9 md:!h-10 lg:!h-12 !w-auto !max-w-[130px] sm:!max-w-[180px] md:!max-w-none object-contain"
                 priority
+                unoptimized={resolvedLogoUrl.startsWith("data:") || resolvedLogoUrl.endsWith(".svg") || resolvedLogoUrl.startsWith("http")}
               />
             ) : (
-              <div className="flex items-center gap-3">
-                <span className="text-[30px] sm:text-[34px] font-black tracking-tight leading-none text-[#FCC50E]">
-                  {content.logoText}
+              <div className="flex items-center gap-2">
+                <span className="site-header-logo-text text-primary font-bold tracking-tight leading-none text-lg sm:text-xl md:text-2xl">
+                  {isSjmlBrand ? "SJML" : rawLogoText}
                 </span>
                 <span
-                  className="h-7 w-px bg-black/20 shrink-0"
+                  className="site-header-logo-rule hidden sm:block w-px h-5 sm:h-6 bg-black/15 shrink-0"
                   aria-hidden="true"
                 />
-                <div className="flex flex-col text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.06em] leading-[1.15] text-[#161617]">
-                  <span>{content.taglineLine1}</span>
-                  <span>{content.taglineLine2}</span>
+                <div className="site-header-logo-tagline hidden sm:flex flex-col text-[9px] sm:text-[10px] leading-tight">
+                  <span className="font-semibold text-[#000000] uppercase">
+                    {content.taglineLine1 || "Branding &"}
+                  </span>
+                  <span className="font-semibold text-[#000000] uppercase">
+                    {content.taglineLine2 || "Advertising"}
+                  </span>
                 </div>
               </div>
             )}
           </Link>
 
           {/* Right Actions: Phone & CTA Button */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2.5 sm:gap-4 md:gap-6 shrink-0">
             {content.phoneText && (
               <a
                 href={content.phoneHref}
-                className="hidden sm:inline-block text-xs sm:text-[13px] font-medium text-[#161617]/80 hover:text-[#161617] transition-colors"
+                className="hidden md:inline-block text-xs sm:text-[13px] xl:text-[14px] font-medium text-[#161617]/80 hover:text-[#161617] transition-colors whitespace-nowrap"
               >
                 {content.phoneText}
               </a>
@@ -177,10 +236,15 @@ export function Template1Header({
             <button
               type="button"
               onClick={handleCtaButtonClick}
-              className="inline-flex items-center gap-2.5 rounded-[4px] bg-[#161617] px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-[4px] bg-[#161617] px-3.5 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 text-[11.5px] sm:text-[12.5px] md:text-[13px] xl:text-[14px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] shrink-0"
             >
-              <span className="text-[#FCC50E]">{content.ctaText}</span>
-              <ArrowUpRightIcon className="text-[#FCC50E]" />
+              <span className="sm:hidden text-[#FCC50E] whitespace-nowrap">
+                {mobileCtaText}
+              </span>
+              <span className="hidden sm:inline text-[#FCC50E] whitespace-nowrap">
+                {content.ctaText}
+              </span>
+              <ArrowUpRightIcon className="text-[#FCC50E] shrink-0" />
             </button>
           </div>
         </div>
