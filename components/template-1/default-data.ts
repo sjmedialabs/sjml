@@ -234,6 +234,7 @@ export interface Template1FeaturedWork {
   approachText: string
   evidenceLabel?: string
   evidenceText: string
+  narrativeHtml?: string
   href?: string
 }
 
@@ -244,8 +245,9 @@ export interface Template1SecondaryWorkItem {
   image: string
   imageAlt?: string
   statusNote?: string
-  challenge: string
-  approach: string
+  challenge?: string
+  approach?: string
+  narrativeHtml?: string
   href?: string
 }
 
@@ -280,6 +282,7 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
     evidenceLabel: "Evidence",
     evidenceText:
       "Published creative shown. Campaign performance data has not been supplied.",
+    narrativeHtml: `<p><strong>Challenge:</strong> Make technical building products clear and relevant to potential buyers.</p><p><strong>Approach:</strong> Product-led social creatives pair architectural context with focused benefit messaging.</p><p><strong>Evidence:</strong> Published creative shown. Campaign performance data has not been supplied.</p>`,
     href: "/work",
   },
   projects: [
@@ -292,6 +295,7 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
       statusNote: "Narrative for approval",
       challenge: "Communicate care with clarity.",
       approach: "Human-led imagery and focused service communication.",
+      narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> Communicate care with clarity.</p><p><strong>Approach:</strong> Human-led imagery and focused service communication.</p>`,
       href: "/work",
     },
     {
@@ -304,6 +308,7 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
       challenge: "Simplify a complex digital offering.",
       approach:
         "A structured digital experience with clear information hierarchy.",
+      narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> Simplify a complex digital offering.</p><p><strong>Approach:</strong> A structured digital experience with clear information hierarchy.</p>`,
       href: "/work",
     },
   ],
