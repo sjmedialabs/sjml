@@ -310,38 +310,38 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               : "Enter basic details to create a page. You can customize its sections afterward."}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              onAction("Page editing cancelled")
-              onCancel()
-            }}
-            className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
-            type="button"
-          >
-            Cancel
-          </Button>
-          <Button
-            size="sm"
-            disabled={isSaving || (Boolean(page) && !hasChanges)}
-            onClick={() => void createPage()}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-            type="button"
-          >
-            {isSaving ? (
-              <>
-                <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
-                {page ? "Saving..." : "Creating..."}
-              </>
-            ) : page ? (
-              "Save Changes"
-            ) : (
-              "Create Page"
-            )}
-          </Button>
-        </div>
+        {page && (
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onAction("Page editing cancelled")
+                onCancel()
+              }}
+              className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              disabled={isSaving || !hasChanges}
+              onClick={() => void createPage()}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              type="button"
+            >
+              {isSaving ? (
+                <>
+                  <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Status Messages */}

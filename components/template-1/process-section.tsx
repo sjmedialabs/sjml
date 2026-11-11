@@ -81,24 +81,24 @@ function ProcessCarousel({ steps }: { steps: Template1ProcessStep[] }) {
 
   return (
     <div className="relative">
-      {/* Left Navigation Arrow */}
+      {/* Desktop Left Navigation Arrow */}
       <button
         type="button"
         onClick={scrollPrev}
         disabled={!canScrollPrev}
         aria-label="Previous step"
-        className="absolute left-1 sm:-left-5 md:-left-6 lg:-left-6 xl:-left-13 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+        className="hidden sm:flex absolute -left-5 md:-left-6 lg:-left-6 xl:-left-13 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      {/* Right Navigation Arrow */}
+      {/* Desktop Right Navigation Arrow */}
       <button
         type="button"
         onClick={scrollNext}
         disabled={!canScrollNext}
         aria-label="Next step"
-        className="absolute right-1 sm:-right-5 md:-right-6 lg:-right-6 xl:-right-13 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+        className="hidden sm:flex absolute -right-5 md:-right-6 lg:-right-6 xl:-right-13 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
@@ -120,22 +120,47 @@ function ProcessCarousel({ steps }: { steps: Template1ProcessStep[] }) {
         </div>
       </div>
 
-      {/* Carousel Bottom Dots */}
+      {/* Carousel Bottom Dots & Mobile Navigation */}
       {scrollSnaps.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-8 sm:mt-10">
-          {scrollSnaps.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => scrollTo(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === selectedIndex
-                  ? "w-7 bg-[#FCC50E]"
-                  : "w-2 bg-white/20 hover:bg-white/40"
-              }`}
-              aria-label={`Go to step group ${idx + 1}`}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-3 sm:gap-1.5 mt-8 sm:mt-10">
+          {/* Mobile Left Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            aria-label="Previous step"
+            className="flex sm:hidden w-8 h-8 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-sm hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex items-center gap-1.5">
+            {scrollSnaps.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => scrollTo(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === selectedIndex
+                    ? "w-7 bg-[#FCC50E]"
+                    : "w-2 bg-white/20 hover:bg-white/40"
+                }`}
+                aria-label={`Go to step group ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Mobile Right Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            aria-label="Next step"
+            className="flex sm:hidden w-8 h-8 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-sm hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>
