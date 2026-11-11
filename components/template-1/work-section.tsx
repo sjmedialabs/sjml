@@ -1,8 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import useEmblaCarousel from "embla-carousel-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
   type Template1WorkData,
   type Template1FeaturedWork,
@@ -44,6 +46,187 @@ function ArrowUpRightIcon({ className }: { className?: string }) {
         strokeLinejoin="round"
       />
     </svg>
+  )
+}
+
+function ProjectCard({ project }: { project: Template1SecondaryWorkItem }) {
+  return (
+    <div className="flex flex-col h-full">
+      <div className="bg-[#F3F2EE] p-3.5 sm:p-5 md:p-6 rounded-[4px] mb-3.5 sm:mb-4">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-white shadow-sm">
+          <Image
+            src={project.image}
+            alt={project.imageAlt || project.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-semibold text-[#161617]">
+          {project.href ? (
+            <Link
+              href={project.href}
+              className="hover:underline inline-flex items-center gap-1.5"
+            >
+              {project.title}
+            </Link>
+          ) : (
+            project.title
+          )}
+        </h3>
+        <ArrowUpRightIcon className="text-[#161617]/60 shrink-0" />
+      </div>
+
+      <p className="text-[11px] sm:text-[11.5px] text-[#161617]/50 mt-0.5">
+        {project.category}
+      </p>
+
+      <div className="my-3 sm:my-3.5 border-t border-black/12" />
+
+      {project.narrativeHtml ? (
+        <div
+          className="work-project-narrative text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75 space-y-1 [&_strong]:font-medium [&_strong]:text-[#161617]/85 [&_p]:mb-1 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_a]:text-primary [&_a]:underline"
+          dangerouslySetInnerHTML={{ __html: project.narrativeHtml }}
+        />
+      ) : (
+        <>
+          {project.statusNote && (
+            <p className="text-[10.5px] sm:text-[11px] text-[#161617]/45 mb-1">
+              {project.statusNote}
+            </p>
+          )}
+          {project.challenge && (
+            <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75">
+              <span className="font-medium text-[#161617]/85">
+                Challenge:
+              </span>{" "}
+              {project.challenge}
+            </p>
+          )}
+          {project.approach && (
+            <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75 mt-0.5">
+              <span className="font-medium text-[#161617]/85">
+                Approach:
+              </span>{" "}
+              {project.approach}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function ProjectsCarousel({
+  projects,
+}: {
+  projects: Template1SecondaryWorkItem[]
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    containScroll: "trimSnaps",
+    slidesToScroll: 1,
+  })
+
+  const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [canScrollNext, setCanScrollNext] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev()
+  }, [emblaApi])
+
+  const scrollNext = useCallback(() => {
+    emblaApi?.scrollNext()
+  }, [emblaApi])
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      emblaApi?.scrollTo(index)
+    },
+    [emblaApi]
+  )
+
+  const onSelect = useCallback((api: NonNullable<typeof emblaApi>) => {
+    setSelectedIndex(api.selectedScrollSnap())
+    setCanScrollPrev(api.canScrollPrev())
+    setCanScrollNext(api.canScrollNext())
+  }, [])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect(emblaApi)
+    setScrollSnaps(emblaApi.scrollSnapList())
+    emblaApi.on("select", () => onSelect(emblaApi))
+    emblaApi.on("reInit", () => {
+      onSelect(emblaApi)
+      setScrollSnaps(emblaApi.scrollSnapList())
+    })
+  }, [emblaApi, onSelect])
+
+  return (
+    <div className="relative pt-6 sm:pt-8">
+      {/* Left Navigation Arrow */}
+      <button
+        type="button"
+        onClick={scrollPrev}
+        disabled={!canScrollPrev}
+        aria-label="Previous projects"
+        className="absolute left-1 sm:-left-5 md:-left-6 lg:-left-6 xl:-left-13 top-[35%] sm:top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      {/* Right Navigation Arrow */}
+      <button
+        type="button"
+        onClick={scrollNext}
+        disabled={!canScrollNext}
+        aria-label="Next projects"
+        className="absolute right-1 sm:-right-5 md:-right-6 lg:-right-6 xl:-right-13 top-[35%] sm:top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Embla Viewport */}
+      <div
+        className="overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        ref={emblaRef}
+      >
+        <div className="flex -ml-6 sm:-ml-8 md:-ml-8 lg:-ml-10">
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 pl-6 sm:pl-8 md:pl-8 lg:pl-10"
+            >
+              <ProjectCard project={project} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Carousel Bottom Dots */}
+      {scrollSnaps.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mt-6 sm:mt-8">
+          {scrollSnaps.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => scrollTo(idx)}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                idx === selectedIndex
+                  ? "w-7 bg-[#161617]"
+                  : "w-2 bg-black/20 hover:bg-black/40"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -138,97 +321,56 @@ export function Template1WorkSection({
                   ))}
                 </h4>
 
-                <div className="space-y-3.5 sm:space-y-4">
-                  <div>
-                    <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                      {content.featured.challengeLabel || "Challenge"}
-                    </p>
-                    <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
-                      {content.featured.challengeText}
-                    </p>
-                  </div>
+                {content.featured.narrativeHtml ? (
+                  <div
+                    className="featured-work-narrative text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80 space-y-2 [&_strong]:font-medium [&_strong]:text-[#161617] [&_p]:mb-1.5 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_a]:text-[#FCC50E] [&_a]:underline"
+                    dangerouslySetInnerHTML={{ __html: content.featured.narrativeHtml }}
+                  />
+                ) : (
+                  <div className="space-y-3.5 sm:space-y-4">
+                    <div>
+                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
+                        {content.featured.challengeLabel || "Challenge"}
+                      </p>
+                      <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
+                        {content.featured.challengeText}
+                      </p>
+                    </div>
 
-                  <div>
-                    <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                      {content.featured.approachLabel || "Approach"}
-                    </p>
-                    <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
-                      {content.featured.approachText}
-                    </p>
-                  </div>
+                    <div>
+                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
+                        {content.featured.approachLabel || "Approach"}
+                      </p>
+                      <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
+                        {content.featured.approachText}
+                      </p>
+                    </div>
 
-                  <div>
-                    <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                      {content.featured.evidenceLabel || "Evidence"}
-                    </p>
-                    <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/60">
-                      {content.featured.evidenceText}
-                    </p>
+                    <div>
+                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
+                        {content.featured.evidenceLabel || "Evidence"}
+                      </p>
+                      <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/60">
+                        {content.featured.evidenceText}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Secondary Projects Grid */}
-          {content.projects.length > 0 && (
-            <div className="pt-6 sm:pt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 sm:gap-8 md:gap-8 lg:gap-10">
-              {content.projects.map((project) => (
-                <div key={project.id} className="flex flex-col">
-                  <div className="bg-[#F3F2EE] p-3.5 sm:p-5 md:p-6 rounded-[4px] mb-3.5 sm:mb-4">
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-white shadow-sm">
-                      <Image
-                        src={project.image}
-                        alt={project.imageAlt || project.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-semibold text-[#161617]">
-                      {project.href ? (
-                        <Link
-                          href={project.href}
-                          className="hover:underline inline-flex items-center gap-1.5"
-                        >
-                          {project.title}
-                        </Link>
-                      ) : (
-                        project.title
-                      )}
-                    </h3>
-                    <ArrowUpRightIcon className="text-[#161617]/60 shrink-0" />
-                  </div>
-
-                  <p className="text-[11px] sm:text-[11.5px] text-[#161617]/50 mt-0.5">
-                    {project.category}
-                  </p>
-
-                  <div className="my-3 sm:my-3.5 border-t border-black/12" />
-
-                  {project.statusNote && (
-                    <p className="text-[10.5px] sm:text-[11px] text-[#161617]/45 mb-1">
-                      {project.statusNote}
-                    </p>
-                  )}
-                  <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75">
-                    <span className="font-medium text-[#161617]/85">
-                      Challenge:
-                    </span>{" "}
-                    {project.challenge}
-                  </p>
-                  <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75 mt-0.5">
-                    <span className="font-medium text-[#161617]/85">
-                      Approach:
-                    </span>{" "}
-                    {project.approach}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Secondary Projects: Dynamic carousel if > 2, otherwise 2-column grid */}
+          {content.projects.length > 0 &&
+            (content.projects.length > 2 ? (
+              <ProjectsCarousel projects={content.projects} />
+            ) : (
+              <div className="pt-6 sm:pt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 sm:gap-8 md:gap-8 lg:gap-10">
+                {content.projects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            ))}
 
           {/* Bottom CTA & Disclaimer */}
           <div className="mt-8 sm:mt-10 md:mt-12">

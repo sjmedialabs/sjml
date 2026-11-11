@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { ChangeEvent } from "react"
-import { Upload, X } from "lucide-react"
+import { Plus, Trash2, Upload, X } from "lucide-react"
 import { uploadImageAction } from "@/app/actions/upload"
+import { Button } from "@/components/ui/button"
+import { RichTextEditor } from "./rich-text-editor"
 import type {
   Template1PageData,
   Template1SectionVisibility,
@@ -64,6 +66,15 @@ const hiddenHeaderFooterFieldKeys = new Set([
   "logoText",
   "taglineLine1",
   "taglineLine2",
+])
+
+const hiddenFeaturedWorkFieldKeys = new Set([
+  "challengeLabel",
+  "challengeText",
+  "approachLabel",
+  "approachText",
+  "evidenceLabel",
+  "evidenceText",
 ])
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -156,12 +167,12 @@ function SimpleImageUpload({
 
   return (
     <div className="min-w-0">
-      <span className="mb-1.5 block text-sm text-[#525252]">{label}</span>
+      <span className="block text-sm font-medium admin-text-secondary mb-1.5">{label}</span>
       <div className="flex flex-wrap items-center gap-3">
         {value && (
           <img
             alt={`${label} preview`}
-            className="h-12 w-12 rounded border border-[#d1d5db] object-cover"
+            className="h-10 w-10 rounded-lg border admin-border object-contain bg-white p-1 shrink-0"
             src={value}
           />
         )}
@@ -172,28 +183,30 @@ function SimpleImageUpload({
           ref={inputRef}
           type="file"
         />
-        <button
-          className="inline-flex min-h-10 items-center gap-2 rounded bg-[#eef3f8] px-4 py-2 text-sm font-medium text-[#526783] transition-colors hover:bg-[#e2eaf2] disabled:cursor-wait disabled:opacity-60"
+        <Button
+          variant="outline"
+          size="sm"
           disabled={isUploading}
           onClick={() => inputRef.current?.click()}
+          className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent h-10 px-4 shrink-0"
           type="button"
         >
-          <Upload aria-hidden="true" size={16} />
-          {isUploading ? "Uploading..." : "Upload File"}
-        </button>
+          <Upload aria-hidden="true" className="w-4 h-4 mr-2" />
+          {isUploading ? "Uploading..." : "Upload Image"}
+        </Button>
         {value && (
-          <span className="flex items-center gap-2 text-sm text-[#526783]">
-            Image uploaded
+          <span className="flex items-center gap-2 text-xs admin-text-secondary shrink-0">
+            <span>Image uploaded</span>
             <button
               aria-label={`Remove ${label}`}
-              className="rounded p-1 text-[#526783] hover:bg-[#eef3f8]"
+              className="rounded p-1 text-red-500 hover:bg-red-50 transition-colors"
               onClick={() => {
                 onChange("")
                 onAction(`${label} removed`)
               }}
               type="button"
             >
-              <X aria-hidden="true" size={16} />
+              <X aria-hidden="true" size={14} />
             </button>
           </span>
         )}
@@ -233,6 +246,19 @@ function SectionFields({
 
   if (typeof value === "string") {
     const fieldName = path[path.length - 1] ?? ""
+    if (fieldName === "narrativeHtml" || fieldName.endsWith("Html")) {
+      return (
+        <div className="min-w-0 md:col-span-2">
+          <RichTextEditor
+            label={formatLabel(fieldName.replace(/Html$/, ""))}
+            description="Format the narrative with rich text (bolding, lists, headings, and paragraph structure)."
+            value={value}
+            onChange={(html) => onChange(path, html)}
+          />
+        </div>
+      )
+    }
+
     const isImageField = /(?:image|logo|photo|icon)(?:url)?$/i.test(fieldName)
     const displayFieldName =
       path[0] === "hero" && path.length === 2
@@ -257,7 +283,7 @@ function SectionFields({
     }
 
     const inputClassName =
-      "min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] leading-6 text-[#161617] outline-none focus:border-[#a3a3a3]"
+      "w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
     const isLongText = value.length > 60 || value.includes("\n")
     const spansFullWidth =
       isLongText || /description|answer|statement|subtitle/i.test(fieldName)
@@ -267,10 +293,8 @@ function SectionFields({
     )
 
     return (
-      <label
-        className={`block min-w-0 ${spansFullWidth ? "md:col-span-2" : ""}`}
-      >
-        <span className="mb-1.5 block text-sm text-[#525252]">{label}</span>
+      <div className={`block min-w-0 ${spansFullWidth ? "md:col-span-2" : ""}`}>
+        <label className="block text-sm font-medium admin-text-secondary mb-1.5">{label}</label>
         {isLongText ? (
           <textarea
             className={`${inputClassName} min-h-32 resize-y`}
@@ -285,42 +309,106 @@ function SectionFields({
             value={value}
           />
         )}
-      </label>
+      </div>
     )
   }
 
   if (Array.isArray(value)) {
     const isClientsList = path[0] === "clients" && path[path.length - 1] === "clients"
     const isFaqList = path[0] === "faq" && path[path.length - 1] === "faqs"
+    const isWorkProjectsList = path[0] === "work" && path[path.length - 1] === "projects"
+    const isServicesList = path[0] === "services" && path[path.length - 1] === "services"
+    const isWhySjmlList = path[0] === "whySjml" && path[path.length - 1] === "points"
+    const isProcessList = path[0] === "process" && path[path.length - 1] === "steps"
 
     return (
-      <div className="min-w-0 space-y-3 md:col-span-2">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h4 className="text-sm font-semibold text-[#333]">
-            {formatLabel(path[path.length - 1] ?? "")}
+      <div className="min-w-0 space-y-4 md:col-span-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+          <h4 className="text-sm font-semibold admin-text-primary">
+            {formatLabel(path[path.length - 1] ?? "")} ({value.length})
           </h4>
-          {(isClientsList || isFaqList) && (
-            <button
-              className="rounded border border-[#d1d5db] px-3 py-2 text-sm font-medium text-[#526783] hover:bg-[#f5f7fa]"
+          {(isClientsList || isFaqList || isWorkProjectsList || isServicesList || isWhySjmlList || isProcessList) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent"
               onClick={() => {
                 pendingScrollIndex.current = value.length
                 onChange(path, [
                   ...value,
                   isClientsList
                     ? { id: `client-${crypto.randomUUID()}`, name: "", logoUrl: "" }
-                    : { id: `faq-${crypto.randomUUID()}`, question: "", answer: "" },
+                    : isFaqList
+                      ? { id: `faq-${crypto.randomUUID()}`, question: "", answer: "" }
+                      : isWorkProjectsList
+                        ? {
+                            id: `work-${crypto.randomUUID()}`,
+                            title: "",
+                            category: "",
+                            image: "/placeholder.jpg",
+                            imageAlt: "",
+                            statusNote: "Narrative for approval",
+                            challenge: "",
+                            approach: "",
+                            narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> </p><p><strong>Approach:</strong> </p>`,
+                            href: "/work",
+                          }
+                        : isServicesList
+                          ? {
+                              id: `service-${crypto.randomUUID()}`,
+                              number: String(value.length + 1).padStart(2, "0"),
+                              title: "",
+                              tags: "",
+                              description: "",
+                            }
+                          : isWhySjmlList
+                            ? {
+                                id: `why-${crypto.randomUUID()}`,
+                                number: String(value.length + 1).padStart(2, "0"),
+                                title: "",
+                                description: "",
+                              }
+                            : {
+                                id: `step-${crypto.randomUUID()}`,
+                                number: String(value.length + 1).padStart(2, "0"),
+                                title: "",
+                                description: "",
+                              },
                 ])
-                onAction(isClientsList ? "Client added" : "FAQ added")
+                onAction(
+                  isClientsList
+                    ? "Client added"
+                    : isFaqList
+                      ? "FAQ added"
+                      : isWorkProjectsList
+                        ? "Project added"
+                        : isServicesList
+                          ? "Service added"
+                          : isWhySjmlList
+                            ? "Point added"
+                            : "Step added",
+                )
               }}
               type="button"
             >
-              {isClientsList ? "Add client" : "Add FAQ"}
-            </button>
+              <Plus className="w-4 h-4 mr-1.5" />
+              {isClientsList
+                ? "Add Client"
+                : isFaqList
+                  ? "Add FAQ"
+                  : isWorkProjectsList
+                    ? "Add Project"
+                    : isServicesList
+                      ? "Add Service"
+                      : isWhySjmlList
+                        ? "Add Point"
+                        : "Add Step"}
+            </Button>
           )}
         </div>
         {value.map((item, index) => (
           <fieldset
-            className="block min-w-0 rounded border border-[#e5e7eb] p-4 break-inside-avoid"
+            className="block min-w-0 rounded-xl border admin-border admin-card p-5 break-inside-avoid relative"
             key={index}
             ref={(element) => {
               if (index === pendingScrollIndex.current) {
@@ -328,36 +416,51 @@ function SectionFields({
               }
             }}
           >
-            <legend className="px-1 text-xs font-medium text-[#71839e]">
+            <legend className="px-2 text-xs font-semibold uppercase tracking-wider admin-text-secondary">
               {isClientsList
                 ? `Client ${index + 1}`
                 : isFaqList
                   ? `FAQ ${index + 1}`
-                  : `Item ${index + 1}`}
+                  : isWorkProjectsList
+                    ? `Project ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title) || `Project ${index + 1}`}`
+                    : isServicesList
+                      ? `Service ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title.replace(/\n/g, " ")) || `Service ${index + 1}`}`
+                      : isWhySjmlList
+                        ? `Point ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title) || `Point ${index + 1}`}`
+                        : isProcessList
+                          ? `Step ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title) || `Step ${index + 1}`}`
+                          : `Item ${index + 1}`}
             </legend>
             {isClientsList && isRecord(item) ? (
-              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-                <label className="block min-w-0">
-                  <span className="mb-1.5 block text-sm text-[#525252]">Name</span>
+              <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Client Name
+                  </label>
                   <input
-                    className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] leading-6 text-[#161617] outline-none focus:border-[#a3a3a3]"
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
                     onChange={(event) =>
                       onChange([...path, String(index), "name"], event.target.value)
                     }
+                    placeholder="Client name"
                     value={typeof item.name === "string" ? item.name : ""}
                   />
-                </label>
-                <SimpleImageUpload
-                  label="Logo"
-                  onChange={(url) =>
-                    onChange([...path, String(index), "logoUrl"], url)
-                  }
-                  onAction={onAction}
-                  value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
-                />
-                <div className="sm:col-span-2">
-                  <button
-                    className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                </div>
+                <div className="flex-1 min-w-0">
+                  <SimpleImageUpload
+                    label="Client Logo"
+                    onChange={(url) =>
+                      onChange([...path, String(index), "logoUrl"], url)
+                    }
+                    onAction={onAction}
+                    value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
+                  />
+                </div>
+                <div className="shrink-0">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
                     onClick={() => {
                       onChange(
                         path,
@@ -365,48 +468,362 @@ function SectionFields({
                       )
                       onAction("Client deleted")
                     }}
+                    title="Delete Client"
+                    aria-label="Delete Client"
                     type="button"
                   >
-                    Delete client
-                  </button>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ) : isFaqList && isRecord(item) ? (
               <div className="grid min-w-0 gap-4">
-                <label className="block min-w-0">
-                  <span className="mb-1.5 block text-sm text-[#525252]">Question</span>
+                <div className="block min-w-0">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-sm font-medium admin-text-secondary">
+                      Question
+                    </label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0"
+                      onClick={() => {
+                        onChange(
+                          path,
+                          value.filter((_, faqIndex) => faqIndex !== index),
+                        )
+                        onAction("FAQ deleted")
+                      }}
+                      title="Delete FAQ"
+                      aria-label="Delete FAQ"
+                      type="button"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                   <input
-                    className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] leading-6 text-[#161617] outline-none focus:border-[#a3a3a3]"
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
                     onChange={(event) =>
                       onChange([...path, String(index), "question"], event.target.value)
                     }
                     value={typeof item.question === "string" ? item.question : ""}
                   />
-                </label>
-                <label className="block min-w-0">
-                  <span className="mb-1.5 block text-sm text-[#525252]">Answer</span>
+                </div>
+                <div className="block min-w-0">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Answer
+                  </label>
                   <textarea
-                    className="min-h-32 w-full resize-y rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] leading-6 text-[#161617] outline-none focus:border-[#a3a3a3]"
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary min-h-28 resize-y"
                     onChange={(event) =>
                       onChange([...path, String(index), "answer"], event.target.value)
                     }
                     rows={4}
                     value={typeof item.answer === "string" ? item.answer : ""}
                   />
-                </label>
-                <button
-                  className="justify-self-start rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                  onClick={() => {
-                    onChange(
-                      path,
-                      value.filter((_, faqIndex) => faqIndex !== index),
-                    )
-                    onAction("FAQ deleted")
-                  }}
-                  type="button"
-                >
-                  Delete FAQ
-                </button>
+                </div>
+              </div>
+            ) : isWorkProjectsList && isRecord(item) ? (
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <div className="block min-w-0">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Project Title
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "title"], event.target.value)
+                    }
+                    placeholder="e.g. RightData"
+                    value={typeof item.title === "string" ? item.title : ""}
+                  />
+                </div>
+
+                <div className="block min-w-0">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Category / Service Subtitle
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "category"], event.target.value)
+                    }
+                    placeholder="e.g. Enterprise technology / Web & Experience"
+                    value={typeof item.category === "string" ? item.category : ""}
+                  />
+                </div>
+
+                <div className="block min-w-0">
+                  <SimpleImageUpload
+                    label="Project Image"
+                    onChange={(url) =>
+                      onChange([...path, String(index), "image"], url)
+                    }
+                    onAction={onAction}
+                    value={typeof item.image === "string" ? item.image : ""}
+                  />
+                </div>
+
+                <div className="block min-w-0">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Project Link URL
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "href"], event.target.value)
+                    }
+                    placeholder="/work"
+                    value={typeof item.href === "string" ? item.href : ""}
+                  />
+                </div>
+
+                {/* RICH TEXT EDITOR FOR NARRATIVE & CASE DETAILS */}
+                <div className="sm:col-span-2 pt-1">
+                  <RichTextEditor
+                    label="Case Narrative (Rich Text Editor)"
+                    description="Edit the Narrative for approval, Challenge, and Approach using rich text formatting (bold, italic, bullets, headers, etc.)."
+                    value={
+                      typeof item.narrativeHtml === "string" && item.narrativeHtml.trim()
+                        ? item.narrativeHtml
+                        : [
+                            typeof item.statusNote === "string" && item.statusNote
+                              ? `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">${item.statusNote}</span></p>`
+                              : "",
+                            typeof item.challenge === "string" && item.challenge
+                              ? `<p><strong>Challenge:</strong> ${item.challenge}</p>`
+                              : "",
+                            typeof item.approach === "string" && item.approach
+                              ? `<p><strong>Approach:</strong> ${item.approach}</p>`
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join("")
+                    }
+                    onChange={(html) => {
+                      onChange([...path, String(index), "narrativeHtml"], html)
+                    }}
+                  />
+                </div>
+
+                <div className="sm:col-span-2 pt-1 flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0"
+                    onClick={() => {
+                      onChange(
+                        path,
+                        value.filter((_, projectIndex) => projectIndex !== index),
+                      )
+                      onAction("Project deleted")
+                    }}
+                    title="Delete Project"
+                    aria-label="Delete Project"
+                    type="button"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : isServicesList && isRecord(item) ? (
+              <div className="grid min-w-0 gap-4 sm:grid-cols-12">
+                <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Service Number
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "number"], event.target.value)
+                    }
+                    placeholder={String(index + 1).padStart(2, "0")}
+                    value={typeof item.number === "string" ? item.number : ""}
+                  />
+                </div>
+                <div className="sm:col-span-8">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Service Title
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "title"], event.target.value)
+                    }
+                    placeholder="e.g. Website & Conversion Optimization"
+                    value={typeof item.title === "string" ? item.title : ""}
+                  />
+                </div>
+                <div className="sm:col-span-1 flex sm:items-end justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                    onClick={() => {
+                      onChange(
+                        path,
+                        value.filter((_, serviceIndex) => serviceIndex !== index),
+                      )
+                      onAction("Service deleted")
+                    }}
+                    title="Delete Service"
+                    aria-label="Delete Service"
+                    type="button"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="sm:col-span-12">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Service Tags / Channels
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "tags"], event.target.value)
+                    }
+                    placeholder="e.g. WEB EXPERIENCE / UX / CONVERSION"
+                    value={typeof item.tags === "string" ? item.tags : ""}
+                  />
+                </div>
+                <div className="sm:col-span-12">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Description
+                  </label>
+                  <textarea
+                    className="w-full px-4 py-2.5 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary min-h-20 resize-y"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "description"], event.target.value)
+                    }
+                    placeholder="Describe this service offering and value proposition"
+                    rows={3}
+                    value={typeof item.description === "string" ? item.description : ""}
+                  />
+                </div>
+              </div>
+            ) : isWhySjmlList && isRecord(item) ? (
+              <div className="grid min-w-0 gap-4 sm:grid-cols-12">
+                <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Point Number
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "number"], event.target.value)
+                    }
+                    placeholder={String(index + 1).padStart(2, "0")}
+                    value={typeof item.number === "string" ? item.number : ""}
+                  />
+                </div>
+                <div className="sm:col-span-8">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Point Title
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "title"], event.target.value)
+                    }
+                    placeholder="e.g. Creative That Connects"
+                    value={typeof item.title === "string" ? item.title : ""}
+                  />
+                </div>
+                <div className="sm:col-span-1 flex sm:items-end justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                    onClick={() => {
+                      onChange(
+                        path,
+                        value.filter((_, pointIndex) => pointIndex !== index),
+                      )
+                      onAction("Point deleted")
+                    }}
+                    title="Delete Point"
+                    aria-label="Delete Point"
+                    type="button"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="sm:col-span-12">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Description
+                  </label>
+                  <textarea
+                    className="w-full px-4 py-2.5 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary min-h-20 resize-y"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "description"], event.target.value)
+                    }
+                    placeholder="Describe this reason or capability..."
+                    rows={3}
+                    value={typeof item.description === "string" ? item.description : ""}
+                  />
+                </div>
+              </div>
+            ) : isProcessList && isRecord(item) ? (
+              <div className="grid min-w-0 gap-4 sm:grid-cols-12">
+                <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Step Number
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "number"], event.target.value)
+                    }
+                    placeholder={String(index + 1).padStart(2, "0")}
+                    value={typeof item.number === "string" ? item.number : ""}
+                  />
+                </div>
+                <div className="sm:col-span-8">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Step Title
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "title"], event.target.value)
+                    }
+                    placeholder="e.g. Discover"
+                    value={typeof item.title === "string" ? item.title : ""}
+                  />
+                </div>
+                <div className="sm:col-span-1 flex sm:items-end justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                    onClick={() => {
+                      onChange(
+                        path,
+                        value.filter((_, stepIndex) => stepIndex !== index),
+                      )
+                      onAction("Step deleted")
+                    }}
+                    title="Delete Step"
+                    aria-label="Delete Step"
+                    type="button"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="sm:col-span-12">
+                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                    Description
+                  </label>
+                  <textarea
+                    className="w-full px-4 py-2.5 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary min-h-20 resize-y"
+                    onChange={(event) =>
+                      onChange([...path, String(index), "description"], event.target.value)
+                    }
+                    placeholder="Describe this step in your process..."
+                    rows={3}
+                    value={typeof item.description === "string" ? item.description : ""}
+                  />
+                </div>
               </div>
             ) : (
               <SectionFields
@@ -444,6 +861,12 @@ function SectionFields({
                 path.length === 1 &&
                 path[0] === "hero" &&
                 lockedHeroFormFieldKeys.has(key)
+              ) &&
+              !(
+                path.length === 2 &&
+                path[0] === "work" &&
+                path[1] === "featured" &&
+                hiddenFeaturedWorkFieldKeys.has(key)
               ),
           )
           .map(([key, child]) => (
@@ -495,57 +918,49 @@ export function Template1SectionEditor({
   const showScrollIndicator = data.hero.showScrollIndicator !== false
 
   return (
-    <div>
-      <nav
-        aria-label="Page editor sections"
-        className="mb-4 flex flex-wrap gap-2"
-        role="tablist"
-      >
+    <div className="w-full">
+      {/* Tab Navigation */}
+      <div className="w-full flex items-center gap-1.5 sm:gap-2 mb-6 overflow-x-auto pb-1.5 flex-nowrap scrollbar-thin">
         {tabs.map(({ key, label }) => {
           const active = activeSection === key
           return (
             <button
-              aria-controls="page-editor-panel"
-              aria-selected={active}
-              className={`rounded px-4 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-[#FCC50E] text-[#161617]"
-                  : "bg-[#e5e7eb] text-[#525252] hover:bg-[#d9dce1]"
-              }`}
-              id={`page-editor-tab-${key}`}
               key={key}
               onClick={() => setActiveSection(key)}
-              role="tab"
+              className={`flex-1 text-center justify-center min-w-fit px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                active
+                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                  : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
+              }`}
               type="button"
             >
               {label}
             </button>
           )
         })}
-      </nav>
-      <section
-        aria-labelledby={`page-editor-tab-${activeSection}`}
-        className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white px-4 pb-4 !pt-3 sm:px-5 sm:pb-5"
-        id="page-editor-panel"
-        role="tabpanel"
-      >
-        <div className="mb-5 flex items-center justify-between gap-4">
-          <h3
-            className="!text-[30px] font-bold text-[#161617]"
-            id="page-editor-heading"
-          >
-            {activeLabel}
-          </h3>
+      </div>
+
+      {/* Editor Panel Card */}
+      <div className="w-full admin-card border admin-border rounded-xl p-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 pb-4 border-b admin-border">
+          <div>
+            <h3 className="text-xl font-bold admin-text-primary">
+              {activeLabel === "SEO" ? "SEO Metadata" : activeLabel}
+            </h3>
+            <p className="text-sm admin-text-secondary mt-0.5">
+              Configure content, overrides, and settings for the {activeLabel.toLowerCase()} section.
+            </p>
+          </div>
           {activeSection !== "seo" && (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-[#525252]">
+              <span className="text-sm admin-text-secondary font-medium">
                 {enabledSections[activeSection] ? "Enabled" : "Disabled"}
               </span>
               <button
                 aria-checked={enabledSections[activeSection]}
                 aria-label={`${enabledSections[activeSection] ? "Disable" : "Enable"} ${activeLabel} section`}
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                  enabledSections[activeSection] ? "bg-[#16a34a]" : "bg-[#9ca3af]"
+                  enabledSections[activeSection] ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
                 }`}
                 onClick={() => {
                   onEnabledSectionsChange({
@@ -560,7 +975,7 @@ export function Template1SectionEditor({
                 type="button"
               >
                 <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                  className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
                     enabledSections[activeSection] ? "translate-x-[22px]" : "translate-x-0.5"
                   }`}
                 />
@@ -569,9 +984,9 @@ export function Template1SectionEditor({
           )}
         </div>
 
-        {/* Landing Page Notices for Header & Footer */}
+        {/* Notice for Header */}
         {activeSection === "header" && (
-          <div className="mb-5 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 flex items-start gap-3">
+          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 flex items-start gap-3">
             <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
             <div className="text-sm">
               <p className="font-semibold text-amber-950">Header Contact & Logo Notice</p>
@@ -582,8 +997,9 @@ export function Template1SectionEditor({
           </div>
         )}
 
+        {/* Notice for Footer */}
         {activeSection === "footer" && (
-          <div className="mb-5 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 flex items-start gap-3">
+          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 flex items-start gap-3">
             <span className="text-amber-600 font-bold text-lg leading-none mt-0.5">ℹ️</span>
             <div className="text-sm">
               <p className="font-semibold text-amber-950">Footer Contact & Logo Notice</p>
@@ -594,23 +1010,24 @@ export function Template1SectionEditor({
           </div>
         )}
 
+        {/* Hero-specific Scroll Indicator Switch */}
         {activeSection === "hero" && (
-          <div className="mb-5 flex items-center justify-between gap-4 rounded-md border border-[#e5e7eb] p-4">
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-xl border admin-border admin-card p-4">
             <div>
-              <p className="font-medium text-[#161617]">Scroll indicator</p>
-              <p className="text-sm text-[#525252]">
-                Show or hide the scroll cue in the hero section.
+              <p className="font-medium admin-text-primary text-sm">Scroll Indicator</p>
+              <p className="text-xs admin-text-secondary mt-0.5">
+                Show or hide the scroll cue mouse icon in the hero section.
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-[#525252]">
+              <span className="text-xs admin-text-secondary font-medium">
                 {showScrollIndicator ? "Enabled" : "Disabled"}
               </span>
               <button
                 aria-checked={showScrollIndicator}
                 aria-label={`${showScrollIndicator ? "Disable" : "Enable"} scroll indicator`}
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                  showScrollIndicator ? "bg-[#16a34a]" : "bg-[#9ca3af]"
+                  showScrollIndicator ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
                 }`}
                 onClick={() => {
                   updateField(["hero", "showScrollIndicator"], !showScrollIndicator)
@@ -622,7 +1039,7 @@ export function Template1SectionEditor({
                 type="button"
               >
                 <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                  className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
                     showScrollIndicator ? "translate-x-[22px]" : "translate-x-0.5"
                   }`}
                 />
@@ -631,56 +1048,65 @@ export function Template1SectionEditor({
           </div>
         )}
 
+        {/* SEO Tab or Standard Section Fields */}
         {activeSection === "seo" ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="mb-1.5 block text-sm text-[#525252]">SEO title</span>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                SEO Title
+              </label>
               <input
-                className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] text-[#161617] outline-none focus:border-[#a3a3a3]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
                 maxLength={70}
                 onChange={(event) => onSeoChange({ ...seoData, title: event.target.value })}
                 placeholder="Search result title"
                 value={seoData.title}
               />
-              <span className="mt-1 block text-xs text-[#737373]">
+              <span className="mt-1.5 block text-xs admin-text-muted">
                 {seoData.title.length}/70 characters
               </span>
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-sm text-[#525252]">Open Graph image URL</span>
+            </div>
+            <div>
+              <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                Open Graph Image URL
+              </label>
               <input
-                className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] text-[#161617] outline-none focus:border-[#a3a3a3]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
                 onChange={(event) => onSeoChange({ ...seoData, ogImage: event.target.value })}
                 placeholder="https://example.com/image.jpg"
                 type="url"
                 value={seoData.ogImage}
               />
-            </label>
-            <label className="block sm:col-span-2">
-              <span className="mb-1.5 block text-sm text-[#525252]">Meta description</span>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                Meta Description
+              </label>
               <textarea
-                className="min-h-36 w-full resize-y rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] leading-6 text-[#161617] outline-none focus:border-[#a3a3a3]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary min-h-28 resize-y"
                 maxLength={320}
                 onChange={(event) =>
                   onSeoChange({ ...seoData, description: event.target.value })
                 }
-                placeholder="Briefly describe this page for search results"
-                rows={6}
+                placeholder="Briefly describe this page for search engine results"
+                rows={4}
                 value={seoData.description}
               />
-              <span className="mt-1 block text-xs text-[#737373]">
+              <span className="mt-1.5 block text-xs admin-text-muted">
                 {seoData.description.length}/320 characters
               </span>
-            </label>
-            <label className="block sm:col-span-2">
-              <span className="mb-1.5 block text-sm text-[#525252]">Keywords</span>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                Keywords
+              </label>
               <input
-                className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-[15px] text-[#161617] outline-none focus:border-[#a3a3a3]"
+                className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
                 onChange={(event) => onSeoChange({ ...seoData, keywords: event.target.value })}
-                placeholder="Comma-separated keywords"
+                placeholder="Comma-separated keywords (e.g. branding, performance marketing)"
                 value={seoData.keywords}
               />
-            </label>
+            </div>
           </div>
         ) : (
           <SectionFields
@@ -690,7 +1116,7 @@ export function Template1SectionEditor({
             value={data[activeSection]}
           />
         )}
-      </section>
+      </div>
     </div>
   )
 }

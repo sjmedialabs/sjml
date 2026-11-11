@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { CheckCircle2, Eye, LoaderCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Eye, LoaderCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   defaultTemplate1PageData,
   defaultTemplate1SectionVisibility,
@@ -203,24 +205,28 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
   }
 
   const pageDetails = (
-    <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
-      <label className="block">
-        <span className="mb-2 block text-base font-normal text-[#525252]">Title</span>
-        <input
-          className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-base text-[#161617] outline-none placeholder:text-[#737373] focus:border-[#a3a3a3]"
+    <div className="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label className="block text-sm font-medium admin-text-secondary mb-2">
+          Page Title
+        </label>
+        <Input
+          className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
           onChange={(event) => {
             setTitle(event.target.value)
             if (!slugEdited) setSlug(toSlug(event.target.value))
           }}
-          placeholder="Page title"
+          placeholder="e.g. Performance Marketing Agency"
           required
           value={title}
         />
-      </label>
-      <label className="block">
-        <span className="mb-2 block text-base font-normal text-[#525252]">URL slug</span>
-        <input
-          className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-base text-[#161617] outline-none placeholder:text-[#737373] focus:border-[#a3a3a3]"
+      </div>
+      <div>
+        <label className="block text-sm font-medium admin-text-secondary mb-2">
+          URL Slug
+        </label>
+        <Input
+          className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary font-mono"
           onChange={(event) => {
             setSlugEdited(true)
             setSlug(toSlug(event.target.value))
@@ -229,12 +235,14 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
           required
           value={slug}
         />
-        <span className="mt-2 block text-sm text-[#525252]">
+        <span className="mt-1.5 block text-xs admin-text-muted">
           Route preview: /{slug || "page-slug"}
         </span>
-      </label>
-      <fieldset className="sm:col-span-2">
-        <legend className="mb-2 block text-base font-normal text-[#525252]">Template</legend>
+      </div>
+      <div className="sm:col-span-2">
+        <label className="block text-sm font-medium admin-text-secondary mb-2">
+          Select Template
+        </label>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {templateOptions.map((option) => (
             <div className="relative" key={option}>
@@ -248,15 +256,15 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
                 value={option}
               />
               <label
-                className={`flex min-h-28 cursor-pointer flex-col justify-between rounded-md border p-4 pr-14 transition-colors ${
+                className={`flex min-h-24 cursor-pointer flex-col justify-between rounded-xl border p-4 pr-12 transition-all ${
                   template === option
-                    ? "border-[#FCC50E] bg-[#fff9df] ring-2 ring-[#FCC50E]/30"
-                    : "border-[#d1d5db] bg-white hover:border-[#a3a3a3]"
+                    ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                    : "admin-border admin-card hover:border-black/20"
                 }`}
                 htmlFor={`landing-page-template-${option}`}
               >
-                <span className="text-base font-semibold text-[#161617]">{option}</span>
-                <span className="mt-3 text-sm text-[#525252]">
+                <span className="text-base font-semibold admin-text-primary">{option}</span>
+                <span className="mt-2 text-xs admin-text-secondary">
                   {option === "Template 1"
                     ? `${templateOnePageSections} editable page sections`
                     : "Page template"}
@@ -264,7 +272,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               </label>
               <button
                 aria-label={`Preview ${option}`}
-                className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded border border-[#d1d5db] bg-white text-[#525252] transition-colors hover:border-[#FCC50E] hover:text-[#161617] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCC50E]"
+                className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-lg border admin-border admin-bg-secondary admin-text-secondary transition-colors hover:text-primary hover:border-primary"
                 onClick={() => {
                   window.open("/template-1?preview=1", "_blank", "noopener,noreferrer")
                   onAction("Opening template preview")
@@ -272,68 +280,134 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
                 title={`Preview ${option}`}
                 type="button"
               >
-                <Eye aria-hidden="true" size={18} />
+                <Eye aria-hidden="true" size={16} />
               </button>
             </div>
           ))}
         </div>
-      </fieldset>
+      </div>
     </div>
   )
 
   return (
-    <section className="min-h-[calc(100vh-4rem)] -m-8 w-full min-w-0 bg-[#f5f7fa] p-5 text-[#161617]">
-      <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
+    <div className="w-full">
+      {/* Top Header */}
+      <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
         <div>
-          <h1 className="text-[28px] font-bold">
-            {page ? `Edit ${page.title}` : "Create New Page"}
+          <button
+            onClick={onCancel}
+            type="button"
+            className="text-sm admin-text-secondary hover:admin-text-primary transition-colors mb-2 inline-flex items-center gap-1.5"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Landing Pages
+          </button>
+          <h1 className="text-2xl font-bold admin-text-primary mb-2">
+            {page ? `Edit: ${page.title}` : "Create New Landing Page"}
           </h1>
-          <p className="mt-1 text-base text-[#525252]">
+          <p className="admin-text-secondary">
             {page
-              ? "Manage the selected template sections and SEO."
-              : "Enter the basic details to create a page. You can edit its sections afterward."}
+              ? "Manage the selected template sections, content overrides, and SEO configuration."
+              : "Enter basic details to create a page. You can customize its sections afterward."}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <button
-            className="rounded bg-[#FCC50E] px-5 py-2.5 text-sm font-semibold text-[#161617] hover:bg-[#eab800] disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isSaving || (Boolean(page) && !hasChanges)}
-            form="landing-page-form"
-            type="submit"
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              onAction("Page editing cancelled")
+              onCancel()
+            }}
+            className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
+            type="button"
           >
-            {isSaving ? (page ? "Saving..." : "Creating...") : page ? "Save changes" : "Create page"}
-          </button>
-          {(isSaving || isSaved) && (
-            <div
-              aria-live="polite"
-              className={`flex items-center gap-2 text-sm ${isSaved ? "text-emerald-700" : "text-[#525252]"}`}
-              role="status"
-            >
-              {isSaving ? (
-                <LoaderCircle aria-hidden="true" className="animate-spin" size={16} />
-              ) : (
-                <CheckCircle2 aria-hidden="true" size={16} />
-              )}
-              {isSaving
-                ? page
-                  ? "Saving changes..."
-                  : "Creating page..."
-                : "Saved successfully"}
-            </div>
-          )}
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            disabled={isSaving || (Boolean(page) && !hasChanges)}
+            onClick={() => void createPage()}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            type="button"
+          >
+            {isSaving ? (
+              <>
+                <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
+                {page ? "Saving..." : "Creating..."}
+              </>
+            ) : page ? (
+              "Save Changes"
+            ) : (
+              "Create Page"
+            )}
+          </Button>
         </div>
-      </header>
+      </div>
 
-      <form
-        id="landing-page-form"
-        className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-5 sm:p-7"
-        onSubmit={(event) => {
-          event.preventDefault()
-          if (page && !hasChanges) return
-          void createPage()
-        }}
-      >
-        {page && template === "Template 1" ? (
+      {/* Status Messages */}
+      {isSaved && (
+        <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
+          Landing page changes saved successfully!
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Main Content */}
+      {page && template === "Template 1" ? (
+        <div className="w-full space-y-6">
+          {/* Collapsible/Editable basic settings */}
+          <div className="w-full admin-card border admin-border rounded-xl p-6">
+            <h2 className="text-lg font-semibold admin-text-primary mb-4">Page Information</h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">
+                  Page Title
+                </label>
+                <Input
+                  className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Page title"
+                  required
+                  value={title}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium admin-text-secondary mb-2">
+                  URL Route
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary font-mono"
+                    onChange={(event) => setSlug(toSlug(event.target.value))}
+                    placeholder="slug"
+                    required
+                    value={slug}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="admin-border-light admin-text-secondary hover:admin-bg-secondary h-11 px-3 text-xs bg-transparent shrink-0"
+                  >
+                    <a href={`/${slug}?preview=1`} target="_blank" rel="noreferrer">
+                      <Eye className="w-3.5 h-3.5 mr-1" /> View
+                    </a>
+                  </Button>
+                </div>
+                <span className="mt-1.5 block text-xs admin-text-muted">
+                  Full route: /{slug}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section-by-section Editor */}
           <Template1SectionEditor
             data={sectionData}
             onChange={setSectionData}
@@ -343,43 +417,58 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
             onSeoChange={setSeoData}
             onAction={onAction}
           />
-        ) : page ? (
-          <section className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#525252] sm:p-5">
-            No section editor is available for this template.
-          </section>
-        ) : (
-          <section className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 sm:p-5">
-            <h2 className="mb-4 text-base font-semibold text-[#161617]">Page Details</h2>
-            {pageDetails}
-          </section>
-        )}
+        </div>
+      ) : page ? (
+        <div className="admin-card border admin-border rounded-xl p-6 text-sm admin-text-muted">
+          No section editor is available for this template.
+        </div>
+      ) : (
+        <div className="admin-card border admin-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Page Details</h2>
+          {pageDetails}
+        </div>
+      )}
 
-        <footer className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5ebf2] pt-5">
-          <div aria-live="polite" className="text-sm">
-            {errorMessage ? (
-              <p className="text-red-600">{errorMessage}</p>
+      {/* Bottom Footer Actions */}
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 pt-6 border-t admin-border">
+        <p className="text-sm admin-text-secondary">
+          {page
+            ? `Configure the ${template} sections and SEO metadata above.`
+            : `Your page will be created using ${template} (${templateOnePageSections} editable sections).`}
+        </p>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              onAction("Page editing cancelled")
+              onCancel()
+            }}
+            className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
+            type="button"
+          >
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            disabled={isSaving || (Boolean(page) && !hasChanges)}
+            onClick={() => void createPage()}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            type="button"
+          >
+            {isSaving ? (
+              <>
+                <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
+                {page ? "Saving..." : "Creating..."}
+              </>
+            ) : page ? (
+              "Save Changes"
             ) : (
-              <p className="text-[#525252]">
-                {page
-                  ? `Configure the ${template} sections and SEO.`
-                  : `Your page will be created using ${template} (${templateOnePageSections} sections). Edit it afterward to configure each section.`}
-              </p>
+              "Create Page"
             )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              className="rounded border border-[#d1d5db] px-4 py-2.5 text-sm font-semibold text-[#525252] hover:bg-[#f5f5f5]"
-              onClick={() => {
-                onAction("Page editing cancelled")
-                onCancel()
-              }}
-              type="button"
-            >
-              Cancel
-            </button>
-          </div>
-        </footer>
-      </form>
-    </section>
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
