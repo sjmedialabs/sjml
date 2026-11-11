@@ -52,6 +52,32 @@ function isLandingPageList(value: unknown): value is LandingPage[] {
   )
 }
 
+function formatISTDateTime(dateString: string): string {
+  if (!dateString) return "—"
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+
+    const datePart = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date)
+
+    const timePart = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date).toUpperCase()
+
+    return `${datePart}, ${timePart}`
+  } catch {
+    return dateString
+  }
+}
+
 export function LandingPagesManager() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -335,7 +361,7 @@ export function LandingPagesManager() {
                       {page.sections}
                     </td>
                     <td className="p-4 admin-text-muted text-sm whitespace-nowrap">
-                      {page.updated}
+                      {formatISTDateTime(page.updated)}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
