@@ -169,24 +169,24 @@ function ProjectsCarousel({
 
   return (
     <div className="relative pt-6 sm:pt-8">
-      {/* Left Navigation Arrow */}
+      {/* Desktop Left Navigation Arrow */}
       <button
         type="button"
         onClick={scrollPrev}
         disabled={!canScrollPrev}
         aria-label="Previous projects"
-        className="absolute left-1 sm:-left-5 md:-left-6 lg:-left-6 xl:-left-13 top-[35%] sm:top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+        className="hidden sm:flex absolute -left-5 md:-left-6 lg:-left-6 xl:-left-13 top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      {/* Right Navigation Arrow */}
+      {/* Desktop Right Navigation Arrow */}
       <button
         type="button"
         onClick={scrollNext}
         disabled={!canScrollNext}
         aria-label="Next projects"
-        className="absolute right-1 sm:-right-5 md:-right-6 lg:-right-6 xl:-right-13 top-[35%] sm:top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer active:scale-95"
+        className="hidden sm:flex absolute -right-5 md:-right-6 lg:-right-6 xl:-right-13 top-[38%] -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
@@ -208,22 +208,47 @@ function ProjectsCarousel({
         </div>
       </div>
 
-      {/* Carousel Bottom Dots */}
+      {/* Carousel Bottom Dots & Mobile Navigation */}
       {scrollSnaps.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-6 sm:mt-8">
-          {scrollSnaps.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => scrollTo(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                idx === selectedIndex
-                  ? "w-7 bg-[#161617]"
-                  : "w-2 bg-black/20 hover:bg-black/40"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-3 sm:gap-1.5 mt-6 sm:mt-8">
+          {/* Mobile Left Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            aria-label="Previous projects"
+            className="flex sm:hidden w-8 h-8 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex items-center gap-1.5">
+            {scrollSnaps.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => scrollTo(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === selectedIndex
+                    ? "w-7 bg-[#161617]"
+                    : "w-2 bg-black/20 hover:bg-black/40"
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Mobile Right Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            aria-label="Next projects"
+            className="flex sm:hidden w-8 h-8 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>

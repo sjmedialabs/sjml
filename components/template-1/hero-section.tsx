@@ -214,7 +214,7 @@ export function Template1HeroSection({
                   </div>
                 )}
                 {content.showScrollIndicator && (
-                  <div className="ml-auto flex shrink-0 -translate-y-4 flex-col items-center gap-1 font-bold text-black">
+                  <div className="ml-auto hidden lg:flex shrink-0 -translate-y-4 flex-col items-center gap-1 font-bold text-black">
                     <svg
                       aria-hidden="true"
                       className="animate-bounce"
