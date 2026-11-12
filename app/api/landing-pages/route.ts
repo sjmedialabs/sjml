@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { clientPromise } from "@/lib/mongodb"
 import type { Document } from "mongodb"
-import { verifyToken } from "@/lib/jwt"
+import { getAuthenticatedAdminFromRequest } from "@/lib/admin-auth"
 import {
   defaultTemplate1PageData,
   normalizeTemplate1PageData,
@@ -50,7 +50,12 @@ const reservedSlugs = new Set([
   "work",
 ])
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const admin = await getAuthenticatedAdminFromRequest(request)
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 })
+  }
+
   try {
     const client = await clientPromise
     const collection = client.db("sjmedialabs").collection<LandingPageRecord>("landingPages")
@@ -69,12 +74,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get("authorization")
-  if (!authHeader?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-  if (!verifyToken(authHeader.slice("Bearer ".length))) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+  const admin = await getAuthenticatedAdminFromRequest(request)
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 })
   }
 
   try {
