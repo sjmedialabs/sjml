@@ -113,7 +113,12 @@ export function LandingPagesManager() {
 
     async function loadLandingPages() {
       try {
-        const response = await fetch("/api/landing-pages")
+        const token = localStorage.getItem("adminToken")
+        const headers: Record<string, string> = {}
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`
+        }
+        const response = await fetch("/api/landing-pages", { headers })
         const result: unknown = await response.json()
         if (!response.ok) {
           const errorMessage =

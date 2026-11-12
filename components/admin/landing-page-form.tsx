@@ -274,7 +274,11 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
                 aria-label={`Preview ${option}`}
                 className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-lg border admin-border admin-bg-secondary admin-text-secondary transition-colors hover:text-primary hover:border-primary"
                 onClick={() => {
-                  window.open("/template-1?preview=1", "_blank", "noopener,noreferrer")
+                  const token = localStorage.getItem("adminToken")
+                  const url = token
+                    ? `/template-1?preview=1&preview_token=${encodeURIComponent(token)}`
+                    : "/template-1?preview=1"
+                  window.open(url, "_blank", "noopener,noreferrer")
                   onAction("Opening template preview")
                 }}
                 title={`Preview ${option}`}
