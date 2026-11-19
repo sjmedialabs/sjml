@@ -5,12 +5,20 @@ import type { ChangeEvent } from "react"
 import { Plus, Trash2, Upload, X } from "lucide-react"
 import { uploadImageAction } from "@/app/actions/upload"
 import { Button } from "@/components/ui/button"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { RichTextEditor } from "./rich-text-editor"
 import type {
   Template1PageData,
   Template1SectionVisibility,
 } from "@/components/template-1/default-data"
+import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
+import { normalizeFooterContent } from "@/lib/footer-content"
+import {
+  formatImageSpecLine,
+  resolveImageSpec,
+  type ImageUploadSpec,
+} from "@/lib/admin-media-specs"
 
 interface Template1SectionEditorProps {
   data: Template1PageData
@@ -47,7 +55,6 @@ const twoColumnSections = new Set([
 ])
 
 const lockedHeroFormFieldKeys = new Set([
-  "formOverline",
   "fullNameLabel",
   "fullNamePlaceholder",
   "emailLabel",
@@ -56,7 +63,6 @@ const lockedHeroFormFieldKeys = new Set([
   "phonePlaceholder",
   "messageLabel",
   "messagePlaceholder",
-  "trustText",
   "privacyText",
   "privacyLinkText",
   "privacyLinkHref",
@@ -66,6 +72,8 @@ const hiddenHeaderFooterFieldKeys = new Set([
   "logoText",
   "taglineLine1",
   "taglineLine2",
+  "phoneHref",
+  "emailHref",
 ])
 
 const hiddenFeaturedWorkFieldKeys = new Set([
@@ -85,6 +93,39 @@ function formatLabel(value: string) {
   return value
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .replace(/^./, (character) => character.toUpperCase())
+}
+
+function limitDigits(text: string, maxDigits: number) {
+  let digitCount = 0
+  let result = ""
+  for (const ch of text) {
+    if (/\d/.test(ch)) {
+      if (digitCount >= maxDigits) continue
+      digitCount += 1
+    }
+    result += ch
+  }
+  return result
+}
+
+function sanitizePhoneTextInput(raw: string) {
+  const cleaned = raw.replace(/[^\d+\s()-]/g, "")
+  const hasLeadingPlus = cleaned.startsWith("+")
+  const withoutPlus = cleaned.replace(/\+/g, "")
+
+  if (hasLeadingPlus) {
+    const withSeparator = withoutPlus.match(/^([1-9]\d{0,2})([\s()-]+)(.*)$/)
+    if (withSeparator) {
+      const [, countryCode, separator, rest] = withSeparator
+      return `+${countryCode}${separator}${limitDigits(rest, 10)}`
+    }
+    if (withoutPlus.startsWith("91")) {
+      return `+${limitDigits(withoutPlus, 12)}`
+    }
+    return `+${limitDigits(withoutPlus, 13)}`
+  }
+
+  return limitDigits(withoutPlus, 10)
 }
 
 function updateAtPath<T>(root: T, path: string[], value: unknown): T {
@@ -111,16 +152,45 @@ function updateAtPath<T>(root: T, path: string[], value: unknown): T {
   return updated
 }
 
+function getSectionImageSpec(path: string[]): ImageUploadSpec {
+  const section = path[0]
+  if (section === "header" || section === "footer") {
+    return resolveImageSpec("logo")
+  }
+  if (section === "work" && path[1] === "featured") {
+    return resolveImageSpec("caseStudy")
+  }
+  if (section === "whySjml") {
+    return resolveImageSpec("cardWide", {
+      recommendedWidth: 1280,
+      recommendedHeight: 800,
+      hint: "16:10 showcase image for the Why SJML section.",
+    })
+  }
+  return resolveImageSpec("generic")
+}
+
+interface DeleteConfirmationRequest {
+  title: string
+  description: string
+  confirmLabel?: string
+  onConfirm: () => void
+}
+
 function SimpleImageUpload({
   label,
   value,
+  spec = resolveImageSpec("generic"),
   onChange,
   onAction,
+  onRequestDelete,
 }: {
   label: string
   value: string
+  spec?: ImageUploadSpec
   onChange: (value: string) => void
   onAction: (message: string) => void
+  onRequestDelete: (request: DeleteConfirmationRequest) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -137,8 +207,8 @@ function SimpleImageUpload({
       onAction(`❌ ${message}`)
       return
     }
-    if (file.size > 10 * 1024 * 1024) {
-      const message = "Image must be smaller than 10MB."
+    if (file.size > spec.maxSizeMB * 1024 * 1024) {
+      const message = `Image must be smaller than ${spec.maxSizeMB}MB.`
       setErrorMessage(message)
       onAction(`❌ ${message}`)
       return
@@ -167,52 +237,74 @@ function SimpleImageUpload({
 
   return (
     <div className="min-w-0">
-      <span className="block text-sm font-medium admin-text-secondary mb-1.5">{label}</span>
-      <div className="flex flex-wrap items-center gap-3">
-        {value && (
-          <img
-            alt={`${label} preview`}
-            className="h-10 w-10 rounded-lg border admin-border object-contain bg-white p-1 shrink-0"
-            src={value}
-          />
-        )}
-        <input
-          accept="image/*"
-          className="sr-only"
-          onChange={(event) => void handleFileChange(event)}
-          ref={inputRef}
-          type="file"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={isUploading}
-          onClick={() => inputRef.current?.click()}
-          className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent h-10 px-4 shrink-0"
-          type="button"
-        >
-          <Upload aria-hidden="true" className="w-4 h-4 mr-2" />
-          {isUploading ? "Uploading..." : "Upload Image"}
-        </Button>
-        {value && (
-          <span className="flex items-center gap-2 text-xs admin-text-secondary shrink-0">
-            <span>Image uploaded</span>
-            <button
-              aria-label={`Remove ${label}`}
-              className="rounded p-1 text-red-500 hover:bg-red-50 transition-colors"
-              onClick={() => {
-                onChange("")
-                onAction(`${label} removed`)
-              }}
-              type="button"
-            >
-              <X aria-hidden="true" size={14} />
-            </button>
-          </span>
-        )}
+      <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+        {label}
+      </label>
+      <div className="rounded-lg border admin-border admin-bg-secondary p-3">
+        <div className="flex items-center gap-3">
+          {value && (
+            <img
+              alt={`${label} preview`}
+              className="h-12 w-12 rounded-md border admin-border object-contain bg-white p-1 shrink-0"
+              src={value}
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => void handleFileChange(event)}
+                ref={inputRef}
+                type="file"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isUploading}
+                onClick={() => inputRef.current?.click()}
+                className="cursor-pointer admin-border-light admin-text-primary hover:admin-bg-secondary bg-white dark:bg-transparent h-9 px-3.5 text-xs font-medium shrink-0"
+                type="button"
+              >
+                <Upload aria-hidden="true" className="w-3.5 h-3.5 mr-1.5" />
+                {isUploading
+                  ? "Uploading..."
+                  : value
+                    ? "Replace Image"
+                    : "Upload Image"}
+              </Button>
+              {value && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-label={`Remove ${label}`}
+                  className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-9 px-2.5 text-xs shrink-0"
+                  onClick={() =>
+                    onRequestDelete({
+                      title: `Remove ${label}?`,
+                      description: `Are you sure you want to remove this ${label.toLowerCase()}? You can upload a new image later.`,
+                      confirmLabel: "Remove",
+                      onConfirm: () => {
+                        onChange("")
+                        onAction(`${label} removed`)
+                      },
+                    })
+                  }
+                  type="button"
+                >
+                  <X aria-hidden="true" className="w-3.5 h-3.5 mr-1" />
+                  Remove
+                </Button>
+              )}
+            </div>
+            <p className="mt-1.5 text-[11.5px] leading-snug admin-text-muted">
+              {formatImageSpecLine(spec)}
+            </p>
+          </div>
+        </div>
       </div>
       {errorMessage && (
-        <p aria-live="polite" className="mt-1 text-xs text-red-600">
+        <p aria-live="polite" className="mt-1.5 text-xs text-red-600">
           {errorMessage}
         </p>
       )}
@@ -225,11 +317,15 @@ function SectionFields({
   path,
   onChange,
   onAction,
+  onRequestDelete,
+  cmsFooterAddress,
 }: {
   value: unknown
   path: string[]
   onChange: (path: string[], value: unknown) => void
   onAction: (message: string) => void
+  onRequestDelete: (request: DeleteConfirmationRequest) => void
+  cmsFooterAddress?: string
 }) {
   const newlyAddedItemRef = useRef<HTMLFieldSetElement | null>(null)
   const pendingScrollIndex = useRef<number | null>(null)
@@ -262,11 +358,13 @@ function SectionFields({
     const isImageField = /(?:image|logo|photo|icon)(?:url)?$/i.test(fieldName)
     const displayFieldName =
       path[0] === "hero" && path.length === 2
-        ? fieldName === "formTitle"
-          ? "Form Title"
-          : fieldName === "submitButtonText"
-            ? "Form Submit Button Text"
-            : fieldName.replace(/Label$/, "").replace(/Placeholder$/, "")
+        ? fieldName === "formOverline"
+          ? "Form Overline"
+          : fieldName === "formTitle"
+            ? "Form Title"
+            : fieldName === "submitButtonText"
+              ? "Form Submit Button Text"
+              : fieldName.replace(/Label$/, "").replace(/Placeholder$/, "")
         : fieldName
     const label = /href$/i.test(displayFieldName)
       ? `${formatLabel(displayFieldName.replace(/href$/i, ""))} Redirection URL`.trim()
@@ -275,39 +373,97 @@ function SectionFields({
       return (
         <SimpleImageUpload
           label={label}
+          spec={getSectionImageSpec(path)}
           onChange={(url) => onChange(path, url)}
           onAction={onAction}
+          onRequestDelete={onRequestDelete}
           value={value}
         />
       )
     }
 
+    const isPhoneField = fieldName === "phoneText"
+    const isEmailField = fieldName === "emailText"
+    const isFooterAddressField = path[0] === "footer" && fieldName === "addressText"
+    const phoneValidationError = isPhoneField
+      ? validatePhoneTextWithCountryCode(value)
+      : null
+    const resolvedDisplayValue =
+      isFooterAddressField &&
+      cmsFooterAddress &&
+      (!value.trim() || value.trim() === "Hyderabad, Telangana, India")
+        ? cmsFooterAddress
+        : value
     const inputClassName =
       "w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-    const isLongText = value.length > 60 || value.includes("\n")
+    const isLongText =
+      isFooterAddressField ||
+      (!isPhoneField &&
+        !isEmailField &&
+        (resolvedDisplayValue.length > 60 || resolvedDisplayValue.includes("\n")))
     const spansFullWidth =
-      isLongText || /description|answer|statement|subtitle/i.test(fieldName)
+      isLongText ||
+      isFooterAddressField ||
+      /description|answer|statement|subtitle/i.test(fieldName)
     const rows = Math.min(
       10,
-      Math.max(4, value.split("\n").length, Math.ceil(value.length / 60)),
+      Math.max(
+        isFooterAddressField ? 3 : 4,
+        resolvedDisplayValue.split("\n").length,
+        Math.ceil(resolvedDisplayValue.length / 60),
+      ),
     )
 
     return (
-      <div className={`block min-w-0 ${spansFullWidth ? "md:col-span-2" : ""}`}>
+      <div className={`block min-w-0 ${spansFullWidth ? "sm:col-span-2 md:col-span-2" : ""}`}>
         <label className="block text-sm font-medium admin-text-secondary mb-1.5">{label}</label>
         {isLongText ? (
           <textarea
-            className={`${inputClassName} min-h-32 resize-y`}
+            className={`${inputClassName} ${isFooterAddressField ? "min-h-24" : "min-h-32"} resize-y`}
             onChange={(event) => onChange(path, event.target.value)}
+            placeholder={
+              isFooterAddressField ? cmsFooterAddress || "Enter full address" : undefined
+            }
             rows={rows}
-            value={value}
+            value={resolvedDisplayValue}
           />
         ) : (
-          <input
-            className={inputClassName}
-            onChange={(event) => onChange(path, event.target.value)}
-            value={value}
-          />
+          <>
+            <input
+              aria-invalid={Boolean(phoneValidationError)}
+              className={`${inputClassName}${
+                phoneValidationError ? " border-red-500 focus:border-red-500" : ""
+              }`}
+              inputMode={isPhoneField ? "tel" : isEmailField ? "email" : undefined}
+              onChange={(event) =>
+                onChange(
+                  path,
+                  isPhoneField
+                    ? sanitizePhoneTextInput(event.target.value)
+                    : event.target.value,
+                )
+              }
+              placeholder={
+                isPhoneField
+                  ? "+91 40 40268570"
+                  : isEmailField
+                    ? "info@sjmedialabs.com"
+                    : undefined
+              }
+              type={isPhoneField ? "tel" : isEmailField ? "email" : "text"}
+              value={resolvedDisplayValue}
+            />
+            {isPhoneField &&
+              (phoneValidationError ? (
+                <p aria-live="polite" className="mt-1.5 text-xs text-red-600">
+                  {phoneValidationError}
+                </p>
+              ) : (
+                <p className="mt-1.5 text-xs admin-text-muted">
+                  Include country code + 10-digit number (e.g. +91 9876543210).
+                </p>
+              ))}
+          </>
         )}
       </div>
     )
@@ -449,10 +605,12 @@ function SectionFields({
                 <div className="flex-1 min-w-0">
                   <SimpleImageUpload
                     label="Client Logo"
+                    spec={resolveImageSpec("clientLogo")}
                     onChange={(url) =>
                       onChange([...path, String(index), "logoUrl"], url)
                     }
                     onAction={onAction}
+                    onRequestDelete={onRequestDelete}
                     value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
                   />
                 </div>
@@ -462,11 +620,21 @@ function SectionFields({
                     size="sm"
                     className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
                     onClick={() => {
-                      onChange(
-                        path,
-                        value.filter((_, clientIndex) => clientIndex !== index),
-                      )
-                      onAction("Client deleted")
+                      const clientName =
+                        typeof item.name === "string" && item.name.trim()
+                          ? `"${item.name.trim()}"`
+                          : `Client ${index + 1}`
+                      onRequestDelete({
+                        title: "Delete Client?",
+                        description: `Are you sure you want to delete ${clientName}? This action cannot be undone.`,
+                        onConfirm: () => {
+                          onChange(
+                            path,
+                            value.filter((_, clientIndex) => clientIndex !== index),
+                          )
+                          onAction("Client deleted")
+                        },
+                      })
                     }}
                     title="Delete Client"
                     aria-label="Delete Client"
@@ -488,11 +656,21 @@ function SectionFields({
                       size="sm"
                       className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0"
                       onClick={() => {
-                        onChange(
-                          path,
-                          value.filter((_, faqIndex) => faqIndex !== index),
-                        )
-                        onAction("FAQ deleted")
+                        const questionText =
+                          typeof item.question === "string" && item.question.trim()
+                            ? `"${item.question.trim()}"`
+                            : `FAQ ${index + 1}`
+                        onRequestDelete({
+                          title: "Delete FAQ?",
+                          description: `Are you sure you want to delete ${questionText}? This action cannot be undone.`,
+                          onConfirm: () => {
+                            onChange(
+                              path,
+                              value.filter((_, faqIndex) => faqIndex !== index),
+                            )
+                            onAction("FAQ deleted")
+                          },
+                        })
                       }}
                       title="Delete FAQ"
                       aria-label="Delete FAQ"
@@ -556,10 +734,16 @@ function SectionFields({
                 <div className="block min-w-0">
                   <SimpleImageUpload
                     label="Project Image"
+                    spec={resolveImageSpec("cardWide", {
+                      recommendedWidth: 1280,
+                      recommendedHeight: 800,
+                      hint: "16:10 project card image.",
+                    })}
                     onChange={(url) =>
                       onChange([...path, String(index), "image"], url)
                     }
                     onAction={onAction}
+                    onRequestDelete={onRequestDelete}
                     value={typeof item.image === "string" ? item.image : ""}
                   />
                 </div>
@@ -612,11 +796,21 @@ function SectionFields({
                     size="sm"
                     className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0"
                     onClick={() => {
-                      onChange(
-                        path,
-                        value.filter((_, projectIndex) => projectIndex !== index),
-                      )
-                      onAction("Project deleted")
+                      const projectTitle =
+                        typeof item.title === "string" && item.title.trim()
+                          ? `"${item.title.trim()}"`
+                          : `Project ${index + 1}`
+                      onRequestDelete({
+                        title: "Delete Project?",
+                        description: `Are you sure you want to delete ${projectTitle}? This action cannot be undone.`,
+                        onConfirm: () => {
+                          onChange(
+                            path,
+                            value.filter((_, projectIndex) => projectIndex !== index),
+                          )
+                          onAction("Project deleted")
+                        },
+                      })
                     }}
                     title="Delete Project"
                     aria-label="Delete Project"
@@ -628,50 +822,70 @@ function SectionFields({
               </div>
             ) : isServicesList && isRecord(item) ? (
               <div className="grid min-w-0 gap-4 sm:grid-cols-12">
-                <div className="sm:col-span-3">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Service Number
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "number"], event.target.value)
-                    }
-                    placeholder={String(index + 1).padStart(2, "0")}
-                    value={typeof item.number === "string" ? item.number : ""}
-                  />
-                </div>
-                <div className="sm:col-span-8">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Service Title
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "title"], event.target.value)
-                    }
-                    placeholder="e.g. Website & Conversion Optimization"
-                    value={typeof item.title === "string" ? item.title : ""}
-                  />
-                </div>
-                <div className="sm:col-span-1 flex sm:items-end justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
-                    onClick={() => {
-                      onChange(
-                        path,
-                        value.filter((_, serviceIndex) => serviceIndex !== index),
-                      )
-                      onAction("Service deleted")
-                    }}
-                    title="Delete Service"
-                    aria-label="Delete Service"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                <div className="sm:col-span-12 flex flex-col sm:flex-row sm:items-end gap-4">
+                  <div className="shrink-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5 whitespace-nowrap">
+                      Service Number
+                    </label>
+                    <div
+                      aria-readonly="true"
+                      className="w-20 h-10 px-3 admin-input rounded-lg text-sm admin-text-muted opacity-75 cursor-not-allowed select-none flex items-center justify-center"
+                      title="Automatically set from the service position in the list"
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                      Service Title
+                    </label>
+                    <input
+                      className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                      onChange={(event) =>
+                        onChange([...path, String(index), "title"], event.target.value)
+                      }
+                      placeholder="e.g. Website & Conversion Optimization"
+                      value={typeof item.title === "string" ? item.title : ""}
+                    />
+                  </div>
+                  <div className="flex sm:items-end justify-end shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                      onClick={() => {
+                        const serviceTitle =
+                          typeof item.title === "string" && item.title.trim()
+                            ? `"${item.title.replace(/\n/g, " ").trim()}"`
+                            : `Service ${index + 1}`
+                        onRequestDelete({
+                          title: "Delete Service?",
+                          description: `Are you sure you want to delete ${serviceTitle}? This action cannot be undone.`,
+                          onConfirm: () => {
+                            onChange(
+                              path,
+                              value
+                                .filter((_, serviceIndex) => serviceIndex !== index)
+                                .map((serviceItem, nextIndex) =>
+                                  isRecord(serviceItem)
+                                    ? {
+                                        ...serviceItem,
+                                        number: String(nextIndex + 1).padStart(2, "0"),
+                                      }
+                                    : serviceItem,
+                                ),
+                            )
+                            onAction("Service deleted")
+                          },
+                        })
+                      }}
+                      title="Delete Service"
+                      aria-label="Delete Service"
+                      type="button"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="sm:col-span-12">
                   <label className="block text-sm font-medium admin-text-secondary mb-1.5">
@@ -703,50 +917,70 @@ function SectionFields({
               </div>
             ) : isWhySjmlList && isRecord(item) ? (
               <div className="grid min-w-0 gap-4 sm:grid-cols-12">
-                <div className="sm:col-span-3">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Point Number
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "number"], event.target.value)
-                    }
-                    placeholder={String(index + 1).padStart(2, "0")}
-                    value={typeof item.number === "string" ? item.number : ""}
-                  />
-                </div>
-                <div className="sm:col-span-8">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Point Title
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "title"], event.target.value)
-                    }
-                    placeholder="e.g. Creative That Connects"
-                    value={typeof item.title === "string" ? item.title : ""}
-                  />
-                </div>
-                <div className="sm:col-span-1 flex sm:items-end justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
-                    onClick={() => {
-                      onChange(
-                        path,
-                        value.filter((_, pointIndex) => pointIndex !== index),
-                      )
-                      onAction("Point deleted")
-                    }}
-                    title="Delete Point"
-                    aria-label="Delete Point"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                <div className="sm:col-span-12 flex flex-col sm:flex-row sm:items-end gap-4">
+                  <div className="shrink-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5 whitespace-nowrap">
+                      Point Number
+                    </label>
+                    <div
+                      aria-readonly="true"
+                      className="w-20 h-10 px-3 admin-input rounded-lg text-sm admin-text-muted opacity-75 cursor-not-allowed select-none flex items-center justify-center"
+                      title="Automatically set from the point position in the list"
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                      Point Title
+                    </label>
+                    <input
+                      className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                      onChange={(event) =>
+                        onChange([...path, String(index), "title"], event.target.value)
+                      }
+                      placeholder="e.g. Creative That Connects"
+                      value={typeof item.title === "string" ? item.title : ""}
+                    />
+                  </div>
+                  <div className="flex sm:items-end justify-end shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                      onClick={() => {
+                        const pointTitle =
+                          typeof item.title === "string" && item.title.trim()
+                            ? `"${item.title.trim()}"`
+                            : `Point ${index + 1}`
+                        onRequestDelete({
+                          title: "Delete Point?",
+                          description: `Are you sure you want to delete ${pointTitle}? This action cannot be undone.`,
+                          onConfirm: () => {
+                            onChange(
+                              path,
+                              value
+                                .filter((_, pointIndex) => pointIndex !== index)
+                                .map((pointItem, nextIndex) =>
+                                  isRecord(pointItem)
+                                    ? {
+                                        ...pointItem,
+                                        number: String(nextIndex + 1).padStart(2, "0"),
+                                      }
+                                    : pointItem,
+                                ),
+                            )
+                            onAction("Point deleted")
+                          },
+                        })
+                      }}
+                      title="Delete Point"
+                      aria-label="Delete Point"
+                      type="button"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="sm:col-span-12">
                   <label className="block text-sm font-medium admin-text-secondary mb-1.5">
@@ -765,50 +999,70 @@ function SectionFields({
               </div>
             ) : isProcessList && isRecord(item) ? (
               <div className="grid min-w-0 gap-4 sm:grid-cols-12">
-                <div className="sm:col-span-3">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Step Number
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "number"], event.target.value)
-                    }
-                    placeholder={String(index + 1).padStart(2, "0")}
-                    value={typeof item.number === "string" ? item.number : ""}
-                  />
-                </div>
-                <div className="sm:col-span-8">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Step Title
-                  </label>
-                  <input
-                    className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "title"], event.target.value)
-                    }
-                    placeholder="e.g. Discover"
-                    value={typeof item.title === "string" ? item.title : ""}
-                  />
-                </div>
-                <div className="sm:col-span-1 flex sm:items-end justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
-                    onClick={() => {
-                      onChange(
-                        path,
-                        value.filter((_, stepIndex) => stepIndex !== index),
-                      )
-                      onAction("Step deleted")
-                    }}
-                    title="Delete Step"
-                    aria-label="Delete Step"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                <div className="sm:col-span-12 flex flex-col sm:flex-row sm:items-end gap-4">
+                  <div className="shrink-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5 whitespace-nowrap">
+                      Step Number
+                    </label>
+                    <div
+                      aria-readonly="true"
+                      className="w-20 h-10 px-3 admin-input rounded-lg text-sm admin-text-muted opacity-75 cursor-not-allowed select-none flex items-center justify-center"
+                      title="Automatically set from the step position in the list"
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+                      Step Title
+                    </label>
+                    <input
+                      className="w-full h-10 px-4 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
+                      onChange={(event) =>
+                        onChange([...path, String(index), "title"], event.target.value)
+                      }
+                      placeholder="e.g. Discover"
+                      value={typeof item.title === "string" ? item.title : ""}
+                    />
+                  </div>
+                  <div className="flex sm:items-end justify-end shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
+                      onClick={() => {
+                        const stepTitle =
+                          typeof item.title === "string" && item.title.trim()
+                            ? `"${item.title.trim()}"`
+                            : `Step ${index + 1}`
+                        onRequestDelete({
+                          title: "Delete Step?",
+                          description: `Are you sure you want to delete ${stepTitle}? This action cannot be undone.`,
+                          onConfirm: () => {
+                            onChange(
+                              path,
+                              value
+                                .filter((_, stepIndex) => stepIndex !== index)
+                                .map((stepItem, nextIndex) =>
+                                  isRecord(stepItem)
+                                    ? {
+                                        ...stepItem,
+                                        number: String(nextIndex + 1).padStart(2, "0"),
+                                      }
+                                    : stepItem,
+                                ),
+                            )
+                            onAction("Step deleted")
+                          },
+                        })
+                      }}
+                      title="Delete Step"
+                      aria-label="Delete Step"
+                      type="button"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="sm:col-span-12">
                   <label className="block text-sm font-medium admin-text-secondary mb-1.5">
@@ -829,6 +1083,8 @@ function SectionFields({
               <SectionFields
                 onChange={onChange}
                 onAction={onAction}
+                onRequestDelete={onRequestDelete}
+                cmsFooterAddress={cmsFooterAddress}
                 path={[...path, String(index)]}
                 value={item}
               />
@@ -841,8 +1097,10 @@ function SectionFields({
 
   if (isRecord(value)) {
     const useTwoColumns = path.length === 1 && twoColumnSections.has(path[0])
+    const lastSegment = path[path.length - 1] ?? ""
+    const isNamedNestedSection = path.length > 1 && Number.isNaN(Number(lastSegment))
 
-    return (
+    const gridContent = (
       <div
         className={`grid min-w-0 grid-cols-1 gap-4 ${
           useTwoColumns ? "md:grid-cols-2" : "sm:grid-cols-2"
@@ -852,6 +1110,7 @@ function SectionFields({
           .filter(
             ([key]) =>
               key.toLowerCase() !== "id" &&
+              key !== "ctaHref" &&
               !(
                 path.length === 1 &&
                 (path[0] === "header" || path[0] === "footer") &&
@@ -874,12 +1133,31 @@ function SectionFields({
               key={[...path, key].join(".")}
               onChange={onChange}
               onAction={onAction}
+              onRequestDelete={onRequestDelete}
+              cmsFooterAddress={cmsFooterAddress}
               path={[...path, key]}
               value={child}
             />
           ))}
       </div>
     )
+
+    if (isNamedNestedSection) {
+      const legendLabel =
+        path[0] === "work" && lastSegment === "featured"
+          ? "Featured Project"
+          : formatLabel(lastSegment)
+      return (
+        <fieldset className="sm:col-span-2 md:col-span-2 min-w-0 rounded-xl border admin-border admin-card p-5">
+          <legend className="px-2 text-xs font-semibold uppercase tracking-wider admin-text-secondary">
+            {legendLabel}
+          </legend>
+          {gridContent}
+        </fieldset>
+      )
+    }
+
+    return gridContent
   }
 
   return null
@@ -895,6 +1173,29 @@ export function Template1SectionEditor({
   onAction,
 }: Template1SectionEditorProps) {
   const [activeSection, setActiveSection] = useState<keyof Template1PageData | "seo">("hero")
+  const [pendingDelete, setPendingDelete] = useState<DeleteConfirmationRequest | null>(null)
+  const [cmsFooterAddress, setCmsFooterAddress] = useState("")
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadCmsFooterAddress() {
+      try {
+        const res = await fetch("/api/content/footer")
+        if (!res.ok || cancelled) return
+        const json = await res.json()
+        const normalized = normalizeFooterContent(json)
+        if (!cancelled && normalized.address) {
+          setCmsFooterAddress(normalized.address.trim())
+        }
+      } catch (error) {
+        console.error("Failed to fetch CMS footer address:", error)
+      }
+    }
+    void loadCmsFooterAddress()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function updateField(path: string[], value: unknown) {
     onChange(updateAtPath(data, path, value))
@@ -1112,11 +1413,27 @@ export function Template1SectionEditor({
           <SectionFields
             onChange={updateField}
             onAction={onAction}
+            onRequestDelete={setPendingDelete}
+            cmsFooterAddress={cmsFooterAddress}
             path={[activeSection]}
             value={data[activeSection]}
           />
         )}
       </div>
+
+      <ConfirmDeleteDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null)
+        }}
+        title={pendingDelete?.title}
+        description={pendingDelete?.description}
+        confirmLabel={pendingDelete?.confirmLabel ?? "Delete"}
+        onConfirm={() => {
+          pendingDelete?.onConfirm()
+          setPendingDelete(null)
+        }}
+      />
     </div>
   )
 }

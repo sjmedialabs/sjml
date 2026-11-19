@@ -41,8 +41,15 @@ function ArrowUpRightIcon({ className }: { className?: string }) {
   )
 }
 
-function ServiceRow({ service }: { service: Template1ServiceItem }) {
+function ServiceRow({
+  service,
+  position,
+}: {
+  service: Template1ServiceItem
+  position: number
+}) {
   const titleLines = service.title.split("\n")
+  const serviceNumber = String(position).padStart(2, "0")
   return (
     <div
       key={service.id}
@@ -51,7 +58,7 @@ function ServiceRow({ service }: { service: Template1ServiceItem }) {
       {/* Number */}
       <div className="md:col-span-1">
         <span className="text-[22px] sm:text-[28px] md:text-[34px] lg:text-[40px] font-medium leading-none text-[#161617]/40">
-          {service.number}
+          {serviceNumber}
         </span>
       </div>
 
@@ -139,8 +146,8 @@ export function Template1ServicesSection({
 
           {/* First 4 Services Rows */}
           <div className="divide-y divide-black/12 border-t border-b border-black/12">
-            {initialServices.map((service) => (
-              <ServiceRow key={service.id} service={service} />
+            {initialServices.map((service, index) => (
+              <ServiceRow key={service.id} service={service} position={index + 1} />
             ))}
           </div>
 
@@ -158,8 +165,12 @@ export function Template1ServicesSection({
               >
                 <div className="overflow-hidden">
                   <div className="divide-y divide-black/12 border-b border-black/12">
-                    {extraServices.map((service) => (
-                      <ServiceRow key={service.id} service={service} />
+                    {extraServices.map((service, index) => (
+                      <ServiceRow
+                        key={service.id}
+                        service={service}
+                        position={initialServices.length + index + 1}
+                      />
                     ))}
                   </div>
                 </div>
@@ -172,7 +183,7 @@ export function Template1ServicesSection({
                   onClick={() => setIsExpanded((prev) => !prev)}
                   aria-expanded={isExpanded}
                   aria-controls="additional-services-accordion"
-                  className="group inline-flex items-center gap-2 rounded-[4px] border border-black/15 bg-white px-5 sm:px-6 py-3 text-[13px] font-medium text-[#161617] transition-colors hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] cursor-pointer"
+                  className="group inline-flex items-center gap-2 rounded-[4px] border border-black/15 bg-white px-5 sm:px-6 py-3 text-[13px] font-medium text-[#161617] transition-all duration-200 hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] cursor-pointer"
                 >
                   <span>{isExpanded ? "See Less" : "See More"}</span>
                   <ChevronDown
@@ -193,10 +204,10 @@ export function Template1ServicesSection({
               <button
                 type="button"
                 onClick={handleCtaButtonClick}
-                className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                className="group cursor-pointer w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
               >
                 <span className="text-[#FCC50E]">{content.ctaText}</span>
-                <ArrowUpRightIcon className="text-[#FCC50E]" />
+                <ArrowUpRightIcon className="text-[#FCC50E] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </div>
           )}

@@ -112,10 +112,10 @@ export function Template1FaqSection({
                   <button
                     type="button"
                     onClick={handleCtaButtonClick}
-                    className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                    className="group cursor-pointer w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
                   >
                     <span className="text-[#FCC50E]">{content.ctaText}</span>
-                    <ArrowUpRightIcon className="text-[#FCC50E]" />
+                    <ArrowUpRightIcon className="text-[#FCC50E] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </button>
                 </div>
               )}
@@ -131,12 +131,12 @@ export function Template1FaqSection({
                       type="button"
                       onClick={() => toggleItem(faq.id)}
                       aria-expanded={isOpen}
-                      className="flex w-full items-center justify-between gap-4 text-left focus:outline-none group"
+                      className="flex w-full items-center justify-between gap-4 text-left focus:outline-none group cursor-pointer"
                     >
-                      <span className="text-[14px] sm:text-[14.5px] md:text-[15px] lg:text-[16px] font-semibold text-[#161617] group-hover:text-[#161617]/80 transition-colors">
+                      <span className="text-[14px] sm:text-[14.5px] md:text-[15px] lg:text-[16px] font-semibold text-[#161617] group-hover:text-[#161617]/75 transition-colors">
                         {faq.question}
                       </span>
-                      <span className="text-[18px] sm:text-[20px] font-normal leading-none text-[#161617]/60 shrink-0 select-none">
+                      <span className="text-[18px] sm:text-[20px] font-normal leading-none text-[#161617]/60 group-hover:text-[#161617] transition-colors shrink-0 select-none">
                         {isOpen ? "−" : "+"}
                       </span>
                     </button>

@@ -9,13 +9,8 @@ import {
   Strikethrough,
   List,
   ListOrdered,
-  Quote,
-  Minus,
   Undo,
   Redo,
-  Heading3,
-  Heading4,
-  Pilcrow,
 } from "lucide-react"
 
 interface RichTextEditorProps {
@@ -39,10 +34,11 @@ export function RichTextEditor({
     extensions: [StarterKit],
     content: value || "",
     immediatelyRender: false,
+    shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
         class:
-          "min-h-[140px] px-3.5 py-3 text-sm admin-text-primary focus:outline-none leading-relaxed prose prose-sm max-w-none [&_p]:mb-2 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2 [&_blockquote]:border-l-2 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_hr]:border-black/10 [&_hr]:my-3",
+          "rich-text-editor-content min-h-[140px] px-3.5 py-3 text-sm admin-text-primary focus:outline-none leading-relaxed max-w-none [&_p]:mb-2 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:list-item [&_li>p]:mb-0",
       },
     },
     onUpdate: ({ editor }) => {
@@ -53,7 +49,7 @@ export function RichTextEditor({
   // Synchronize external value changes if content differs
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || "")
+      editor.commands.setContent(value || "", { emitUpdate: false })
     }
   }, [editor, value])
 
@@ -79,8 +75,9 @@ export function RichTextEditor({
           {/* Bold */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
+            className={`cursor-pointer p-1.5 rounded text-xs transition-colors ${
               editor.isActive("bold")
                 ? "bg-primary text-black font-semibold shadow-sm"
                 : "text-[#525252] hover:text-black hover:bg-black/5"
@@ -94,8 +91,9 @@ export function RichTextEditor({
           {/* Italic */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
+            className={`cursor-pointer p-1.5 rounded text-xs transition-colors ${
               editor.isActive("italic")
                 ? "bg-primary text-black font-semibold shadow-sm"
                 : "text-[#525252] hover:text-black hover:bg-black/5"
@@ -109,8 +107,9 @@ export function RichTextEditor({
           {/* Strikethrough */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
+            className={`cursor-pointer p-1.5 rounded text-xs transition-colors ${
               editor.isActive("strike")
                 ? "bg-primary text-black font-semibold shadow-sm"
                 : "text-[#525252] hover:text-black hover:bg-black/5"
@@ -123,58 +122,12 @@ export function RichTextEditor({
 
           <div className="w-px h-4 bg-black/10 mx-1" aria-hidden="true" />
 
-          {/* Heading 3 */}
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`p-1.5 rounded text-xs font-semibold transition-colors ${
-              editor.isActive("heading", { level: 3 })
-                ? "bg-primary text-black shadow-sm"
-                : "text-[#525252] hover:text-black hover:bg-black/5"
-            }`}
-            title="Heading 3"
-            aria-label="Heading 3"
-          >
-            <Heading3 className="w-4 h-4" />
-          </button>
-
-          {/* Heading 4 */}
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-            className={`p-1.5 rounded text-xs font-semibold transition-colors ${
-              editor.isActive("heading", { level: 4 })
-                ? "bg-primary text-black shadow-sm"
-                : "text-[#525252] hover:text-black hover:bg-black/5"
-            }`}
-            title="Heading 4"
-            aria-label="Heading 4"
-          >
-            <Heading4 className="w-4 h-4" />
-          </button>
-
-          {/* Paragraph */}
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().setParagraph().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
-              editor.isActive("paragraph")
-                ? "bg-primary text-black font-semibold shadow-sm"
-                : "text-[#525252] hover:text-black hover:bg-black/5"
-            }`}
-            title="Normal text"
-            aria-label="Normal text"
-          >
-            <Pilcrow className="w-4 h-4" />
-          </button>
-
-          <div className="w-px h-4 bg-black/10 mx-1" aria-hidden="true" />
-
           {/* Bullet List */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
+            className={`cursor-pointer p-1.5 rounded text-xs transition-colors ${
               editor.isActive("bulletList")
                 ? "bg-primary text-black font-semibold shadow-sm"
                 : "text-[#525252] hover:text-black hover:bg-black/5"
@@ -188,8 +141,9 @@ export function RichTextEditor({
           {/* Ordered List */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
+            className={`cursor-pointer p-1.5 rounded text-xs transition-colors ${
               editor.isActive("orderedList")
                 ? "bg-primary text-black font-semibold shadow-sm"
                 : "text-[#525252] hover:text-black hover:bg-black/5"
@@ -200,40 +154,15 @@ export function RichTextEditor({
             <ListOrdered className="w-4 h-4" />
           </button>
 
-          {/* Blockquote */}
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-1.5 rounded text-xs transition-colors ${
-              editor.isActive("blockquote")
-                ? "bg-primary text-black font-semibold shadow-sm"
-                : "text-[#525252] hover:text-black hover:bg-black/5"
-            }`}
-            title="Quote block"
-            aria-label="Quote block"
-          >
-            <Quote className="w-4 h-4" />
-          </button>
-
-          {/* Horizontal Rule */}
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className="p-1.5 rounded text-xs text-[#525252] hover:text-black hover:bg-black/5 transition-colors"
-            title="Horizontal Divider"
-            aria-label="Horizontal Divider"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-
           <div className="w-px h-4 bg-black/10 mx-1" aria-hidden="true" />
 
           {/* Undo */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
-            className="p-1.5 rounded text-xs text-[#525252] hover:text-black hover:bg-black/5 transition-colors disabled:opacity-40"
+            className="cursor-pointer p-1.5 rounded text-xs text-[#525252] hover:text-black hover:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
           >
@@ -243,9 +172,10 @@ export function RichTextEditor({
           {/* Redo */}
           <button
             type="button"
+            onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
-            className="p-1.5 rounded text-xs text-[#525252] hover:text-black hover:bg-black/5 transition-colors disabled:opacity-40"
+            className="cursor-pointer p-1.5 rounded text-xs text-[#525252] hover:text-black hover:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title="Redo (Ctrl+Y)"
             aria-label="Redo"
           >
