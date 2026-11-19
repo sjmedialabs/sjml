@@ -139,11 +139,9 @@ export function Template1Header({
     (cmsFooterData?.phone && cmsFooterData.phone.trim()) ||
     defaultTemplate1HeaderData.phoneText
 
-  const resolvedPhoneHref =
-    (data?.phoneHref && data.phoneHref.trim()) ||
-    (resolvedPhone
-      ? `tel:${resolvedPhone.replace(/\s+/g, "")}`
-      : defaultTemplate1HeaderData.phoneHref)
+  const resolvedPhoneHref = resolvedPhone
+    ? `tel:${resolvedPhone.replace(/[^\d+]/g, "")}`
+    : ""
 
   const content: Required<Template1HeaderData> = {
     ...defaultTemplate1HeaderData,
@@ -155,15 +153,10 @@ export function Template1Header({
       data?.taglineLine2 ?? defaultTemplate1HeaderData.taglineLine2,
     logoHref: data?.logoHref ?? defaultTemplate1HeaderData.logoHref,
     phoneText: resolvedPhone,
-    phoneHref: resolvedPhoneHref,
     ctaText:
       data?.ctaText ??
       activeHeader?.ctaButton?.text ??
       defaultTemplate1HeaderData.ctaText,
-    ctaHref:
-      data?.ctaHref ??
-      activeHeader?.ctaButton?.href ??
-      defaultTemplate1HeaderData.ctaHref,
   }
 
   const handleCtaButtonClick = () => {
@@ -226,7 +219,7 @@ export function Template1Header({
           <div className="flex items-center gap-2.5 sm:gap-4 md:gap-6 shrink-0">
             {content.phoneText && (
               <a
-                href={content.phoneHref}
+                href={resolvedPhoneHref}
                 className="hidden md:inline-block text-xs sm:text-[13px] xl:text-[14px] font-medium text-[#161617]/80 hover:text-[#161617] transition-colors whitespace-nowrap"
               >
                 {content.phoneText}
@@ -236,7 +229,7 @@ export function Template1Header({
             <button
               type="button"
               onClick={handleCtaButtonClick}
-              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-[4px] bg-[#161617] px-3.5 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 text-[11.5px] sm:text-[12.5px] md:text-[13px] xl:text-[14px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] shrink-0"
+              className="group cursor-pointer inline-flex items-center gap-1.5 sm:gap-2 rounded-[4px] bg-[#161617] px-3.5 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 text-[11.5px] sm:text-[12.5px] md:text-[13px] xl:text-[14px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98] shrink-0"
             >
               <span className="sm:hidden text-[#FCC50E] whitespace-nowrap">
                 {mobileCtaText}
@@ -244,7 +237,7 @@ export function Template1Header({
               <span className="hidden sm:inline text-[#FCC50E] whitespace-nowrap">
                 {content.ctaText}
               </span>
-              <ArrowUpRightIcon className="text-[#FCC50E] shrink-0" />
+              <ArrowUpRightIcon className="text-[#FCC50E] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
           </div>
         </div>

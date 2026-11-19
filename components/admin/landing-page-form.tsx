@@ -13,6 +13,7 @@ import {
   type Template1SectionVisibility,
 } from "@/components/template-1/default-data"
 import { defaultLandingPageSeo, type LandingPageSeo } from "@/lib/landing-pages"
+import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import { Template1SectionEditor } from "./template-1-section-editor"
 
 const templateOptions = ["Template 1"] as const
@@ -104,6 +105,27 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
 
   async function createPage() {
     if (isSaving || (page && !hasChanges)) return
+
+    const headerPhoneError = validatePhoneTextWithCountryCode(
+      sectionData.header.phoneText ?? "",
+    )
+    if (headerPhoneError) {
+      const message = `Header Phone Text: ${headerPhoneError}`
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
+      return
+    }
+
+    const footerPhoneError = validatePhoneTextWithCountryCode(
+      sectionData.footer.phoneText ?? "",
+    )
+    if (footerPhoneError) {
+      const message = `Footer Phone Text: ${footerPhoneError}`
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
+      return
+    }
+
     setIsSaving(true)
     setIsSaved(false)
     setErrorMessage("")
@@ -314,38 +336,6 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               : "Enter basic details to create a page. You can customize its sections afterward."}
           </p>
         </div>
-        {page && (
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                onAction("Page editing cancelled")
-                onCancel()
-              }}
-              className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
-              type="button"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              disabled={isSaving || !hasChanges}
-              onClick={() => void createPage()}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-              type="button"
-            >
-              {isSaving ? (
-                <>
-                  <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Status Messages */}
@@ -433,11 +423,13 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
         </div>
       )}
 
-      {/* Bottom Footer Actions */}
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 pt-6 border-t admin-border">
+      {/* Sticky Footer Actions */}
+      <div className="sticky bottom-4 z-30 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border admin-border admin-card px-6 py-4 shadow-lg">
         <p className="text-sm admin-text-secondary">
           {page
-            ? `Configure the ${template} sections and SEO metadata above.`
+            ? hasChanges
+              ? "You have unsaved changes."
+              : `Configure the ${template} sections and SEO metadata above.`
             : `Your page will be created using ${template} (${templateOnePageSections} editable sections).`}
         </p>
         <div className="flex items-center gap-3">

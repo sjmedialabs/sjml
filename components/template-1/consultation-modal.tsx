@@ -200,14 +200,14 @@ export function Template1ConsultationModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-4 md:p-6 backdrop-blur-[2px] animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/60 p-3 sm:p-4 md:p-6 backdrop-blur-[2px] animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="template1-modal-title"
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-[440px] sm:max-w-[460px] md:max-w-[480px] max-h-[92vh] overflow-y-auto rounded-[8px] bg-white p-5 sm:p-7 md:p-8 text-[#161617] shadow-[0_20px_50px_rgba(0,0,0,0.28)]"
+        className="relative my-auto w-full max-w-[440px] sm:max-w-[460px] md:max-w-[480px] rounded-[8px] bg-white p-5 sm:p-6 md:p-7 text-[#161617] shadow-[0_20px_50px_rgba(0,0,0,0.28)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top-Right Cross Button */}
@@ -215,7 +215,7 @@ export function Template1ConsultationModal({
           type="button"
           onClick={handleClose}
           aria-label="Close modal"
-          className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 inline-flex h-8 w-8 items-center justify-center rounded-[4px] text-[#161617]/55 transition-colors hover:bg-black/5 hover:text-[#161617]"
+          className="cursor-pointer absolute right-3.5 top-3.5 sm:right-4 sm:top-4 inline-flex h-8 w-8 items-center justify-center rounded-[4px] text-[#161617]/55 transition-colors hover:bg-black/5 hover:text-[#161617]"
         >
           <CloseCrossIcon />
         </button>
@@ -243,14 +243,14 @@ export function Template1ConsultationModal({
               <button
                 type="button"
                 onClick={() => setIsSubmitted(false)}
-                className="rounded-[4px] border border-black/15 bg-white px-3.5 sm:px-4 py-2 text-[12px] font-medium text-[#161617] hover:bg-black/5 transition-colors"
+                className="cursor-pointer rounded-[4px] border border-black/15 bg-white px-3.5 sm:px-4 py-2 text-[12px] font-medium text-[#161617] hover:bg-black/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
               >
                 Submit another enquiry
               </button>
               <button
                 type="button"
                 onClick={handleClose}
-                className="rounded-[4px] bg-[#161617] px-4 py-2 text-[12px] font-medium text-white hover:bg-[#2a2a2c] transition-colors"
+                className="cursor-pointer rounded-[4px] bg-[#161617] px-4 py-2 text-[12px] font-medium text-white hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] transition-all duration-200"
               >
                 Close
               </button>
@@ -385,12 +385,12 @@ export function Template1ConsultationModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3 sm:py-3.5 text-[13px] sm:text-[14px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c] disabled:opacity-60 cursor-pointer"
+              className="group mt-2 flex w-full items-center justify-center gap-2.5 rounded-[4px] bg-[#161617] px-5 py-3 sm:py-3.5 text-[13px] sm:text-[14px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none cursor-pointer"
             >
               <span className="text-[#FCC50E]">
                 {isSubmitting ? "Submitting..." : content.submitButtonText}
               </span>
-              <ArrowUpRightIcon className="text-[#FCC50E]" />
+              <ArrowUpRightIcon className="text-[#FCC50E] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
 
             {/* Privacy Footnote */}

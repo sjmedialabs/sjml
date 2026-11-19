@@ -106,27 +106,25 @@ export function Template1Footer({
     (activeHeader?.phone && activeHeader.phone.trim()) ||
     defaultTemplate1FooterData.phoneText
 
-  const resolvedPhoneHref =
-    (data?.phoneHref && data.phoneHref.trim()) ||
-    (resolvedPhone
-      ? `tel:${resolvedPhone.replace(/\s+/g, "")}`
-      : defaultTemplate1FooterData.phoneHref)
+  const resolvedPhoneHref = resolvedPhone
+    ? `tel:${resolvedPhone.replace(/[^\d+]/g, "")}`
+    : ""
 
   const resolvedEmail =
     (data?.emailText && data.emailText.trim()) ||
     (cmsFooterData?.email && cmsFooterData.email.trim()) ||
     defaultTemplate1FooterData.emailText
 
-  const resolvedEmailHref =
-    (data?.emailHref && data.emailHref.trim()) ||
-    (resolvedEmail
-      ? `mailto:${resolvedEmail}`
-      : defaultTemplate1FooterData.emailHref)
+  const resolvedEmailHref = resolvedEmail ? `mailto:${resolvedEmail.trim()}` : ""
 
+  const rawAddressOverride = data?.addressText?.trim() || ""
+  const isLegacyPlaceholderAddress =
+    rawAddressOverride === "Hyderabad, Telangana, India"
   const resolvedAddress =
-    (data?.addressText && data.addressText.trim()) ||
+    (!isLegacyPlaceholderAddress && rawAddressOverride) ||
     (cmsFooterData?.address && cmsFooterData.address.trim()) ||
-    defaultTemplate1FooterData.addressText
+    rawAddressOverride ||
+    "Hyderabad, Telangana, India"
 
   const resolvedCopyright =
     (data?.copyrightText && data.copyrightText.trim()) ||
@@ -149,9 +147,7 @@ export function Template1Footer({
     logoHref: data?.logoHref ?? defaultTemplate1FooterData.logoHref,
     brandMotto: resolvedBrandMotto,
     phoneText: resolvedPhone,
-    phoneHref: resolvedPhoneHref,
     emailText: resolvedEmail,
-    emailHref: resolvedEmailHref,
     addressText: resolvedAddress,
     legalLinks: data?.legalLinks ?? defaultTemplate1FooterData.legalLinks,
     copyrightText: resolvedCopyright,
@@ -212,7 +208,7 @@ export function Template1Footer({
           <div className="sm:col-span-1 md:col-span-4 flex flex-col space-y-1.5 sm:space-y-2 text-[12.5px] sm:text-[13px] md:text-[13.5px]">
             {content.phoneText && (
               <a
-                href={content.phoneHref}
+                href={resolvedPhoneHref}
                 className="font-medium text-[#161617]/80 hover:text-[#161617] transition-colors w-fit"
               >
                 {content.phoneText}
@@ -220,7 +216,7 @@ export function Template1Footer({
             )}
             {content.emailText && (
               <a
-                href={content.emailHref}
+                href={resolvedEmailHref}
                 className="text-[#161617]/65 hover:text-[#161617] transition-colors w-fit"
               >
                 {content.emailText}

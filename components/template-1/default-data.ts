@@ -8,9 +8,7 @@ export interface Template1HeaderData {
   taglineLine2?: string
   logoHref?: string
   phoneText?: string
-  phoneHref?: string
   ctaText?: string
-  ctaHref?: string
 }
 
 export const defaultTemplate1HeaderData: Required<Template1HeaderData> = {
@@ -20,9 +18,7 @@ export const defaultTemplate1HeaderData: Required<Template1HeaderData> = {
   taglineLine2: "ADVERTISING",
   logoHref: "/",
   phoneText: "+91 40 40268570",
-  phoneHref: "tel:+914040268570",
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
 }
 
 export interface Template1LeadFormValues {
@@ -38,7 +34,6 @@ export interface Template1HeroData {
   headline?: string
   description?: string
   ctaText?: string
-  ctaHref?: string
   trustText?: string
   formOverline?: string
   formTitle?: string
@@ -63,7 +58,6 @@ export const defaultTemplate1HeroData: Required<Template1HeroData> = {
   description:
     "Build a stronger digital presence, reach the right audience, and unlock new growth opportunities with creative, data-driven marketing strategies from SJ Media Labs.",
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
   trustText: "12+ Years of Creative & Digital Expertise",
   formOverline: "LET’S BUILD WHAT’S NEXT",
   formTitle: "Let's Talk About Your Growth.",
@@ -172,7 +166,6 @@ export interface Template1ServicesData {
   subtitle?: string
   services?: Template1ServiceItem[]
   ctaText?: string
-  ctaHref?: string
 }
 
 export const defaultTemplate1ServicesData: Required<Template1ServicesData> = {
@@ -215,7 +208,6 @@ export const defaultTemplate1ServicesData: Required<Template1ServicesData> = {
     },
   ],
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
 }
 
 
@@ -257,7 +249,6 @@ export interface Template1WorkData {
   featured?: Template1FeaturedWork
   projects?: Template1SecondaryWorkItem[]
   ctaText?: string
-  ctaHref?: string
   disclaimer?: string
 }
 
@@ -313,7 +304,6 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
     },
   ],
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
   disclaimer:
     "Authentic visuals from SJML's portfolio. Case narratives and campaign-use permissions require approval; no measurable outcomes are claimed.",
 }
@@ -333,7 +323,6 @@ export interface Template1WhySjmlData {
   imageAlt?: string
   imageCaption?: string
   ctaText?: string
-  ctaHref?: string
   points?: Template1WhySjmlPoint[]
 }
 
@@ -344,7 +333,6 @@ export const defaultTemplate1WhySjmlData: Required<Template1WhySjmlData> = {
   imageAlt: "SJML creative and strategic work showcase",
   imageCaption: "CREATIVITY WITH A COMMERCIAL PURPOSE",
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
   points: [
     {
       id: "why-1",
@@ -519,7 +507,6 @@ export interface Template1FaqData {
   headline?: string
   subtitle?: string
   ctaText?: string
-  ctaHref?: string
   faqs?: Template1FaqItem[]
 }
 
@@ -528,7 +515,6 @@ export const defaultTemplate1FaqData: Required<Template1FaqData> = {
   headline: "Everything You\nNeed to Know.",
   subtitle: "Clear answers. No big promises.\nJust the right place to start.",
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
   faqs: [
     {
       id: "faq-1",
@@ -569,7 +555,6 @@ export interface Template1CtaData {
   headline?: string
   subtitle?: string
   ctaText?: string
-  ctaHref?: string
 }
 
 export const defaultTemplate1CtaData: Required<Template1CtaData> = {
@@ -578,7 +563,6 @@ export const defaultTemplate1CtaData: Required<Template1CtaData> = {
   subtitle:
     "Let's create a smarter digital strategy that connects your brand with the right people.",
   ctaText: "Book a Consultation",
-  ctaHref: "#consultation-form",
 }
 
 
@@ -595,9 +579,7 @@ export interface Template1FooterData {
   logoHref?: string
   brandMotto?: string
   phoneText?: string
-  phoneHref?: string
   emailText?: string
-  emailHref?: string
   addressText?: string
   legalLinks?: Template1FooterLink[]
   copyrightText?: string
@@ -611,10 +593,8 @@ export const defaultTemplate1FooterData: Required<Template1FooterData> = {
   logoHref: "/",
   brandMotto: "Igniting Brilliance",
   phoneText: "+91 40 40268570",
-  phoneHref: "tel:+914040268570",
   emailText: "info@sjmedialabs.com",
-  emailHref: "mailto:info@sjmedialabs.com",
-  addressText: "Hyderabad, Telangana, India",
+  addressText: "",
   legalLinks: [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
