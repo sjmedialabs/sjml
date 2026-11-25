@@ -7,6 +7,7 @@ import {
   type Template1ClientItem,
   defaultTemplate1ClientsData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 
 export type { Template1ClientsData, Template1ClientItem }
 
@@ -72,7 +73,10 @@ export function Template1ClientsSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[26px] sm:text-[30px] md:text-[34px] lg:text-[38px] xl:text-[42px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617]">
+            <h2
+              className="text-[length:calc(26px*var(--landing-title-scale))] sm:text-[length:calc(30px*var(--landing-title-scale))] md:text-[length:calc(34px*var(--landing-title-scale))] lg:text-[length:calc(38px*var(--landing-title-scale))] xl:text-[length:calc(42px*var(--landing-title-scale))] font-semibold leading-[1.15] tracking-[-0.02em] text-[#161617]"
+              style={landingTitleStyle(42, content.headlineFontSize)}
+            >
               {content.headline}
             </h2>
           </div>

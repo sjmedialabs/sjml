@@ -13,6 +13,7 @@ import {
   defaultTemplate1WorkData,
 } from "./default-data"
 import { Template1ConsultationModal } from "./consultation-modal"
+import { landingTitleStyle } from "./title-size"
 
 export type {
   Template1WorkData,
@@ -88,7 +89,11 @@ function ProjectCard({ project }: { project: Template1SecondaryWorkItem }) {
 
       <div className="my-3 sm:my-3.5 border-t border-black/12" />
 
-      {project.narrativeHtml ? (
+      {project.cardSubtitle?.trim() ? (
+        <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75">
+          {project.cardSubtitle}
+        </p>
+      ) : project.narrativeHtml ? (
         <div
           className="work-project-narrative text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/75 space-y-1 [&_strong]:font-medium [&_strong]:text-[#161617]/85 [&_p]:mb-1 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1.5 [&_li]:list-item [&_li>p]:mb-0 [&_a]:text-primary [&_a]:underline"
           dangerouslySetInnerHTML={{ __html: project.narrativeHtml }}
@@ -180,26 +185,24 @@ function ProjectsCarousel({
   return (
     <div className="relative pt-6 sm:pt-8">
       {/* Desktop Left Navigation Arrow */}
-      {hasMultipleSnaps && (
+      {canScrollPrev && (
         <button
           type="button"
           onClick={scrollPrev}
-          disabled={!canScrollPrev}
           aria-label="Previous projects"
-          className="hidden lg:flex absolute -left-6 xl:-left-13 top-[38%] -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
+          className="hidden lg:flex absolute -left-6 xl:-left-13 top-[38%] -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 transition-all items-center justify-center cursor-pointer active:scale-95"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
       )}
 
       {/* Desktop Right Navigation Arrow */}
-      {hasMultipleSnaps && (
+      {canScrollNext && (
         <button
           type="button"
           onClick={scrollNext}
-          disabled={!canScrollNext}
           aria-label="Next projects"
-          className="hidden lg:flex absolute -right-6 xl:-right-13 top-[38%] -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
+          className="hidden lg:flex absolute -right-6 xl:-right-13 top-[38%] -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-black/10 bg-white/95 text-[#161617] shadow-md hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:scale-105 transition-all items-center justify-center cursor-pointer active:scale-95"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -216,7 +219,7 @@ function ProjectsCarousel({
           {projects.map((project) => (
             <div
               key={project.id}
-              className="min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 pl-6 sm:pl-8 md:pl-8 lg:pl-10"
+              className="min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/3 pl-6 sm:pl-8 md:pl-8 lg:pl-10"
             >
               <ProjectCard project={project} />
             </div>
@@ -228,15 +231,16 @@ function ProjectsCarousel({
       {hasMultipleSnaps && (
         <div className="flex items-center justify-center gap-3 lg:gap-1.5 mt-6 sm:mt-8">
           {/* Mobile & Tablet Left Navigation Arrow */}
-          <button
-            type="button"
-            onClick={scrollPrev}
-            disabled={!canScrollPrev}
-            aria-label="Previous projects"
-            className="flex lg:hidden w-9 h-9 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+          {canScrollPrev && (
+            <button
+              type="button"
+              onClick={scrollPrev}
+              aria-label="Previous projects"
+              className="flex lg:hidden w-9 h-9 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 transition-all items-center justify-center cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
 
           {/* Dots */}
           <div className="flex items-center gap-1.5">
@@ -256,15 +260,16 @@ function ProjectsCarousel({
           </div>
 
           {/* Mobile & Tablet Right Navigation Arrow */}
-          <button
-            type="button"
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            aria-label="Next projects"
-            className="flex lg:hidden w-9 h-9 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          {canScrollNext && (
+            <button
+              type="button"
+              onClick={scrollNext}
+              aria-label="Next projects"
+              className="flex lg:hidden w-9 h-9 rounded-full border border-black/10 bg-white text-[#161617] shadow-sm hover:bg-[#161617] hover:text-[#FCC50E] active:scale-95 transition-all items-center justify-center cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -282,16 +287,10 @@ export function Template1WorkSection({
   const content = {
     ...defaultTemplate1WorkData,
     ...data,
-    featured: {
-      ...defaultTemplate1WorkData.featured,
-      ...(data?.featured ?? {}),
-    },
     projects: data?.projects ?? defaultTemplate1WorkData.projects,
   }
 
   const headlineLines = content.headline.split("\n")
-  const narrativeHeadlineLines =
-    content.featured.narrativeHeadline.split("\n")
 
   const handleCtaButtonClick = () => {
     if (onCtaClick) {
@@ -312,7 +311,10 @@ export function Template1WorkSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] 2xl:text-[54px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617]">
+            <h2
+              className="text-[length:calc(28px*var(--landing-title-scale))] sm:text-[length:calc(34px*var(--landing-title-scale))] md:text-[length:calc(38px*var(--landing-title-scale))] lg:text-[length:calc(44px*var(--landing-title-scale))] xl:text-[length:calc(50px*var(--landing-title-scale))] 2xl:text-[length:calc(54px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617]"
+              style={landingTitleStyle(54, content.headlineFontSize)}
+            >
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}
@@ -321,104 +323,7 @@ export function Template1WorkSection({
             </h2>
           </div>
 
-          {/* Featured Project Row */}
-          <div className="pt-2 sm:pt-4 pb-8 sm:pb-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 md:gap-8 lg:gap-10 xl:gap-12 items-start">
-              {/* Featured Image Box */}
-              <div className="md:col-span-6 lg:col-span-7 bg-[#F3F2EE] p-4 sm:p-6 md:p-6 lg:p-8 rounded-[4px]">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2px] bg-white shadow-sm">
-                  <Image
-                    src={content.featured.image}
-                    alt={content.featured.imageAlt || content.featured.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-
-              {/* Featured Narrative Details */}
-              <div className="md:col-span-6 lg:col-span-5">
-                <p className="text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/45">
-                  {content.featured.badge}
-                </p>
-                <div className="mt-1 sm:mt-1.5 flex items-center justify-between gap-3">
-                  {content.featured.href ? (
-                    <Link
-                      href={content.featured.href}
-                      className="group flex w-full items-center justify-between gap-3"
-                    >
-                      <h3 className="text-[22px] sm:text-[24px] md:text-[25px] lg:text-[27px] font-semibold tracking-[-0.01em] text-[#161617] group-hover:underline">
-                        {content.featured.title}
-                      </h3>
-                      <ArrowUpRightIcon className="text-[#161617]/60 group-hover:text-[#161617] transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" />
-                    </Link>
-                  ) : (
-                    <>
-                      <h3 className="text-[22px] sm:text-[24px] md:text-[25px] lg:text-[27px] font-semibold tracking-[-0.01em] text-[#161617]">
-                        {content.featured.title}
-                      </h3>
-                      <ArrowUpRightIcon className="text-[#161617]/60 shrink-0" />
-                    </>
-                  )}
-                </div>
-                <div className="mt-1 text-[11.5px] sm:text-[12px] leading-[1.45] text-[#161617]/55">
-                  <p>{content.featured.industry}</p>
-                  <p>{content.featured.serviceType}</p>
-                </div>
-
-                <div className="my-4 sm:my-5 border-t border-black/12" />
-
-                <p className="text-[9px] sm:text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[#161617]/45">
-                  {content.featured.narrativeLabel}
-                </p>
-                <h4 className="mt-1 sm:mt-1.5 mb-4 sm:mb-5 text-[18px] sm:text-[20px] md:text-[21px] lg:text-[22px] xl:text-[24px] font-semibold leading-[1.2] tracking-[-0.01em] text-[#161617]">
-                  {narrativeHeadlineLines.map((line, idx) => (
-                    <span key={idx} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h4>
-
-                {content.featured.narrativeHtml ? (
-                  <div
-                    className="featured-work-narrative text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80 space-y-2 [&_strong]:font-medium [&_strong]:text-[#161617] [&_p]:mb-1.5 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1.5 [&_li]:list-item [&_li>p]:mb-0 [&_a]:text-[#FCC50E] [&_a]:underline"
-                    dangerouslySetInnerHTML={{ __html: content.featured.narrativeHtml }}
-                  />
-                ) : (
-                  <div className="space-y-3.5 sm:space-y-4">
-                    <div>
-                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                        {content.featured.challengeLabel || "Challenge"}
-                      </p>
-                      <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
-                        {content.featured.challengeText}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                        {content.featured.approachLabel || "Approach"}
-                      </p>
-                      <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-[#161617]/80">
-                        {content.featured.approachText}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-[10.5px] sm:text-[11px] font-medium text-[#161617]/45 mb-0.5">
-                        {content.featured.evidenceLabel || "Evidence"}
-                      </p>
-                      <p className="text-[12px] sm:text-[12.5px] md:text-[13px] leading-[1.55] text-[#161617]/60">
-                        {content.featured.evidenceText}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Projects: Responsive carousel (swipes on mobile/tablet and whenever > 2 projects) */}
+          {/* Projects */}
           {content.projects.length > 0 && (
             <ProjectsCarousel projects={content.projects} />
           )}

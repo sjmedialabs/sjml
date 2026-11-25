@@ -1,5 +1,7 @@
 import { getHomeContent, getPageContent } from "@/lib/models/content"
 import { normalizeHeaderContent } from "@/lib/header-content"
+import { clientPromise } from "@/lib/mongodb"
+import { normalizeWorkGridItem } from "@/lib/work-grid-item"
 import {
   Template1Header,
   Template1HeroSection,
@@ -19,6 +21,7 @@ import {
   defaultTemplate1SectionVisibility,
   normalizeTemplate1SectionVisibility,
   normalizeTemplate1PageData,
+  resolveLandingWorkProjects,
   type Template1PageData,
   type Template1SectionVisibility,
 } from "./default-data"
@@ -40,6 +43,26 @@ export async function Template1Page({
   const visibility = normalizeTemplate1SectionVisibility(
     enabledSections ?? defaultTemplate1SectionVisibility,
   )
+
+  if (visibility.work) {
+    try {
+      const client = await clientPromise
+      const worksData = await client
+        .db("sjmedialabs")
+        .collection("works")
+        .find({ isActive: { $ne: false } })
+        .toArray()
+      const works = worksData.map((work) =>
+        normalizeWorkGridItem(work as Record<string, unknown>),
+      )
+      content.work = {
+        ...content.work,
+        projects: resolveLandingWorkProjects(content.work.projects, works),
+      }
+    } catch (error) {
+      console.error("Failed to resolve landing page works:", error)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F6F2] text-[#161617]">

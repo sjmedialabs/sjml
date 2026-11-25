@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/jwt"
 import { getLeads, addLead } from "@/lib/models/lead"
+import { verifyRecaptcha } from "@/lib/verify-recaptcha"
 
 export const dynamic = "force-dynamic"
 
@@ -75,6 +76,17 @@ export async function POST(request: NextRequest) {
 
     if (!body.email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
+    }
+
+    const isLandingHeroLead =
+      body.subject === "Template 1 enquiry" && body.source === "website"
+    if (isLandingHeroLead && process.env.RECAPTCHA_SECRET_KEY) {
+      const captchaOk = await verifyRecaptcha(
+        typeof body.captchaToken === "string" ? body.captchaToken : "",
+      )
+      if (!captchaOk) {
+        return NextResponse.json({ error: "Captcha verification failed" }, { status: 400 })
+      }
     }
 
     const newLead = await addLead({

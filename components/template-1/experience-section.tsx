@@ -4,6 +4,7 @@ import {
   type Template1StatItem,
   defaultTemplate1ExperienceData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 
 export type { Template1ExperienceData, Template1StatItem }
 
@@ -38,7 +39,10 @@ export function Template1ExperienceSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[26px] sm:text-[32px] md:text-[36px] lg:text-[42px] xl:text-[48px] 2xl:text-[54px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617]">
+            <h2
+              className="text-[length:calc(26px*var(--landing-title-scale))] sm:text-[length:calc(32px*var(--landing-title-scale))] md:text-[length:calc(36px*var(--landing-title-scale))] lg:text-[length:calc(42px*var(--landing-title-scale))] xl:text-[length:calc(48px*var(--landing-title-scale))] 2xl:text-[length:calc(54px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617]"
+              style={landingTitleStyle(54, content.headlineFontSize)}
+            >
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}
