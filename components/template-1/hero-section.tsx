@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import {
   type Template1HeroData,
@@ -14,7 +14,9 @@ import {
   validateLeadFormField,
 } from "./form-validation"
 import { Template1ConsultationModal } from "./consultation-modal"
+import { landingTitleStyle } from "./title-size"
 import { submitTemplate1Lead } from "./submit-lead"
+import { executeInvisibleCaptcha } from "./invisible-captcha"
 
 export type { Template1HeroData, Template1LeadFormValues }
 
@@ -70,6 +72,9 @@ export function Template1HeroSection({
   >({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [captchaError, setCaptchaError] = useState("")
+  const captchaRef = useRef<HTMLDivElement>(null)
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
   useEffect(() => {
     if (!isSubmitted) return
@@ -117,7 +122,16 @@ export function Template1HeroSection({
     }
 
     setIsSubmitting(true)
+    setCaptchaError("")
     try {
+      let captchaToken: string | undefined
+      if (recaptchaSiteKey) {
+        if (!captchaRef.current) {
+          throw new Error("Captcha failed to load")
+        }
+        captchaToken = await executeInvisibleCaptcha(captchaRef.current, recaptchaSiteKey)
+      }
+
       if (onFormSubmit) {
         await onFormSubmit({
           fullName: formValues.fullName.trim(),
@@ -134,6 +148,7 @@ export function Template1HeroSection({
             message: formValues.message.trim(),
           },
           "website",
+          captchaToken,
         )
       }
       setIsSubmitted(true)
@@ -145,6 +160,11 @@ export function Template1HeroSection({
       })
       setErrors({})
       setTouched({})
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ""
+      setCaptchaError(
+        message.includes("enquiry") ? message : "Verification failed. Please try again.",
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -168,8 +188,8 @@ export function Template1HeroSection({
         <div className="mx-auto w-full max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
           <div className="grid grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-12 lg:items-stretch -translate-y-7 lg:gap-10 xl:gap-14 2xl:gap-16">
             {/* Left Hero Copy */}
-            <div className="lg:col-span-7 flex flex-col justify-between pt-2">
-              <div>
+            <div className="lg:col-span-7 relative flex flex-col pt-2">
+              <div className="flex flex-1 flex-col justify-center">
                 {/* Badge */}
                 <div className="mb-4 sm:mb-5">
                   <span className="text-[10.5px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#161617]/85">
@@ -178,7 +198,10 @@ export function Template1HeroSection({
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-[32px] sm:text-[42px] md:text-[48px] lg:text-[52px] xl:text-[60px] 2xl:text-[66px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617] mb-5 sm:mb-6">
+                <h1
+                  className="text-[length:calc(32px*var(--landing-title-scale))] sm:text-[length:calc(42px*var(--landing-title-scale))] md:text-[length:calc(48px*var(--landing-title-scale))] lg:text-[length:calc(52px*var(--landing-title-scale))] xl:text-[length:calc(60px*var(--landing-title-scale))] 2xl:text-[length:calc(66px*var(--landing-title-scale))] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617] mb-5 sm:mb-6"
+                  style={landingTitleStyle(66, content.headlineFontSize)}
+                >
                   {headlineLines.map((line, index) => (
                     <span key={index} className="block">
                       {line}
@@ -204,7 +227,7 @@ export function Template1HeroSection({
                 </div>
               </div>
 
-              <div className="mt-7 sm:mt-8 flex items-end justify-between gap-4">
+              <div className="mt-7 sm:mt-8 flex items-end justify-between gap-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
                 {/* Trust Line */}
                 {content.trustText && (
                   <div className="max-w-[360px] md:max-w-full xl:max-w-[400px]">
@@ -259,7 +282,10 @@ export function Template1HeroSection({
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#161617]/55 mb-1.5">
                 {content.formOverline}
               </p>
-              <h2 className="text-[20px] sm:text-[22px] md:text-[23px] font-semibold tracking-[-0.01em] text-[#161617] mb-3 sm:mb-4">
+              <h2
+                className="text-[length:calc(20px*var(--landing-title-scale))] sm:text-[length:calc(22px*var(--landing-title-scale))] md:text-[length:calc(23px*var(--landing-title-scale))] font-semibold tracking-[-0.01em] text-[#161617] mb-3 sm:mb-4"
+                style={landingTitleStyle(23, content.formTitleFontSize)}
+              >
                 {content.formTitle}
               </h2>
 
@@ -403,6 +429,12 @@ export function Template1HeroSection({
                       </p>
                     )}
                   </div>
+
+                  <div ref={captchaRef} className="h-0 w-0 overflow-visible" />
+
+                  {captchaError && (
+                    <p className="text-[11px] text-[#D92D20]">{captchaError}</p>
+                  )}
 
                   {/* Submit CTA */}
                   <button

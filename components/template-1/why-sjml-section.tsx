@@ -9,6 +9,7 @@ import {
   type Template1LeadFormValues,
   defaultTemplate1WhySjmlData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 import { Template1ConsultationModal } from "./consultation-modal"
 
 export type { Template1WhySjmlData, Template1WhySjmlPoint }
@@ -108,7 +109,10 @@ export function Template1WhySjmlSection({
                   {content.overline}
                 </p>
               )}
-              <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-5 sm:mb-6">
+              <h2
+                className="text-[length:calc(28px*var(--landing-title-scale))] sm:text-[length:calc(34px*var(--landing-title-scale))] md:text-[length:calc(38px*var(--landing-title-scale))] lg:text-[length:calc(44px*var(--landing-title-scale))] xl:text-[length:calc(50px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-5 sm:mb-6"
+                style={landingTitleStyle(50, content.headlineFontSize)}
+              >
                 {headlineLines.map((line, index) => (
                   <span key={index} className="block">
                     {line}

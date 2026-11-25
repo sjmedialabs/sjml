@@ -6,6 +6,7 @@ import {
   type Template1LeadFormValues,
   defaultTemplate1CtaData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 import { Template1ConsultationModal } from "./consultation-modal"
 
 export type { Template1CtaData }
@@ -78,7 +79,10 @@ export function Template1CtaSection({
           )}
 
           {/* Headline */}
-          <h2 className="text-[32px] sm:text-[42px] md:text-[48px] lg:text-[56px] xl:text-[64px] 2xl:text-[72px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]">
+          <h2
+            className="text-[length:calc(32px*var(--landing-title-scale))] sm:text-[length:calc(42px*var(--landing-title-scale))] md:text-[length:calc(48px*var(--landing-title-scale))] lg:text-[length:calc(56px*var(--landing-title-scale))] xl:text-[length:calc(64px*var(--landing-title-scale))] 2xl:text-[length:calc(72px*var(--landing-title-scale))] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]"
+            style={landingTitleStyle(72, content.headlineFontSize)}
+          >
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}

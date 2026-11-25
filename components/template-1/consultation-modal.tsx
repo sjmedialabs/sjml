@@ -14,6 +14,7 @@ import {
   validateLeadFormField,
 } from "./form-validation"
 import { submitTemplate1Lead } from "./submit-lead"
+import { landingTitleStyle } from "./title-size"
 
 export interface Template1ConsultationModalProps {
   isOpen: boolean
@@ -226,7 +227,8 @@ export function Template1ConsultationModal({
         </p>
         <h2
           id="template1-modal-title"
-          className="pr-8 text-[19px] sm:text-[21px] md:text-[22px] font-semibold tracking-[-0.01em] text-[#161617] mb-5 sm:mb-6"
+          className="pr-8 text-[length:calc(19px*var(--landing-title-scale))] sm:text-[length:calc(21px*var(--landing-title-scale))] md:text-[length:calc(22px*var(--landing-title-scale))] font-semibold tracking-[-0.01em] text-[#161617] mb-5 sm:mb-6"
+          style={landingTitleStyle(23, content.formTitleFontSize)}
         >
           {content.formTitle}
         </h2>

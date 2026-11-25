@@ -7,10 +7,13 @@ import { uploadImageAction } from "@/app/actions/upload"
 import { Button } from "@/components/ui/button"
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { RichTextEditor } from "./rich-text-editor"
-import type {
-  Template1PageData,
-  Template1SectionVisibility,
+import {
+  landingProjectFromWork,
+  type Template1PageData,
+  type Template1SecondaryWorkItem,
+  type Template1SectionVisibility,
 } from "@/components/template-1/default-data"
+import { normalizeWorkGridItem, type WorkGridItem } from "@/lib/work-grid-item"
 import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
 import { normalizeFooterContent } from "@/lib/footer-content"
@@ -312,6 +315,224 @@ function SimpleImageUpload({
   )
 }
 
+function WorkProjectsPicker({
+  projects,
+  onChange,
+  onAction,
+  onRequestDelete,
+}: {
+  projects: Template1SecondaryWorkItem[]
+  onChange: (projects: Template1SecondaryWorkItem[]) => void
+  onAction: (message: string) => void
+  onRequestDelete: (request: DeleteConfirmationRequest) => void
+}) {
+  const [categories, setCategories] = useState<{ label: string; value: string }[]>([])
+  const [works, setWorks] = useState<WorkGridItem[]>([])
+  const [category, setCategory] = useState("")
+  const [selectedWorkId, setSelectedWorkId] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadOptions() {
+      try {
+        const [categoryResponse, worksResponse] = await Promise.all([
+          fetch("/api/content/work-page"),
+          fetch("/api/works?all=true"),
+        ])
+
+        if (cancelled) return
+
+        if (categoryResponse.ok) {
+          const data = await categoryResponse.json()
+          const options = Array.isArray(data.filterCategories)
+            ? data.filterCategories
+                .filter(
+                  (item: { value?: string; label?: string }) =>
+                    item?.value && item.value !== "all",
+                )
+                .map((item: { value: string; label?: string }) => ({
+                  value: item.value,
+                  label: item.label || item.value,
+                }))
+            : []
+          setCategories(options)
+        }
+
+        if (worksResponse.ok) {
+          const data = await worksResponse.json()
+          const records = Array.isArray(data) ? data : []
+          setWorks(
+            records.map((work: Record<string, unknown>) => normalizeWorkGridItem(work)),
+          )
+        }
+      } catch (error) {
+        console.error("Failed to load landing page works:", error)
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+
+    void loadOptions()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const worksInCategory = category
+    ? works.filter((work) => work.categories.includes(category))
+    : []
+  const selectedKeys = new Set(
+    projects.flatMap((project) => [project.workId, project.slug, project.id].filter(Boolean)),
+  )
+
+  function addSelectedWork() {
+    const work = worksInCategory.find((item) => item.id === selectedWorkId)
+    if (!work) return
+    if (selectedKeys.has(work.id) || selectedKeys.has(work.slug)) {
+      onAction("This work is already in the list")
+      return
+    }
+    onChange([...projects, landingProjectFromWork(work)])
+    setSelectedWorkId("")
+    onAction("Project added")
+  }
+
+  const selectClassName =
+    "w-full h-10 px-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary bg-transparent"
+
+  return (
+    <div className="min-w-0 space-y-4 md:col-span-2">
+      <div className="rounded-xl border admin-border admin-card p-4 space-y-3">
+        <div>
+          <h4 className="text-sm font-semibold admin-text-primary">Add a project</h4>
+          <p className="text-xs admin-text-secondary mt-0.5">
+            Choose a category, then a work from that category. The selected work appears in this section.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+          <div>
+            <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+              Category
+            </label>
+            <select
+              className={selectClassName}
+              value={category}
+              disabled={isLoading}
+              onChange={(event) => {
+                setCategory(event.target.value)
+                setSelectedWorkId("")
+              }}
+            >
+              <option value="">{isLoading ? "Loading categories..." : "Select a category"}</option>
+              {categories.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+              Work
+            </label>
+            <select
+              className={selectClassName}
+              value={selectedWorkId}
+              disabled={!category || isLoading}
+              onChange={(event) => setSelectedWorkId(event.target.value)}
+            >
+              <option value="">
+                {!category
+                  ? "Select a category first"
+                  : worksInCategory.length === 0
+                    ? "No works in this category"
+                    : "Select a work"}
+              </option>
+              {worksInCategory.map((work) => (
+                <option key={work.id} value={work.id} disabled={selectedKeys.has(work.id) || selectedKeys.has(work.slug)}>
+                  {work.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="admin-border-light admin-text-primary hover:admin-bg-secondary bg-transparent h-10"
+            disabled={!selectedWorkId}
+            onClick={addSelectedWork}
+            type="button"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Add Project
+          </Button>
+        </div>
+      </div>
+
+      <h4 className="text-sm font-semibold admin-text-primary">
+        Projects ({projects.length})
+      </h4>
+
+      {projects.length === 0 ? (
+        <p className="text-sm admin-text-secondary">No projects selected yet.</p>
+      ) : (
+        <div className="space-y-3">
+          {projects.map((project, index) => (
+            <div
+              key={project.id || project.slug || index}
+              className="flex items-center gap-3 rounded-xl border admin-border admin-card p-3"
+            >
+              <div className="h-14 w-20 shrink-0 overflow-hidden rounded-md bg-[#F3F2EE]">
+                {project.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={project.image}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium admin-text-primary truncate">
+                  {project.title || "Untitled work"}
+                </p>
+                <p className="text-xs admin-text-secondary truncate">
+                  {project.category || "No category"}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0 shrink-0"
+                onClick={() => {
+                  const projectTitle = project.title?.trim()
+                    ? `"${project.title.trim()}"`
+                    : `Project ${index + 1}`
+                  onRequestDelete({
+                    title: "Delete Project?",
+                    description: `Are you sure you want to remove ${projectTitle} from this section?`,
+                    onConfirm: () => {
+                      onChange(projects.filter((_, projectIndex) => projectIndex !== index))
+                      onAction("Project removed")
+                    },
+                  })
+                }}
+                title="Remove project"
+                aria-label="Remove project"
+                type="button"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SectionFields({
   value,
   path,
@@ -469,11 +690,55 @@ function SectionFields({
     )
   }
 
+  if (typeof value === "number") {
+    const fieldName = path[path.length - 1] ?? ""
+    if (fieldName === "headlineFontSize" || fieldName === "formTitleFontSize") {
+      const isFormTitle = fieldName === "formTitleFontSize"
+      const min = isFormTitle ? 14 : 20
+      const max = isFormTitle ? 48 : 96
+      const step = isFormTitle ? 1 : 2
+      const sizes = []
+      for (let size = min; size <= max; size += step) sizes.push(size)
+      if (!sizes.includes(value)) sizes.push(value)
+      sizes.sort((a, b) => a - b)
+      return (
+        <div className="block min-w-0">
+          <label className="block text-sm font-medium admin-text-secondary mb-1.5">
+            {isFormTitle ? "Form title size" : "Title size"}
+          </label>
+          <select
+            className="w-full h-10 px-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary bg-transparent"
+            value={value}
+            onChange={(event) => onChange(path, Number(event.target.value))}
+          >
+            {sizes.map((size) => (
+              <option key={size} value={size}>
+                {size}px
+              </option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+  }
+
   if (Array.isArray(value)) {
     const isClientsList = path[0] === "clients" && path[path.length - 1] === "clients"
     const isFaqList = path[0] === "faq" && path[path.length - 1] === "faqs"
     const isWorkProjectsList = path[0] === "work" && path[path.length - 1] === "projects"
     const isServicesList = path[0] === "services" && path[path.length - 1] === "services"
+
+    if (isWorkProjectsList) {
+      const projects = value.filter(isRecord).map((item) => item as unknown as Template1SecondaryWorkItem)
+      return (
+        <WorkProjectsPicker
+          projects={projects}
+          onChange={(next) => onChange(path, next)}
+          onAction={onAction}
+          onRequestDelete={onRequestDelete}
+        />
+      )
+    }
     const isWhySjmlList = path[0] === "whySjml" && path[path.length - 1] === "points"
     const isProcessList = path[0] === "process" && path[path.length - 1] === "steps"
 
@@ -483,7 +748,7 @@ function SectionFields({
           <h4 className="text-sm font-semibold admin-text-primary">
             {formatLabel(path[path.length - 1] ?? "")} ({value.length})
           </h4>
-          {(isClientsList || isFaqList || isWorkProjectsList || isServicesList || isWhySjmlList || isProcessList) && (
+          {(isClientsList || isFaqList || isServicesList || isWhySjmlList || isProcessList) && (
             <Button
               variant="outline"
               size="sm"
@@ -494,22 +759,9 @@ function SectionFields({
                   ...value,
                   isClientsList
                     ? { id: `client-${crypto.randomUUID()}`, name: "", logoUrl: "" }
-                    : isFaqList
+                      : isFaqList
                       ? { id: `faq-${crypto.randomUUID()}`, question: "", answer: "" }
-                      : isWorkProjectsList
-                        ? {
-                            id: `work-${crypto.randomUUID()}`,
-                            title: "",
-                            category: "",
-                            image: "/placeholder.jpg",
-                            imageAlt: "",
-                            statusNote: "Narrative for approval",
-                            challenge: "",
-                            approach: "",
-                            narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> </p><p><strong>Approach:</strong> </p>`,
-                            href: "/work",
-                          }
-                        : isServicesList
+                      : isServicesList
                           ? {
                               id: `service-${crypto.randomUUID()}`,
                               number: String(value.length + 1).padStart(2, "0"),
@@ -536,9 +788,7 @@ function SectionFields({
                     ? "Client added"
                     : isFaqList
                       ? "FAQ added"
-                      : isWorkProjectsList
-                        ? "Project added"
-                        : isServicesList
+                      : isServicesList
                           ? "Service added"
                           : isWhySjmlList
                             ? "Point added"
@@ -552,9 +802,7 @@ function SectionFields({
                 ? "Add Client"
                 : isFaqList
                   ? "Add FAQ"
-                  : isWorkProjectsList
-                    ? "Add Project"
-                    : isServicesList
+                  : isServicesList
                       ? "Add Service"
                       : isWhySjmlList
                         ? "Add Point"
@@ -577,9 +825,7 @@ function SectionFields({
                 ? `Client ${index + 1}`
                 : isFaqList
                   ? `FAQ ${index + 1}`
-                  : isWorkProjectsList
-                    ? `Project ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title) || `Project ${index + 1}`}`
-                    : isServicesList
+                  : isServicesList
                       ? `Service ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title.replace(/\n/g, " ")) || `Service ${index + 1}`}`
                       : isWhySjmlList
                         ? `Point ${index + 1}: ${(isRecord(item) && typeof item.title === "string" && item.title) || `Point ${index + 1}`}`
@@ -699,125 +945,6 @@ function SectionFields({
                     rows={4}
                     value={typeof item.answer === "string" ? item.answer : ""}
                   />
-                </div>
-              </div>
-            ) : isWorkProjectsList && isRecord(item) ? (
-              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-                <div className="block min-w-0">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Project Title
-                  </label>
-                  <input
-                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "title"], event.target.value)
-                    }
-                    placeholder="e.g. RightData"
-                    value={typeof item.title === "string" ? item.title : ""}
-                  />
-                </div>
-
-                <div className="block min-w-0">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Category / Service Subtitle
-                  </label>
-                  <input
-                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "category"], event.target.value)
-                    }
-                    placeholder="e.g. Enterprise technology / Web & Experience"
-                    value={typeof item.category === "string" ? item.category : ""}
-                  />
-                </div>
-
-                <div className="block min-w-0">
-                  <SimpleImageUpload
-                    label="Project Image"
-                    spec={resolveImageSpec("cardWide", {
-                      recommendedWidth: 1280,
-                      recommendedHeight: 800,
-                      hint: "16:10 project card image.",
-                    })}
-                    onChange={(url) =>
-                      onChange([...path, String(index), "image"], url)
-                    }
-                    onAction={onAction}
-                    onRequestDelete={onRequestDelete}
-                    value={typeof item.image === "string" ? item.image : ""}
-                  />
-                </div>
-
-                <div className="block min-w-0">
-                  <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-                    Project Link URL
-                  </label>
-                  <input
-                    className="w-full px-4 py-3 admin-input rounded-lg focus:outline-none focus:border-primary text-sm admin-text-primary"
-                    onChange={(event) =>
-                      onChange([...path, String(index), "href"], event.target.value)
-                    }
-                    placeholder="/work"
-                    value={typeof item.href === "string" ? item.href : ""}
-                  />
-                </div>
-
-                {/* RICH TEXT EDITOR FOR NARRATIVE & CASE DETAILS */}
-                <div className="sm:col-span-2 pt-1">
-                  <RichTextEditor
-                    label="Case Narrative (Rich Text Editor)"
-                    description="Edit the Narrative for approval, Challenge, and Approach using rich text formatting (bold, italic, bullets, headers, etc.)."
-                    value={
-                      typeof item.narrativeHtml === "string" && item.narrativeHtml.trim()
-                        ? item.narrativeHtml
-                        : [
-                            typeof item.statusNote === "string" && item.statusNote
-                              ? `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">${item.statusNote}</span></p>`
-                              : "",
-                            typeof item.challenge === "string" && item.challenge
-                              ? `<p><strong>Challenge:</strong> ${item.challenge}</p>`
-                              : "",
-                            typeof item.approach === "string" && item.approach
-                              ? `<p><strong>Approach:</strong> ${item.approach}</p>`
-                              : "",
-                          ]
-                            .filter(Boolean)
-                            .join("")
-                    }
-                    onChange={(html) => {
-                      onChange([...path, String(index), "narrativeHtml"], html)
-                    }}
-                  />
-                </div>
-
-                <div className="sm:col-span-2 pt-1 flex justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-8 w-8 p-0"
-                    onClick={() => {
-                      const projectTitle =
-                        typeof item.title === "string" && item.title.trim()
-                          ? `"${item.title.trim()}"`
-                          : `Project ${index + 1}`
-                      onRequestDelete({
-                        title: "Delete Project?",
-                        description: `Are you sure you want to delete ${projectTitle}? This action cannot be undone.`,
-                        onConfirm: () => {
-                          onChange(
-                            path,
-                            value.filter((_, projectIndex) => projectIndex !== index),
-                          )
-                          onAction("Project deleted")
-                        },
-                      })
-                    }}
-                    title="Delete Project"
-                    aria-label="Delete Project"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
             ) : isServicesList && isRecord(item) ? (
@@ -1121,6 +1248,7 @@ function SectionFields({
                 path[0] === "hero" &&
                 lockedHeroFormFieldKeys.has(key)
               ) &&
+              !(path.length === 1 && path[0] === "work" && key === "featured") &&
               !(
                 path.length === 2 &&
                 path[0] === "work" &&

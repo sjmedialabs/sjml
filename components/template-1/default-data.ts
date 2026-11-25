@@ -32,11 +32,13 @@ export interface Template1HeroData {
   showScrollIndicator?: boolean
   badgeText?: string
   headline?: string
+  headlineFontSize?: number
   description?: string
   ctaText?: string
   trustText?: string
   formOverline?: string
   formTitle?: string
+  formTitleFontSize?: number
   fullNameLabel?: string
   fullNamePlaceholder?: string
   emailLabel?: string
@@ -55,12 +57,14 @@ export const defaultTemplate1HeroData: Required<Template1HeroData> = {
   showScrollIndicator: true,
   badgeText: "DIGITAL MARKETING AGENCY • HYDERABAD",
   headline: "Digital Marketing\nThat Turns Attention\nInto Business\nGrowth.",
+  headlineFontSize: 66,
   description:
     "Build a stronger digital presence, reach the right audience, and unlock new growth opportunities with creative, data-driven marketing strategies from SJ Media Labs.",
   ctaText: "Book a Consultation",
   trustText: "12+ Years of Creative & Digital Expertise",
   formOverline: "LET’S BUILD WHAT’S NEXT",
   formTitle: "Let's Talk About Your Growth.",
+  formTitleFontSize: 23,
   fullNameLabel: "Full Name",
   fullNamePlaceholder: "Enter full name",
   emailLabel: "Business Email",
@@ -84,12 +88,14 @@ export interface Template1StatItem {
 export interface Template1ExperienceData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   stats?: Template1StatItem[]
 }
 
 export const defaultTemplate1ExperienceData: Required<Template1ExperienceData> = {
   overline: "A CREATIVE PARTNER. A BUSINESS MINDSET.",
   headline: "Built on Experience.\nDriven by Results.",
+  headlineFontSize: 54,
   stats: [
     {
       id: "experience",
@@ -114,6 +120,7 @@ export interface Template1ChallengeItem {
 export interface Template1ChallengeData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   highlightText?: string
   items?: Template1ChallengeItem[]
   bottomLabel?: string
@@ -123,6 +130,7 @@ export interface Template1ChallengeData {
 export const defaultTemplate1ChallengeData: Required<Template1ChallengeData> = {
   overline: "THE CHALLENGE",
   headline: "Your Brand\nDeserves More Than\nJust Visibility.",
+  headlineFontSize: 60,
   highlightText: "Attention is the beginning.\nThe right enquiry is the opportunity.",
   items: [
     {
@@ -163,6 +171,7 @@ export interface Template1ServiceItem {
 export interface Template1ServicesData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   subtitle?: string
   services?: Template1ServiceItem[]
   ctaText?: string
@@ -171,6 +180,7 @@ export interface Template1ServicesData {
 export const defaultTemplate1ServicesData: Required<Template1ServicesData> = {
   overline: "WHAT WE DO",
   headline: "Every Channel.\nOne Clear Growth Strategy.",
+  headlineFontSize: 54,
   subtitle:
     "Connected thinking. Focused execution. Marketing built around your business.",
   services: [
@@ -241,11 +251,56 @@ export interface Template1SecondaryWorkItem {
   approach?: string
   narrativeHtml?: string
   href?: string
+  workId?: string
+  slug?: string
+  cardSubtitle?: string
+}
+
+export interface LandingWorkSource {
+  id: string
+  slug: string
+  title: string
+  image: string
+  categoryTags: string
+  cardSubtitle?: string
+}
+
+export function landingProjectFromWork(work: LandingWorkSource): Template1SecondaryWorkItem {
+  return {
+    id: work.id || work.slug,
+    workId: work.id,
+    slug: work.slug,
+    title: work.title,
+    category: work.categoryTags,
+    image: work.image || "/placeholder.jpg",
+    imageAlt: work.title,
+    href: work.slug ? `/work/${work.slug}` : "/work",
+    cardSubtitle: work.cardSubtitle?.trim() || "",
+  }
+}
+
+export function resolveLandingWorkProjects(
+  projects: Template1SecondaryWorkItem[] | undefined,
+  works: LandingWorkSource[],
+): Template1SecondaryWorkItem[] {
+  return (projects ?? []).map((project) => {
+    const match = works.find((work) => {
+      if (project.workId && (work.id === project.workId || work.slug === project.workId)) return true
+      if (project.slug && work.slug === project.slug) return true
+      return false
+    })
+    if (!match) return project
+    return {
+      ...landingProjectFromWork(match),
+      id: project.id || match.id || match.slug,
+    }
+  })
 }
 
 export interface Template1WorkData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   featured?: Template1FeaturedWork
   projects?: Template1SecondaryWorkItem[]
   ctaText?: string
@@ -255,6 +310,7 @@ export interface Template1WorkData {
 export const defaultTemplate1WorkData: Required<Template1WorkData> = {
   overline: "THE WORK",
   headline: "Creative Thinking.\nReal-World Impact.",
+  headlineFontSize: 54,
   featured: {
     badge: "01 / FEATURED PROJECT",
     title: "NCL Buildtek",
@@ -288,6 +344,9 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
       approach: "Human-led imagery and focused service communication.",
       narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> Communicate care with clarity.</p><p><strong>Approach:</strong> Human-led imagery and focused service communication.</p>`,
       href: "/work",
+      workId: "",
+      slug: "",
+      cardSubtitle: "",
     },
     {
       id: "work-rightdata",
@@ -301,6 +360,9 @@ export const defaultTemplate1WorkData: Required<Template1WorkData> = {
         "A structured digital experience with clear information hierarchy.",
       narrativeHtml: `<p><span style="color: rgba(22, 22, 23, 0.45); font-size: 11px;">Narrative for approval</span></p><p><strong>Challenge:</strong> Simplify a complex digital offering.</p><p><strong>Approach:</strong> A structured digital experience with clear information hierarchy.</p>`,
       href: "/work",
+      workId: "",
+      slug: "",
+      cardSubtitle: "",
     },
   ],
   ctaText: "Book a Consultation",
@@ -319,6 +381,7 @@ export interface Template1WhySjmlPoint {
 export interface Template1WhySjmlData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   image?: string
   imageAlt?: string
   imageCaption?: string
@@ -329,6 +392,7 @@ export interface Template1WhySjmlData {
 export const defaultTemplate1WhySjmlData: Required<Template1WhySjmlData> = {
   overline: "WHY SJML",
   headline: "Creative Minds.\nStrategic Thinking.\nOne Growth Partner.",
+  headlineFontSize: 50,
   image: "/healthcare-platform-case-study.jpg",
   imageAlt: "SJML creative and strategic work showcase",
   imageCaption: "CREATIVITY WITH A COMMERCIAL PURPOSE",
@@ -375,12 +439,14 @@ export interface Template1ProcessStep {
 export interface Template1ProcessData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   steps?: Template1ProcessStep[]
 }
 
 export const defaultTemplate1ProcessData: Required<Template1ProcessData> = {
   overline: "HOW WE WORK",
   headline: "A Clear Process.\nFrom Insight to Impact.",
+  headlineFontSize: 50,
   steps: [
     {
       id: "step-1",
@@ -425,6 +491,7 @@ export interface Template1ClientItem {
 export interface Template1ClientsData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   statValue?: string
   statLabel?: string
   clients?: Template1ClientItem[]
@@ -433,6 +500,7 @@ export interface Template1ClientsData {
 export const defaultTemplate1ClientsData: Required<Template1ClientsData> = {
   overline: "CLIENTS",
   headline: "Brands We've Worked With.",
+  headlineFontSize: 42,
   statValue: "800+",
   statLabel: "Clients",
   clients: [
@@ -505,6 +573,7 @@ export interface Template1FaqItem {
 export interface Template1FaqData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   subtitle?: string
   ctaText?: string
   faqs?: Template1FaqItem[]
@@ -513,6 +582,7 @@ export interface Template1FaqData {
 export const defaultTemplate1FaqData: Required<Template1FaqData> = {
   overline: "A LITTLE MORE CLARITY",
   headline: "Everything You\nNeed to Know.",
+  headlineFontSize: 50,
   subtitle: "Clear answers. No big promises.\nJust the right place to start.",
   ctaText: "Book a Consultation",
   faqs: [
@@ -553,6 +623,7 @@ export const defaultTemplate1FaqData: Required<Template1FaqData> = {
 export interface Template1CtaData {
   overline?: string
   headline?: string
+  headlineFontSize?: number
   subtitle?: string
   ctaText?: string
 }
@@ -560,6 +631,7 @@ export interface Template1CtaData {
 export const defaultTemplate1CtaData: Required<Template1CtaData> = {
   overline: "INSPIRE. CONNECT. PERFORM.",
   headline: "Your Next Stage\nof Growth\nStarts Here.",
+  headlineFontSize: 72,
   subtitle:
     "Let's create a smarter digital strategy that connects your brand with the right people.",
   ctaText: "Book a Consultation",

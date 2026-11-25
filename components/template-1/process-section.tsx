@@ -8,6 +8,7 @@ import {
   type Template1ProcessStep,
   defaultTemplate1ProcessData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 
 export type { Template1ProcessData, Template1ProcessStep }
 
@@ -211,7 +212,10 @@ export function Template1ProcessSection({
               {content.overline}
             </p>
           )}
-          <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] font-semibold leading-[1.14] tracking-[-0.02em] text-white">
+          <h2
+            className="text-[length:calc(28px*var(--landing-title-scale))] sm:text-[length:calc(34px*var(--landing-title-scale))] md:text-[length:calc(38px*var(--landing-title-scale))] lg:text-[length:calc(44px*var(--landing-title-scale))] xl:text-[length:calc(50px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-white"
+            style={landingTitleStyle(50, content.headlineFontSize)}
+          >
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}
