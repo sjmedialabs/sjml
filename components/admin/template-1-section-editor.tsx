@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import type { ChangeEvent } from "react"
 import { Plus, Trash2, Upload, X } from "lucide-react"
-import { uploadImageAction } from "@/app/actions/upload"
 import { Button } from "@/components/ui/button"
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { RichTextEditor } from "./rich-text-editor"
@@ -223,11 +222,25 @@ function SimpleImageUpload({
     formData.append("file", file)
 
     try {
-      const result = await uploadImageAction(formData)
-      if (!result.url) {
-        throw new Error(result.error ?? "Image upload failed.")
+      // Server actions are rejected behind the reverse proxy (Host is rewritten to
+      // localhost, so the origin check fails). The rest of the admin uploads through
+      // this route, which is not subject to that check.
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+      const result: { url?: unknown; error?: unknown } = await response
+        .json()
+        .catch(() => ({}))
+      const url = typeof result.url === "string" ? result.url : ""
+      if (!response.ok || !url) {
+        const message =
+          typeof result.error === "string" && result.error
+            ? result.error
+            : "Image upload failed."
+        throw new Error(message)
       }
-      onChange(result.url)
+      onChange(url)
       onAction("Image uploaded successfully")
     } catch (error) {
       const message = error instanceof Error ? error.message : "Image upload failed."

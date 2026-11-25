@@ -104,6 +104,9 @@ export default async function SubServiceDetailPage(props: {
         ]}
         parentTitle={categoryLabel}
         parentSlug={parentSlug}
+        parentHref={`/services/${parentSlug}`}
+        parentActive={false}
+        showOverview={navItems.length > 0}
         navItems={navItems}
         template={template}
       />

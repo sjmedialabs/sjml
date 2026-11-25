@@ -1,6 +1,6 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import { clientPromise } from "@/lib/mongodb"
 import { normalizeServiceDetailTemplate } from "@/lib/service-detail-template"
 import { ServiceDetailLayout } from "@/components/services/service-detail-layout"
@@ -67,12 +67,18 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
 
   if (!service) notFound()
 
-  if (subServices.length > 0) {
-    redirect(`/services/${slug}/${subServices[0].slug}`)
+  const title = service.title as string
+  const hasSubServices = subServices.length > 0
+  const template = normalizeServiceDetailTemplate(service, title, title.toUpperCase())
+  if (hasSubServices) {
+    template.categoryLabel = "SERVICES"
   }
 
-  const title = service.title as string
-  const template = normalizeServiceDetailTemplate(service, title, title)
+  const navItems = subServices.map((item) => ({
+    slug: item.slug,
+    name: item.name,
+    href: `/services/${slug}/${item.slug}`,
+  }))
 
   return (
     <main className="site-page min-h-screen bg-white">
@@ -83,9 +89,12 @@ export default async function ServiceDetailPage(props: { params: Promise<{ slug:
           { label: "Services", href: "/services" },
           { label: title },
         ]}
-        parentTitle={template.categoryLabel || title.toUpperCase()}
+        parentTitle={title.toUpperCase()}
         parentSlug={slug}
-        navItems={[]}
+        parentHref={`/services/${slug}`}
+        parentActive
+        showOverview={hasSubServices}
+        navItems={navItems}
         template={template}
       />
       <Footer />

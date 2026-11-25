@@ -38,6 +38,10 @@ export interface HomeHero {
   scrollIndicatorText: string
   /** Hero headline font size in px (default 42) */
   titleFontSize?: number
+  /** Over-title font size in px (default 14) */
+  overTitleFontSize?: number
+  /** Description font size in px (default 16) */
+  descriptionFontSize?: number
   /** Carousel max height in px (default 500) */
   maxHeight?: number
   /** Over-title text color (hex) */
@@ -129,7 +133,9 @@ export function createDefaultHero(): HomeHero {
     showScrollIndicator: true,
     scrollIndicatorText: "SCROLL DOWN",
     titleFontSize: 42,
-    maxHeight: 500,
+    overTitleFontSize: 14,
+    descriptionFontSize: 16,
+    maxHeight: 700,
     overTitleColor: HOME_HERO_DEFAULT_COLORS.overTitle,
     headlineColor: HOME_HERO_DEFAULT_COLORS.headline,
     highlightColor: HOME_HERO_DEFAULT_COLORS.highlight,
@@ -422,6 +428,14 @@ export function normalizeHomeContent(
       scrollIndicatorText: (heroRaw.scrollIndicatorText as string) ?? "SCROLL DOWN",
       titleFontSize:
         typeof heroRaw.titleFontSize === "number" ? heroRaw.titleFontSize : heroDefaults.titleFontSize,
+      overTitleFontSize:
+        typeof heroRaw.overTitleFontSize === "number"
+          ? heroRaw.overTitleFontSize
+          : heroDefaults.overTitleFontSize,
+      descriptionFontSize:
+        typeof heroRaw.descriptionFontSize === "number"
+          ? heroRaw.descriptionFontSize
+          : heroDefaults.descriptionFontSize,
       maxHeight: typeof heroRaw.maxHeight === "number" ? heroRaw.maxHeight : heroDefaults.maxHeight,
       overTitleColor: normalizeHexColor(heroRaw.overTitleColor, HOME_HERO_DEFAULT_COLORS.overTitle),
       headlineColor: normalizeHexColor(heroRaw.headlineColor, HOME_HERO_DEFAULT_COLORS.headline),

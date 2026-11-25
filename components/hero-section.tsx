@@ -31,13 +31,22 @@ function ScrollMouseIcon({ className }: { className?: string }) {
   )
 }
 
+function fluidFontSize(sizePx: number, minRatio = 0.55) {
+  const min = Math.max(12, Math.round(sizePx * minRatio))
+  return `clamp(${min}px, calc(${sizePx}px * (100vw / 1400px)), ${sizePx}px)`
+}
+
 function SlideContent({
   slide,
   titleFontSize,
+  overTitleFontSize,
+  descriptionFontSize,
   colors,
 }: {
   slide: HeroSlide
   titleFontSize: number
+  overTitleFontSize: number
+  descriptionFontSize: number
   colors: {
     overTitle: string
     headline: string
@@ -46,18 +55,18 @@ function SlideContent({
   }
 }) {
   return (
-    <div className="home-hero-content max-w-xl lg:max-w-2xl">
+    <div className="home-hero-content w-full max-w-xl lg:max-w-2xl text-left mr-auto">
       {slide.overTitle && (
         <p
-          className="site-subtitle text-sm uppercase tracking-[0.2em] mb-3"
-          style={{ color: colors.overTitle }}
+          className="site-subtitle tracking-wide mb-3 text-left normal-case"
+          style={{ color: colors.overTitle, fontSize: fluidFontSize(overTitleFontSize, 0.85) }}
         >
           {slide.overTitle}
         </p>
       )}
       <h1
-        className="font-bold uppercase leading-[1.1] tracking-tight mb-3 md:mb-4"
-        style={{ fontSize: `clamp(2.15rem, 5vw, ${titleFontSize}px)`, color: colors.headline }}
+        className="font-bold leading-[1.1] tracking-tight mb-3 md:mb-4 text-left normal-case"
+        style={{ fontSize: fluidFontSize(titleFontSize), color: colors.headline }}
       >
         {slide.headline && <span className="block">{slide.headline}</span>}
         {slide.headlineLine2 && <span className="block">{slide.headlineLine2}</span>}
@@ -68,23 +77,26 @@ function SlideContent({
         )}
       </h1>
       {slide.description && (
-        <p className="site-paragraph max-w-md mb-5" style={{ color: colors.description }}>
+        <p
+          className="site-paragraph max-w-md mb-5 text-left normal-case"
+          style={{ color: colors.description, fontSize: fluidFontSize(descriptionFontSize, 0.85) }}
+        >
           {slide.description}
         </p>
       )}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+      <div className="flex flex-col sm:flex-row items-start justify-start gap-3 sm:gap-6">
         <Link
           href={slide.primaryButtonUrl || "/services"}
-          className="home-hero-cta-primary inline-flex items-center gap-2 px-4 font-semibold text-sm uppercase tracking-wide transition-colors"
+          className="home-hero-cta-primary inline-flex items-center gap-2 px-4 font-semibold text-sm tracking-wide transition-colors normal-case"
         >
-          {slide.primaryButtonText || "OUR SERVICES"}
+          {slide.primaryButtonText || "Our Services"}
           <ArrowIcon />
         </Link>
         <Link
           href={slide.secondaryButtonUrl || "/work"}
-          className="home-hero-cta-secondary inline-flex items-center text-sm uppercase tracking-wide font-medium border-b-2 border-home-primary pb-0.5 text-white transition-colors hover:text-home-primary"
+          className="home-hero-cta-secondary inline-flex items-center text-sm tracking-wide font-medium border-b-2 border-home-primary pb-0.5 text-white transition-colors hover:text-home-primary normal-case"
         >
-          {slide.secondaryButtonText || "VIEW OUR WORK"}
+          {slide.secondaryButtonText || "View Our Work"}
         </Link>
       </div>
     </div>
@@ -129,7 +141,9 @@ export function HeroSection({ data }: HeroSectionProps) {
 
   const activeSlide = slides[activeIndex] ?? slides[0]
   const titleFontSize = data.titleFontSize ?? 42
-  const maxHeight = data.maxHeight ?? 500
+  const overTitleFontSize = data.overTitleFontSize ?? 14
+  const descriptionFontSize = data.descriptionFontSize ?? 16
+  const maxHeight = Math.max(data.maxHeight ?? 700, 700)
   const colors = {
     overTitle: data.overTitleColor ?? HOME_HERO_DEFAULT_COLORS.overTitle,
     headline: data.headlineColor ?? HOME_HERO_DEFAULT_COLORS.headline,
@@ -159,10 +173,10 @@ export function HeroSection({ data }: HeroSectionProps) {
             />
           ) : null}
 
-          <div className="relative z-[2] flex h-full items-center">
-            <div className="site-container flex w-full items-center gap-4 md:gap-6">
+          <div className="relative z-[2] flex w-full flex-1 items-center justify-start self-stretch">
+            <div className="site-container relative w-full">
               {slides.length > 1 && showSlideControls && (
-                <div className="flex shrink-0 flex-col gap-3">
+                <div className="home-hero-slide-controls absolute left-0 top-1/2 z-[3] flex -translate-x-[calc(100%+0.75rem)] -translate-y-1/2 flex-col gap-3">
                   {slides.map((slide, index) => (
                     <button
                       key={slide.id}
@@ -189,8 +203,14 @@ export function HeroSection({ data }: HeroSectionProps) {
                 </div>
               )}
 
-              <div className="flex min-w-0 flex-1 items-center">
-                <SlideContent slide={activeSlide} titleFontSize={titleFontSize} colors={colors} />
+              <div className="flex min-w-0 w-full items-center justify-start text-left">
+                <SlideContent
+                  slide={activeSlide}
+                  titleFontSize={titleFontSize}
+                  overTitleFontSize={overTitleFontSize}
+                  descriptionFontSize={descriptionFontSize}
+                  colors={colors}
+                />
               </div>
             </div>
           </div>
@@ -198,7 +218,7 @@ export function HeroSection({ data }: HeroSectionProps) {
           {data.showScrollIndicator && (
             <div className="home-hero-scroll-indicator absolute bottom-5 right-[max(1.25rem,calc((100vw-85vw)/2+1.25rem))] z-[3] flex flex-col items-center gap-1.5 text-white">
               <ScrollMouseIcon />
-              <span className="text-sm uppercase tracking-widest">{data.scrollIndicatorText || "SCROLL DOWN"}</span>
+              <span className="text-sm tracking-widest normal-case">{data.scrollIndicatorText || "Scroll Down"}</span>
             </div>
           )}
         </div>
