@@ -31,6 +31,61 @@ export interface WorkDetailProjectDetails {
   website: string
 }
 
+export interface WorkDetailGalleryVideo {
+  url: string
+  thumbnail: string
+  thumbnailSource: "url" | "upload"
+  title?: string
+}
+
+export type WorkDetailGalleryMediaPriority = "images" | "videos"
+
+export interface WorkDetailGalleryMediaPointer {
+  kind: "image" | "video"
+  url: string
+}
+
+export type WorkGalleryVideoSource =
+  | { kind: "file"; src: string }
+  | { kind: "embed"; src: string }
+
+export function resolveWorkGalleryVideoSource(url: string): WorkGalleryVideoSource | null {
+  const value = url.trim()
+  if (!value) return null
+
+  const isRootRelative = value.startsWith("/") && !value.startsWith("//")
+  let parsed: URL
+  try {
+    parsed = new URL(value, "https://local.invalid")
+  } catch {
+    return null
+  }
+
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null
+  if (parsed.hostname === "local.invalid" && !isRootRelative) return null
+
+  const host = parsed.hostname.toLowerCase()
+  let videoId: string | null = null
+
+  if (host === "youtu.be" || host === "www.youtu.be") {
+    videoId = parsed.pathname.split("/").filter(Boolean)[0] ?? null
+  } else if (host === "youtube.com" || host === "www.youtube.com" || host === "m.youtube.com") {
+    videoId =
+      parsed.searchParams.get("v") ??
+      parsed.pathname.match(/^\/(?:embed|shorts|live)\/([^/]+)/)?.[1] ??
+      null
+  } else if (host === "vimeo.com" || host === "www.vimeo.com" || host === "player.vimeo.com") {
+    videoId = parsed.pathname.match(/^\/(?:video\/)?(\d+)/)?.[1] ?? null
+    if (videoId) return { kind: "embed", src: `https://player.vimeo.com/video/${videoId}` }
+  }
+
+  if (videoId && /^[\w-]+$/.test(videoId)) {
+    return { kind: "embed", src: `https://www.youtube-nocookie.com/embed/${videoId}` }
+  }
+
+  return { kind: "file", src: value }
+}
+
 export interface WorkDetailMeta {
   year: string
   industry: string
@@ -68,6 +123,9 @@ export interface WorkDetailTemplate {
   pillars: WorkDetailPillar[]
   galleryLabel: string
   galleryImages: string[]
+  galleryVideos: WorkDetailGalleryVideo[]
+  galleryMediaPriority: WorkDetailGalleryMediaPriority
+  galleryLatestMedia?: WorkDetailGalleryMediaPointer
   resultsLabel: string
   resultsTitle: string
   resultsText: string
@@ -125,6 +183,8 @@ export function createDefaultWorkDetailTemplate(title = "Project Title"): WorkDe
     ],
     galleryLabel: "OUR WORK",
     galleryImages: [],
+    galleryVideos: [],
+    galleryMediaPriority: "images",
     resultsLabel: "THE RESULTS",
     resultsTitle: "Impact & Results",
     resultsText: "The new brand identity helped establish strong market presence and increased customer engagement across all touchpoints.",
@@ -181,6 +241,13 @@ export function normalizeWorkDetailTemplate(data: Record<string, unknown>, title
     : Array.isArray(data.galleryImages)
       ? (data.galleryImages as string[])
       : null
+  const rawGalleryVideos = Array.isArray(raw.galleryVideos)
+    ? raw.galleryVideos
+    : Array.isArray(data.galleryVideos)
+      ? data.galleryVideos
+      : []
+  const rawGalleryMediaPriority = raw.galleryMediaPriority ?? data.galleryMediaPriority
+  const rawLatestMedia = raw.galleryLatestMedia ?? data.galleryLatestMedia
 
   const heroImage =
     typeof raw.heroImage === "string"
@@ -218,6 +285,36 @@ export function normalizeWorkDetailTemplate(data: Record<string, unknown>, title
         ? rawGallery.filter(Boolean)
         : (((sections?.gallery as { items?: Array<{ image: string }> })?.items)?.map((i) => i.image).filter(Boolean) ??
           []),
+    galleryVideos: rawGalleryVideos.flatMap((video) => {
+      if (!video || typeof video !== "object") return []
+      const item = video as Partial<WorkDetailGalleryVideo>
+      if (typeof item.url !== "string" || !item.url.trim()) return []
+      const thumbnail = typeof item.thumbnail === "string" ? item.thumbnail : ""
+      return [{
+        url: item.url.trim(),
+        thumbnail,
+        thumbnailSource:
+          item.thumbnailSource === "url" || item.thumbnailSource === "upload"
+            ? item.thumbnailSource
+            : /^\/api\/images\/[a-f\d]{24}$/i.test(thumbnail)
+              ? "upload"
+              : "url",
+        ...(typeof item.title === "string" ? { title: item.title } : {}),
+      }]
+    }),
+    galleryMediaPriority: rawGalleryMediaPriority === "videos" ? "videos" : "images",
+    galleryLatestMedia:
+      rawLatestMedia &&
+      typeof rawLatestMedia === "object" &&
+      ((rawLatestMedia as Partial<WorkDetailGalleryMediaPointer>).kind === "image" ||
+        (rawLatestMedia as Partial<WorkDetailGalleryMediaPointer>).kind === "video") &&
+      typeof (rawLatestMedia as Partial<WorkDetailGalleryMediaPointer>).url === "string" &&
+      (rawLatestMedia as WorkDetailGalleryMediaPointer).url.trim() !== ""
+        ? {
+            kind: (rawLatestMedia as WorkDetailGalleryMediaPointer).kind,
+            url: (rawLatestMedia as WorkDetailGalleryMediaPointer).url.trim(),
+          }
+        : undefined,
     resultsLabel: raw.resultsLabel ?? defaults.resultsLabel,
     resultsTitle: raw.resultsTitle ?? defaults.resultsTitle,
     resultsText: raw.resultsText ?? defaults.resultsText,
