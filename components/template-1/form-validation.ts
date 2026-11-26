@@ -1,17 +1,21 @@
 import type { Template1LeadFormValues } from "./default-data"
+import {
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 export type Template1LeadFormErrors = Partial<
   Record<keyof Template1LeadFormValues, string>
 >
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-const PHONE_10_DIGIT_REGEX = /^\d{10}$/
-
-/**
- * Strips any non-digit characters and limits phone input to 10 digits.
- */
+/** Keeps a valid Indian mobile-number prefix, digits, and a maximum of 10 digits. */
 export function sanitizePhoneInput(raw: string): string {
-  return raw.replace(/\D/g, "").slice(0, 10)
+  return sanitizeIndianMobile(raw)
 }
 
 /**
@@ -58,7 +62,9 @@ export function validateLeadFormField(
   switch (field) {
     case "fullName": {
       if (!trimmed) return "Full name is required."
-      if (trimmed.length < 2) return "Please enter at least 2 characters."
+      if (!isValidEnquiryName(trimmed)) {
+        return "Use letters and spaces only."
+      }
       return undefined
     }
     case "businessEmail": {
@@ -70,18 +76,28 @@ export function validateLeadFormField(
     }
     case "phoneNumber": {
       if (!trimmed) return "Phone number is required."
-      if (!PHONE_10_DIGIT_REGEX.test(trimmed)) {
-        return "Please enter a valid 10-digit phone number."
+      if (!isValidIndianMobile(trimmed)) {
+        return "Enter a 10-digit mobile number starting with 6, 7, 8, or 9."
       }
       return undefined
     }
     case "message": {
-      // Optional field
+      if (!hasValidEnquiryWordCount(value)) return "Message must be 500 words or fewer."
       return undefined
     }
     default:
       return undefined
   }
+}
+
+export function sanitizeLeadFormValue(
+  field: keyof Template1LeadFormValues,
+  value: string,
+): string {
+  if (field === "fullName") return sanitizeEnquiryName(value)
+  if (field === "phoneNumber") return sanitizePhoneInput(value)
+  if (field === "message") return limitEnquiryWords(value)
+  return value
 }
 
 export function validateLeadForm(

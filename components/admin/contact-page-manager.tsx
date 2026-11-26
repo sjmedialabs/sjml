@@ -71,12 +71,12 @@ export function ContactPageManager() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-start">
+      <div className="mb-6 flex justify-between items-start" data-admin-sticky-header>
         <div>
           <h1 className="text-2xl font-bold admin-text-primary mb-1">Contact Page</h1>
           <p className="admin-text-secondary text-sm">Hero, contact info, form, map and bottom CTA</p>
         </div>
-        <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Page"}</Button>
+        <Button onClick={save} disabled={saving} data-admin-sticky-save>{saving ? "Saving..." : "Save Page"}</Button>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />

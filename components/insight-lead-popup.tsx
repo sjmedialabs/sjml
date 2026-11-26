@@ -4,10 +4,15 @@ import { useState, type FormEvent } from "react"
 import { X } from "@/components/flat-lucide"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  isValidEnquiryName,
+  isValidIndianMobile,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 function validatePhone(phone: string): boolean {
-  const digits = phone.replace(/\D/g, "")
-  return digits.length >= 10
+  return isValidIndianMobile(phone)
 }
 
 interface InsightLeadPopupProps {
@@ -34,8 +39,12 @@ export function InsightLeadPopup({ isOpen, onClose, insightSlug, onSuccess }: In
       setError("Email is required.")
       return
     }
+    if (name.trim() && !isValidEnquiryName(name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
     if (phone && !validatePhone(phone)) {
-      setError("Please enter a valid phone number (at least 10 digits).")
+      setError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
       return
     }
     setSubmitting(true)
@@ -82,9 +91,19 @@ export function InsightLeadPopup({ isOpen, onClose, insightSlug, onSuccess }: In
           <h2 className="text-xl font-bold text-black mt-2">Enter your details to continue</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input placeholder="Name *" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
+          <Input placeholder="Name *" value={name} onChange={(e) => setName(sanitizeEnquiryName(e.target.value))} className={inputClass} required />
           <Input type="email" placeholder="Email *" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
-          <Input placeholder="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} required />
+          <Input
+            type="tel"
+            inputMode="numeric"
+            maxLength={10}
+            pattern="[6-9][0-9]{9}"
+            placeholder="10-digit mobile number"
+            value={phone}
+            onChange={(e) => setPhone(sanitizeIndianMobile(e.target.value))}
+            className={inputClass}
+            required
+          />
           <Input placeholder="Company (optional)" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
           {error && <p className="text-sm admin-alert-error px-3 py-2 rounded-lg">{error}</p>}
           <Button

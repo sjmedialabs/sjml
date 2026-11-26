@@ -1,6 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import {
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 // ── Shared class names (matching existing site styling) ──────────────────
 const inputCls =
@@ -127,6 +135,18 @@ const initial = {
 
 type FormData = typeof initial
 
+const LONG_TEXT_FIELDS: Array<keyof FormData> = [
+  "usp",
+  "signatureMenuItems",
+  "specificKPITargets",
+  "targetDemographics",
+  "customerInterests",
+  "socialMediaLinks",
+  "mainCompetitors",
+  "competitorStrengths",
+  "specialRequests",
+]
+
 // ── Main component ──────────────────────────────────────────────────────
 export function RestaurantMarketingForm() {
   const [fd, setFd] = useState<FormData>(initial)
@@ -140,7 +160,10 @@ export function RestaurantMarketingForm() {
 
   // helpers
   const set = (field: keyof FormData, value: string) =>
-    setFd((p) => ({ ...p, [field]: value }))
+    setFd((p) => ({
+      ...p,
+      [field]: LONG_TEXT_FIELDS.includes(field) ? limitEnquiryWords(value) : value,
+    }))
 
   const toggle = (field: keyof FormData, value: string) =>
     setFd((p) => {
@@ -153,11 +176,13 @@ export function RestaurantMarketingForm() {
     const e: typeof errors = {}
     if (!fd.restaurantName.trim()) e.restaurantName = "Restaurant name is required"
     if (!fd.contactPerson.trim()) e.contactPerson = "Contact person is required"
+    else if (!isValidEnquiryName(fd.contactPerson)) e.contactPerson = "Use letters and spaces only"
     if (!fd.email.trim()) e.email = "Email is required"
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email.trim())) e.email = "Enter a valid email address"
-    if (!fd.phone.trim()) { e.phone = "Phone number is required" } else if (fd.phone.trim()) {
-      const digits = fd.phone.replace(/\D/g, "")
-      if (digits.length < 10) e.phone = "Phone must have at least 10 digits"
+    if (!fd.phone.trim()) e.phone = "Phone number is required"
+    else if (!isValidIndianMobile(fd.phone)) e.phone = "Enter a 10-digit mobile number starting with 6, 7, 8, or 9"
+    for (const field of LONG_TEXT_FIELDS) {
+      if (!hasValidEnquiryWordCount(fd[field] as string)) e[field] = "Maximum 500 words"
     }
     setErrors(e)
     return Object.keys(e).length === 0
@@ -212,6 +237,7 @@ export function RestaurantMarketingForm() {
   // ── Form ────────────────────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} noValidate>
+      <p className={hintCls}>Each description field is limited to 500 words.</p>
       {/* Honeypot — hidden from humans */}
       <div className="absolute opacity-0 pointer-events-none h-0 overflow-hidden" aria-hidden="true" tabIndex={-1}>
         <label>
@@ -237,7 +263,7 @@ export function RestaurantMarketingForm() {
           </div>
           <div>
             <label className={labelCls} htmlFor="contactPerson">Contact Person *</label>
-            <input id="contactPerson" type="text" className={inputCls} placeholder="Full Name" required value={fd.contactPerson} onChange={(e) => set("contactPerson", e.target.value)} />
+            <input id="contactPerson" type="text" className={inputCls} placeholder="Full Name" required value={fd.contactPerson} onChange={(e) => set("contactPerson", sanitizeEnquiryName(e.target.value))} />
             <FieldError msg={errors.contactPerson} />
           </div>
         </div>
@@ -249,7 +275,7 @@ export function RestaurantMarketingForm() {
           </div>
           <div>
             <label className={labelCls} htmlFor="phone">Phone Number *</label>
-            <input id="phone" type="tel" className={inputCls} placeholder="+1 (555) 000-0000" value={fd.phone} onChange={(e) => set("phone", e.target.value)} />
+            <input id="phone" type="tel" inputMode="numeric" maxLength={10} pattern="[6-9][0-9]{9}" required className={inputCls} placeholder="10-digit mobile number" value={fd.phone} onChange={(e) => set("phone", sanitizeIndianMobile(e.target.value))} />
             <FieldError msg={errors.phone} />
           </div>
         </div>

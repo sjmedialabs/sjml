@@ -68,12 +68,12 @@ export function InsightsPageContentManager() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-start">
+      <div className="mb-6 flex justify-between items-start" data-admin-sticky-header>
         <div>
           <h2 className="text-xl font-bold admin-text-primary mb-1">Insights Page Content</h2>
           <p className="admin-text-secondary text-sm">Hero, filters, load more and sidebar on /insights</p>
         </div>
-        <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Page"}</Button>
+        <Button onClick={save} disabled={saving} data-admin-sticky-save>{saving ? "Saving..." : "Save Page"}</Button>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />

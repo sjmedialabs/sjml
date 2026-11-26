@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { normalizeHeaderContent } from "@/lib/header-content"
@@ -115,7 +116,7 @@ export function HeaderManager() {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Header / Navigation</h1>
         <p className="admin-text-secondary">Manage your site header and navigation menu</p>
       </div>
@@ -228,9 +229,16 @@ export function HeaderManager() {
                 placeholder="URL"
                 className="flex-1 px-3 py-2 admin-card border admin-border-light rounded admin-text-primary text-sm"
               />
-              <button onClick={() => removeNavItem(item.id)} className="text-red-500 hover:text-red-400 text-sm px-2">
-                Remove
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="text-red-500 hover:text-red-400 text-sm px-2">
+                    Remove
+                  </button>
+                }
+                title="Remove this navigation item?"
+                description="This navigation item will be removed from the header."
+                onConfirm={() => removeNavItem(item.id)}
+              />
             </div>
           ))}
         </div>
@@ -267,6 +275,7 @@ export function HeaderManager() {
       <button
         onClick={saveData}
         disabled={saving}
+        data-admin-sticky-save
         className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
       >
         {saving ? "Saving..." : "Save Header Settings"}

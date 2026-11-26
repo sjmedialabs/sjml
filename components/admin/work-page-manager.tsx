@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -11,9 +12,12 @@ import { WorkDetailTemplateEditor, WorkCtaEditor } from "./work-detail-template-
 import { WorkPageContentManager } from "./work-page-content-manager"
 import {
   createDefaultWorkDetailTemplate,
+  findWorkGalleryVideoMissingThumbnail,
   normalizeWorkDetailTemplate,
   type WorkDetailTemplate,
 } from "@/lib/work-detail-template"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import { scrollToAdminRequiredField } from "@/lib/admin-required-fields"
 
 interface WorkItem {
   id: string
@@ -72,6 +76,8 @@ export function WorkPageManager() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState("")
+  const [showThumbnailValidation, setShowThumbnailValidation] = useState(false)
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
   const [slugError, setSlugError] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [view, setView] = useState<"list" | "edit" | "pageContent">("list")
@@ -171,6 +177,37 @@ export function WorkPageManager() {
 
   const saveWork = async () => {
     if (!editingWork) return
+    const missingBasicField = !editingWork.title.trim() ? "work-title" : !editingWork.slug.trim() ? "work-slug" : null
+    if (missingBasicField) {
+      setRequiredFieldError(missingBasicField)
+      setEditTab("basic")
+      requestAnimationFrame(() => {
+        const field = document.getElementById(missingBasicField)
+        if (field instanceof HTMLInputElement) scrollToAdminRequiredField(field)
+      })
+      return
+    }
+    setRequiredFieldError(null)
+
+    const missingThumbnailIndex = findWorkGalleryVideoMissingThumbnail(editingWork.detailTemplate)
+    if (missingThumbnailIndex !== null) {
+      setShowThumbnailValidation(true)
+      setEditTab("detailTemplate")
+      requestAnimationFrame(() => {
+        const thumbnailField = document.getElementById(`gallery-video-thumbnail-url-${missingThumbnailIndex}`)
+        if (thumbnailField instanceof HTMLInputElement) {
+          thumbnailField.scrollIntoView({ behavior: "smooth", block: "center" })
+          thumbnailField.focus({ preventScroll: true })
+        } else {
+          document
+            .getElementById(`gallery-video-thumbnail-validation-${missingThumbnailIndex}`)
+            ?.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      })
+      return
+    }
+
+    setShowThumbnailValidation(false)
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
@@ -246,7 +283,6 @@ export function WorkPageManager() {
   }
 
   const deleteWork = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this work?")) return
     try {
       const token = localStorage.getItem("adminToken")
       const res = await fetch(`/api/works/${id}`, {
@@ -266,6 +302,8 @@ export function WorkPageManager() {
   const addNewWork = () => {
     setEditingWork({ ...emptyWork, id: "" } as WorkItem)
     setIsNew(true)
+    setShowThumbnailValidation(false)
+    setRequiredFieldError(null)
     setSlugError(false)
     setEditTab("basic")
     setView("edit")
@@ -274,6 +312,8 @@ export function WorkPageManager() {
   const editWork = (work: WorkItem) => {
     setEditingWork(normalizeWorkItem(work as WorkItem & Record<string, unknown>))
     setIsNew(false)
+    setShowThumbnailValidation(false)
+    setRequiredFieldError(null)
     setSlugError(false)
     setEditTab("basic")
     setView("edit")
@@ -281,6 +321,9 @@ export function WorkPageManager() {
 
   const updateField = (field: string, value: any) => {
     if (field === "slug") setSlugError(false)
+    if (requiredFieldError === `work-${field}` && typeof value === "string" && value.trim()) {
+      setRequiredFieldError(null)
+    }
     setEditingWork((prev) => (prev ? { ...prev, [field]: value } : null))
   }
 
@@ -308,7 +351,7 @@ export function WorkPageManager() {
   if (view === "list") {
     return (
       <div>
-        <div className="mb-8 flex justify-between items-start">
+        <div className="mb-8 flex justify-between items-start" data-admin-sticky-header>
           <div>
             <h1 className="text-2xl font-bold admin-text-primary mb-2">Portfolio / Works Management</h1>
             <p className="admin-text-secondary">Create and manage your portfolio projects. Each work has its own detail page.</p>
@@ -404,14 +447,16 @@ export function WorkPageManager() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteWork(work.id)}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <ConfirmDeleteDialog
+                          trigger={
+                            <Button type="button" variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          }
+                          title="Delete this work?"
+                          description="This work will be permanently deleted."
+                          onConfirm={() => deleteWork(work.id)}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -459,8 +504,8 @@ export function WorkPageManager() {
 
   // Edit View
   return (
-    <div>
-      <div className="mb-8 flex items-center gap-4">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-8 flex items-center gap-4" data-admin-sticky-header>
         <Button
           variant="ghost"
           onClick={() => {
@@ -481,9 +526,9 @@ export function WorkPageManager() {
       <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingWork && (
-        <div className="space-y-6">
+        <div className="admin-cms-tab-layout space-y-6">
           {/* Tab Navigation Bar */}
-          <div className="flex border-b admin-border gap-2 pb-px">
+          <div className="flex border-b admin-border gap-2 pb-px" data-admin-sticky-nav>
             <button
               type="button"
               onClick={() => setEditTab("basic")}
@@ -530,6 +575,7 @@ export function WorkPageManager() {
             </button>
           </div>
 
+          <div data-admin-scroll-content>
           {/* TAB 1: Basic Info */}
           {editTab === "basic" && (
             <div className="admin-card border admin-border rounded-xl p-6">
@@ -538,17 +584,22 @@ export function WorkPageManager() {
                 <div>
                   <label className="block text-sm admin-text-secondary mb-2">Title *</label>
                   <Input
+                    id="work-title"
+                    required
                     value={editingWork.title}
                     onChange={(e) => updateField("title", e.target.value)}
                     className="admin-bg-tertiary admin-border-light admin-text-primary"
                     placeholder="Project title"
                   />
+                  <AdminRequiredFieldMessage show={requiredFieldError === "work-title"} />
                 </div>
                 <div>
                   <label className={`block text-sm font-semibold mb-2 ${slugError ? "text-red-400" : "admin-text-secondary"}`}>
                     Slug * {slugError && <span className="text-xs text-red-400 font-normal">(Already taken)</span>}
                   </label>
                   <Input
+                    id="work-slug"
+                    required
                     value={editingWork.slug}
                     onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
                     className={`transition-all ${
@@ -558,6 +609,7 @@ export function WorkPageManager() {
                     }`}
                     placeholder="project-slug"
                   />
+                  <AdminRequiredFieldMessage show={requiredFieldError === "work-slug"} />
                   {slugError && (
                     <p className="text-xs text-red-400 font-medium mt-1.5 flex items-center gap-1">
                       ⚠️ This slug is already taken. Please change the slug.
@@ -736,6 +788,7 @@ export function WorkPageManager() {
             <WorkDetailTemplateEditor
               template={editingWork.detailTemplate}
               onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
+              showThumbnailValidation={showThumbnailValidation}
             />
           )}
 
@@ -746,12 +799,14 @@ export function WorkPageManager() {
               onChange={(detailTemplate) => updateField("detailTemplate", detailTemplate)}
             />
           )}
+          </div>
 
           {/* Save Button */}
           <div className="flex gap-4 pt-4 border-t admin-border">
             <Button
               onClick={saveWork}
-              disabled={saving || !editingWork.title || !editingWork.slug}
+              disabled={saving}
+              data-admin-sticky-save
             >
               {saving ? "Saving..." : isNew ? "Create Work" : "Save Changes"}
             </Button>

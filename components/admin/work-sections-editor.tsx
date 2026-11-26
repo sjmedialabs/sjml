@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImageUpload } from "./image-upload"
 import { SectionEnableToggle } from "./section-enable-toggle"
 import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import {
   type WorkDetailSections,
   type WorkInfoCard,
@@ -143,9 +144,16 @@ export function WorkSectionsEditor({ sections, onChange }: WorkSectionsEditorPro
                   <Button variant="ghost" size="sm" disabled={index === sections.snapshot.infoCards.length - 1} onClick={() => updateInfoCards(moveItem(sections.snapshot.infoCards, index, 1))}>
                     <ChevronDown className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => updateInfoCards(sections.snapshot.infoCards.filter((_, i) => i !== index))} className="text-red-400">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    }
+                    title="Remove this information card?"
+                    description="This card will be removed from the work detail page."
+                    onConfirm={() => updateInfoCards(sections.snapshot.infoCards.filter((_, i) => i !== index))}
+                  />
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -175,7 +183,12 @@ export function WorkSectionsEditor({ sections, onChange }: WorkSectionsEditorPro
           <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-3">
             <div className="flex justify-between">
               <span className="text-sm admin-text-secondary">Deliverable {index + 1}</span>
-              <Button variant="ghost" size="sm" onClick={() => updateDeliverables(sections.delivered.deliverables.filter((_, i) => i !== index))} className="text-red-400"><Trash2 className="w-4 h-4" /></Button>
+              <ConfirmDeleteDialog
+                trigger={<Button type="button" variant="ghost" size="sm" className="text-red-400"><Trash2 className="w-4 h-4" /></Button>}
+                title="Remove this deliverable?"
+                description="This deliverable will be removed from the work detail page."
+                onConfirm={() => updateDeliverables(sections.delivered.deliverables.filter((_, i) => i !== index))}
+              />
             </div>
             <label className="flex items-center gap-2 text-sm admin-text-primary"><input type="checkbox" checked={item.enabled} onChange={(e) => { const n = [...sections.delivered.deliverables]; n[index] = { ...item, enabled: e.target.checked }; updateDeliverables(n) }} /> Enabled</label>
             <ImageUpload label="Icon" value={item.icon} onChange={(url) => { const n = [...sections.delivered.deliverables]; n[index] = { ...item, icon: url }; updateDeliverables(n) }} />
@@ -198,7 +211,12 @@ export function WorkSectionsEditor({ sections, onChange }: WorkSectionsEditorPro
           <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-3">
             <div className="flex justify-between">
               <span className="text-sm admin-text-secondary">Image {index + 1}</span>
-              <Button variant="ghost" size="sm" onClick={() => updateGallery(sections.gallery.items.filter((_, i) => i !== index))} className="text-red-400"><Trash2 className="w-4 h-4" /></Button>
+              <ConfirmDeleteDialog
+                trigger={<Button type="button" variant="ghost" size="sm" className="text-red-400"><Trash2 className="w-4 h-4" /></Button>}
+                title="Remove this gallery image?"
+                description="This image will be removed from the work gallery."
+                onConfirm={() => updateGallery(sections.gallery.items.filter((_, i) => i !== index))}
+              />
             </div>
             <ImageUpload label="Image" value={item.image} onChange={(url) => { const n = [...sections.gallery.items]; n[index] = { ...item, image: url }; updateGallery(n) }} />
             <Input placeholder="Title (optional)" value={item.title ?? ""} onChange={(e) => { const n = [...sections.gallery.items]; n[index] = { ...item, title: e.target.value }; updateGallery(n) }} className="admin-bg-tertiary admin-border-light admin-text-primary" />
@@ -220,7 +238,12 @@ export function WorkSectionsEditor({ sections, onChange }: WorkSectionsEditorPro
           <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-3">
             <div className="flex justify-between">
               <span className="text-sm admin-text-secondary">Step {index + 1}</span>
-              <Button variant="ghost" size="sm" onClick={() => updateSteps(sections.process.steps.filter((_, i) => i !== index))} className="text-red-400"><Trash2 className="w-4 h-4" /></Button>
+              <ConfirmDeleteDialog
+                trigger={<Button type="button" variant="ghost" size="sm" className="text-red-400"><Trash2 className="w-4 h-4" /></Button>}
+                title="Remove this process step?"
+                description="This step will be removed from the work detail page."
+                onConfirm={() => updateSteps(sections.process.steps.filter((_, i) => i !== index))}
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Step number (01)" value={step.stepNumber} onChange={(e) => { const n = [...sections.process.steps]; n[index] = { ...step, stepNumber: e.target.value }; updateSteps(n) }} className="admin-bg-tertiary admin-border-light admin-text-primary" />
@@ -244,7 +267,12 @@ export function WorkSectionsEditor({ sections, onChange }: WorkSectionsEditorPro
           <div key={index} className="p-4 admin-bg-tertiary rounded-lg space-y-3 mb-3">
             <div className="flex justify-between">
               <span className="text-sm admin-text-secondary">Metric {index + 1}</span>
-              <Button variant="ghost" size="sm" onClick={() => updateMetrics(sections.results.metrics.filter((_, i) => i !== index))} className="text-red-400"><Trash2 className="w-4 h-4" /></Button>
+              <ConfirmDeleteDialog
+                trigger={<Button type="button" variant="ghost" size="sm" className="text-red-400"><Trash2 className="w-4 h-4" /></Button>}
+                title="Remove this result metric?"
+                description="This metric will be removed from the work detail page."
+                onConfirm={() => updateMetrics(sections.results.metrics.filter((_, i) => i !== index))}
+              />
             </div>
             <label className="flex items-center gap-2 text-sm admin-text-primary"><input type="checkbox" checked={metric.enabled} onChange={(e) => { const n = [...sections.results.metrics]; n[index] = { ...metric, enabled: e.target.checked }; updateMetrics(n) }} /> Enabled</label>
             <ImageUpload label="Icon" value={metric.icon} onChange={(url) => { const n = [...sections.results.metrics]; n[index] = { ...metric, icon: url }; updateMetrics(n) }} />

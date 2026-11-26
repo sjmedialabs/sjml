@@ -3,6 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import type { ContactFormBlock, ContactPageTypography } from "@/lib/contact-page-content"
+import {
+  countWords,
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 function ArrowIcon() {
   return (
@@ -32,11 +41,25 @@ export function ContactPageForm({
   const [submitted, setSubmitted] = useState(false)
   const [emailError, setEmailError] = useState("")
   const [privacyError, setPrivacyError] = useState("")
+  const [fieldError, setFieldError] = useState("")
 
   const emailIsValid = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isValidEnquiryName(formData.name)) {
+      setFieldError("Enter a name using letters and spaces only.")
+      return
+    }
+    if (!isValidIndianMobile(formData.phone)) {
+      setFieldError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
+      return
+    }
+    if (!hasValidEnquiryWordCount(formData.message)) {
+      setFieldError("Message must be 500 words or fewer.")
+      return
+    }
+    setFieldError("")
     const emailValue = (e.currentTarget as HTMLFormElement).querySelector<HTMLInputElement>("#contact-email")?.value ?? formData.email
     if (!emailIsValid(emailValue)) {
       setEmailError("Enter a valid email address, such as name@company.com.")
@@ -101,7 +124,9 @@ export function ContactPageForm({
               required
               aria-label="Name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, name: sanitizeEnquiryName(e.target.value) })}
+              pattern="[\p{L}\s]+"
+              title="Use letters and spaces only"
               placeholder={data.namePlaceholder}
               className="contact-form-input"
               style={{ fontSize: `${typography.formLabelFontSize}px` }}
@@ -148,9 +173,12 @@ export function ContactPageForm({
               id="contact-phone"
               type="tel"
               required
+              inputMode="numeric"
+              maxLength={10}
+              pattern="[6-9][0-9]{9}"
               aria-label="Phone"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, phone: sanitizeIndianMobile(e.target.value) })}
               placeholder={data.phonePlaceholder}
               className="contact-form-input"
               style={{ fontSize: `${typography.formLabelFontSize}px` }}
@@ -196,12 +224,14 @@ export function ContactPageForm({
             rows={5}
             aria-label="Message"
             value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, message: limitEnquiryWords(e.target.value) })}
             placeholder={data.messagePlaceholder}
             className="contact-form-textarea"
             style={{ fontSize: `${typography.formLabelFontSize}px` }}
           />
+          <p className="text-xs text-muted-foreground text-right">{countWords(formData.message)}/500 words</p>
         </div>
+        {fieldError && <p role="alert" className="text-sm text-red-600">{fieldError}</p>}
         <label className="contact-form-privacy">
           <input
             type="checkbox"

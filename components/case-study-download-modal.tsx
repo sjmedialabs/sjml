@@ -4,10 +4,15 @@ import { useState, type FormEvent } from "react"
 import { X, Download, FileText } from "@/components/flat-lucide"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  isValidEnquiryName,
+  isValidIndianMobile,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 function validatePhone(phone: string): boolean {
-  const digits = phone.replace(/\D/g, "")
-  return digits.length >= 10
+  return isValidIndianMobile(phone)
 }
 
 interface CaseStudyDownloadModalProps {
@@ -41,12 +46,16 @@ export function CaseStudyDownloadModal({
       setError("Name is required.")
       return
     }
+    if (!isValidEnquiryName(name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
     if (!email.trim()) {
       setError("Email is required.")
       return
     }
     if (!phone.trim() || !validatePhone(phone)) {
-      setError("Please enter a valid phone number (at least 10 digits).")
+      setError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
       return
     }
     if (!industry.trim()) {
@@ -120,7 +129,7 @@ export function CaseStudyDownloadModal({
                 <Input
                   placeholder="Enter your name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(sanitizeEnquiryName(e.target.value))}
                   className={inputClass}
                   required
                 />
@@ -142,9 +151,12 @@ export function CaseStudyDownloadModal({
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Phone Number *</label>
                 <Input
                   type="tel"
-                  placeholder="e.g. +91 9876543210"
+                  inputMode="numeric"
+                  maxLength={10}
+                  pattern="[6-9][0-9]{9}"
+                  placeholder="10-digit mobile number"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizeIndianMobile(e.target.value))}
                   className={inputClass}
                   required
                 />

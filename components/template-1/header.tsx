@@ -177,7 +177,7 @@ export function Template1Header({
       <header
         className={`sticky top-0 z-50 w-full bg-white border-b border-black/10 text-[#161617] ${className}`}
       >
-        <div className="mx-auto flex h-16 sm:h-18 md:h-20 max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+        <div className="mx-auto flex h-16 max-w-[1200px] xl:max-w-[1320px] 2xl:max-w-[1440px] items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
           {/* Brand Logo - fetched from website's header */}
           <Link
             href={content.logoHref}
@@ -190,7 +190,7 @@ export function Template1Header({
                 alt={rawLogoText || "SJ Media Labs"}
                 width={180}
                 height={56}
-                className="site-header-logo-img !h-7 sm:!h-9 md:!h-10 lg:!h-12 !w-auto !max-w-[130px] sm:!max-w-[180px] md:!max-w-none object-contain"
+                className="site-header-logo-img !h-8  !w-auto !max-w-[130px] sm:!max-w-[180px] md:!max-w-none object-contain"
                 priority
                 unoptimized={resolvedLogoUrl.startsWith("data:") || resolvedLogoUrl.endsWith(".svg") || resolvedLogoUrl.startsWith("http")}
               />

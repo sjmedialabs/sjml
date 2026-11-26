@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { ImageUpload } from "./image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Trash2 } from "lucide-react"
@@ -15,38 +16,26 @@ import {
   TypographyPillRow,
 } from "./admin-compact-fields"
 import {
+  isValidWorkGalleryThumbnailUrl,
   resolveWorkGalleryVideoSource,
   WORK_METRIC_ICON_PRESETS,
   WORK_PILLAR_ICON_PRESETS,
   type WorkDetailTemplate,
 } from "@/lib/work-detail-template"
 
-function isImageThumbnailUrl(value: string): boolean {
-  const url = value.trim()
-  if (!url) return true
-
-  try {
-    const parsed = new URL(url, "https://local.invalid")
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false
-    if (parsed.hostname === "local.invalid" && !url.startsWith("/")) return false
-    if (parsed.hostname === "local.invalid" && /^\/api\/images\/[a-f\d]{24}$/i.test(parsed.pathname)) return true
-    return /\.(?:jpe?g|png|gif|webp|avif|bmp|svg|ico)$/i.test(parsed.pathname)
-  } catch {
-    return false
-  }
-}
-
 function ThumbnailUrlField({
   id,
   value,
   onChange,
+  showValidationError,
 }: {
   id: string
   value: string
   onChange: (value: string) => void
+  showValidationError: boolean
 }) {
   const [draft, setDraft] = useState(value)
-  const valid = isImageThumbnailUrl(draft)
+  const valid = isValidWorkGalleryThumbnailUrl(draft)
 
   useEffect(() => {
     setDraft(value)
@@ -55,25 +44,28 @@ function ThumbnailUrlField({
   return (
     <div>
       <label htmlFor={id} className="admin-compact-label">
-        Thumbnail URL (optional)
+        Thumbnail URL *
       </label>
       <Input
         id={id}
         type="url"
+        required
         value={draft}
         onChange={(event) => {
           const nextValue = event.target.value
           setDraft(nextValue)
-          if (isImageThumbnailUrl(nextValue)) onChange(nextValue)
+          onChange(nextValue)
         }}
-        placeholder="https://example.com/video-thumbnail.jpg"
-        aria-invalid={!valid}
+        placeholder="Enter link"
+        aria-invalid={showValidationError && !valid}
         className="admin-compact-input h-8 text-xs px-2.5"
       />
-      {valid ? (
-        <p className="text-xs admin-text-muted mt-1">Use an image URL (JPG, PNG, WebP, or another image format).</p>
-      ) : (
-        <p className="text-xs text-red-500 mt-1">Thumbnail URL must point to an image file.</p>
+      {showValidationError && !valid && (
+        <p className="text-xs text-red-500 mt-1" role="alert">
+          {draft.trim()
+            ? "Enter a valid image URL or upload a thumbnail image."
+            : "This field is required."}
+        </p>
       )}
     </div>
   )
@@ -82,9 +74,11 @@ function ThumbnailUrlField({
 export function WorkDetailTemplateEditor({
   template,
   onChange,
+  showThumbnailValidation,
 }: {
   template: WorkDetailTemplate
   onChange: (template: WorkDetailTemplate) => void
+  showThumbnailValidation: boolean
 }) {
   const setTypo = (patch: Partial<WorkDetailTemplate["typography"]>) =>
     onChange({ ...template, typography: { ...template.typography, ...patch } })
@@ -243,19 +237,25 @@ export function WorkDetailTemplateEditor({
                 >
                   <img src={img} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={() =>
+                    <ConfirmDeleteDialog
+                      trigger={
+                        <button
+                          type="button"
+                          className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-transform hover:scale-110 shadow cursor-pointer"
+                          title="Delete Image"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      }
+                      title="Remove this gallery image?"
+                      description="This image will be removed from the work detail page."
+                      onConfirm={() =>
                         onChange({
                           ...template,
                           galleryImages: template.galleryImages.filter((_, i) => i !== index),
                         })
                       }
-                      className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-transform hover:scale-110 shadow cursor-pointer"
-                      title="Delete Image"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                    />
                   </div>
                 </div>
               ))}
@@ -267,21 +267,21 @@ export function WorkDetailTemplateEditor({
           <div key={`video-${index}`} className="mt-4 rounded-lg border admin-border-light p-3 space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold admin-text-secondary">Gallery video {index + 1}</p>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() =>
+              <ConfirmDeleteDialog
+                trigger={
+                  <Button type="button" variant="ghost" size="sm" className="text-red-400" aria-label={`Remove gallery video ${index + 1}`}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                }
+                title="Remove this gallery video?"
+                description="This video will be removed from the work detail page."
+                onConfirm={() =>
                   onChange({
                     ...template,
                     galleryVideos: template.galleryVideos.filter((_, i) => i !== index),
                   })
                 }
-                className="text-red-400"
-                aria-label={`Remove gallery video ${index + 1}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              />
             </div>
             <CompactField
               label="Video URL (direct MP4/WebM or YouTube/Vimeo link)"
@@ -295,7 +295,7 @@ export function WorkDetailTemplateEditor({
                   ...(url.trim() ? { galleryLatestMedia: { kind: "video" as const, url } } : {}),
                 })
               }}
-              placeholder="https://example.com/video.mp4"
+              placeholder="Enter link"
             />
             <CompactField
               label="Video title (optional)"
@@ -321,28 +321,40 @@ export function WorkDetailTemplateEditor({
                 onChange({ ...template, galleryVideos })
               }}
             />
-            {video.thumbnailSource === "url" ? (
-              <ThumbnailUrlField
-                id={`gallery-video-thumbnail-url-${index}`}
-                value={video.thumbnail}
-                onChange={(thumbnail) => {
-                  const galleryVideos = [...template.galleryVideos]
-                  galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "url" }
-                  onChange({ ...template, galleryVideos })
-                }}
-              />
-            ) : (
-              <ImageUpload
-                preset="gallery"
-                label="Upload thumbnail image"
-                value={video.thumbnail}
-                onChange={(thumbnail) => {
-                  const galleryVideos = [...template.galleryVideos]
-                  galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "upload" }
-                  onChange({ ...template, galleryVideos })
-                }}
-              />
-            )}
+            <div id={`gallery-video-thumbnail-validation-${index}`}>
+              {video.thumbnailSource === "url" ? (
+                <ThumbnailUrlField
+                  id={`gallery-video-thumbnail-url-${index}`}
+                  value={video.thumbnail}
+                  showValidationError={showThumbnailValidation && Boolean(video.url.trim())}
+                  onChange={(thumbnail) => {
+                    const galleryVideos = [...template.galleryVideos]
+                    galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "url" }
+                    onChange({ ...template, galleryVideos })
+                  }}
+                />
+              ) : (
+                <>
+                  <ImageUpload
+                    preset="gallery"
+                    label="Upload thumbnail image *"
+                    value={video.thumbnail}
+                    onChange={(thumbnail) => {
+                      const galleryVideos = [...template.galleryVideos]
+                      galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "upload" }
+                      onChange({ ...template, galleryVideos })
+                    }}
+                  />
+                  {showThumbnailValidation &&
+                    video.url.trim() &&
+                    !isValidWorkGalleryThumbnailUrl(video.thumbnail) && (
+                      <p className="text-xs text-red-500 mt-1" role="alert">
+                        This field is required.
+                      </p>
+                    )}
+                </>
+              )}
+            </div>
           </div>
         ))}
       </AdminCompactCard>

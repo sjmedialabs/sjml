@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 
@@ -144,7 +145,7 @@ export function ClientsPageManager() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Clients</h1>
         <p className="admin-text-secondary">Manage your client logos and information</p>
       </div>
@@ -199,13 +200,16 @@ export function ClientsPageManager() {
             <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
               <div className="flex justify-between mb-2">
                 <span className="text-xs admin-text-muted">Stat {index + 1}</span>
-                <button
-                  type="button"
-                  onClick={() => setData({ ...data, stats: data.stats.filter((_, i) => i !== index) })}
-                  className="text-red-500 text-xs"
-                >
-                  Remove
-                </button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <button type="button" className="text-red-500 text-xs">
+                      Remove
+                    </button>
+                  }
+                  title="Remove this statistic?"
+                  description="This statistic will be removed from the clients page."
+                  onConfirm={() => setData({ ...data, stats: data.stats.filter((_, i) => i !== index) })}
+                />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <input
@@ -289,9 +293,16 @@ export function ClientsPageManager() {
             <div key={client.id} className="p-4 admin-bg-tertiary rounded-lg">
               <div className="flex justify-between items-start mb-3">
                 <span className="admin-text-primary font-medium">{client.name}</span>
-                <button onClick={() => deleteClient(client.id)} className="text-red-500 hover:text-red-400 text-sm">
-                  Delete
-                </button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <button type="button" className="text-red-500 hover:text-red-400 text-sm">
+                      Delete
+                    </button>
+                  }
+                  title="Delete this client?"
+                  description="This client will be removed from the clients page."
+                  onConfirm={() => deleteClient(client.id)}
+                />
               </div>
               <div className="space-y-3">
                 <div>
@@ -350,6 +361,7 @@ export function ClientsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
+          data-admin-sticky-save
           className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}

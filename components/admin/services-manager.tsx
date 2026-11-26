@@ -8,6 +8,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import { ImageUpload } from "@/components/admin/image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import {
+  getFirstMissingAdminRequiredField,
+  scrollToAdminRequiredField,
+} from "@/lib/admin-required-fields"
 
 interface Service {
   id: string
@@ -23,6 +29,7 @@ interface Service {
 export function ServicesManager() {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchServices()
@@ -50,8 +57,6 @@ export function ServicesManager() {
   }
 
   const removeService = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this service?")) return
-    
     const token = localStorage.getItem("adminToken")
     try {
       if (id && id.length > 5) {
@@ -69,6 +74,18 @@ export function ServicesManager() {
   }
 
   const handleSave = async () => {
+    const missingField = getFirstMissingAdminRequiredField(document.getElementById("homepage-services-editor"))
+    if (missingField) {
+      setRequiredFieldError(missingField.id)
+      requestAnimationFrame(() => {
+        const field = document.getElementById(missingField.id)
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+          scrollToAdminRequiredField(field)
+        }
+      })
+      return
+    }
+    setRequiredFieldError(null)
     const token = localStorage.getItem("adminToken")
     
     // Save each service individually
@@ -110,7 +127,7 @@ export function ServicesManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Services</h1>
           <p className="admin-text-secondary">Manage the services displayed on your homepage.</p>
@@ -124,30 +141,43 @@ export function ServicesManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Service
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div id="homepage-services-editor" className="grid md:grid-cols-2 gap-6">
         {services.map((service) => (
           <Card key={service.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary text-lg">{service.title || "New Service"}</CardTitle>
-              <button onClick={() => removeService(service.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete service">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this service?"
+                description="This service will be permanently deleted."
+                onConfirm={() => removeService(service.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label className="admin-text-primary">Title</Label>
                 <Input
+                  id={`homepage-service-title-${service.id}`}
+                  required
                   value={service.title}
-                  onChange={(e) => updateService(service.id, "title", e.target.value)}
+                  onChange={(e) => {
+                    updateService(service.id, "title", e.target.value)
+                    if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+                  }}
                   className="admin-bg-secondary admin-border-light admin-text-primary"
                 />
+                <AdminRequiredFieldMessage show={requiredFieldError === `homepage-service-title-${service.id}`} />
               </div>
               <div className="space-y-2">
                 <Label className="admin-text-primary">Slug (URL)</Label>

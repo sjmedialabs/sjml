@@ -1,8 +1,14 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import {
+  getFirstMissingAdminRequiredField,
+  scrollToAdminRequiredField,
+} from "@/lib/admin-required-fields"
 
 interface CaseStudy {
   id: string
@@ -50,7 +56,7 @@ export function CaseStudiesPageManager() {
   const [message, setMessage] = useState("")
   const [editingStudy, setEditingStudy] = useState<CaseStudy | null>(null)
   const [activeTab, setActiveTab] = useState("basic")
-  const [modalError, setModalError] = useState("")
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -96,6 +102,25 @@ export function CaseStudiesPageManager() {
   }
 
   const saveData = async () => {
+    const invalidStudy = data.caseStudies.find(
+      (study) => !study.title?.trim() || !study.tags?.[0]?.trim(),
+    )
+    if (invalidStudy) {
+      setEditingStudy(invalidStudy)
+      setActiveTab("basic")
+      const missingFieldId = !invalidStudy.tags?.[0]?.trim()
+        ? "case-study-category"
+        : "case-study-title"
+      setRequiredFieldError(missingFieldId)
+      requestAnimationFrame(() => {
+        const field = document.getElementById(missingFieldId)
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+          scrollToAdminRequiredField(field)
+        }
+      })
+      return
+    }
+
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
@@ -129,6 +154,7 @@ export function CaseStudiesPageManager() {
   }
 
   const addCaseStudy = () => {
+    setRequiredFieldError(null)
     const newStudy: CaseStudy = {
       id: Date.now().toString(),
       slug: "",
@@ -167,7 +193,7 @@ export function CaseStudiesPageManager() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Case Studies</h1>
         <p className="admin-text-secondary">Manage your case studies</p>
       </div>
@@ -298,19 +324,24 @@ export function CaseStudiesPageManager() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          setEditingStudy(study); setModalError("")
+                          setEditingStudy(study)
                           setActiveTab("basic")
+                          setRequiredFieldError(null)
                         }}
                         className="admin-text-secondary hover:admin-text-primary px-2 py-1 text-sm"
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => deleteCaseStudy(study.id)}
-                        className="text-red-400 hover:text-red-300 px-2 py-1 text-sm"
-                      >
-                        Delete
-                      </button>
+                      <ConfirmDeleteDialog
+                        trigger={
+                          <button type="button" className="text-red-400 hover:text-red-300 px-2 py-1 text-sm">
+                            Delete
+                          </button>
+                        }
+                        title="Delete this case study?"
+                        description="This case study will be permanently deleted."
+                        onConfirm={() => deleteCaseStudy(study.id)}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -327,33 +358,36 @@ export function CaseStudiesPageManager() {
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">Edit Case Study</h2>
               <div className="flex gap-2">
+                <ConfirmDeleteDialog
+                  trigger={
+                    <button type="button" className="text-red-600 hover:text-red-700 text-sm px-3 py-1">
+                      Delete
+                    </button>
+                  }
+                  title="Delete this case study?"
+                  description="This case study will be permanently deleted."
+                  onConfirm={() => deleteCaseStudy(editingStudy.id)}
+                />
                 <button
-                  onClick={() => deleteCaseStudy(editingStudy.id)}
-                  className="text-red-600 hover:text-red-700 text-sm px-3 py-1"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={() => { setEditingStudy(null); setModalError("") }}
+                  onClick={() => setEditingStudy(null)}
                   className="text-gray-600 hover:text-gray-900 text-sm px-3 py-1"
                 >
                   Close
                 </button>
               </div>
             </div>
-            <div className="p-6 overflow-auto flex-1">
-            {modalError && (
-              <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{modalError}</p>
-            )}
-
+            <div id="case-study-editor" className="p-6 overflow-auto flex-1">
               <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Select Category <span className="text-red-500">*</span></label>
                   <select
+                    id="case-study-category"
+                    required
                     value={editingStudy.tags?.[0] || ""}
                     onChange={(e) => {
                       const selected = e.target.value
                       updateCaseStudy({ ...editingStudy, tags: selected ? [selected] : [] })
+                      if (requiredFieldError === e.target.id && selected.trim()) setRequiredFieldError(null)
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                   >
@@ -362,12 +396,15 @@ export function CaseStudiesPageManager() {
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
+                  <AdminRequiredFieldMessage show={requiredFieldError === "case-study-category"} />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Title <span className="text-red-500">*</span></label>
                   <input
                     type="text"
+                    id="case-study-title"
+                    required
                     value={editingStudy.title}
                     onChange={(e) => {
                       const newTitle = e.target.value
@@ -376,11 +413,12 @@ export function CaseStudiesPageManager() {
                         title: newTitle,
                         slug: newTitle.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
                       })
-                      setModalError("")
+                      if (requiredFieldError === e.target.id && newTitle.trim()) setRequiredFieldError(null)
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:border-primary"
                     placeholder="Enter case study title"
                   />
+                  <AdminRequiredFieldMessage show={requiredFieldError === "case-study-title"} />
                 </div>
 
                 <ImageUpload
@@ -447,19 +485,25 @@ export function CaseStudiesPageManager() {
             </div>
             <div className="flex justify-end gap-2 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
               <button
-                onClick={() => { setEditingStudy(null); setModalError("") }}
+                onClick={() => setEditingStudy(null)}
                 className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  const title = editingStudy.title?.trim()
-                  if (!title) {
-                    setModalError("Title is required.")
+                  const missingField = getFirstMissingAdminRequiredField(document.getElementById("case-study-editor"))
+                  if (missingField) {
+                    setRequiredFieldError(missingField.id)
+                    requestAnimationFrame(() => {
+                      const field = document.getElementById(missingField.id)
+                      if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+                        scrollToAdminRequiredField(field)
+                      }
+                    })
                     return
                   }
-                  setModalError("")
+                  setRequiredFieldError(null)
                   setEditingStudy(null)
                 }}
                 className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90"
@@ -475,6 +519,7 @@ export function CaseStudiesPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
+          data-admin-sticky-save
           className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}

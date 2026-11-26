@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ImageUpload } from "./image-upload"
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Plus, Trash2 } from "lucide-react"
 import { createDefaultFooter, normalizeFooterContent, type FooterContent, type FooterLink } from "@/lib/footer-content"
 
@@ -113,12 +114,12 @@ export function FooterManager() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start gap-4 flex-wrap">
+      <div className="flex justify-between items-start gap-4 flex-wrap" data-admin-sticky-header>
         <div>
           <h2 className="text-2xl font-bold admin-text-primary mb-2">Footer Settings</h2>
           <p className="admin-text-secondary">Manage logo, links, contact info, and social media for the site footer.</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} data-admin-sticky-save>
           {saving ? "Saving…" : "Save Footer"}
         </Button>
       </div>
@@ -254,9 +255,16 @@ export function FooterManager() {
               value={link.href}
               onChange={(e) => updateLink("companyLinks", index, { href: e.target.value })}
             />
-            <Button variant="ghost" size="sm" className="text-red-400" onClick={() => removeLink("companyLinks", index)}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <ConfirmDeleteDialog
+              trigger={
+                <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              }
+              title="Remove this company link?"
+              description="This link will be removed from the footer."
+              onConfirm={() => removeLink("companyLinks", index)}
+            />
           </div>
         ))}
       </div>
@@ -285,9 +293,16 @@ export function FooterManager() {
               value={link.href}
               onChange={(e) => updateLink("serviceLinks", index, { href: e.target.value })}
             />
-            <Button variant="ghost" size="sm" className="text-red-400" onClick={() => removeLink("serviceLinks", index)}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <ConfirmDeleteDialog
+              trigger={
+                <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              }
+              title="Remove this service link?"
+              description="This link will be removed from the footer."
+              onConfirm={() => removeLink("serviceLinks", index)}
+            />
           </div>
         ))}
       </div>

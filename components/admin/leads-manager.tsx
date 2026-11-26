@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -127,7 +128,6 @@ export function LeadsManager() {
   }
 
   const deleteLead = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this lead?")) return
     try {
       const token = localStorage.getItem("adminToken")
       const res = await fetch(`/api/leads/${id}`, {
@@ -256,7 +256,7 @@ export function LeadsManager() {
 
   return (
     <div>
-      <div className="mb-8 flex justify-between items-start">
+      <div className="mb-8 flex justify-between items-start" data-admin-sticky-header>
         <div>
           <h1 className="text-2xl font-bold admin-text-primary mb-2">Leads Management</h1>
           <p className="admin-text-secondary">Track and manage leads from website, Meta Ads, and Google Ads</p>
@@ -452,14 +452,16 @@ export function LeadsManager() {
                       >
                         View
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteLead(lead.id)}
-                        className="text-red-400 hover:text-red-300"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <ConfirmDeleteDialog
+                        trigger={
+                          <Button type="button" variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        }
+                        title="Delete this lead?"
+                        description="This lead will be permanently deleted."
+                        onConfirm={() => deleteLead(lead.id)}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -604,13 +606,16 @@ export function LeadsManager() {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => deleteLead(selectedLead.id)}
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/20"
-                >
-                  Delete Lead
-                </Button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button type="button" variant="outline" className="border-red-500/50 text-red-400 hover:bg-red-500/20">
+                      Delete Lead
+                    </Button>
+                  }
+                  title="Delete this lead?"
+                  description="This lead will be permanently deleted."
+                  onConfirm={() => deleteLead(selectedLead.id)}
+                />
                 <Button onClick={() => setSelectedLead(null)}>
                   Close
                 </Button>

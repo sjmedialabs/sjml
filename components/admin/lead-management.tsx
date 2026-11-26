@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -113,7 +114,6 @@ export function LeadManagement({ token }: LeadManagementProps) {
   }
 
   const deleteLead = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this lead?")) return
     try {
       const response = await fetch(`/api/leads/${id}`, {
         method: "DELETE",
@@ -407,14 +407,16 @@ export function LeadManagement({ token }: LeadManagementProps) {
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteLead(lead.id)}
-                        className="admin-text-secondary hover:text-red-500 hover:bg-[#333]"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <ConfirmDeleteDialog
+                        trigger={
+                          <Button type="button" variant="ghost" size="sm" className="admin-text-secondary hover:text-red-500 hover:bg-[#333]">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        }
+                        title="Delete this lead?"
+                        description="This lead will be permanently deleted."
+                        onConfirm={() => deleteLead(lead.id)}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

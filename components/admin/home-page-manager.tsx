@@ -21,6 +21,7 @@ import {
   type HomeServiceCard,
 } from "@/lib/home-content"
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { ColorPill, TypographyPillRow } from "./admin-compact-fields"
 import { STAT_ICON_PRESETS, isStatIconPreset } from "@/components/stats-icons"
 
@@ -169,38 +170,41 @@ export function HomePageManager() {
   ]
 
   return (
-    <div>
-      <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold admin-text-primary mb-2">Homepage</h1>
-          <p className="admin-text-secondary">
-            Manage the homepage hero, statistics bar, and services section (reference layout).
-          </p>
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-6" data-admin-sticky-header>
+        <div className="flex justify-between items-start gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold admin-text-primary mb-2">Homepage</h1>
+            <p className="admin-text-secondary">
+              Manage the homepage hero, statistics bar, and services section (reference layout).
+            </p>
+          </div>
+          <Button onClick={saveContent} disabled={saving} data-admin-sticky-save>
+            {saving ? "Saving…" : "Save Homepage"}
+          </Button>
         </div>
-        <Button onClick={saveContent} disabled={saving}>
-          {saving ? "Saving…" : "Save Homepage"}
-        </Button>
+
+        <div className="flex flex-wrap gap-2 mt-3">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+                activeTab === tab.id
+                  ? "bg-primary text-primary-foreground"
+                  : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              activeTab === tab.id
-                ? "bg-primary text-primary-foreground"
-                : "admin-bg-secondary admin-text-secondary hover:admin-text-primary"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
+      <div data-admin-scroll-content>
       {activeTab === "hero" && (
         <div className="space-y-6">
           <div className="admin-card border admin-border rounded-xl p-6 space-y-4">
@@ -326,16 +330,18 @@ export function HomePageManager() {
                   >
                     <ChevronDown className="w-4 h-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-400"
-                    onClick={() =>
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    }
+                    title="Delete this slide?"
+                    description="This slide will be removed from the homepage."
+                    onConfirm={() =>
                       setHero({ ...hero, slides: hero.slides.filter((_, i) => i !== index) })
                     }
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  />
                 </div>
               </div>
               <label className="flex items-center gap-2 text-sm admin-text-primary">
@@ -449,14 +455,16 @@ export function HomePageManager() {
             <div key={stat.id} className="admin-card border admin-border rounded-xl p-6 space-y-3">
               <div className="flex justify-between">
                 <span className="admin-text-secondary text-sm">Stat {index + 1}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-400"
-                  onClick={() => setStats(stats.filter((_, i) => i !== index))}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  }
+                  title="Delete this statistic?"
+                  description="This statistic will be removed from the homepage."
+                  onConfirm={() => setStats(stats.filter((_, i) => i !== index))}
+                />
               </div>
               <label className="flex items-center gap-2 text-sm admin-text-primary">
                 <input
@@ -686,19 +694,21 @@ export function HomePageManager() {
             <div key={item.id} className="admin-card border admin-border rounded-xl p-6 space-y-3">
               <div className="flex justify-between">
                 <span className="admin-text-secondary text-sm">Card {index + 1}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-400"
-                  onClick={() =>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="sm" className="text-red-400">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  }
+                  title="Delete this service card?"
+                  description="This service card will be removed from the homepage."
+                  onConfirm={() =>
                     setServicesSection({
                       ...servicesSection,
                       items: servicesSection.items.filter((_, i) => i !== index),
                     })
                   }
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                />
               </div>
               <label className="flex items-center gap-2 text-sm admin-text-primary">
                 <input
@@ -757,6 +767,7 @@ export function HomePageManager() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

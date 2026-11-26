@@ -115,7 +115,7 @@ export function SettingsManager() {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">General Website Settings</h1>
         <p className="admin-text-secondary">
           Manage contact information and social media links
@@ -268,6 +268,7 @@ export function SettingsManager() {
           <Button
             onClick={handleSave}
             disabled={saving}
+            data-admin-sticky-save
             className="bg-primary hover:bg-primary/90 text-white px-8"
           >
             {saving ? "Saving..." : "Save Settings"}

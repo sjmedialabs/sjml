@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react"
 import { uploadVideoAction } from "@/app/actions/upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Film, Upload, X } from "lucide-react"
 import {
   formatVideoSpecLine,
@@ -90,14 +91,20 @@ export function VideoUpload({
       {value ? (
         <div className="relative rounded-lg border admin-border-light overflow-hidden admin-bg-tertiary">
           <video src={value} className="w-full max-h-40 object-cover bg-black" muted playsInline controls />
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80"
-            aria-label="Remove video"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <ConfirmDeleteDialog
+            trigger={
+              <button
+                type="button"
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80"
+                aria-label="Remove video"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            }
+            title="Remove this video?"
+            description="The video will be removed from this content."
+            onConfirm={() => onChange("")}
+          />
         </div>
       ) : (
         <div

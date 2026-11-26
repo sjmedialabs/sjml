@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import { ImageUpload } from "./image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface Industry {
   id: string
@@ -53,7 +54,7 @@ export function IndustriesManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Industries</h1>
           <p className="admin-text-secondary">Manage the industries section on your homepage.</p>
@@ -67,7 +68,7 @@ export function IndustriesManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Industry
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -79,9 +80,16 @@ export function IndustriesManager() {
           <Card key={industry.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary text-lg">{industry.title || "New Industry"}</CardTitle>
-              <button onClick={() => removeIndustry(industry.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete industry">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this industry?"
+                description="This industry will be removed from the page."
+                onConfirm={() => removeIndustry(industry.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

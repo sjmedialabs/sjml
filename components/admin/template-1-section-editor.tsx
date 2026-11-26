@@ -15,12 +15,6 @@ import {
 import { normalizeWorkGridItem, type WorkGridItem } from "@/lib/work-grid-item"
 import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
-import { normalizeFooterContent } from "@/lib/footer-content"
-import {
-  formatImageSpecLine,
-  resolveImageSpec,
-  type ImageUploadSpec,
-} from "@/lib/admin-media-specs"
 
 interface Template1SectionEditorProps {
   data: Template1PageData
@@ -253,71 +247,54 @@ function SimpleImageUpload({
 
   return (
     <div className="min-w-0">
-      <label className="block text-sm font-medium admin-text-secondary mb-1.5">
-        {label}
-      </label>
-      <div className="rounded-lg border admin-border admin-bg-secondary p-3">
-        <div className="flex items-center gap-3">
-          {value && (
-            <img
-              alt={`${label} preview`}
-              className="h-12 w-12 rounded-md border admin-border object-contain bg-white p-1 shrink-0"
-              src={value}
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                accept="image/*"
-                className="sr-only"
-                onChange={(event) => void handleFileChange(event)}
-                ref={inputRef}
-                type="file"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={isUploading}
-                onClick={() => inputRef.current?.click()}
-                className="cursor-pointer admin-border-light admin-text-primary hover:admin-bg-secondary bg-white dark:bg-transparent h-9 px-3.5 text-xs font-medium shrink-0"
-                type="button"
-              >
-                <Upload aria-hidden="true" className="w-3.5 h-3.5 mr-1.5" />
-                {isUploading
-                  ? "Uploading..."
-                  : value
-                    ? "Replace Image"
-                    : "Upload Image"}
-              </Button>
-              {value && (
-                <Button
-                  variant="outline"
-                  size="sm"
+      <span className="mb-1.5 block text-sm text-[#525252]">{label}</span>
+      <div className="flex flex-wrap items-center gap-3">
+        {value && (
+          <img
+            alt={`${label} preview`}
+            className="h-12 w-12 rounded border border-[#d1d5db] object-cover"
+            src={value}
+          />
+        )}
+        <input
+          accept="image/*"
+          className="sr-only"
+          onChange={(event) => void handleFileChange(event)}
+          ref={inputRef}
+          type="file"
+        />
+        <button
+          className="inline-flex min-h-10 items-center gap-2 rounded bg-[#eef3f8] px-4 py-2 text-sm font-medium text-[#526783] transition-colors hover:bg-[#e2eaf2] disabled:cursor-wait disabled:opacity-60"
+          disabled={isUploading}
+          onClick={() => inputRef.current?.click()}
+          type="button"
+        >
+          <Upload aria-hidden="true" size={16} />
+          {isUploading ? "Uploading..." : "Upload File"}
+        </button>
+        {value && (
+          <span className="flex items-center gap-2 text-sm text-[#526783]">
+            Image uploaded
+            <ConfirmDeleteDialog
+              trigger={
+                <button
                   aria-label={`Remove ${label}`}
-                  className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-9 px-2.5 text-xs shrink-0"
-                  onClick={() =>
-                    onRequestDelete({
-                      title: `Remove ${label}?`,
-                      description: `Are you sure you want to remove this ${label.toLowerCase()}? You can upload a new image later.`,
-                      confirmLabel: "Remove",
-                      onConfirm: () => {
-                        onChange("")
-                        onAction(`${label} removed`)
-                      },
-                    })
-                  }
+                  className="rounded p-1 text-[#526783] hover:bg-[#eef3f8]"
                   type="button"
                 >
-                  <X aria-hidden="true" className="w-3.5 h-3.5 mr-1" />
-                  Remove
-                </Button>
-              )}
-            </div>
-            <p className="mt-1.5 text-[11.5px] leading-snug admin-text-muted">
-              {formatImageSpecLine(spec)}
-            </p>
-          </div>
-        </div>
+                  <X aria-hidden="true" size={16} />
+                </button>
+              }
+              title={`Remove ${label.toLowerCase()}?`}
+              description="This file will be removed from this content."
+              confirmLabel="Remove"
+              onConfirm={() => {
+                onChange("")
+                onAction(`${label} removed`)
+              }}
+            />
+          </span>
+        )}
       </div>
       {errorMessage && (
         <p aria-live="polite" className="mt-1.5 text-xs text-red-600">
@@ -861,46 +838,34 @@ function SectionFields({
                     value={typeof item.name === "string" ? item.name : ""}
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <SimpleImageUpload
-                    label="Client Logo"
-                    spec={resolveImageSpec("clientLogo")}
-                    onChange={(url) =>
-                      onChange([...path, String(index), "logoUrl"], url)
+                <SimpleImageUpload
+                  label="Logo"
+                  onChange={(url) =>
+                    onChange([...path, String(index), "logoUrl"], url)
+                  }
+                  onAction={onAction}
+                  value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
+                />
+                <div className="sm:col-span-2">
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <button
+                        className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                        type="button"
+                      >
+                        Delete client
+                      </button>
                     }
-                    onAction={onAction}
-                    onRequestDelete={onRequestDelete}
-                    value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
-                  />
-                </div>
-                <div className="shrink-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent h-10 w-10 p-0 flex items-center justify-center shrink-0"
-                    onClick={() => {
-                      const clientName =
-                        typeof item.name === "string" && item.name.trim()
-                          ? `"${item.name.trim()}"`
-                          : `Client ${index + 1}`
-                      onRequestDelete({
-                        title: "Delete Client?",
-                        description: `Are you sure you want to delete ${clientName}? This action cannot be undone.`,
-                        onConfirm: () => {
-                          onChange(
-                            path,
-                            value.filter((_, clientIndex) => clientIndex !== index),
-                          )
-                          onAction("Client deleted")
-                        },
-                      })
+                    title="Delete this client?"
+                    description="This client will be removed from this section."
+                    onConfirm={() => {
+                      onChange(
+                        path,
+                        value.filter((_, clientIndex) => clientIndex !== index),
+                      )
+                      onAction("Client deleted")
                     }}
-                    title="Delete Client"
-                    aria-label="Delete Client"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  />
                 </div>
               </div>
             ) : isFaqList && isRecord(item) ? (

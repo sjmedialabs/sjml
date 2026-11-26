@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save, GripVertical } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface Stat {
   id: string
@@ -52,7 +53,7 @@ export function StatsManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Statistics</h1>
           <p className="admin-text-secondary">Manage the statistics displayed on your homepage.</p>
@@ -66,7 +67,7 @@ export function StatsManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Stat
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -81,9 +82,16 @@ export function StatsManager() {
                 <GripVertical className="w-4 h-4 admin-text-muted cursor-grab" />
                 <CardTitle className="admin-text-primary text-lg">Statistic</CardTitle>
               </div>
-              <button onClick={() => removeStat(stat.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete statistic">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this statistic?"
+                description="This statistic will be removed from the page."
+                onConfirm={() => removeStat(stat.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

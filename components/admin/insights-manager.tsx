@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { ImageUpload } from "./image-upload"
 
 interface Insight {
@@ -69,7 +70,7 @@ export function InsightsManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Insights / Blog</h1>
           <p className="admin-text-secondary">Manage blog posts and articles.</p>
@@ -83,7 +84,7 @@ export function InsightsManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Insight
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -95,9 +96,16 @@ export function InsightsManager() {
           <Card key={insight.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary">{insight.title || "New Insight"}</CardTitle>
-              <button onClick={() => removeInsight(insight.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete insight">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this insight?"
+                description="This insight will be removed from the page."
+                onConfirm={() => removeInsight(insight.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">

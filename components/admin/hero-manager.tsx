@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 export function HeroManager() {
   const [heroData, setHeroData] = useState({
@@ -56,12 +57,12 @@ export function HeroManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Hero Section</h1>
           <p className="admin-text-secondary">Manage the hero section content on your homepage.</p>
         </div>
-        <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+        <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
           <Save className="w-4 h-4 mr-2" />
           Save Changes
         </Button>
@@ -136,9 +137,16 @@ export function HeroManager() {
                   className="flex items-center justify-between admin-bg-secondary border admin-border-light rounded-lg px-4 py-3"
                 >
                   <span className="admin-text-primary">{word}</span>
-                  <button onClick={() => removeRotatingWord(index)} className="admin-text-secondary hover:text-primary">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete rotating word">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    }
+                    title="Remove this rotating word?"
+                    description="This word will be removed from the hero text."
+                    onConfirm={() => removeRotatingWord(index)}
+                  />
                 </li>
               ))}
             </ul>
