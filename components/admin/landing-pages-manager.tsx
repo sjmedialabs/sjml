@@ -251,7 +251,7 @@ export function LandingPagesManager() {
     <>
     <AdminToast message={actionMessage} onClose={() => setActionMessage("")} duration={3000} />
     <section className="min-h-[calc(100vh-4rem)] bg-[#f5f7fa] -m-8 p-5 text-[#172b4d]">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4" data-admin-sticky-header>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold admin-text-primary mb-2">Landing Pages</h1>
           <p className="admin-text-secondary">
@@ -439,6 +439,7 @@ export function LandingPagesManager() {
           </table>
         </div>
       </div>
-    </div>
+    </section>
+    </>
   )
 }

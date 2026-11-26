@@ -328,7 +328,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
             </div>
           ))}
         </div>
-      </div>
+      </fieldset>
     </div>
   )
 
@@ -413,7 +413,6 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
             onSeoChange={setSeoData}
             onAction={onAction}
           />
-        </div>
       ) : page ? (
         <div className="admin-card border admin-border rounded-xl p-6 text-sm admin-text-muted">
           No section editor is available for this template.
@@ -467,6 +466,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
           </Button>
         </div>
       </div>
-    </div>
+      </form>
+    </section>
   )
 }

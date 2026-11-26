@@ -15,7 +15,6 @@ import {
 import { normalizeWorkGridItem, type WorkGridItem } from "@/lib/work-grid-item"
 import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
-import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface Template1SectionEditorProps {
   data: Template1PageData
@@ -838,7 +837,7 @@ function SectionFields({
                     placeholder="Client name"
                     value={typeof item.name === "string" ? item.name : ""}
                   />
-                </label>
+                </div>
                 <SimpleImageUpload
                   label="Logo"
                   onChange={(url) =>
@@ -866,12 +865,7 @@ function SectionFields({
                       )
                       onAction("Client deleted")
                     }}
-                    title="Delete Client"
-                    aria-label="Delete Client"
-                    type="button"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  />
                 </div>
               </div>
             ) : isFaqList && isRecord(item) ? (
