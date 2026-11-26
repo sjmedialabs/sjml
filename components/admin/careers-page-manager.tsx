@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 
@@ -138,8 +139,8 @@ export function CareersPageManager() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Careers Page</h1>
         <p className="admin-text-secondary">Manage job postings and career page content</p>
       </div>
@@ -147,7 +148,7 @@ export function CareersPageManager() {
       <AdminToast message={message} onClose={() => setMessage("")} />
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6" data-admin-sticky-nav>
         {["jobs", "hero", "culture", "benefits", "cta"].map((tab) => (
           <button
             key={tab}
@@ -161,6 +162,7 @@ export function CareersPageManager() {
         ))}
       </div>
 
+      <div data-admin-scroll-content>
       {activeTab === "hero" && (
         <div className="admin-card border admin-border rounded-xl p-6">
           <h2 className="text-lg font-semibold admin-text-primary mb-4">Hero Section</h2>
@@ -261,12 +263,16 @@ export function CareersPageManager() {
                           >
                             Edit
                           </button>
-                          <button
-                            onClick={() => deleteJob(job.id)}
-                            className="text-red-400 hover:text-red-300 px-2 py-1 text-sm"
-                          >
-                            Delete
-                          </button>
+                          <ConfirmDeleteDialog
+                            trigger={
+                              <button type="button" className="text-red-400 hover:text-red-300 px-2 py-1 text-sm">
+                                Delete
+                              </button>
+                            }
+                            title="Delete this job?"
+                            description="This job posting will be permanently deleted."
+                            onConfirm={() => deleteJob(job.id)}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -283,12 +289,16 @@ export function CareersPageManager() {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold admin-text-primary">Edit Job Posting</h2>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => deleteJob(editingJob.id)}
-                      className="text-red-500 hover:text-red-400 text-sm px-3 py-1"
-                    >
-                      Delete
-                    </button>
+                    <ConfirmDeleteDialog
+                      trigger={
+                        <button type="button" className="text-red-500 hover:text-red-400 text-sm px-3 py-1">
+                          Delete
+                        </button>
+                      }
+                      title="Delete this job?"
+                      description="This job posting will be permanently deleted."
+                      onConfirm={() => deleteJob(editingJob.id)}
+                    />
                     <button
                       onClick={() => setEditingJob(null)}
                       className="admin-text-secondary hover:admin-text-primary text-sm px-3 py-1"
@@ -497,12 +507,16 @@ export function CareersPageManager() {
               <div key={index} className="p-4 admin-bg-tertiary rounded-lg">
                 <div className="flex justify-between items-start mb-3">
                   <span className="admin-text-secondary text-sm">Benefit #{index + 1}</span>
-                  <button
-                    onClick={() => setData({ ...data, benefits: data.benefits.filter((_, i) => i !== index) })}
-                    className="text-red-500 hover:text-red-400 text-sm"
-                  >
-                    Remove
-                  </button>
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <button type="button" className="text-red-500 hover:text-red-400 text-sm">
+                        Remove
+                      </button>
+                    }
+                    title="Remove this benefit?"
+                    description="This benefit will be removed from the careers page."
+                    onConfirm={() => setData({ ...data, benefits: data.benefits.filter((_, i) => i !== index) })}
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ImageUpload
@@ -548,11 +562,13 @@ export function CareersPageManager() {
           </div>
         </div>
       )}
+      </div>
 
       <div className="mt-6">
         <button
           onClick={saveData}
           disabled={saving}
+          data-admin-sticky-save
           className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}

@@ -3,6 +3,7 @@
 import { AdminToast } from "./admin-toast"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
 import {
@@ -95,20 +96,20 @@ export function IndustriesPageManager() {
   }
 
   return (
-    <div>
-      <div className="mb-8 flex justify-between items-start">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-8 flex justify-between items-start" data-admin-sticky-header>
         <div>
           <h1 className="text-2xl font-bold admin-text-primary mb-2">Industries Page</h1>
           <p className="admin-text-secondary">Manage the /industries page content, cards and stats</p>
         </div>
-        <Button onClick={saveData} disabled={saving}>
+        <Button onClick={saveData} disabled={saving} data-admin-sticky-save>
           {saving ? "Saving..." : "Save Page"}
         </Button>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
-      <div className="flex gap-2 border-b admin-border pb-4 mb-6">
+      <div className="flex gap-2 border-b admin-border pb-4 mb-6" data-admin-sticky-nav>
         {(["content", "cards", "stats"] as const).map((tab) => (
           <button
             key={tab}
@@ -122,6 +123,7 @@ export function IndustriesPageManager() {
         ))}
       </div>
 
+      <div data-admin-scroll-content>
       {activeTab === "content" && (
         <div className="space-y-2.5">
           <AdminCompactCard title="Typography">
@@ -186,11 +188,18 @@ export function IndustriesPageManager() {
           {content.cards.map((card, index) => (
             <AdminCompactCard key={card.id} title={`Industry ${index + 1}: ${card.title || "Untitled"}`}>
               <div className="flex justify-end mb-1">
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400" onClick={() =>
-                  setContent({ ...content, cards: content.cards.filter((_, i) => i !== index) })
-                }>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  }
+                  title="Remove this industry card?"
+                  description="This card will be removed from the industries page."
+                  onConfirm={() =>
+                    setContent({ ...content, cards: content.cards.filter((_, i) => i !== index) })
+                  }
+                />
               </div>
               <AdminFieldGrid cols={2}>
                 <CompactField label="Title" value={card.title} onChange={(v) => updateCard(index, { title: v })} />
@@ -245,6 +254,7 @@ export function IndustriesPageManager() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

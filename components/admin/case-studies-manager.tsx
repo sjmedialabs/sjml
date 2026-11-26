@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import { ImageUpload } from "./image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface CaseStudy {
   id: string
@@ -73,7 +74,7 @@ export function CaseStudiesManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Case Studies</h1>
           <p className="admin-text-secondary">Manage your featured case studies.</p>
@@ -87,7 +88,7 @@ export function CaseStudiesManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Case Study
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -99,9 +100,16 @@ export function CaseStudiesManager() {
           <Card key={caseStudy.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary">{caseStudy.title || "New Case Study"}</CardTitle>
-              <button onClick={() => removeCaseStudy(caseStudy.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete case study">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this case study?"
+                description="This case study will be removed from the page."
+                onConfirm={() => removeCaseStudy(caseStudy.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">

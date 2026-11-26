@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import {
   AdminCompactCard,
   AdminFieldGrid,
@@ -55,14 +56,18 @@ export function InsightDetailTemplateEditor({
           <div key={section.id} className="border-t admin-border pt-2 mt-2 first:border-0 first:pt-0 first:mt-0">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs admin-text-secondary">Section {index + 1}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-red-400"
-                onClick={() => onChange({ ...template, sections: template.sections.filter((_, i) => i !== index) })}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                }
+                title="Remove this section?"
+                description="This section will be removed from the insight detail page."
+                onConfirm={() =>
+                  onChange({ ...template, sections: template.sections.filter((_, i) => i !== index) })
+                }
+              />
             </div>
             <CompactField label="Heading" value={section.heading} onChange={(v) => updateSection(index, { heading: v })} />
             {section.paragraphs.map((paragraph, pIndex) => (

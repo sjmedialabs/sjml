@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useRef, useCallback } from "react"
 import Image from "next/image"
 import { uploadImageAction } from "@/app/actions/upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import {
   formatImageSpecLine,
   resolveImageSpec,
@@ -157,11 +158,6 @@ export function ImageUpload({
     inputRef.current?.click()
   }
 
-  const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onChange("")
-  }
-
   return (
     <div className={className}>
       {label && <label className="block text-sm admin-text-secondary mb-1">{label}</label>}
@@ -173,11 +169,18 @@ export function ImageUpload({
           <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border admin-border-light group">
             <Image src={value || "/placeholder.svg"} alt="Uploaded image" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <button onClick={handleRemove} className="p-1 bg-red-500 rounded-full hover:bg-red-600" title="Remove">
-                <svg className="w-4 h-4 admin-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="p-1 bg-red-500 rounded-full hover:bg-red-600" title="Remove image">
+                    <svg className="w-4 h-4 admin-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                }
+                title="Remove this image?"
+                description="The image will be removed from this content."
+                onConfirm={() => onChange("")}
+              />
             </div>
           </div>
         )}

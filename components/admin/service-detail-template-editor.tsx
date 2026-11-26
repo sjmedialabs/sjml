@@ -3,6 +3,7 @@
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import {
   AdminCompactCard,
   AdminFieldGrid,
@@ -72,11 +73,18 @@ export function ServiceDetailTemplateEditor({
           <div key={feature.id} className="border-t admin-border pt-2 mt-2 first:border-0 first:pt-0 first:mt-0">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs admin-text-secondary">Feature {index + 1}</span>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400" onClick={() =>
-                onChange({ ...template, features: template.features.filter((_, i) => i !== index) })
-              }>
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                }
+                title="Remove this feature?"
+                description="This feature will be removed from the service page."
+                onConfirm={() =>
+                  onChange({ ...template, features: template.features.filter((_, i) => i !== index) })
+                }
+              />
             </div>
             <AdminFieldGrid cols={2}>
               <CompactField label="Title" value={feature.title} onChange={(v) => {
@@ -109,11 +117,18 @@ export function ServiceDetailTemplateEditor({
           <div key={step.id} className="border-t admin-border pt-2 mt-2">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs admin-text-secondary">Step {index + 1}</span>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400" onClick={() =>
-                onChange({ ...template, processSteps: template.processSteps.filter((_, i) => i !== index) })
-              }>
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <Button type="button" variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                }
+                title="Remove this process step?"
+                description="This step will be removed from the service page."
+                onConfirm={() =>
+                  onChange({ ...template, processSteps: template.processSteps.filter((_, i) => i !== index) })
+                }
+              />
             </div>
             <AdminFieldGrid cols={3}>
               <CompactField label="Number" value={step.stepNumber} onChange={(v) => {

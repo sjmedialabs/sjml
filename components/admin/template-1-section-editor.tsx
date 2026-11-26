@@ -9,6 +9,7 @@ import type {
   Template1SectionVisibility,
 } from "@/components/template-1/default-data"
 import type { LandingPageSeo } from "@/lib/landing-pages"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface Template1SectionEditorProps {
   data: Template1PageData
@@ -184,17 +185,24 @@ function SimpleImageUpload({
         {value && (
           <span className="flex items-center gap-2 text-sm text-[#526783]">
             Image uploaded
-            <button
-              aria-label={`Remove ${label}`}
-              className="rounded p-1 text-[#526783] hover:bg-[#eef3f8]"
-              onClick={() => {
+            <ConfirmDeleteDialog
+              trigger={
+                <button
+                  aria-label={`Remove ${label}`}
+                  className="rounded p-1 text-[#526783] hover:bg-[#eef3f8]"
+                  type="button"
+                >
+                  <X aria-hidden="true" size={16} />
+                </button>
+              }
+              title={`Remove ${label.toLowerCase()}?`}
+              description="This file will be removed from this content."
+              confirmLabel="Remove"
+              onConfirm={() => {
                 onChange("")
                 onAction(`${label} removed`)
               }}
-              type="button"
-            >
-              <X aria-hidden="true" size={16} />
-            </button>
+            />
           </span>
         )}
       </div>
@@ -356,19 +364,25 @@ function SectionFields({
                   value={typeof item.logoUrl === "string" ? item.logoUrl : ""}
                 />
                 <div className="sm:col-span-2">
-                  <button
-                    className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                    onClick={() => {
+                  <ConfirmDeleteDialog
+                    trigger={
+                      <button
+                        className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                        type="button"
+                      >
+                        Delete client
+                      </button>
+                    }
+                    title="Delete this client?"
+                    description="This client will be removed from this section."
+                    onConfirm={() => {
                       onChange(
                         path,
                         value.filter((_, clientIndex) => clientIndex !== index),
                       )
                       onAction("Client deleted")
                     }}
-                    type="button"
-                  >
-                    Delete client
-                  </button>
+                  />
                 </div>
               </div>
             ) : isFaqList && isRecord(item) ? (
@@ -394,19 +408,25 @@ function SectionFields({
                     value={typeof item.answer === "string" ? item.answer : ""}
                   />
                 </label>
-                <button
-                  className="justify-self-start rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-                  onClick={() => {
+                <ConfirmDeleteDialog
+                  trigger={
+                    <button
+                      className="justify-self-start rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                      type="button"
+                    >
+                      Delete FAQ
+                    </button>
+                  }
+                  title="Delete this FAQ?"
+                  description="This FAQ will be removed from this section."
+                  onConfirm={() => {
                     onChange(
                       path,
                       value.filter((_, faqIndex) => faqIndex !== index),
                     )
                     onAction("FAQ deleted")
                   }}
-                  type="button"
-                >
-                  Delete FAQ
-                </button>
+                />
               </div>
             ) : (
               <SectionFields

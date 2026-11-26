@@ -142,8 +142,8 @@ export function SeoManager() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-3xl font-bold admin-text-primary mb-2">
           SEO & Meta Tags Management
         </h1>
@@ -154,8 +154,8 @@ export function SeoManager() {
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
-      <Tabs defaultValue="global" className="w-full">
-        <TabsList className="mb-6">
+      <Tabs defaultValue="global" className="admin-cms-tab-layout w-full">
+        <TabsList className="mb-6" data-admin-sticky-nav>
           <TabsTrigger value="global">🌐 Global Settings</TabsTrigger>
           <TabsTrigger value="pages">📄 Page-Specific SEO</TabsTrigger>
           <TabsTrigger value="social">🔗 Social Media</TabsTrigger>
@@ -432,6 +432,7 @@ export function SeoManager() {
         <Button
           onClick={saveData}
           disabled={saving}
+          data-admin-sticky-save
           className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-base"
         >
           {saving ? "Saving..." : "💾 Save All SEO Settings"}

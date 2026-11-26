@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save, Star } from "lucide-react"
 import { ImageUpload } from "./image-upload"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 interface Testimonial {
   id: string
@@ -63,7 +64,7 @@ export function TestimonialsManager() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-admin-sticky-header>
         <div>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Testimonials</h1>
           <p className="admin-text-secondary">Manage client testimonials displayed on your homepage.</p>
@@ -77,7 +78,7 @@ export function TestimonialsManager() {
             <Plus className="w-4 h-4 mr-2" />
             Add Testimonial
           </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 admin-text-primary" data-admin-sticky-save>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -89,9 +90,16 @@ export function TestimonialsManager() {
           <Card key={testimonial.id} className="admin-card admin-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="admin-text-primary">{testimonial.author || "New Testimonial"}</CardTitle>
-              <button onClick={() => removeTestimonial(testimonial.id)} className="admin-text-secondary hover:text-primary">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button type="button" className="admin-text-secondary hover:text-primary" aria-label="Delete testimonial">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                }
+                title="Delete this testimonial?"
+                description="This testimonial will be removed from the page."
+                onConfirm={() => removeTestimonial(testimonial.id)}
+              />
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
 import {
@@ -96,20 +97,20 @@ export function AboutPageManager() {
   ]
 
   return (
-    <div>
-      <div className="mb-4 flex justify-between items-start gap-3 flex-wrap">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-4 flex justify-between items-start gap-3 flex-wrap" data-admin-sticky-header>
         <div>
           <h1 className="text-xl font-bold admin-text-primary mb-1">About Page</h1>
           <p className="admin-text-secondary text-xs">Manage About Us sections.</p>
         </div>
-        <Button onClick={saveData} disabled={saving} size="sm">
+        <Button onClick={saveData} disabled={saving} size="sm" data-admin-sticky-save>
           {saving ? "Saving…" : "Save About Page"}
         </Button>
       </div>
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      <div className="flex flex-wrap gap-1.5 mb-4" data-admin-sticky-nav>
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -126,6 +127,7 @@ export function AboutPageManager() {
         ))}
       </div>
 
+      <div data-admin-scroll-content>
       {activeTab === "hero" && (
         <AdminCompactCard title="Hero">
           <AdminFieldGrid cols={2}>
@@ -311,11 +313,15 @@ export function AboutPageManager() {
           {content.valuesSection.items.map((item, index) => (
             <AdminCompactCard key={item.id} title={`Value ${index + 1}`}>
               <div className="flex justify-end -mt-1 mb-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-red-400"
-                  onClick={() =>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  }
+                  title="Remove this value?"
+                  description="This value will be removed from the About page."
+                  onConfirm={() =>
                     setContent({
                       ...content,
                       valuesSection: {
@@ -324,9 +330,7 @@ export function AboutPageManager() {
                       },
                     })
                   }
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                />
               </div>
               <AdminFieldGrid cols={2}>
                 <CompactField
@@ -478,11 +482,15 @@ export function AboutPageManager() {
           {content.journeySection.items.map((item, index) => (
             <AdminCompactCard key={item.id} title={`Stat ${index + 1}`}>
               <div className="flex justify-end -mt-1 mb-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-red-400"
-                  onClick={() =>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  }
+                  title="Remove this stat?"
+                  description="This stat will be removed from the About page."
+                  onConfirm={() =>
                     setContent({
                       ...content,
                       journeySection: {
@@ -491,9 +499,7 @@ export function AboutPageManager() {
                       },
                     })
                   }
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                />
               </div>
               <AdminFieldGrid cols={2}>
                 <CompactField
@@ -558,6 +564,7 @@ export function AboutPageManager() {
           </Button>
         </div>
       )}
+      </div>
     </div>
   )
 }

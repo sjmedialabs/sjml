@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,11 @@ import {
   normalizeInsightDetailTemplate,
   type InsightDetailTemplate,
 } from "@/lib/insight-detail-template"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import {
+  getFirstMissingAdminRequiredField,
+  scrollToAdminRequiredField,
+} from "@/lib/admin-required-fields"
 
 interface InsightItem {
   id: string
@@ -70,6 +76,7 @@ export function InsightsPageManager() {
   const [editingInsight, setEditingInsight] = useState<InsightItem | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [seeding, setSeeding] = useState(false)
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchInsights()
@@ -141,6 +148,18 @@ export function InsightsPageManager() {
 
   const saveInsight = async () => {
     if (!editingInsight) return
+    const missingField = getFirstMissingAdminRequiredField(document.getElementById("insight-editor"))
+    if (missingField) {
+      setRequiredFieldError(missingField.id)
+      requestAnimationFrame(() => {
+        const field = document.getElementById(missingField.id)
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+          scrollToAdminRequiredField(field)
+        }
+      })
+      return
+    }
+    setRequiredFieldError(null)
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
@@ -173,7 +192,6 @@ export function InsightsPageManager() {
   }
 
   const deleteInsight = async (id: string) => {
-    if (!confirm("Delete this insight?")) return
     try {
       const token = localStorage.getItem("adminToken")
       const res = await fetch(`/api/insights/${id}`, {
@@ -193,17 +211,22 @@ export function InsightsPageManager() {
   const addNewInsight = () => {
     setEditingInsight({ ...emptyInsight, id: "" } as InsightItem)
     setIsNew(true)
+    setRequiredFieldError(null)
     setView("edit")
   }
 
   const editInsight = (item: InsightItem) => {
     setEditingInsight(normalizeInsightItem(item as unknown as Record<string, unknown>))
     setIsNew(false)
+    setRequiredFieldError(null)
     setView("edit")
   }
 
   const updateField = (field: string, value: unknown) => {
     if (!editingInsight) return
+    if (requiredFieldError === `insight-${field}` && typeof value === "string" && value.trim()) {
+      setRequiredFieldError(null)
+    }
     setEditingInsight({ ...editingInsight, [field]: value })
   }
 
@@ -230,7 +253,7 @@ export function InsightsPageManager() {
   if (view === "list") {
     return (
       <div>
-        <div className="mb-8 flex justify-between items-start">
+        <div className="mb-8 flex justify-between items-start" data-admin-sticky-header>
           <div>
             <h1 className="text-2xl font-bold admin-text-primary mb-2">Insights / Blog</h1>
             <p className="admin-text-secondary">Manage blog posts and article detail pages.</p>
@@ -311,9 +334,16 @@ export function InsightsPageManager() {
                         <Button variant="ghost" size="sm" onClick={() => editInsight(item)} className="admin-text-secondary hover:admin-text-primary">
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => deleteInsight(item.id)} className="text-red-400 hover:text-red-300">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <ConfirmDeleteDialog
+                          trigger={
+                            <Button type="button" variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          }
+                          title="Delete this insight?"
+                          description="This insight will be permanently deleted."
+                          onConfirm={() => deleteInsight(item.id)}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -345,7 +375,7 @@ export function InsightsPageManager() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex items-center gap-4" data-admin-sticky-header>
         <Button variant="ghost" onClick={() => { setView("list"); setEditingInsight(null); setIsNew(false) }} className="admin-text-secondary hover:admin-text-primary">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
@@ -358,17 +388,19 @@ export function InsightsPageManager() {
       <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingInsight && (
-        <div className="space-y-6">
+        <div id="insight-editor" className="space-y-6">
           <div className="admin-card border admin-border rounded-xl p-6">
             <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Title *</label>
-                <Input value={editingInsight.title} onChange={(e) => updateField("title", e.target.value)} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+                <Input id="insight-title" required value={editingInsight.title} onChange={(e) => updateField("title", e.target.value)} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+                <AdminRequiredFieldMessage show={requiredFieldError === "insight-title"} />
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
-                <Input value={editingInsight.slug} onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+                <Input id="insight-slug" required value={editingInsight.slug} onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))} className="admin-bg-tertiary admin-border-light admin-text-primary" />
+                <AdminRequiredFieldMessage show={requiredFieldError === "insight-slug"} />
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Category tags</label>
@@ -424,7 +456,7 @@ export function InsightsPageManager() {
             onChange={(detailTemplate) => setEditingInsight({ ...editingInsight, detailTemplate })}
           />
 
-          <Button onClick={saveInsight} disabled={saving} className="h-10 px-6">
+          <Button onClick={saveInsight} disabled={saving} className="h-10 px-6" data-admin-sticky-save>
             {saving ? "Saving..." : isNew ? "Create Insight" : "Save Changes"}
           </Button>
         </div>

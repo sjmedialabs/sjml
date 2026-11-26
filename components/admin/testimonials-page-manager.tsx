@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import { ImageUpload } from "./image-upload"
 
@@ -113,7 +114,7 @@ export function TestimonialsPageManager() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-2xl font-bold admin-text-primary mb-2">Testimonials</h1>
         <p className="admin-text-secondary">Manage client testimonials and reviews</p>
       </div>
@@ -205,12 +206,16 @@ export function TestimonialsPageManager() {
             <div key={testimonial.id} className="p-4 admin-bg-tertiary rounded-lg">
               <div className="flex justify-between items-start mb-3">
                 <span className="admin-text-primary font-medium">{testimonial.author || "New Testimonial"}</span>
-                <button
-                  onClick={() => deleteTestimonial(testimonial.id)}
-                  className="text-red-500 hover:text-red-400 text-sm"
-                >
-                  Delete
-                </button>
+                <ConfirmDeleteDialog
+                  trigger={
+                    <button type="button" className="text-red-500 hover:text-red-400 text-sm">
+                      Delete
+                    </button>
+                  }
+                  title="Delete this testimonial?"
+                  description="This testimonial will be permanently deleted."
+                  onConfirm={() => deleteTestimonial(testimonial.id)}
+                />
               </div>
               <div className="space-y-3">
                 <div>
@@ -295,6 +300,7 @@ export function TestimonialsPageManager() {
         <button
           onClick={saveData}
           disabled={saving}
+          data-admin-sticky-save
           className="h-9 px-4 bg-primary text-primary-foreground rounded-[4px] hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save All Changes"}

@@ -107,7 +107,7 @@ export function DashboardOverview() {
   if (!mounted || loading) {
     return (
       <div className="space-y-8">
-        <div>
+        <div data-admin-sticky-header>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Dashboard Overview</h1>
           <p className="admin-text-secondary">Loading dashboard statistics...</p>
         </div>
@@ -127,7 +127,7 @@ export function DashboardOverview() {
   if (error) {
     return (
       <div className="space-y-8">
-        <div>
+        <div data-admin-sticky-header>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Dashboard Overview</h1>
           <div className="admin-card p-6 mt-4">
             <p className="admin-text-secondary text-red-500 mb-4">{error}</p>
@@ -159,7 +159,7 @@ export function DashboardOverview() {
   if (!stats) {
     return (
       <div className="space-y-8">
-        <div>
+        <div data-admin-sticky-header>
           <h1 className="text-3xl font-bold admin-text-primary mb-2">Dashboard Overview</h1>
           <p className="admin-text-secondary text-yellow-500">No statistics available</p>
         </div>
@@ -169,7 +169,7 @@ export function DashboardOverview() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <div data-admin-sticky-header>
         <h1 className="text-3xl font-bold admin-text-primary mb-2">Dashboard Overview</h1>
         <p className="admin-text-secondary">Welcome back! Here's what's happening with your website.</p>
       </div>

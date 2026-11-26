@@ -110,14 +110,20 @@ function PageMultiSelect({
               className="inline-flex items-center gap-1 rounded-full border admin-border bg-black/5 px-2.5 py-1 text-xs admin-text-primary"
             >
               {getPageLabel(pageId)}
-              <button
-                type="button"
-                onClick={() => removePage(pageId)}
-                className="rounded-full p-0.5 hover:bg-black/10"
-                aria-label={`Remove ${getPageLabel(pageId)}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <ConfirmDeleteDialog
+                trigger={
+                  <button
+                    type="button"
+                    className="rounded-full p-0.5 hover:bg-black/10"
+                    aria-label={`Remove ${getPageLabel(pageId)}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                }
+                title="Remove this page?"
+                description={`${getPageLabel(pageId)} will no longer be assigned to this script.`}
+                onConfirm={() => removePage(pageId)}
+              />
             </span>
           ))}
         </div>
@@ -352,8 +358,8 @@ export function ScriptsManager() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="admin-cms-scroll-layout">
+      <div className="mb-8" data-admin-sticky-header>
         <h1 className="text-3xl font-bold admin-text-primary mb-2">Header & Footer Scripts</h1>
         <p className="admin-text-secondary">
           Add multiple tracking, chat, or custom scripts and assign each one to specific pages or the whole site.
@@ -362,8 +368,8 @@ export function ScriptsManager() {
 
       <AdminToast message={message} onClose={() => setMessage("")} />
 
-      <Tabs defaultValue="header" className="w-full">
-        <TabsList className="mb-6">
+      <Tabs defaultValue="header" className="admin-cms-tab-layout w-full">
+        <TabsList className="mb-6" data-admin-sticky-nav>
           <TabsTrigger value="header">Header ({headerScripts.length})</TabsTrigger>
           <TabsTrigger value="footer">Footer ({footerScripts.length})</TabsTrigger>
         </TabsList>
@@ -372,7 +378,7 @@ export function ScriptsManager() {
       </Tabs>
 
       <div className="flex justify-end items-center mt-8 pt-6 border-t admin-border">
-        <Button onClick={saveScripts} disabled={saving} className="bg-primary hover:bg-primary/90 text-white px-8 py-3">
+        <Button onClick={saveScripts} disabled={saving} className="bg-primary hover:bg-primary/90 text-white px-8 py-3" data-admin-sticky-save>
           {saving ? "Saving..." : "Save scripts"}
         </Button>
       </div>

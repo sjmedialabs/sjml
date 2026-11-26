@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache"
 import { verifyToken } from "@/lib/jwt"
 import { clientPromise } from "@/lib/mongodb"
 import { sortByDisplayOrder } from "@/lib/service-order"
+import { findWorkGalleryVideoMissingThumbnail } from "@/lib/work-detail-template"
 
 export const dynamic = "force-dynamic"
 
@@ -70,6 +71,14 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json()
+    const missingThumbnailIndex = findWorkGalleryVideoMissingThumbnail(data.detailTemplate)
+    if (missingThumbnailIndex !== null) {
+      return NextResponse.json(
+        { error: `Gallery video ${missingThumbnailIndex + 1} needs a thumbnail image URL or uploaded image.` },
+        { status: 400 },
+      )
+    }
+
     const client = await clientPromise
     const db = client.db("sjmedialabs")
 

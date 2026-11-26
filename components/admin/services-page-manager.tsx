@@ -1,6 +1,7 @@
 "use client"
 
 import { AdminToast } from "./admin-toast"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ImageUpload } from "./image-upload"
@@ -36,6 +37,11 @@ import { CompactSelect } from "./admin-compact-fields"
 import { SERVICE_ICON_OPTIONS, ServiceCardIconDisplay } from "@/components/services/service-card-icons"
 import { sortByDisplayOrder } from "@/lib/service-order"
 import { normalizeSubServiceMeta, syncSubServiceImages } from "@/lib/sub-service-document"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import {
+  getFirstMissingAdminRequiredField,
+  scrollToAdminRequiredField,
+} from "@/lib/admin-required-fields"
 
 interface ServiceItem {
   id: string
@@ -148,6 +154,24 @@ export function ServicesPageManager() {
   const [subParentFilter, setSubParentFilter] = useState("")
   const [subIsNew, setSubIsNew] = useState(false)
   const [editingServiceHasSubs, setEditingServiceHasSubs] = useState<boolean | null>(null)
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
+
+  const validateEditor = (editorId: string) => {
+    const missingField = getFirstMissingAdminRequiredField(document.getElementById(editorId))
+    if (!missingField) {
+      setRequiredFieldError(null)
+      return true
+    }
+
+    setRequiredFieldError(missingField.id)
+    requestAnimationFrame(() => {
+      const field = document.getElementById(missingField.id)
+      if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+        scrollToAdminRequiredField(field)
+      }
+    })
+    return false
+  }
 
   useEffect(() => {
     fetchServices()
@@ -197,6 +221,7 @@ export function ServicesPageManager() {
 
   const saveSubService = async () => {
     if (!editingSub) return
+    if (!validateEditor("sub-service-editor")) return
     setSubSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
@@ -228,7 +253,6 @@ export function ServicesPageManager() {
   }
 
   const deleteSubService = async (id: string) => {
-    if (!confirm("Delete this sub-service?")) return
     try {
       const token = localStorage.getItem("adminToken")
       const res = await fetch(`/api/sub-services/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
@@ -242,6 +266,7 @@ export function ServicesPageManager() {
 
   const addNewSubService = () => {
     setActiveTab("sub-services")
+    setRequiredFieldError(null)
     setEditingSub({
       id: "",
       parentSlug: subParentFilter || (allServicesForParent[0]?.slug ?? ""),
@@ -266,6 +291,7 @@ export function ServicesPageManager() {
 
   const editSubService = (sub: SubServiceItem) => {
     setActiveTab("sub-services")
+    setRequiredFieldError(null)
     const parentTitle = getParentServiceTitle(sub.parentSlug)
     setEditingSub({
       ...sub,
@@ -350,6 +376,7 @@ export function ServicesPageManager() {
 
   const saveService = async () => {
     if (!editingService) return
+    if (!validateEditor("service-editor")) return
     setSaving(true)
     try {
       const token = localStorage.getItem("adminToken")
@@ -410,6 +437,7 @@ export function ServicesPageManager() {
   const addNewService = () => {
     setEditingService({ ...emptyService, id: "" } as ServiceItem)
     setIsNew(true)
+    setRequiredFieldError(null)
     setView("edit")
   }
 
@@ -446,6 +474,7 @@ export function ServicesPageManager() {
       ),
     })
     setIsNew(false)
+    setRequiredFieldError(null)
     setView("edit")
   }
 
@@ -473,7 +502,7 @@ export function ServicesPageManager() {
   if (subView === "edit" && editingSub) {
     return (
       <div>
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-8 flex items-center gap-4" data-admin-sticky-header>
           <Button
             variant="ghost"
             onClick={cancelSubServiceEdit}
@@ -489,19 +518,25 @@ export function ServicesPageManager() {
 
         <AdminToast message={message} onClose={() => setMessage("")} />
 
-        <div className="space-y-6 admin-card border admin-border rounded-xl p-6">
+        <div id="sub-service-editor" className="space-y-6 admin-card border admin-border rounded-xl p-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm admin-text-secondary mb-2">Parent Service *</label>
               <select
+                id="sub-service-parent"
+                required
                 value={editingSub.parentSlug}
-                onChange={(e) => setEditingSub({ ...editingSub, parentSlug: e.target.value })}
+                onChange={(e) => {
+                  setEditingSub({ ...editingSub, parentSlug: e.target.value })
+                  if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+                }}
                 className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2"
               >
                 {allServicesForParent.map((s) => (
                   <option key={s.id} value={s.slug}>{s.title}</option>
                 ))}
               </select>
+              <AdminRequiredFieldMessage show={requiredFieldError === "sub-service-parent"} />
             </div>
             <div>
               <label className="block text-sm admin-text-secondary mb-2">Display Order</label>
@@ -509,11 +544,19 @@ export function ServicesPageManager() {
             </div>
             <div>
               <label className="block text-sm admin-text-secondary mb-2">Name *</label>
-              <Input value={editingSub.name} onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="Logo Design" />
+              <Input id="sub-service-name" required value={editingSub.name} onChange={(e) => {
+                setEditingSub({ ...editingSub, name: e.target.value })
+                if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+              }} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="Logo Design" />
+              <AdminRequiredFieldMessage show={requiredFieldError === "sub-service-name"} />
             </div>
             <div>
               <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
-              <Input value={editingSub.slug} onChange={(e) => setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
+              <Input id="sub-service-slug" required value={editingSub.slug} onChange={(e) => {
+                setEditingSub({ ...editingSub, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })
+                if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+              }} className="admin-bg-tertiary admin-border-light admin-text-primary" placeholder="logo-design" />
+              <AdminRequiredFieldMessage show={requiredFieldError === "sub-service-slug"} />
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -568,7 +611,7 @@ export function ServicesPageManager() {
             <label htmlFor="subActive" className="text-sm admin-text-primary">Active</label>
           </div>
           <div className="flex gap-4">
-            <Button onClick={saveSubService} disabled={subSaving}>{subSaving ? "Saving…" : subIsNew ? "Create Sub-Service" : "Save Sub-Service"}</Button>
+            <Button onClick={saveSubService} disabled={subSaving} data-admin-sticky-save>{subSaving ? "Saving…" : subIsNew ? "Create Sub-Service" : "Save Sub-Service"}</Button>
             <Button variant="outline" onClick={cancelSubServiceEdit} className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent">Cancel</Button>
           </div>
         </div>
@@ -579,8 +622,8 @@ export function ServicesPageManager() {
   // List View
   if (view === "list") {
     return (
-      <div>
-        <div className="mb-8 flex justify-between items-start">
+      <div className="admin-cms-scroll-layout">
+        <div className="mb-8 flex justify-between items-start" data-admin-sticky-header>
           <div>
             <h1 className="text-2xl font-bold admin-text-primary mb-2">Services Management</h1>
             <p className="admin-text-secondary">Manage services page content and individual services</p>
@@ -601,7 +644,7 @@ export function ServicesPageManager() {
             </Button>
           )}
           {activeTab === "page-content" && (
-            <Button onClick={savePageContent} disabled={pageContentSaving}>
+            <Button onClick={savePageContent} disabled={pageContentSaving} data-admin-sticky-save>
               {pageContentSaving ? 'Saving...' : 'Save Page Content'}
             </Button>
           )}
@@ -610,7 +653,7 @@ export function ServicesPageManager() {
         <AdminToast message={message} onClose={() => setMessage("")} />
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b admin-border pb-4 mb-6">
+        <div className="flex gap-2 border-b admin-border pb-4 mb-6" data-admin-sticky-nav>
           <button
             onClick={() => setActiveTab('page-content')}
             className={`px-4 py-2 rounded-lg transition-colors ${activeTab === 'page-content' ? 'bg-primary text-primary-foreground' : 'admin-bg-secondary admin-text-secondary hover:admin-text-primary'}`}
@@ -631,6 +674,7 @@ export function ServicesPageManager() {
           </button>
         </div>
 
+        <div data-admin-scroll-content>
         {/* Page Content Tab */}
         {activeTab === 'page-content' && (
           <ServicesOverviewEditor content={pageContent} onChange={setPageContent} />
@@ -824,7 +868,16 @@ export function ServicesPageManager() {
                         </td>
                         <td className="p-4 text-right">
                           <Button variant="ghost" size="sm" onClick={() => editSubService(sub)} className="admin-text-secondary hover:admin-text-primary"><Pencil className="w-4 h-4" /></Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteSubService(sub.id)} className="text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4" /></Button>
+                          <ConfirmDeleteDialog
+                            trigger={
+                              <Button type="button" variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            }
+                            title="Delete this sub-service?"
+                            description="This sub-service will be permanently deleted."
+                            onConfirm={() => deleteSubService(sub.id)}
+                          />
                         </td>
                       </tr>
                     ))
@@ -844,6 +897,7 @@ export function ServicesPageManager() {
             </div>
           </>
         )}
+        </div>
       </div>
     )
   }
@@ -851,7 +905,7 @@ export function ServicesPageManager() {
   // Edit View
   return (
     <div>
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex items-center gap-4" data-admin-sticky-header>
         <Button
           variant="ghost"
           onClick={() => {
@@ -872,7 +926,7 @@ export function ServicesPageManager() {
       <AdminToast message={message} onClose={() => setMessage("")} />
 
       {editingService && (
-        <div className="space-y-6">
+        <div id="service-editor" className="space-y-6">
           {/* Basic Info */}
           <div className="admin-card border admin-border rounded-xl p-6">
             <h2 className="text-lg font-semibold admin-text-primary mb-4">Basic Information</h2>
@@ -880,20 +934,32 @@ export function ServicesPageManager() {
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Title *</label>
                 <Input
+                  id="service-title"
+                  required
                   value={editingService.title}
-                  onChange={(e) => updateField("title", e.target.value)}
+                  onChange={(e) => {
+                    updateField("title", e.target.value)
+                    if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+                  }}
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="Service title"
                 />
+                <AdminRequiredFieldMessage show={requiredFieldError === "service-title"} />
               </div>
               <div>
                 <label className="block text-sm admin-text-secondary mb-2">Slug *</label>
                 <Input
+                  id="service-slug"
+                  required
                   value={editingService.slug}
-                  onChange={(e) => updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+                  onChange={(e) => {
+                    updateField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-"))
+                    if (requiredFieldError === e.target.id && e.target.value.trim()) setRequiredFieldError(null)
+                  }}
                   className="admin-bg-tertiary admin-border-light admin-text-primary"
                   placeholder="service-slug"
                 />
+                <AdminRequiredFieldMessage show={requiredFieldError === "service-slug"} />
               </div>
               <div>
                 <CompactSelect
@@ -985,7 +1051,8 @@ export function ServicesPageManager() {
           <div className="flex gap-4">
             <Button
               onClick={saveService}
-              disabled={saving || !editingService.title || !editingService.slug}
+              disabled={saving}
+              data-admin-sticky-save
              
             >
               {saving ? "Saving..." : isNew ? "Create Service" : "Save Changes"}

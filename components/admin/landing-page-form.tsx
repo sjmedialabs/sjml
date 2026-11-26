@@ -11,6 +11,11 @@ import {
   type Template1SectionVisibility,
 } from "@/components/template-1/default-data"
 import { defaultLandingPageSeo, type LandingPageSeo } from "@/lib/landing-pages"
+import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
+import {
+  getFirstMissingAdminRequiredField,
+  scrollToAdminRequiredField,
+} from "@/lib/admin-required-fields"
 import { Template1SectionEditor } from "./template-1-section-editor"
 
 const templateOptions = ["Template 1"] as const
@@ -95,6 +100,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [requiredFieldError, setRequiredFieldError] = useState<string | null>(null)
 
   useEffect(() => {
     if (hasChanges) setIsSaved(false)
@@ -204,35 +210,53 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
 
   const pageDetails = (
     <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
-      <label className="block">
-        <span className="mb-2 block text-base font-normal text-[#525252]">Title</span>
+      <div className="block">
+        <label htmlFor="landing-page-title" className="mb-2 block text-base font-normal text-[#525252]">
+          Title
+        </label>
         <input
+          id="landing-page-title"
           className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-base text-[#161617] outline-none placeholder:text-[#737373] focus:border-[#a3a3a3]"
           onChange={(event) => {
             setTitle(event.target.value)
-            if (!slugEdited) setSlug(toSlug(event.target.value))
+            if (requiredFieldError === "landing-page-title" && event.target.value.trim()) {
+              setRequiredFieldError(null)
+            }
+            if (!slugEdited) {
+              const nextSlug = toSlug(event.target.value)
+              setSlug(nextSlug)
+              if (requiredFieldError === "landing-page-slug" && nextSlug) setRequiredFieldError(null)
+            }
           }}
           placeholder="Page title"
           required
           value={title}
         />
-      </label>
-      <label className="block">
-        <span className="mb-2 block text-base font-normal text-[#525252]">URL slug</span>
+        <AdminRequiredFieldMessage show={requiredFieldError === "landing-page-title"} />
+      </div>
+      <div className="block">
+        <label htmlFor="landing-page-slug" className="mb-2 block text-base font-normal text-[#525252]">
+          URL slug
+        </label>
         <input
+          id="landing-page-slug"
           className="min-h-12 w-full rounded border border-[#d1d5db] bg-white px-3 py-3 text-base text-[#161617] outline-none placeholder:text-[#737373] focus:border-[#a3a3a3]"
           onChange={(event) => {
             setSlugEdited(true)
             setSlug(toSlug(event.target.value))
+            if (requiredFieldError === "landing-page-slug" && event.target.value.trim()) {
+              setRequiredFieldError(null)
+            }
           }}
           placeholder="auto-generated from title"
           required
           value={slug}
         />
+        <AdminRequiredFieldMessage show={requiredFieldError === "landing-page-slug"} />
         <span className="mt-2 block text-sm text-[#525252]">
           Route preview: /{slug || "page-slug"}
         </span>
-      </label>
+      </div>
       <fieldset className="sm:col-span-2">
         <legend className="mb-2 block text-base font-normal text-[#525252]">Template</legend>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -283,7 +307,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
 
   return (
     <section className="min-h-[calc(100vh-4rem)] -m-8 w-full min-w-0 bg-[#f5f7fa] p-5 text-[#161617]">
-      <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
+      <header className="mb-5 flex flex-wrap items-start justify-between gap-4" data-admin-sticky-header>
         <div>
           <h1 className="text-[28px] font-bold">
             {page ? `Edit ${page.title}` : "Create New Page"}
@@ -298,6 +322,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
           <button
             className="rounded bg-[#FCC50E] px-5 py-2.5 text-sm font-semibold text-[#161617] hover:bg-[#eab800] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isSaving || (Boolean(page) && !hasChanges)}
+            data-admin-sticky-save
             form="landing-page-form"
             type="submit"
           >
@@ -327,8 +352,19 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
       <form
         id="landing-page-form"
         className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-5 sm:p-7"
+        noValidate
         onSubmit={(event) => {
           event.preventDefault()
+          const missingField = getFirstMissingAdminRequiredField(event.currentTarget)
+          if (missingField) {
+            setRequiredFieldError(missingField.id)
+            requestAnimationFrame(() => {
+              const field = document.getElementById(missingField.id)
+              if (field instanceof HTMLInputElement) scrollToAdminRequiredField(field)
+            })
+            return
+          }
+          setRequiredFieldError(null)
           if (page && !hasChanges) return
           void createPage()
         }}

@@ -38,6 +38,41 @@ export interface WorkDetailGalleryVideo {
   title?: string
 }
 
+export function isValidWorkGalleryThumbnailUrl(value: unknown): boolean {
+  if (typeof value !== "string" || !value.trim()) return false
+
+  const url = value.trim()
+  try {
+    const parsed = new URL(url, "https://local.invalid")
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false
+    if (parsed.hostname === "local.invalid" && !url.startsWith("/")) return false
+    if (parsed.hostname === "local.invalid") {
+      return (
+        /^\/api\/images\/[a-f\d]{24}$/i.test(parsed.pathname) ||
+        /\.(?:jpe?g|png|gif|webp|avif|bmp|svg|ico)$/i.test(parsed.pathname)
+      )
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function findWorkGalleryVideoMissingThumbnail(template: unknown): number | null {
+  if (!template || typeof template !== "object") return null
+
+  const galleryVideos = (template as { galleryVideos?: unknown }).galleryVideos
+  if (!Array.isArray(galleryVideos)) return null
+
+  const missingIndex = galleryVideos.findIndex((video) => {
+    if (!video || typeof video !== "object") return false
+    const item = video as { url?: unknown; thumbnail?: unknown }
+    return typeof item.url === "string" && item.url.trim() !== "" && !isValidWorkGalleryThumbnailUrl(item.thumbnail)
+  })
+
+  return missingIndex === -1 ? null : missingIndex
+}
+
 export type WorkDetailGalleryMediaPriority = "images" | "videos"
 
 export interface WorkDetailGalleryMediaPointer {
