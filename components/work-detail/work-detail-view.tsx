@@ -17,7 +17,9 @@ export function WorkDetailView({
     <>
       <WorkDetailHero title={title} template={template} />
       <WorkDetailProject template={template} />
-      {template.galleryImages.length > 0 && <WorkDetailGallery template={template} />}
+      {(template.galleryImages.length > 0 || template.galleryVideos.length > 0) && (
+        <WorkDetailGallery template={template} />
+      )}
       <WorkDetailResults template={template} />
       <WorkDetailTestimonial template={template} />
       <WorkDetailBottomCta template={template} />

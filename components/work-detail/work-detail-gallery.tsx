@@ -3,12 +3,36 @@
 import { useState, useEffect, useCallback } from "react"
 import useEmblaCarousel from "embla-carousel-react"
 import { X, ChevronLeft, ChevronRight } from "@/components/flat-lucide"
-import type { WorkDetailTemplate } from "@/lib/work-detail-template"
+import { Play } from "lucide-react"
+import {
+  resolveWorkGalleryVideoSource,
+  type WorkDetailTemplate,
+} from "@/lib/work-detail-template"
 
 export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }) {
   const typo = template.typography
-  const images = template.galleryImages.filter(Boolean)
-  const len = images.length
+  const imageMedia = template.galleryImages.filter(Boolean).map((src) => ({ kind: "image" as const, src }))
+  const videoMedia = template.galleryVideos.flatMap((video) => {
+    const source = resolveWorkGalleryVideoSource(video.url)
+    return source ? [{ kind: "video" as const, ...video, source }] : []
+  })
+  const orderedMedia =
+    template.galleryMediaPriority === "videos"
+      ? [...videoMedia, ...imageMedia]
+      : [...imageMedia, ...videoMedia]
+  const latestMedia = template.galleryLatestMedia
+  const latestMediaIndex = latestMedia
+    ? orderedMedia.findIndex(
+        (item) =>
+          item.kind === latestMedia.kind &&
+          (item.kind === "image" ? item.src : item.url) === latestMedia.url,
+      )
+    : -1
+  const media =
+    latestMediaIndex >= 0
+      ? [...orderedMedia.filter((_, index) => index !== latestMediaIndex), orderedMedia[latestMediaIndex]]
+      : orderedMedia
+  const len = media.length
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -58,6 +82,7 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
   const lightboxNext = useCallback(() => {
     setLightboxIndex((i) => (i === null ? null : i === len - 1 ? 0 : i + 1))
   }, [len])
+  const activeMedia = lightboxIndex === null ? null : media[lightboxIndex]
 
   useEffect(() => {
     if (lightboxIndex === null) return
@@ -74,7 +99,7 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
     }
   }, [lightboxIndex, closeLightbox, lightboxPrev, lightboxNext])
 
-  if (!images.length) return null
+  if (!media.length) return null
 
   return (
     <section className="work-detail-gallery py-12 md:py-16">
@@ -96,27 +121,50 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
           {/* Smooth Sliding Carousel Track */}
           <div className="overflow-hidden rounded-xl" ref={emblaRef}>
             <div className="flex -ml-4">
-              {images.map((src, index) => (
+              {media.map((item, index) => (
                 <div
-                  key={`${src}-${index}`}
+                  key={`${item.kind}-${item.kind === "image" ? item.src : item.url}-${index}`}
                   className="pl-4 min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2"
                 >
-                  <div
-                    className="relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/item bg-muted dark:bg-zinc-900 border border-border shadow-sm hover:shadow-md transition-all duration-300"
+                  <button
+                    type="button"
+                    className="relative block w-full aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/item bg-muted dark:bg-zinc-900 border border-border shadow-sm hover:shadow-md transition-all duration-300"
                     onClick={() => setLightboxIndex(index)}
+                    aria-label={
+                      item.kind === "video"
+                        ? `Play ${item.title || `gallery video ${index + 1}`}`
+                        : `View gallery image ${index + 1}`
+                    }
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt={`Work gallery image ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-105"
-                    />
+                    {item.kind === "image" ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.src}
+                        alt={`Work gallery image ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-105"
+                      />
+                    ) : item.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title || `Work gallery video ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-black" />
+                    )}
                     <div className="absolute inset-0 bg-black/0 group-hover/item:bg-black/25 transition-colors flex items-center justify-center">
-                      <span className="opacity-0 group-hover/item:opacity-100 transition-opacity bg-black/75 text-white text-xs px-3 py-1.5 rounded-full font-medium">
-                        Click to view
-                      </span>
+                      {item.kind === "video" ? (
+                        <span className="rounded-full bg-black/75 text-white p-3">
+                          <Play className="w-6 h-6 fill-current" />
+                        </span>
+                      ) : (
+                        <span className="opacity-0 group-hover/item:opacity-100 transition-opacity bg-black/75 text-white text-xs px-3 py-1.5 rounded-full font-medium">
+                          Click to view
+                        </span>
+                      )}
                     </div>
-                  </div>
+                  </button>
                 </div>
               ))}
             </div>
@@ -153,7 +201,7 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
           {/* Pagination Indicators */}
           {len > 1 && (
             <div className="flex justify-center gap-2 mt-6">
-              {images.map((_, i) => (
+              {media.map((_, i) => (
                 <button
                   key={i}
                   type="button"
@@ -170,7 +218,7 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxIndex !== null && images[lightboxIndex] && (
+      {lightboxIndex !== null && activeMedia && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in duration-200"
           role="dialog"
@@ -217,12 +265,33 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
             className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={images[lightboxIndex]}
-              alt={`Gallery detail ${lightboxIndex + 1}`}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-            />
+            {activeMedia.kind === "image" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activeMedia.src}
+                alt={`Gallery detail ${lightboxIndex + 1}`}
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              />
+            ) : activeMedia.source.kind === "embed" ? (
+              <iframe
+                src={activeMedia.source.src}
+                title={activeMedia.title || `Gallery video ${lightboxIndex + 1}`}
+                className="w-full aspect-video rounded-lg"
+                allow="autoplay; encrypted-media; picture-in-picture; web-share"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <video
+                src={activeMedia.source.src}
+                poster={activeMedia.thumbnail || undefined}
+                title={activeMedia.title || `Gallery video ${lightboxIndex + 1}`}
+                className="max-w-full max-h-[85vh] w-full rounded-lg"
+                controls
+                autoPlay
+                playsInline
+              />
+            )}
           </div>
         </div>
       )}

@@ -1,7 +1,9 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { ImageUpload } from "./image-upload"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Plus, Trash2 } from "lucide-react"
 import {
   AdminCompactCard,
@@ -13,10 +15,69 @@ import {
   TypographyPillRow,
 } from "./admin-compact-fields"
 import {
+  resolveWorkGalleryVideoSource,
   WORK_METRIC_ICON_PRESETS,
   WORK_PILLAR_ICON_PRESETS,
   type WorkDetailTemplate,
 } from "@/lib/work-detail-template"
+
+function isImageThumbnailUrl(value: string): boolean {
+  const url = value.trim()
+  if (!url) return true
+
+  try {
+    const parsed = new URL(url, "https://local.invalid")
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false
+    if (parsed.hostname === "local.invalid" && !url.startsWith("/")) return false
+    if (parsed.hostname === "local.invalid" && /^\/api\/images\/[a-f\d]{24}$/i.test(parsed.pathname)) return true
+    return /\.(?:jpe?g|png|gif|webp|avif|bmp|svg|ico)$/i.test(parsed.pathname)
+  } catch {
+    return false
+  }
+}
+
+function ThumbnailUrlField({
+  id,
+  value,
+  onChange,
+}: {
+  id: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  const [draft, setDraft] = useState(value)
+  const valid = isImageThumbnailUrl(draft)
+
+  useEffect(() => {
+    setDraft(value)
+  }, [value])
+
+  return (
+    <div>
+      <label htmlFor={id} className="admin-compact-label">
+        Thumbnail URL (optional)
+      </label>
+      <Input
+        id={id}
+        type="url"
+        value={draft}
+        onChange={(event) => {
+          const nextValue = event.target.value
+          setDraft(nextValue)
+          if (isImageThumbnailUrl(nextValue)) onChange(nextValue)
+        }}
+        placeholder="https://example.com/video-thumbnail.jpg"
+        aria-invalid={!valid}
+        className="admin-compact-input h-8 text-xs px-2.5"
+      />
+      {valid ? (
+        <p className="text-xs admin-text-muted mt-1">Use an image URL (JPG, PNG, WebP, or another image format).</p>
+      ) : (
+        <p className="text-xs text-red-500 mt-1">Thumbnail URL must point to an image file.</p>
+      )}
+    </div>
+  )
+}
 
 export function WorkDetailTemplateEditor({
   template,
@@ -39,6 +100,8 @@ export function WorkDetailTemplateEditor({
 
   const setBottomCta = (patch: Partial<WorkDetailTemplate["bottomCta"]>) =>
     onChange({ ...template, bottomCta: { ...template.bottomCta, ...patch } })
+  const hasGalleryImages = template.galleryImages.some(Boolean)
+  const hasGalleryVideos = template.galleryVideos.some((video) => resolveWorkGalleryVideoSource(video.url) !== null)
 
   return (
     <div className="space-y-2.5">
@@ -96,20 +159,75 @@ export function WorkDetailTemplateEditor({
 
       <AdminCompactCard title="Gallery">
         <CompactField label="Section label" value={template.galleryLabel} onChange={(v) => onChange({ ...template, galleryLabel: v })} />
-        <div className="mb-4">
-          <ImageUpload
-            preset="gallery"
-            label="Upload Gallery Images (Select multiple files)"
-            value=""
-            multiple
-            onMultipleChange={(newUrls) => {
-              const current = template.galleryImages.filter(Boolean)
-              onChange({ ...template, galleryImages: [...current, ...newUrls] })
-            }}
-            onChange={(url) => {
-              if (url) onChange({ ...template, galleryImages: [...template.galleryImages, url] })
-            }}
-          />
+        {hasGalleryImages && hasGalleryVideos && (
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm admin-text-secondary">Media priority</span>
+            <div role="tablist" aria-label="Gallery media priority" className="flex gap-2">
+              {(["images", "videos"] as const).map((priority) => (
+                <button
+                  key={priority}
+                  type="button"
+                  role="tab"
+                  aria-selected={template.galleryMediaPriority === priority}
+                  onClick={() => onChange({ ...template, galleryMediaPriority: priority })}
+                  className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                    template.galleryMediaPriority === priority
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "admin-border-light admin-text-secondary hover:admin-text-primary"
+                  }`}
+                >
+                  {priority === "images" ? "Images first" : "Videos first"}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <div className="min-w-[220px] flex-1">
+            <ImageUpload
+              preset="gallery"
+              label="Upload Gallery Images (Select multiple files)"
+              value=""
+              multiple
+              onMultipleChange={(newUrls) => {
+                const current = template.galleryImages.filter(Boolean)
+                const galleryImages = [...current, ...newUrls]
+                onChange({
+                  ...template,
+                  galleryImages,
+                  ...(newUrls.length
+                    ? { galleryLatestMedia: { kind: "image" as const, url: newUrls[newUrls.length - 1] } }
+                    : {}),
+                })
+              }}
+              onChange={(url) => {
+                if (url) {
+                  onChange({
+                    ...template,
+                    galleryImages: [...template.galleryImages, url],
+                    galleryLatestMedia: { kind: "image", url },
+                  })
+                }
+              }}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              onChange({
+                ...template,
+                galleryVideos: [
+                  ...(template.galleryVideos ?? []),
+                  { url: "", thumbnail: "", thumbnailSource: "url", title: "" },
+                ],
+              })
+            }
+            className="admin-border-light text-gray-300 hover:admin-bg-secondary bg-transparent self-end"
+          >
+            <Plus className="w-4 h-4 mr-1" /> Add video
+          </Button>
         </div>
 
         {template.galleryImages.filter(Boolean).length > 0 && (
@@ -144,6 +262,89 @@ export function WorkDetailTemplateEditor({
             </div>
           </div>
         )}
+
+        {(template.galleryVideos ?? []).map((video, index) => (
+          <div key={`video-${index}`} className="mt-4 rounded-lg border admin-border-light p-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold admin-text-secondary">Gallery video {index + 1}</p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  onChange({
+                    ...template,
+                    galleryVideos: template.galleryVideos.filter((_, i) => i !== index),
+                  })
+                }
+                className="text-red-400"
+                aria-label={`Remove gallery video ${index + 1}`}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+            <CompactField
+              label="Video URL (direct MP4/WebM or YouTube/Vimeo link)"
+              value={video.url}
+              onChange={(url) => {
+                const galleryVideos = [...template.galleryVideos]
+                galleryVideos[index] = { ...video, url }
+                onChange({
+                  ...template,
+                  galleryVideos,
+                  ...(url.trim() ? { galleryLatestMedia: { kind: "video" as const, url } } : {}),
+                })
+              }}
+              placeholder="https://example.com/video.mp4"
+            />
+            <CompactField
+              label="Video title (optional)"
+              value={video.title ?? ""}
+              onChange={(title) => {
+                const galleryVideos = [...template.galleryVideos]
+                galleryVideos[index] = { ...video, title }
+                onChange({ ...template, galleryVideos })
+              }}
+              placeholder="Project video"
+            />
+            <CompactSelect
+              label="Thumbnail source"
+              value={video.thumbnailSource}
+              options={[
+                { value: "url", label: "Enter image URL" },
+                { value: "upload", label: "Upload image" },
+              ]}
+              onChange={(thumbnailSource) => {
+                if (thumbnailSource !== "url" && thumbnailSource !== "upload") return
+                const galleryVideos = [...template.galleryVideos]
+                galleryVideos[index] = { ...video, thumbnail: "", thumbnailSource }
+                onChange({ ...template, galleryVideos })
+              }}
+            />
+            {video.thumbnailSource === "url" ? (
+              <ThumbnailUrlField
+                id={`gallery-video-thumbnail-url-${index}`}
+                value={video.thumbnail}
+                onChange={(thumbnail) => {
+                  const galleryVideos = [...template.galleryVideos]
+                  galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "url" }
+                  onChange({ ...template, galleryVideos })
+                }}
+              />
+            ) : (
+              <ImageUpload
+                preset="gallery"
+                label="Upload thumbnail image"
+                value={video.thumbnail}
+                onChange={(thumbnail) => {
+                  const galleryVideos = [...template.galleryVideos]
+                  galleryVideos[index] = { ...video, thumbnail, thumbnailSource: "upload" }
+                  onChange({ ...template, galleryVideos })
+                }}
+              />
+            )}
+          </div>
+        ))}
       </AdminCompactCard>
 
       <AdminCompactCard title="Results">
