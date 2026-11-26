@@ -9,12 +9,13 @@ import {
 } from "./default-data"
 import {
   type Template1LeadFormErrors,
-  sanitizePhoneInput,
+  sanitizeLeadFormValue,
   validateLeadForm,
   validateLeadFormField,
 } from "./form-validation"
 import { Template1ConsultationModal } from "./consultation-modal"
 import { submitTemplate1Lead } from "./submit-lead"
+import { countWords } from "@/lib/enquiry-validation"
 
 export type { Template1HeroData, Template1LeadFormValues }
 
@@ -84,8 +85,7 @@ export function Template1HeroSection({
     field: keyof Template1LeadFormValues,
     rawValue: string
   ) => {
-    const value =
-      field === "phoneNumber" ? sanitizePhoneInput(rawValue) : rawValue
+    const value = sanitizeLeadFormValue(field, rawValue)
 
     setFormValues((prev) => ({ ...prev, [field]: value }))
 
@@ -350,7 +350,7 @@ export function Template1HeroSection({
                     <input
                       type="tel"
                       inputMode="numeric"
-                      pattern="[0-9]{10}"
+                      pattern="[6-9][0-9]{9}"
                       required
                       maxLength={10}
                       value={formValues.phoneNumber}
@@ -397,6 +397,9 @@ export function Template1HeroSection({
                           : "border-black/12 bg-white focus:border-[#161617] focus:ring-2 focus:ring-[#FCC50E] focus:bg-[#FFFDF5]"
                       }`}
                     />
+                    <p className="mt-1 text-[10px] text-[#161617]/55">
+                      Maximum 500 words ({countWords(formValues.message)}/500)
+                    </p>
                     {errors.message && (
                       <p className="mt-1 text-[11px] text-[#D92D20]">
                         {errors.message}

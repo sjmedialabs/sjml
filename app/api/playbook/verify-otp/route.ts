@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCollection } from "@/lib/mongodb"
+import { isValidEnquiryName, isValidIndianMobile } from "@/lib/enquiry-validation"
 
 // Import WhatsApp service
 import { sendOTP as sendViaWhatsApp, isTwilioWhatsAppConfigured } from "@/lib/sms/twilio-whatsapp"
@@ -13,6 +14,12 @@ export async function POST(request: NextRequest) {
 
     if (!phone || !otp) {
       return NextResponse.json({ error: "Phone and OTP are required" }, { status: 400 })
+    }
+    if (typeof phone !== "string" || !/^\+91[6-9]\d{9}$/.test(phone)) {
+      return NextResponse.json({ error: "Enter a valid 10-digit Indian mobile number" }, { status: 400 })
+    }
+    if (name && (typeof name !== "string" || !isValidEnquiryName(name))) {
+      return NextResponse.json({ error: "Name must contain letters and spaces only" }, { status: 400 })
     }
 
     // Get stored OTP
@@ -64,10 +71,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Phone and name are required" }, { status: 400 })
     }
 
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^\+?[\d\s-()]{10,}$/
-    if (!phoneRegex.test(phone)) {
-      return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 })
+    if (typeof phone !== "string" || !/^\+91[6-9]\d{9}$/.test(phone) || !isValidIndianMobile(phone.slice(3))) {
+      return NextResponse.json({ error: "Enter a valid 10-digit Indian mobile number" }, { status: 400 })
+    }
+    if (typeof name !== "string" || !isValidEnquiryName(name)) {
+      return NextResponse.json({ error: "Name must contain letters and spaces only" }, { status: 400 })
     }
 
     // Generate 6-digit OTP

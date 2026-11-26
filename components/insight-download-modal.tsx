@@ -2,6 +2,12 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  isValidEnquiryName,
+  isValidIndianMobile,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 interface InsightDownloadModalProps {
   isOpen: boolean
@@ -24,13 +30,21 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    if (!isValidEnquiryName(name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
+    if (!isValidIndianMobile(phone)) {
+      setError("Enter a 10-digit Indian mobile number starting with 6, 7, 8, or 9.")
+      return
+    }
     setLoading(true)
 
     try {
       const response = await fetch("/api/playbook/verify-otp", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name }),
+        body: JSON.stringify({ phone: `+91${phone}`, name: name.trim() }),
       })
 
       const data = await response.json()
@@ -60,7 +74,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
       const response = await fetch("/api/playbook/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp, name }),
+        body: JSON.stringify({ phone: `+91${phone}`, otp, name: name.trim() }),
       })
 
       const data = await response.json()
@@ -135,7 +149,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(sanitizeEnquiryName(e.target.value))}
                 required
                 className={inputClass}
                 placeholder="Enter your name"
@@ -146,14 +160,17 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
               <label className="block text-sm font-medium text-black/70 mb-2">Phone Number (WhatsApp) *</label>
               <input
                 type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                pattern="[6-9][0-9]{9}"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(sanitizeIndianMobile(e.target.value))}
                 required
                 className={inputClass}
-                placeholder="+1234567890"
+                placeholder="10-digit mobile number"
               />
               <p className="text-xs text-black/45 mt-1">
-                Include country code (e.g., +1 for US). You'll receive OTP on WhatsApp.
+                Enter your 10-digit Indian mobile number. OTP will be sent to +91{phone}.
               </p>
             </div>
 
@@ -179,7 +196,7 @@ export function InsightDownloadModal({ isOpen, onClose, pdfUrl, insightTitle }: 
                 placeholder="000000"
               />
               <p className="text-xs text-black/45 mt-1">
-                OTP sent to your WhatsApp: {phone}{" "}
+                OTP sent to your WhatsApp: +91{phone}{" "}
                 <button type="button" onClick={() => setStep("form")} className="text-home-primary hover:underline">
                   Change
                 </button>

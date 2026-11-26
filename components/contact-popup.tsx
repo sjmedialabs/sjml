@@ -7,6 +7,15 @@ import { X } from "@/components/flat-lucide"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  countWords,
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 interface ContactPopupProps {
   isOpen: boolean
@@ -26,9 +35,23 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isValidEnquiryName(formData.name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
+    if (!isValidIndianMobile(formData.phone)) {
+      setError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
+      return
+    }
+    if (!hasValidEnquiryWordCount(formData.message)) {
+      setError("Message must be 500 words or fewer.")
+      return
+    }
+    setError("")
     setIsSubmitting(true)
 
     try {
@@ -102,7 +125,7 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
                 <Input
                   placeholder="Full Name*"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, name: sanitizeEnquiryName(e.target.value) })}
                   required
                   className={inputClass}
                 />
@@ -118,10 +141,13 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  pattern="[6-9][0-9]{9}"
                   placeholder="Phone Number*"
                   required
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, phone: sanitizeIndianMobile(e.target.value) })}
                   className={inputClass}
                 />
                 <Input
@@ -135,11 +161,13 @@ export function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
               <Textarea
                 placeholder="Tell us about your project..."
                 value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, message: limitEnquiryWords(e.target.value) })}
                 required
                 rows={4}
                 className={`${inputClass} resize-none`}
               />
+              <p className="text-xs text-black/50 text-right">{countWords(formData.message)}/500 words</p>
+              {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
               <Button
                 type="submit"
                 disabled={isSubmitting}

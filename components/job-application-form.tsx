@@ -2,6 +2,15 @@
 
 import { useState } from "react"
 import { CheckCircle } from "@/components/flat-lucide"
+import {
+  countWords,
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 export function JobApplicationForm() {
   const [formData, setFormData] = useState({
@@ -13,9 +22,23 @@ export function JobApplicationForm() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isValidEnquiryName(formData.name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
+    if (formData.phone && !isValidIndianMobile(formData.phone)) {
+      setError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
+      return
+    }
+    if (!hasValidEnquiryWordCount(formData.coverLetter)) {
+      setError("Cover letter must be 500 words or fewer.")
+      return
+    }
+    setError("")
     setSubmitting(true)
 
     // Simulate form submission
@@ -43,7 +66,7 @@ export function JobApplicationForm() {
           type="text"
           required
           value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, name: sanitizeEnquiryName(e.target.value) })}
           className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-[#E63946]"
         />
       </div>
@@ -61,8 +84,11 @@ export function JobApplicationForm() {
         <label className="block text-sm text-muted-foreground mb-2">Phone</label>
         <input
           type="tel"
+          inputMode="numeric"
+          maxLength={10}
+          pattern="[6-9][0-9]{9}"
           value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, phone: sanitizeIndianMobile(e.target.value) })}
           className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-[#E63946]"
         />
       </div>
@@ -82,11 +108,13 @@ export function JobApplicationForm() {
         <textarea
           rows={4}
           value={formData.coverLetter}
-          onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, coverLetter: limitEnquiryWords(e.target.value) })}
           placeholder="Tell us why you're interested..."
           className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-[#E63946] resize-none"
         />
+        <p className="text-xs text-muted-foreground text-right">{countWords(formData.coverLetter)}/500 words</p>
       </div>
+      {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
       <button
         type="submit"
         disabled={submitting}

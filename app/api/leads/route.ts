@@ -1,6 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/jwt"
 import { getLeads, addLead } from "@/lib/models/lead"
+import {
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+} from "@/lib/enquiry-validation"
 
 export const dynamic = "force-dynamic"
 
@@ -72,6 +77,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+
+    if (body.name && (typeof body.name !== "string" || !isValidEnquiryName(body.name))) {
+      return NextResponse.json({ error: "Name must contain letters and spaces only" }, { status: 400 })
+    }
+    if (body.phone && (typeof body.phone !== "string" || !isValidIndianMobile(body.phone))) {
+      return NextResponse.json(
+        { error: "Phone must be a 10-digit mobile number starting with 6, 7, 8, or 9" },
+        { status: 400 },
+      )
+    }
+    if (body.message && (typeof body.message !== "string" || !hasValidEnquiryWordCount(body.message))) {
+      return NextResponse.json({ error: "Message must be 500 words or fewer" }, { status: 400 })
+    }
 
     if (!body.email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })

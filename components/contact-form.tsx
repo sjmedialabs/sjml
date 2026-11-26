@@ -1,6 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import {
+  countWords,
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+  limitEnquiryWords,
+  sanitizeEnquiryName,
+  sanitizeIndianMobile,
+} from "@/lib/enquiry-validation"
 
 interface ContactFormProps {
   buttonText: string
@@ -16,9 +25,23 @@ export function ContactForm({ buttonText }: ContactFormProps) {
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isValidEnquiryName(formData.name)) {
+      setError("Enter a name using letters and spaces only.")
+      return
+    }
+    if (formData.phone && !isValidIndianMobile(formData.phone)) {
+      setError("Enter a 10-digit mobile number starting with 6, 7, 8, or 9.")
+      return
+    }
+    if (!hasValidEnquiryWordCount(formData.message)) {
+      setError("Message must be 500 words or fewer.")
+      return
+    }
+    setError("")
     setSubmitting(true)
 
     try {
@@ -64,9 +87,9 @@ export function ContactForm({ buttonText }: ContactFormProps) {
           type="text"
           required
           value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, name: sanitizeEnquiryName(e.target.value) })}
           className="w-full px-4 py-3 bg-transparent border border-border rounded-lg text-foreground placeholder-[#666] focus:outline-none focus:border-[#E63946]"
-          placeholder="Full Name/Company Name*"
+          placeholder="Full Name*"
         />
         <input
           type="email"
@@ -80,8 +103,11 @@ export function ContactForm({ buttonText }: ContactFormProps) {
       <div className="grid md:grid-cols-2 gap-4">
         <input
           type="tel"
+          inputMode="numeric"
+          maxLength={10}
+          pattern="[6-9][0-9]{9}"
           value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, phone: sanitizeIndianMobile(e.target.value) })}
           className="w-full px-4 py-3 bg-transparent border border-border rounded-lg text-foreground placeholder-[#666] focus:outline-none focus:border-[#E63946]"
           placeholder="Phone number"
         />
@@ -97,10 +123,12 @@ export function ContactForm({ buttonText }: ContactFormProps) {
         required
         rows={5}
         value={formData.message}
-        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+        onChange={(e) => setFormData({ ...formData, message: limitEnquiryWords(e.target.value) })}
         className="w-full px-4 py-3 bg-transparent border border-border rounded-lg text-foreground placeholder-[#666] focus:outline-none focus:border-[#E63946] resize-none"
         placeholder="Drop your Message or question here..."
       />
+      <p className="text-xs text-muted-foreground text-right">{countWords(formData.message)}/500 words</p>
+      {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
       <div className="text-center">
         <button
           type="submit"

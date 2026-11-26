@@ -1,8 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCollection } from "@/lib/mongodb"
 import { sendDigitalMarketingFormEmail } from "@/lib/email"
+import {
+  hasValidEnquiryWordCount,
+  isValidEnquiryName,
+  isValidIndianMobile,
+} from "@/lib/enquiry-validation"
 
 export const dynamic = "force-dynamic"
+
+const LONG_TEXT_FIELDS = [
+  "businessDesc",
+  "goalsDetails",
+  "socialMediaLinks",
+  "campaigns",
+  "painPoints",
+  "interests",
+  "competitors",
+  "compStrengths",
+  "budgetNotes",
+  "techStackDetails",
+  "challenges",
+  "additionalInfo",
+] as const
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,13 +43,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields
-    if (!body.companyName?.trim()) {
+    if (typeof body.companyName !== "string" || !body.companyName.trim()) {
       return NextResponse.json({ error: "Company Name is required" }, { status: 400 })
     }
-    if (!body.contactPerson?.trim()) {
+    if (typeof body.contactPerson !== "string" || !body.contactPerson.trim()) {
       return NextResponse.json({ error: "Contact Person is required" }, { status: 400 })
     }
-    if (!body.email?.trim()) {
+    if (!isValidEnquiryName(body.contactPerson)) {
+      return NextResponse.json({ error: "Contact Person must contain letters and spaces only" }, { status: 400 })
+    }
+    if (typeof body.email !== "string" || !body.email.trim()) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
@@ -40,13 +63,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Phone validation (required)
-    if (!body.phone?.trim()) {
+    if (typeof body.phone !== "string" || !body.phone.trim()) {
       return NextResponse.json({ error: "Phone number is required" }, { status: 400 })
     }
-    if (body.phone?.trim()) {
-      const digits = body.phone.replace(/\D/g, "")
-      if (digits.length < 10) {
-        return NextResponse.json({ error: "Phone number must have at least 10 digits" }, { status: 400 })
+    if (!isValidIndianMobile(body.phone)) {
+      return NextResponse.json(
+        { error: "Phone must be a 10-digit mobile number starting with 6, 7, 8, or 9" },
+        { status: 400 },
+      )
+    }
+    for (const field of LONG_TEXT_FIELDS) {
+      if (body[field] !== undefined && (typeof body[field] !== "string" || !hasValidEnquiryWordCount(body[field]))) {
+        return NextResponse.json({ error: `${field} must be 500 words or fewer` }, { status: 400 })
       }
     }
 
