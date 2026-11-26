@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import type { Document } from "mongodb"
-import { verifyToken } from "@/lib/jwt"
+import { getAuthenticatedAdminFromRequest } from "@/lib/admin-auth"
 import { clientPromise } from "@/lib/mongodb"
 import {
   defaultTemplate1PageData,
@@ -57,12 +57,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const authHeader = request.headers.get("authorization")
-  if (!authHeader?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-  if (!verifyToken(authHeader.slice("Bearer ".length))) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+  const admin = await getAuthenticatedAdminFromRequest(request)
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 })
   }
 
   try {

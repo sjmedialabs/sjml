@@ -95,6 +95,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
+    const isLandingHeroLead =
+      body.subject === "Template 1 enquiry" && body.source === "website"
+    if (isLandingHeroLead && process.env.RECAPTCHA_SECRET_KEY) {
+      const captchaOk = await verifyRecaptcha(
+        typeof body.captchaToken === "string" ? body.captchaToken : "",
+      )
+      if (!captchaOk) {
+        return NextResponse.json({ error: "Captcha verification failed" }, { status: 400 })
+      }
+    }
+
     const newLead = await addLead({
       name: body.name || "",
       email: body.email,

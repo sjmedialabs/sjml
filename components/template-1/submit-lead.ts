@@ -3,6 +3,7 @@ import type { Template1LeadFormValues } from "./default-data"
 export async function submitTemplate1Lead(
   values: Template1LeadFormValues,
   source: "website" | "website_popup",
+  captchaToken?: string,
 ) {
   const response = await fetch("/api/leads", {
     method: "POST",
@@ -15,6 +16,7 @@ export async function submitTemplate1Lead(
       subject: "Template 1 enquiry",
       source,
       page: window.location.pathname,
+      ...(captchaToken ? { captchaToken } : {}),
     }),
   })
 

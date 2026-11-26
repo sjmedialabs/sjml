@@ -18,6 +18,41 @@ export function sanitizePhoneInput(raw: string): string {
   return sanitizeIndianMobile(raw)
 }
 
+/**
+ * Validates a display phone number requiring a country code (+1 to +999)
+ * followed by a 10-digit phone number (empty string is allowed for optional overrides).
+ */
+export function validatePhoneTextWithCountryCode(value: string): string | null {
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  if (!trimmed.startsWith("+")) {
+    return "Include a country code followed by a 10-digit number (e.g. +91 9876543210)."
+  }
+
+  const separatorMatch = trimmed.match(/^\+([1-9]\d{0,2})[\s()-]+(.+)$/)
+  if (separatorMatch) {
+    const localDigits = separatorMatch[2].replace(/\D/g, "")
+    if (localDigits.length !== 10) {
+      return "Enter a valid country code followed by a 10-digit phone number (e.g. +91 9876543210)."
+    }
+    return null
+  }
+
+  const digitsOnly = trimmed.slice(1).replace(/\D/g, "")
+  if (digitsOnly.startsWith("91")) {
+    if (digitsOnly.length !== 12) {
+      return "Enter a valid country code followed by a 10-digit phone number (e.g. +91 9876543210)."
+    }
+    return null
+  }
+  if (!/^[1-9]\d{10,12}$/.test(digitsOnly)) {
+    return "Enter a valid country code followed by a 10-digit phone number (e.g. +91 9876543210)."
+  }
+
+  return null
+}
+
 export function validateLeadFormField(
   field: keyof Template1LeadFormValues,
   value: string

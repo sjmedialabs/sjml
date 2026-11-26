@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { CheckCircle2, Eye, LoaderCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Eye, LoaderCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   defaultTemplate1PageData,
   defaultTemplate1SectionVisibility,
@@ -108,6 +110,27 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
 
   async function createPage() {
     if (isSaving || (page && !hasChanges)) return
+
+    const headerPhoneError = validatePhoneTextWithCountryCode(
+      sectionData.header.phoneText ?? "",
+    )
+    if (headerPhoneError) {
+      const message = `Header Phone Text: ${headerPhoneError}`
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
+      return
+    }
+
+    const footerPhoneError = validatePhoneTextWithCountryCode(
+      sectionData.footer.phoneText ?? "",
+    )
+    if (footerPhoneError) {
+      const message = `Footer Phone Text: ${footerPhoneError}`
+      setErrorMessage(message)
+      onAction(`❌ ${message}`)
+      return
+    }
+
     setIsSaving(true)
     setIsSaved(false)
     setErrorMessage("")
@@ -228,7 +251,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               if (requiredFieldError === "landing-page-slug" && nextSlug) setRequiredFieldError(null)
             }
           }}
-          placeholder="Page title"
+          placeholder="e.g. Performance Marketing Agency"
           required
           value={title}
         />
@@ -272,15 +295,15 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
                 value={option}
               />
               <label
-                className={`flex min-h-28 cursor-pointer flex-col justify-between rounded-md border p-4 pr-14 transition-colors ${
+                className={`flex min-h-24 cursor-pointer flex-col justify-between rounded-xl border p-4 pr-12 transition-all ${
                   template === option
-                    ? "border-[#FCC50E] bg-[#fff9df] ring-2 ring-[#FCC50E]/30"
-                    : "border-[#d1d5db] bg-white hover:border-[#a3a3a3]"
+                    ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                    : "admin-border admin-card hover:border-black/20"
                 }`}
                 htmlFor={`landing-page-template-${option}`}
               >
-                <span className="text-base font-semibold text-[#161617]">{option}</span>
-                <span className="mt-3 text-sm text-[#525252]">
+                <span className="text-base font-semibold admin-text-primary">{option}</span>
+                <span className="mt-2 text-xs admin-text-secondary">
                   {option === "Template 1"
                     ? `${templateOnePageSections} editable page sections`
                     : "Page template"}
@@ -288,20 +311,24 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               </label>
               <button
                 aria-label={`Preview ${option}`}
-                className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded border border-[#d1d5db] bg-white text-[#525252] transition-colors hover:border-[#FCC50E] hover:text-[#161617] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FCC50E]"
+                className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-lg border admin-border admin-bg-secondary admin-text-secondary transition-colors hover:text-primary hover:border-primary"
                 onClick={() => {
-                  window.open("/template-1?preview=1", "_blank", "noopener,noreferrer")
+                  const token = localStorage.getItem("adminToken")
+                  const url = token
+                    ? `/template-1?preview=1&preview_token=${encodeURIComponent(token)}`
+                    : "/template-1?preview=1"
+                  window.open(url, "_blank", "noopener,noreferrer")
                   onAction("Opening template preview")
                 }}
                 title={`Preview ${option}`}
                 type="button"
               >
-                <Eye aria-hidden="true" size={18} />
+                <Eye aria-hidden="true" size={16} />
               </button>
             </div>
           ))}
         </div>
-      </fieldset>
+      </div>
     </div>
   )
 
@@ -309,13 +336,20 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
     <section className="min-h-[calc(100vh-4rem)] -m-8 w-full min-w-0 bg-[#f5f7fa] p-5 text-[#161617]">
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4" data-admin-sticky-header>
         <div>
-          <h1 className="text-[28px] font-bold">
-            {page ? `Edit ${page.title}` : "Create New Page"}
+          <button
+            onClick={onCancel}
+            type="button"
+            className="text-sm admin-text-secondary hover:admin-text-primary transition-colors mb-2 inline-flex items-center gap-1.5"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Landing Pages
+          </button>
+          <h1 className="text-2xl font-bold admin-text-primary mb-2">
+            {page ? `Edit: ${page.title}` : "Create New Landing Page"}
           </h1>
-          <p className="mt-1 text-base text-[#525252]">
+          <p className="admin-text-secondary">
             {page
-              ? "Manage the selected template sections and SEO."
-              : "Enter the basic details to create a page. You can edit its sections afterward."}
+              ? "Manage the selected template sections, content overrides, and SEO configuration."
+              : "Enter basic details to create a page. You can customize its sections afterward."}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -379,43 +413,60 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
             onSeoChange={setSeoData}
             onAction={onAction}
           />
-        ) : page ? (
-          <section className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#525252] sm:p-5">
-            No section editor is available for this template.
-          </section>
-        ) : (
-          <section className="w-full min-w-0 rounded-md border border-[#e5e7eb] bg-white p-4 sm:p-5">
-            <h2 className="mb-4 text-base font-semibold text-[#161617]">Page Details</h2>
-            {pageDetails}
-          </section>
-        )}
+        </div>
+      ) : page ? (
+        <div className="admin-card border admin-border rounded-xl p-6 text-sm admin-text-muted">
+          No section editor is available for this template.
+        </div>
+      ) : (
+        <div className="admin-card border admin-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold admin-text-primary mb-4">Page Details</h2>
+          {pageDetails}
+        </div>
+      )}
 
-        <footer className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5ebf2] pt-5">
-          <div aria-live="polite" className="text-sm">
-            {errorMessage ? (
-              <p className="text-red-600">{errorMessage}</p>
+      {/* Sticky Footer Actions */}
+      <div className="sticky bottom-4 z-30 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border admin-border admin-card px-6 py-4 shadow-lg">
+        <p className="text-sm admin-text-secondary">
+          {page
+            ? hasChanges
+              ? "You have unsaved changes."
+              : `Configure the ${template} sections and SEO metadata above.`
+            : `Your page will be created using ${template} (${templateOnePageSections} editable sections).`}
+        </p>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              onAction("Page editing cancelled")
+              onCancel()
+            }}
+            className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
+            type="button"
+          >
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            disabled={isSaving || (Boolean(page) && !hasChanges)}
+            onClick={() => void createPage()}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            type="button"
+          >
+            {isSaving ? (
+              <>
+                <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
+                {page ? "Saving..." : "Creating..."}
+              </>
+            ) : page ? (
+              "Save Changes"
             ) : (
-              <p className="text-[#525252]">
-                {page
-                  ? `Configure the ${template} sections and SEO.`
-                  : `Your page will be created using ${template} (${templateOnePageSections} sections). Edit it afterward to configure each section.`}
-              </p>
+              "Create Page"
             )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              className="rounded border border-[#d1d5db] px-4 py-2.5 text-sm font-semibold text-[#525252] hover:bg-[#f5f5f5]"
-              onClick={() => {
-                onAction("Page editing cancelled")
-                onCancel()
-              }}
-              type="button"
-            >
-              Cancel
-            </button>
-          </div>
-        </footer>
-      </form>
-    </section>
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

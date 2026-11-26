@@ -8,6 +8,7 @@ import type {
 } from "@/components/template-1/default-data"
 import { clientPromise } from "@/lib/mongodb"
 import type { LandingPageSeo } from "@/lib/landing-pages"
+import { isAdminOrSuperadmin } from "@/lib/admin-auth"
 
 export const dynamic = "force-dynamic"
 
@@ -21,46 +22,73 @@ interface LandingPageRecord extends Document {
   seoData?: LandingPageSeo
 }
 
-async function getLandingPage(slug: string, preview: boolean) {
+interface PageProps {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{
+    preview?: string
+    token?: string
+    preview_token?: string
+  }>
+}
+
+async function getLandingPage(slug: string, isAuthorizedAdmin: boolean) {
   const client = await clientPromise
   const page = await client
     .db("sjmedialabs")
     .collection<LandingPageRecord>("landingPages")
     .findOne({ slug, template: "Template 1" })
-  return page?.status === "Enabled" || preview ? page : null
+
+  if (!page) return null
+
+  // Published pages (status: "Enabled") are publicly visible to everyone
+  if (page.status === "Enabled") {
+    return page
+  }
+
+  // Unpublished / disabled pages are strictly restricted to authenticated admins & superadmins
+  if (isAuthorizedAdmin) {
+    return page
+  }
+
+  return null
 }
 
 export async function generateMetadata({
   params,
   searchParams,
-}: {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ preview?: string }>
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const [{ slug }, query] = await Promise.all([params, searchParams])
-  const isPreview = query.preview === "1"
-  const page = await getLandingPage(slug, isPreview)
+  const isAuthorizedAdmin = await isAdminOrSuperadmin(query.token || query.preview_token)
+  const page = await getLandingPage(slug, isAuthorizedAdmin)
+
   if (!page) {
-    if (slug === "template-1" && isPreview) {
+    // Template preview metadata only available for authorized admins
+    if (slug === "template-1" && isAuthorizedAdmin) {
       return {
         title: "Template 1 Preview | SJ Media Labs",
-        description: "UI Template 1 section-by-section preview",
+        description: "UI Template 1 section-by-section preview (CMS Preview)",
+        robots: { index: false, follow: false },
       }
     }
-    return { title: "Page not found" }
+    return {
+      title: "Page not found",
+      robots: { index: false, follow: false },
+    }
   }
 
-  const seoTitle = page.seoData?.title.trim() || page.title
-  const description = page.seoData?.description.trim()
+  const isUnpublished = page.status !== "Enabled"
+  const seoTitle = page.seoData?.title?.trim() || page.title
+  const description = page.seoData?.description?.trim()
   const keywords = page.seoData?.keywords
-    .split(",")
-    .map((keyword) => keyword.trim())
-    .filter(Boolean)
+    ?.split(",")
+    ?.map((keyword) => keyword.trim())
+    ?.filter(Boolean)
 
   return {
     title: seoTitle,
     ...(description ? { description } : {}),
     ...(keywords?.length ? { keywords } : {}),
+    ...(isUnpublished ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       title: seoTitle,
       ...(description ? { description } : {}),
@@ -74,24 +102,43 @@ export async function generateMetadata({
 export default async function LandingPageRoute({
   params,
   searchParams,
-}: {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ preview?: string }>
-}) {
+}: PageProps) {
   const [{ slug }, query] = await Promise.all([params, searchParams])
-  const isPreview = query.preview === "1"
-  const page = await getLandingPage(slug, isPreview)
+  const isAuthorizedAdmin = await isAdminOrSuperadmin(query.token || query.preview_token)
+  const page = await getLandingPage(slug, isAuthorizedAdmin)
+
   if (!page) {
-    if (slug === "template-1" && isPreview) {
-      return <Template1Page />
+    // Blueprint templates are never public; only accessible to authorized admins/superadmins
+    if (slug === "template-1" && isAuthorizedAdmin) {
+      return (
+        <>
+          <div className="bg-[#161617] text-[#FCC50E] border-b border-[#FCC50E]/30 px-4 py-2 text-xs font-medium text-center sticky top-0 z-50 flex items-center justify-center gap-2 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>CMS Preview • Template 1 Blueprint</span>
+            <span className="text-white/60">• Only visible to authenticated admins and superadmins</span>
+          </div>
+          <Template1Page />
+        </>
+      )
     }
     notFound()
   }
 
+  const isUnpublished = page.status !== "Enabled"
+
   return (
-    <Template1Page
-      data={page.sectionData}
-      enabledSections={page.enabledSections}
-    />
+    <>
+      {isUnpublished && isAuthorizedAdmin && (
+        <div className="bg-[#161617] text-[#FCC50E] border-b border-[#FCC50E]/30 px-4 py-2 text-xs font-medium text-center sticky top-0 z-50 flex items-center justify-center gap-2 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          <span>CMS Preview • Unpublished Page ({page.status})</span>
+          <span className="text-white/60">• Only visible to authenticated admins and superadmins</span>
+        </div>
+      )}
+      <Template1Page
+        data={page.sectionData}
+        enabledSections={page.enabledSections}
+      />
+    </>
   )
 }

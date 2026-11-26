@@ -1,15 +1,191 @@
-import React from "react"
+"use client"
+
+import React, { useCallback, useEffect, useState } from "react"
+import useEmblaCarousel from "embla-carousel-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
   type Template1ProcessData,
   type Template1ProcessStep,
   defaultTemplate1ProcessData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 
 export type { Template1ProcessData, Template1ProcessStep }
 
 export interface Template1ProcessSectionProps {
   data?: Template1ProcessData
   className?: string
+}
+
+function ProcessStepCard({
+  step,
+  position,
+}: {
+  step: Template1ProcessStep
+  position: number
+}) {
+  const stepNumber = String(position).padStart(2, "0")
+  return (
+    <div
+      style={{ borderTopColor: "rgba(255, 255, 255, 0.14)" }}
+      className="border-t pt-4 sm:pt-5 flex flex-col h-full"
+    >
+      <span className="text-[24px] sm:text-[28px] md:text-[30px] lg:text-[52px] font-semibold leading-none tracking-[-0.02em] text-[#FCC50E] mb-2 sm:mb-3">
+        {stepNumber}
+      </span>
+      <h3 className="text-[16px] sm:text-[17px] md:text-[18px] font-semibold text-white mb-1.5 sm:mb-2">
+        {step.title}
+      </h3>
+      <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-white/60">
+        {step.description}
+      </p>
+    </div>
+  )
+}
+
+function ProcessCarousel({ steps }: { steps: Template1ProcessStep[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    containScroll: "trimSnaps",
+    slidesToScroll: 1,
+  })
+
+  const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [canScrollNext, setCanScrollNext] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev()
+  }, [emblaApi])
+
+  const scrollNext = useCallback(() => {
+    emblaApi?.scrollNext()
+  }, [emblaApi])
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      emblaApi?.scrollTo(index)
+    },
+    [emblaApi]
+  )
+
+  const onSelect = useCallback((api: NonNullable<typeof emblaApi>) => {
+    setSelectedIndex(api.selectedScrollSnap())
+    setCanScrollPrev(api.canScrollPrev())
+    setCanScrollNext(api.canScrollNext())
+  }, [])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    const handleSelect = () => onSelect(emblaApi)
+    const handleReInit = () => {
+      onSelect(emblaApi)
+      setScrollSnaps(emblaApi.scrollSnapList())
+    }
+    handleReInit()
+    emblaApi.on("select", handleSelect)
+    emblaApi.on("reInit", handleReInit)
+    return () => {
+      emblaApi.off("select", handleSelect)
+      emblaApi.off("reInit", handleReInit)
+    }
+  }, [emblaApi, onSelect])
+
+  const hasMultipleSnaps = scrollSnaps.length > 1
+
+  return (
+    <div className="relative">
+      {/* Desktop Left Navigation Arrow */}
+      {hasMultipleSnaps && (
+        <button
+          type="button"
+          onClick={scrollPrev}
+          disabled={!canScrollPrev}
+          aria-label="Previous step"
+          className="hidden lg:flex absolute -left-6 xl:-left-13 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Desktop Right Navigation Arrow */}
+      {hasMultipleSnaps && (
+        <button
+          type="button"
+          onClick={scrollNext}
+          disabled={!canScrollNext}
+          aria-label="Next step"
+          className="hidden lg:flex absolute -right-6 xl:-right-13 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-md hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] hover:scale-105 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer active:scale-95"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Embla Viewport */}
+      <div
+        className={`overflow-hidden touch-pan-y select-none ${
+          hasMultipleSnaps ? "cursor-grab active:cursor-grabbing" : ""
+        }`}
+        ref={emblaRef}
+      >
+        <div className="flex -ml-6 sm:-ml-7 md:-ml-8 lg:-ml-8 xl:-ml-10">
+          {steps.map((step, index) => (
+            <div
+              key={step.id}
+              className="min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/4 pl-6 sm:pl-7 md:pl-8 lg:pl-8 xl:pl-10"
+            >
+              <ProcessStepCard step={step} position={index + 1} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Carousel Bottom Dots & Mobile/Tablet Navigation */}
+      {hasMultipleSnaps && (
+        <div className="flex items-center justify-center gap-3 lg:gap-1.5 mt-8 sm:mt-10">
+          {/* Mobile & Tablet Left Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            aria-label="Previous step"
+            className="flex lg:hidden w-9 h-9 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-sm hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex items-center gap-1.5">
+            {scrollSnaps.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => scrollTo(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === selectedIndex
+                    ? "w-7 bg-[#FCC50E]"
+                    : "w-2 bg-white/20 hover:bg-white/40"
+                }`}
+                aria-label={`Go to step group ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Mobile & Tablet Right Navigation Arrow */}
+          <button
+            type="button"
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            aria-label="Next step"
+            className="flex lg:hidden w-9 h-9 rounded-full border border-white/20 bg-[#1c1c1e] text-white shadow-sm hover:bg-[#FCC50E] hover:text-[#161617] hover:border-[#FCC50E] active:scale-95 disabled:opacity-20 disabled:pointer-events-none transition-all items-center justify-center cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function Template1ProcessSection({
@@ -36,7 +212,10 @@ export function Template1ProcessSection({
               {content.overline}
             </p>
           )}
-          <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] font-semibold leading-[1.14] tracking-[-0.02em] text-white">
+          <h2
+            className="text-[length:calc(28px*var(--landing-title-scale))] sm:text-[length:calc(34px*var(--landing-title-scale))] md:text-[length:calc(38px*var(--landing-title-scale))] lg:text-[length:calc(44px*var(--landing-title-scale))] xl:text-[length:calc(50px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-white"
+            style={landingTitleStyle(50, content.headlineFontSize)}
+          >
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}
@@ -45,26 +224,8 @@ export function Template1ProcessSection({
           </h2>
         </div>
 
-        {/* 4-Column Steps Grid: 1 col on mobile, 2 col on sm & md, 4 col on lg & up */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 md:gap-8 lg:gap-8 xl:gap-10">
-          {content.steps.map((step) => (
-            <div
-              key={step.id}
-              style={{ borderTopColor: "rgba(255, 255, 255, 0.14)" }}
-              className="border-t pt-4 sm:pt-5 flex flex-col"
-            >
-              <span className="text-[24px] sm:text-[28px] md:text-[30px] lg:text-[32px] font-semibold leading-none tracking-[-0.02em] text-[#FCC50E] mb-2 sm:mb-3">
-                {step.number}
-              </span>
-              <h3 className="text-[16px] sm:text-[17px] md:text-[18px] font-semibold text-white mb-1.5 sm:mb-2">
-                {step.title}
-              </h3>
-              <p className="text-[12.5px] sm:text-[13px] md:text-[13.5px] leading-[1.55] text-white/60">
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
+        {/* Responsive carousel (swipes on mobile/tablet and whenever > 4 steps) */}
+        {content.steps.length > 0 && <ProcessCarousel steps={content.steps} />}
       </div>
     </section>
   )

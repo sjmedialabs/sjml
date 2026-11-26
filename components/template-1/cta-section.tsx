@@ -6,6 +6,7 @@ import {
   type Template1LeadFormValues,
   defaultTemplate1CtaData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 import { Template1ConsultationModal } from "./consultation-modal"
 
 export type { Template1CtaData }
@@ -78,7 +79,10 @@ export function Template1CtaSection({
           )}
 
           {/* Headline */}
-          <h2 className="text-[32px] sm:text-[42px] md:text-[48px] lg:text-[56px] xl:text-[64px] 2xl:text-[72px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]">
+          <h2
+            className="text-[length:calc(32px*var(--landing-title-scale))] sm:text-[length:calc(42px*var(--landing-title-scale))] md:text-[length:calc(48px*var(--landing-title-scale))] lg:text-[length:calc(56px*var(--landing-title-scale))] xl:text-[length:calc(64px*var(--landing-title-scale))] 2xl:text-[length:calc(72px*var(--landing-title-scale))] font-semibold leading-[1.08] tracking-[-0.02em] text-[#161617]"
+            style={landingTitleStyle(72, content.headlineFontSize)}
+          >
             {headlineLines.map((line, index) => (
               <span key={index} className="block">
                 {line}
@@ -99,10 +103,10 @@ export function Template1CtaSection({
                 <button
                   type="button"
                   onClick={handleCtaButtonClick}
-                  className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                  className="group cursor-pointer w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
                 >
                   <span className="text-[#FCC50E]">{content.ctaText}</span>
-                  <ArrowUpRightIcon className="text-[#FCC50E]" />
+                  <ArrowUpRightIcon className="text-[#FCC50E] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </button>
               </div>
             )}

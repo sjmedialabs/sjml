@@ -32,6 +32,45 @@ const ICON_OPTIONS = [
   { value: "globe", label: "Globe / Global" },
 ]
 
+const HERO_OVER_TITLE_FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32]
+const HERO_TITLE_FONT_SIZES = [20, 24, 28, 32, 36, 40, 42, 48, 52, 56, 60, 64, 72, 80, 90, 100]
+const HERO_DESCRIPTION_FONT_SIZES = [12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28]
+const SERVICES_LABEL_FONT_SIZES = [8, 9, 10, 11, 12, 13, 14, 15, 16, 18]
+const SERVICES_SECTION_TITLE_FONT_SIZES = [24, 28, 32, 36, 38, 40, 44, 48, 52, 56]
+const SERVICES_SECTION_DESC_FONT_SIZES = [11, 12, 13, 14, 15, 16, 17, 18, 20, 22]
+const SERVICES_CARD_TITLE_FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24]
+const SERVICES_CARD_DESC_FONT_SIZES = [9, 10, 11, 12, 13, 14, 15, 16, 18]
+
+function FontSizeSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: number
+  options: number[]
+  onChange: (value: number) => void
+}) {
+  const opts = options.includes(value) ? options : [...options, value].sort((a, b) => a - b)
+  return (
+    <div>
+      <label className="block text-sm admin-text-secondary mb-2">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2 border"
+      >
+        {opts.map((size) => (
+          <option key={size} value={size}>
+            {size}px
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
 export function HomePageManager() {
   const [activeTab, setActiveTab] = useState<"hero" | "stats" | "services">("hero")
   const [hero, setHero] = useState<HomeHero>(createDefaultHero())
@@ -191,32 +230,38 @@ export function HomePageManager() {
               placeholder="SCROLL DOWN"
               className="admin-bg-tertiary admin-border-light admin-text-primary max-w-xs"
             />
-            <div className="grid sm:grid-cols-2 gap-4 max-w-md">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <FontSizeSelect
+                label="Over-title font size"
+                value={hero.overTitleFontSize ?? 14}
+                options={HERO_OVER_TITLE_FONT_SIZES}
+                onChange={(overTitleFontSize) => setHero({ ...hero, overTitleFontSize })}
+              />
+              <FontSizeSelect
+                label="Title font size"
+                value={hero.titleFontSize ?? 42}
+                options={HERO_TITLE_FONT_SIZES}
+                onChange={(titleFontSize) => setHero({ ...hero, titleFontSize })}
+              />
+              <FontSizeSelect
+                label="Description font size"
+                value={hero.descriptionFontSize ?? 16}
+                options={HERO_DESCRIPTION_FONT_SIZES}
+                onChange={(descriptionFontSize) => setHero({ ...hero, descriptionFontSize })}
+              />
               <div>
-                <label className="block text-sm admin-text-secondary mb-2">Hero title font size (px)</label>
-                <Input
-                  type="number"
-                  min={20}
-                  max={80}
-                  value={hero.titleFontSize ?? 42}
-                  onChange={(e) =>
-                    setHero({ ...hero, titleFontSize: Math.max(20, Math.min(80, Number(e.target.value) || 42)) })
-                  }
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-sm admin-text-secondary mb-2">Carousel max height (px)</label>
-                <Input
-                  type="number"
-                  min={300}
-                  max={800}
-                  value={hero.maxHeight ?? 500}
-                  onChange={(e) =>
-                    setHero({ ...hero, maxHeight: Math.max(300, Math.min(800, Number(e.target.value) || 500)) })
-                  }
-                  className="admin-bg-tertiary admin-border-light admin-text-primary"
-                />
+                <label className="block text-sm admin-text-secondary mb-2">Carousel min height</label>
+                <select
+                  value={hero.maxHeight ?? 700}
+                  onChange={(e) => setHero({ ...hero, maxHeight: Number(e.target.value) })}
+                  className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2 border"
+                >
+                  {[700, 750, 800, 850, 900].map((h) => (
+                    <option key={h} value={h}>
+                      {h}px
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div>
@@ -249,7 +294,11 @@ export function HomePageManager() {
           <div className="flex justify-between items-center gap-4 flex-wrap">
             <div>
               <h2 className="text-lg font-semibold admin-text-primary">Slides</h2>
-              <p className="text-sm admin-text-secondary">{hero.slides.length} slide{hero.slides.length !== 1 ? "s" : ""}</p>
+              <p className="text-sm admin-text-secondary">
+                {hero.slides.length} slide{hero.slides.length !== 1 ? "s" : ""}
+                {" · "}
+                {hero.slides.filter((s) => s.enabled).length} enabled on website
+              </p>
             </div>
             <Button type="button" onClick={addSlide}>
               <Plus className="w-4 h-4 mr-1" /> Add slide
@@ -528,118 +577,74 @@ export function HomePageManager() {
             <div className="border-t admin-border pt-4 mt-2">
               <h3 className="text-sm font-semibold admin-text-primary mb-3">Typography & card size</h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <FontSizeSelect
+                  label="Label font size"
+                  value={servicesSection.labelFontSize ?? 11}
+                  options={SERVICES_LABEL_FONT_SIZES}
+                  onChange={(labelFontSize) => setServicesSection({ ...servicesSection, labelFontSize })}
+                />
+                <FontSizeSelect
+                  label="Section title font size"
+                  value={servicesSection.sectionTitleFontSize ?? 38}
+                  options={SERVICES_SECTION_TITLE_FONT_SIZES}
+                  onChange={(sectionTitleFontSize) =>
+                    setServicesSection({ ...servicesSection, sectionTitleFontSize })
+                  }
+                />
+                <FontSizeSelect
+                  label="Description font size"
+                  value={servicesSection.sectionDescriptionFontSize ?? 15}
+                  options={SERVICES_SECTION_DESC_FONT_SIZES}
+                  onChange={(sectionDescriptionFontSize) =>
+                    setServicesSection({ ...servicesSection, sectionDescriptionFontSize })
+                  }
+                />
                 <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Label font size (px)</label>
-                  <Input
-                    type="number"
-                    min={8}
-                    max={18}
-                    value={servicesSection.labelFontSize ?? 11}
-                    onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        labelFontSize: Math.min(18, Math.max(8, Number(e.target.value) || 11)),
-                      })
-                    }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Section title font size (px)</label>
-                  <Input
-                    type="number"
-                    min={24}
-                    max={56}
-                    value={servicesSection.sectionTitleFontSize ?? 38}
-                    onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        sectionTitleFontSize: Math.min(56, Math.max(24, Number(e.target.value) || 38)),
-                      })
-                    }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Description font size (px)</label>
-                  <Input
-                    type="number"
-                    min={11}
-                    max={22}
-                    value={servicesSection.sectionDescriptionFontSize ?? 15}
-                    onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        sectionDescriptionFontSize: Math.min(22, Math.max(11, Number(e.target.value) || 15)),
-                      })
-                    }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Card width (px)</label>
-                  <Input
-                    type="number"
-                    min={150}
-                    max={320}
+                  <label className="block text-sm admin-text-secondary mb-2">Card width</label>
+                  <select
                     value={servicesSection.cardWidth ?? 190}
                     onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        cardWidth: Math.min(320, Math.max(150, Number(e.target.value) || 190)),
-                      })
+                      setServicesSection({ ...servicesSection, cardWidth: Number(e.target.value) })
                     }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
+                    className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2 border"
+                  >
+                    {[150, 170, 190, 210, 240, 280, 320].map((w) => (
+                      <option key={w} value={w}>
+                        {w}px
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Card height (px)</label>
-                  <Input
-                    type="number"
-                    min={160}
-                    max={360}
+                  <label className="block text-sm admin-text-secondary mb-2">Card height</label>
+                  <select
                     value={servicesSection.cardHeight ?? 220}
                     onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        cardHeight: Math.min(360, Math.max(160, Number(e.target.value) || 220)),
-                      })
+                      setServicesSection({ ...servicesSection, cardHeight: Number(e.target.value) })
                     }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
+                    className="w-full admin-bg-tertiary admin-border-light admin-text-primary rounded px-3 py-2 border"
+                  >
+                    {[160, 180, 200, 220, 260, 300, 360].map((h) => (
+                      <option key={h} value={h}>
+                        {h}px
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Card title font size (px)</label>
-                  <Input
-                    type="number"
-                    min={10}
-                    max={24}
-                    value={servicesSection.cardTitleFontSize ?? 13}
-                    onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        cardTitleFontSize: Math.min(24, Math.max(10, Number(e.target.value) || 13)),
-                      })
-                    }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm admin-text-secondary mb-2">Card description font size (px)</label>
-                  <Input
-                    type="number"
-                    min={9}
-                    max={18}
-                    value={servicesSection.cardDescriptionFontSize ?? 11}
-                    onChange={(e) =>
-                      setServicesSection({
-                        ...servicesSection,
-                        cardDescriptionFontSize: Math.min(18, Math.max(9, Number(e.target.value) || 11)),
-                      })
-                    }
-                    className="admin-bg-tertiary admin-border-light admin-text-primary"
-                  />
-                </div>
+                <FontSizeSelect
+                  label="Card title font size"
+                  value={servicesSection.cardTitleFontSize ?? 13}
+                  options={SERVICES_CARD_TITLE_FONT_SIZES}
+                  onChange={(cardTitleFontSize) => setServicesSection({ ...servicesSection, cardTitleFontSize })}
+                />
+                <FontSizeSelect
+                  label="Card description font size"
+                  value={servicesSection.cardDescriptionFontSize ?? 11}
+                  options={SERVICES_CARD_DESC_FONT_SIZES}
+                  onChange={(cardDescriptionFontSize) =>
+                    setServicesSection({ ...servicesSection, cardDescriptionFontSize })
+                  }
+                />
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">

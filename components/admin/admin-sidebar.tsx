@@ -394,6 +394,7 @@ export default function AdminSidebar({ activeSection, setActiveSection }: AdminS
   const router = useRouter()
 
   const handleLogout = () => {
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
     localStorage.removeItem("adminToken")
     router.push("/admin/login")
   }

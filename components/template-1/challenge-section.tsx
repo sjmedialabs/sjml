@@ -4,6 +4,7 @@ import {
   type Template1ChallengeItem,
   defaultTemplate1ChallengeData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 
 export type { Template1ChallengeData, Template1ChallengeItem }
 
@@ -41,7 +42,10 @@ export function Template1ChallengeSection({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-10 lg:gap-12 xl:gap-16 items-start">
           {/* Left Column */}
           <div className="md:col-span-6 lg:col-span-6 xl:col-span-6">
-            <h2 className="text-[30px] sm:text-[38px] md:text-[42px] lg:text-[48px] xl:text-[54px] 2xl:text-[60px] font-medium leading-[1.12] tracking-[-0.02em] text-white mb-5 sm:mb-7">
+            <h2
+              className="text-[length:calc(30px*var(--landing-title-scale))] sm:text-[length:calc(38px*var(--landing-title-scale))] md:text-[length:calc(42px*var(--landing-title-scale))] lg:text-[length:calc(48px*var(--landing-title-scale))] xl:text-[length:calc(54px*var(--landing-title-scale))] 2xl:text-[length:calc(60px*var(--landing-title-scale))] font-medium leading-[1.12] tracking-[-0.02em] text-white mb-5 sm:mb-7"
+              style={landingTitleStyle(60, content.headlineFontSize)}
+            >
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}

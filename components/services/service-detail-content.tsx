@@ -4,16 +4,13 @@ import { SectionLabel } from "@/components/about/section-label"
 import { ServiceDetailFeatureIcon, ServiceDetailProcessIcon } from "./service-detail-icons"
 import { ServiceDetailBottomCta } from "./service-detail-sidebar"
 
-function ServiceDetailTitle({ title, fontSize }: { title: string; fontSize: number }) {
-  const words = title.trim().split(/\s+/)
-  const firstWord = words[0] ?? title
-  const rest = words.slice(1).join(" ")
-
+function CheckBullet() {
   return (
-    <h1 className="font-bold text-black mb-5 leading-tight" style={{ fontSize: `${fontSize}px` }}>
-      <span className="service-detail-title-underline">{firstWord}</span>
-      {rest ? ` ${rest}` : ""}
-    </h1>
+    <span className="service-offering-check shrink-0 mt-0.5 text-home-primary" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
   )
 }
 
@@ -21,61 +18,150 @@ export function ServiceDetailContent({ template }: { template: ServiceDetailTemp
   const t = template.typography
 
   return (
-    <div className="service-detail-content space-y-12 md:space-y-14">
-      <section className="service-detail-intro">
-        <div className="service-detail-intro-grid">
-          <div className="min-w-0">
-            {template.categoryLabel && (
-              <SectionLabel fontSize={t.categoryLabelFontSize}>{template.categoryLabel}</SectionLabel>
-            )}
-            <ServiceDetailTitle title={template.title} fontSize={t.titleFontSize} />
-            {template.introParagraph1 && (
-              <p className="text-black/75 leading-relaxed max-w-xl" style={{ fontSize: `${t.introFontSize}px` }}>
-                {template.introParagraph1}
-              </p>
-            )}
-            {template.introParagraph2 && (
-              <p className="text-black/75 leading-relaxed max-w-xl mt-3" style={{ fontSize: `${t.introFontSize}px` }}>
-                {template.introParagraph2}
-              </p>
-            )}
-          </div>
-          {template.introImage && (
-            <div className="service-detail-intro-media flex items-start justify-center lg:justify-end pt-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={template.introImage} alt="" className="service-detail-intro-image max-w-full h-auto rounded-xl" />
-            </div>
+    <div className="service-detail-content space-y-8 md:space-y-9">
+      {(template.introHeading || template.introParagraph1 || template.introParagraph2) && (
+        <section className="service-detail-intro max-w-3xl">
+          {template.introHeading && (
+            <h2
+              className="font-bold text-black leading-tight mb-2.5"
+              style={{ fontSize: `${t.introHeadingFontSize}px` }}
+            >
+              {template.introHeading}
+            </h2>
           )}
-        </div>
-      </section>
+          {template.introParagraph1 && (
+            <p className="text-black/75 leading-relaxed" style={{ fontSize: `${t.introFontSize}px` }}>
+              {template.introParagraph1}
+            </p>
+          )}
+          {template.introParagraph2 && (
+            <p className="text-black/75 leading-relaxed mt-2" style={{ fontSize: `${t.introFontSize}px` }}>
+              {template.introParagraph2}
+            </p>
+          )}
+        </section>
+      )}
 
-      {template.features.length > 0 && (
-        <section className="service-features-row" aria-label="Service features">
-          {template.features.map((feature, index) => (
-            <div key={feature.id} className="service-feature-cell">
-              <div className="mb-3">
-                <ServiceDetailFeatureIcon icon={feature.icon} size={t.featureIconSize} />
+      {template.offeringsEnabled && template.offerings.length > 0 && (
+        <section className="service-offerings-section">
+          <h2 className="font-bold text-black mb-4 leading-tight" style={{ fontSize: `${t.sectionTitleFontSize}px` }}>
+            {template.offeringsTitle}
+          </h2>
+          <div className="space-y-3">
+            {template.offerings.map((offering) => (
+              <article key={offering.id} className="service-offering-card border border-black/10 rounded-xl p-4 md:p-5">
+                <div className="service-offering-card-grid">
+                  <div className="min-w-0">
+                    <div className="flex items-start gap-3 mb-2">
+                      <ServiceDetailFeatureIcon icon={offering.icon} size={t.featureIconSize} />
+                      <h3 className="font-bold text-black leading-snug pt-1" style={{ fontSize: `${t.offeringTitleFontSize}px` }}>
+                        {offering.title}
+                      </h3>
+                    </div>
+                    {offering.description && (
+                      <p className="text-black/65 leading-relaxed" style={{ fontSize: `${t.offeringDescriptionFontSize}px` }}>
+                        {offering.description}
+                      </p>
+                    )}
+                  </div>
+                  {offering.points.length > 0 && (
+                    <ul className="space-y-2.5 md:pl-4 md:border-l md:border-black/8">
+                      {offering.points.map((point) => (
+                        <li key={point} className="flex items-start gap-2 text-sm text-black/75 leading-snug">
+                          <CheckBullet />
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {template.valuesEnabled && template.values.length > 0 && (
+        <section className="service-values-section">
+          <h2 className="font-bold text-black mb-4 leading-tight" style={{ fontSize: `${t.sectionTitleFontSize}px` }}>
+            {template.valuesTitle}
+          </h2>
+          <div className="service-values-grid">
+            {template.values.map((item) => (
+              <div key={item.id} className="service-value-cell">
+                <div className="mb-2">
+                  <ServiceDetailFeatureIcon icon={item.icon} size={t.featureIconSize} />
+                </div>
+                <h3 className="font-bold text-black mb-1.5 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
+                  {item.title}
+                </h3>
+                {item.description && (
+                  <p className="text-black/65 leading-relaxed" style={{ fontSize: `${t.featureDescriptionFontSize}px` }}>
+                    {item.description}
+                  </p>
+                )}
               </div>
-              <h2 className="font-bold text-black mb-2 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
-                {feature.title}
-              </h2>
-              {feature.description && (
-                <p className="text-black/65 leading-relaxed" style={{ fontSize: `${t.featureDescriptionFontSize}px` }}>
-                  {feature.description}
-                </p>
-              )}
-              {index < template.features.length - 1 && (
-                <span className="service-feature-divider hidden lg:block" aria-hidden="true" />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
+        </section>
+      )}
+
+      {template.audiencesEnabled && template.audiences.length > 0 && (
+        <section className="service-audiences-section">
+          <h2 className="font-bold text-black mb-4 leading-tight" style={{ fontSize: `${t.sectionTitleFontSize}px` }}>
+            {template.audiencesTitle}
+          </h2>
+          <div className="service-audiences-grid">
+            {template.audiences.map((item) => (
+              <div key={item.id} className="service-audience-card border border-black/10 rounded-xl p-4 text-center">
+                <div className="mb-2 flex justify-center">
+                  <ServiceDetailFeatureIcon icon={item.icon} size={t.featureIconSize} />
+                </div>
+                <h3 className="font-bold text-black mb-1 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
+                  {item.title}
+                </h3>
+                {item.description && (
+                  <p className="text-black/60 leading-relaxed" style={{ fontSize: `${t.featureDescriptionFontSize}px` }}>
+                    {item.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {template.highlightsEnabled && template.features.length > 0 && (
+        <section className="service-highlights-section">
+          {template.highlightsTitle && (
+            <h2 className="font-bold text-black mb-4 leading-tight" style={{ fontSize: `${t.sectionTitleFontSize}px` }}>
+              {template.highlightsTitle}
+            </h2>
+          )}
+          <div className="service-highlights-grid">
+            {template.features.map((feature) => (
+              <div key={feature.id} className="service-highlight-card rounded-xl p-4 bg-[color-mix(in_srgb,var(--home-primary)_18%,white)]">
+                <div className="mb-2">
+                  <ServiceDetailFeatureIcon icon={feature.icon} size={t.featureIconSize} />
+                </div>
+                <h3 className="font-bold text-black mb-1.5 leading-snug" style={{ fontSize: `${t.featureTitleFontSize}px` }}>
+                  {feature.title}
+                </h3>
+                {feature.description && (
+                  <p className="text-black/65 leading-relaxed" style={{ fontSize: `${t.featureDescriptionFontSize}px` }}>
+                    {feature.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
       {template.processSteps.length > 0 && (
         <section className="service-process-section">
           <SectionLabel fontSize={t.processLabelFontSize}>{template.processLabel}</SectionLabel>
-          <h2 className="font-bold text-black mb-10 leading-tight" style={{ fontSize: `${t.processTitleFontSize}px` }}>
+          <h2 className="font-bold text-black mb-6 leading-tight" style={{ fontSize: `${t.processTitleFontSize}px` }}>
             {template.processTitleLine1}{" "}
             <span className="text-home-primary">{template.processTitleHighlight}</span>
           </h2>

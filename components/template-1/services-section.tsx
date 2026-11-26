@@ -1,12 +1,14 @@
 "use client"
 
 import React, { useState } from "react"
+import { ChevronDown } from "lucide-react"
 import {
   type Template1ServicesData,
   type Template1ServiceItem,
   type Template1LeadFormValues,
   defaultTemplate1ServicesData,
 } from "./default-data"
+import { landingTitleStyle } from "./title-size"
 import { Template1ConsultationModal } from "./consultation-modal"
 
 export type { Template1ServicesData, Template1ServiceItem }
@@ -40,6 +42,53 @@ function ArrowUpRightIcon({ className }: { className?: string }) {
   )
 }
 
+function ServiceRow({
+  service,
+  position,
+}: {
+  service: Template1ServiceItem
+  position: number
+}) {
+  const titleLines = service.title.split("\n")
+  const serviceNumber = String(position).padStart(2, "0")
+  return (
+    <div
+      key={service.id}
+      className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 md:gap-6 lg:gap-8 py-5 sm:py-6 md:py-7 lg:py-8 items-start"
+    >
+      {/* Number */}
+      <div className="md:col-span-1">
+        <span className="text-[22px] sm:text-[28px] md:text-[34px] lg:text-[40px] font-medium leading-none text-[#161617]/40">
+          {serviceNumber}
+        </span>
+      </div>
+
+      {/* Title & Tags */}
+      <div className="md:col-span-5 lg:col-span-5">
+        <h3 className="text-[18px] sm:text-[20px] md:text-[21px] lg:text-[22px] xl:text-[24px] font-semibold leading-[1.2] tracking-[-0.01em] text-[#161617]">
+          {titleLines.map((line, index) => (
+            <span key={index} className="block">
+              {line}
+            </span>
+          ))}
+        </h3>
+        {service.tags && (
+          <p className="mt-2 sm:mt-2.5 text-[9.5px] sm:text-[10px] md:text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#161617]/45">
+            {service.tags}
+          </p>
+        )}
+      </div>
+
+      {/* Description */}
+      <div className="md:col-span-6 lg:col-span-6">
+        <p className="text-[13px] sm:text-[13.5px] md:text-[14px] lg:text-[14.5px] leading-[1.6] text-[#161617]/70 max-w-[520px]">
+          {service.description}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function Template1ServicesSection({
   data,
   onCtaClick,
@@ -47,6 +96,7 @@ export function Template1ServicesSection({
   className = "",
 }: Template1ServicesSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const content = {
     ...defaultTemplate1ServicesData,
@@ -55,6 +105,10 @@ export function Template1ServicesSection({
   }
 
   const headlineLines = content.headline.split("\n")
+  const allServices = content.services
+  const initialServices = allServices.slice(0, 4)
+  const extraServices = allServices.slice(4)
+  const hasMore = extraServices.length > 0
 
   const handleCtaButtonClick = () => {
     if (onCtaClick) {
@@ -77,7 +131,10 @@ export function Template1ServicesSection({
                 {content.overline}
               </p>
             )}
-            <h2 className="text-[28px] sm:text-[34px] md:text-[38px] lg:text-[44px] xl:text-[50px] 2xl:text-[54px] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-2.5 sm:mb-3">
+            <h2
+              className="text-[length:calc(28px*var(--landing-title-scale))] sm:text-[length:calc(34px*var(--landing-title-scale))] md:text-[length:calc(38px*var(--landing-title-scale))] lg:text-[length:calc(44px*var(--landing-title-scale))] xl:text-[length:calc(50px*var(--landing-title-scale))] 2xl:text-[length:calc(54px*var(--landing-title-scale))] font-semibold leading-[1.14] tracking-[-0.02em] text-[#161617] mb-2.5 sm:mb-3"
+              style={landingTitleStyle(54, content.headlineFontSize)}
+            >
               {headlineLines.map((line, index) => (
                 <span key={index} className="block">
                   {line}
@@ -91,48 +148,59 @@ export function Template1ServicesSection({
             )}
           </div>
 
-          {/* Services Rows */}
+          {/* First 4 Services Rows */}
           <div className="divide-y divide-black/12 border-t border-b border-black/12">
-            {content.services.map((service) => {
-              const titleLines = service.title.split("\n")
-              return (
-                <div
-                  key={service.id}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 md:gap-6 lg:gap-8 py-5 sm:py-6 md:py-7 lg:py-8 items-start"
-                >
-                  {/* Number */}
-                  <div className="md:col-span-1">
-                    <span className="text-[22px] sm:text-[28px] md:text-[34px] lg:text-[40px] font-medium leading-none text-[#161617]/40">
-                      {service.number}
-                    </span>
-                  </div>
+            {initialServices.map((service, index) => (
+              <ServiceRow key={service.id} service={service} position={index + 1} />
+            ))}
+          </div>
 
-                  {/* Title & Tags */}
-                  <div className="md:col-span-5 lg:col-span-5">
-                    <h3 className="text-[18px] sm:text-[20px] md:text-[21px] lg:text-[22px] xl:text-[24px] font-semibold leading-[1.2] tracking-[-0.01em] text-[#161617]">
-                      {titleLines.map((line, index) => (
-                        <span key={index} className="block">
-                          {line}
-                        </span>
-                      ))}
-                    </h3>
-                    {service.tags && (
-                      <p className="mt-2 sm:mt-2.5 text-[9.5px] sm:text-[10px] md:text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#161617]/45">
-                        {service.tags}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  <div className="md:col-span-6 lg:col-span-6">
-                    <p className="text-[13px] sm:text-[13.5px] md:text-[14px] lg:text-[14.5px] leading-[1.6] text-[#161617]/70 max-w-[520px]">
-                      {service.description}
-                    </p>
+          {/* Accordion for Additional Services (> 4) */}
+          {hasMore && (
+            <>
+              <div
+                id="additional-services-accordion"
+                className={`grid transition-[grid-template-rows,opacity] duration-500 ease-in-out ${
+                  isExpanded
+                    ? "grid-rows-[1fr] opacity-100"
+                    : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                }`}
+                aria-hidden={!isExpanded}
+              >
+                <div className="overflow-hidden">
+                  <div className="divide-y divide-black/12 border-b border-black/12">
+                    {extraServices.map((service, index) => (
+                      <ServiceRow
+                        key={service.id}
+                        service={service}
+                        position={initialServices.length + index + 1}
+                      />
+                    ))}
                   </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+
+              {/* See More / See Less Toggle Button */}
+              <div className="mt-6 sm:mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded((prev) => !prev)}
+                  aria-expanded={isExpanded}
+                  aria-controls="additional-services-accordion"
+                  className="group inline-flex items-center gap-2 rounded-[4px] border border-black/15 bg-white px-5 sm:px-6 py-3 text-[13px] font-medium text-[#161617] transition-all duration-200 hover:bg-[#161617] hover:text-[#FCC50E] hover:border-[#161617] hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] cursor-pointer"
+                >
+                  <span>{isExpanded ? "See Less" : "See More"}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                      isExpanded
+                        ? "rotate-180 text-inherit"
+                        : "text-[#161617]/60 group-hover:text-[#FCC50E]"
+                    }`}
+                  />
+                </button>
+              </div>
+            </>
+          )}
 
           {/* Bottom CTA Button */}
           {content.ctaText && (
@@ -140,10 +208,10 @@ export function Template1ServicesSection({
               <button
                 type="button"
                 onClick={handleCtaButtonClick}
-                className="w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-colors hover:bg-[#2a2a2c]"
+                className="group cursor-pointer w-full sm:w-auto flex sm:inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-[4px] bg-[#161617] px-5 sm:px-6 py-3.5 sm:py-3.5 text-[13px] sm:text-[13px] font-medium text-[#FCC50E] transition-all duration-200 hover:bg-[#2a2a2c] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98]"
               >
                 <span className="text-[#FCC50E]">{content.ctaText}</span>
-                <ArrowUpRightIcon className="text-[#FCC50E]" />
+                <ArrowUpRightIcon className="text-[#FCC50E] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </div>
           )}
