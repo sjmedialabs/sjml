@@ -15,6 +15,10 @@ import {
 import { normalizeWorkGridItem, type WorkGridItem } from "@/lib/work-grid-item"
 import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
+import {
+  resolveImageSpec,
+  type ImageUploadSpec,
+} from "@/lib/admin-media-specs"
 
 interface Template1SectionEditorProps {
   data: Template1PageData
