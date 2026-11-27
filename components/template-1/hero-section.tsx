@@ -227,7 +227,7 @@ export function Template1HeroSection({
                 </div>
               </div>
 
-              <div className="mt-7 sm:mt-8 flex items-end justify-between gap-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
+              <div className="mt-7 sm:mt-8 flex items-end justify-between gap-4">
                 {/* Trust Line */}
                 {content.trustText && (
                   <div className="max-w-[360px] md:max-w-full xl:max-w-[400px]">

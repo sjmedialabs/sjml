@@ -13,6 +13,7 @@ import {
   type Template1SectionVisibility,
 } from "@/components/template-1/default-data"
 import { normalizeWorkGridItem, type WorkGridItem } from "@/lib/work-grid-item"
+import { normalizeFooterContent } from "@/lib/footer-content"
 import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import type { LandingPageSeo } from "@/lib/landing-pages"
 import {
