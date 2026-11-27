@@ -65,7 +65,7 @@ export function WorkDetailGallery({ template }: { template: WorkDetailTemplate }
     if (!emblaApi || len <= 1 || isHovered || lightboxIndex !== null) return
     const timer = setInterval(() => {
       emblaApi.scrollNext()
-    }, 2000)
+    }, 1500)
     return () => clearInterval(timer)
   }, [emblaApi, len, isHovered, lightboxIndex])
 

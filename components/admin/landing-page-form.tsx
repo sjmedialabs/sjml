@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import { ArrowLeft, CheckCircle2, Eye, LoaderCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   defaultTemplate1PageData,
@@ -12,6 +11,7 @@ import {
   type Template1PageData,
   type Template1SectionVisibility,
 } from "@/components/template-1/default-data"
+import { validatePhoneTextWithCountryCode } from "@/components/template-1/form-validation"
 import { defaultLandingPageSeo, type LandingPageSeo } from "@/lib/landing-pages"
 import { AdminRequiredFieldMessage } from "@/components/admin/admin-required-field-message"
 import {
@@ -232,7 +232,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
   }
 
   const pageDetails = (
-    <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
+    <div className="grid gap-x-5 px-4 py-2 gap-y-4 sm:grid-cols-2">
       <div className="block">
         <label htmlFor="landing-page-title" className="mb-2 block text-base font-normal text-[#525252]">
           Title
@@ -335,7 +335,7 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
   return (
     <section className="min-h-[calc(100vh-4rem)] -m-8 w-full min-w-0 bg-[#f5f7fa] p-5 text-[#161617]">
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4" data-admin-sticky-header>
-        <div>
+        <div className="pl-4">
           <button
             onClick={onCancel}
             type="button"
@@ -352,11 +352,10 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
               : "Enter basic details to create a page. You can customize its sections afterward."}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="mr-4 flex flex-col items-end gap-2">
           <button
             className="rounded bg-[#FCC50E] px-5 py-2.5 text-sm font-semibold text-[#161617] hover:bg-[#eab800] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isSaving || (Boolean(page) && !hasChanges)}
-            data-admin-sticky-save
             form="landing-page-form"
             type="submit"
           >
@@ -424,48 +423,6 @@ export function LandingPageForm({ page, onCancel, onAction, onSaved }: LandingPa
         </div>
       )}
 
-      {/* Sticky Footer Actions */}
-      <div className="sticky bottom-4 z-30 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border admin-border admin-card px-6 py-4 shadow-lg">
-        <p className="text-sm admin-text-secondary">
-          {page
-            ? hasChanges
-              ? "You have unsaved changes."
-              : `Configure the ${template} sections and SEO metadata above.`
-            : `Your page will be created using ${template} (${templateOnePageSections} editable sections).`}
-        </p>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              onAction("Page editing cancelled")
-              onCancel()
-            }}
-            className="admin-border-light admin-text-secondary hover:admin-bg-secondary bg-transparent"
-            type="button"
-          >
-            Cancel
-          </Button>
-          <Button
-            size="sm"
-            disabled={isSaving || (Boolean(page) && !hasChanges)}
-            onClick={() => void createPage()}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-            type="button"
-          >
-            {isSaving ? (
-              <>
-                <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
-                {page ? "Saving..." : "Creating..."}
-              </>
-            ) : page ? (
-              "Save Changes"
-            ) : (
-              "Create Page"
-            )}
-          </Button>
-        </div>
-      </div>
       </form>
     </section>
   )

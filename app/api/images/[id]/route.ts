@@ -1,12 +1,10 @@
-import { execFile } from "child_process"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
-import { promisify } from "util"
 import { type NextRequest, NextResponse } from "next/server"
+import sharp from "sharp"
 import { downloadFromGridFS, deleteFromGridFS } from "@/lib/gridfs"
 import { verifyToken } from "@/lib/jwt"
 
-const execFileAsync = promisify(execFile)
 const IMAGE_CACHE_DIR = path.join(process.cwd(), ".image-cache")
 const COMPRESS_OVER_BYTES = 280 * 1024
 
@@ -37,21 +35,12 @@ async function compressedImage(id: string, buffer: Buffer, filename: string, con
     // Cache miss.
   }
 
-  const sourcePath = path.join(IMAGE_CACHE_DIR, `${id}.src`)
-  const outputPath = path.join(IMAGE_CACHE_DIR, `${id}.tmp.webp`)
-  await writeFile(sourcePath, buffer)
   try {
-    await execFileAsync("convert", [
-      sourcePath,
-      "-auto-orient",
-      "-resize",
-      "1600x1600>",
-      "-strip",
-      "-quality",
-      "72",
-      outputPath,
-    ])
-    const optimized = await readFile(outputPath)
+    const optimized = await sharp(buffer)
+      .rotate()
+      .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 72 })
+      .toBuffer()
     if (optimized.length === 0 || optimized.length >= buffer.length) return null
     await writeFile(cachedPath, optimized)
     return { buffer: optimized, contentType: "image/webp" }

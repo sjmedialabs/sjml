@@ -78,6 +78,14 @@ function formatISTDateTime(dateString: string): string {
   }
 }
 
+function openLandingPagePreview(route: string) {
+  const previewUrl = new URL(route, window.location.origin)
+  previewUrl.searchParams.set("preview", "1")
+  const token = localStorage.getItem("adminToken")
+  if (token) previewUrl.searchParams.set("preview_token", token)
+  window.open(previewUrl.toString(), "_blank", "noopener,noreferrer")
+}
+
 export function LandingPagesManager() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -331,6 +339,10 @@ export function LandingPagesManager() {
                       <a
                         className="admin-text-primary font-medium hover:text-primary transition-colors block"
                         href={`${page.route}?preview=1`}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          openLandingPagePreview(page.route)
+                        }}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -341,6 +353,10 @@ export function LandingPagesManager() {
                       <a
                         className="admin-text-secondary hover:text-primary transition-colors text-sm font-mono"
                         href={`${page.route}?preview=1`}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          openLandingPagePreview(page.route)
+                        }}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -375,7 +391,15 @@ export function LandingPagesManager() {
                           asChild
                           className="admin-border-light admin-text-secondary hover:admin-bg-secondary h-8 px-2.5 text-xs bg-transparent"
                         >
-                          <a href={`${page.route}?preview=1`} target="_blank" rel="noreferrer">
+                          <a
+                            href={`${page.route}?preview=1`}
+                            onClick={(event) => {
+                              event.preventDefault()
+                              openLandingPagePreview(page.route)
+                            }}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             <Eye className="w-3.5 h-3.5 mr-1" /> Preview
                           </a>
                         </Button>
